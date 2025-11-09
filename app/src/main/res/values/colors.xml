@@ -2,4 +2,19 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- App specific colors -->
+    <color name="background_light">#FCFCFC</color>
+    <color name="text_primary">#2C2C2C</color>
+    <color name="text_secondary">#252525</color>
+    <color name="hint_text">#80000000</color>
+    <color name="input_background">#33C4C4C4</color>
+    <color name="button_primary">#2C2C2C</color>
+    <color name="button_text">#FCFCFC</color>
+    <color name="link_color">#3F78E0</color>
+    <color name="checkbox_border">#CBCBCB</color>
+    
+    <!-- Login button gradient colors -->
+    <color name="gradient_start">#3F78E0</color>
+    <color name="gradient_end">#00D4FF</color>
 </resources>
