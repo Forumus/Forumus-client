@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="20dp"
+    android:viewportWidth="28"
+    android:viewportHeight="20">
+    <!-- Placeholder for logo vector, replace with actual SVG path -->
+    <path
+        android:fillColor="#3F78E0"
+        android:pathData="M14,4a8,8 0 1,0 0,16a8,8 0 1,0 0,-16z" />
+</vector>

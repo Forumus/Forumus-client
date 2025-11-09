@@ -38,4 +38,18 @@
     <string name="new_member">New Member?</string>
     <string name="register_now">Register now</string>
     <string name="new_member_register">New Member? Register now</string>
+
+    <!-- Success screen -->
+    <string name="success">Success</string>
+    <string name="success_congratulations">Congratulations! You have been successfully authenticated</string>
+    <string name="finish">Finish</string>
+    <string name="success_icon">Success icon</string>
+
+    <!-- Welcome screen -->
+    <string name="get_started">Get started</string>
+    <string name="privacy_policy_text">By providing your information, you consent to the processing of your data in accordance with our <u>Privacy Policy</u></string>
+
+    <!-- Slide screen -->
+    <string name="slide_title">Learn Together</string>
+    <string name="slide_subtitle">Discover topics you care about, ask questions, and get insights from real learners and experts.</string>
 </resources>

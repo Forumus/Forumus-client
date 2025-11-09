@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <font-family xmlns:android="http://schemas.android.com/apk/res/android">
-    <font android:fontWeight="500" android:font="serif" />
+    <font android:fontWeight="400" android:font="serif" />
 </font-family>
