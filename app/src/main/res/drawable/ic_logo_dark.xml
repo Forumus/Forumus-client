@@ -4,17 +4,6 @@
     android:height="46dp"
     android:viewportWidth="63"
     android:viewportHeight="46">
-    <!-- This is a placeholder logo - replace with actual logo -->
-<!--    <path-->
-<!--        android:fillColor="@color/text_primary"-->
-<!--        android:pathData="M31.5,23m-20,0a20,20 0,1 1,40 0a20,20 0,1 1,-40 0" />-->
-<!--    <path-->
-<!--        android:fillColor="@color/background_light"-->
-<!--        android:pathData="M31.5,15L31.5,31M23.5,23L39.5,23"-->
-<!--        android:strokeWidth="2"-->
-<!--        android:strokeColor="@color/background_light"-->
-<!--        android:strokeLineCap="round"/>-->
-    <!-- Logo paths converted from SVG -->
         <path
             android:fillColor="#2C2C2C"
             android:pathData="M63 14.7355C63 15.6896 62.2806 16.4855 61.3389 16.6387C47.2179 18.9353 36.069 30.1476 33.7908 44.3452C33.6402 45.2832 32.848 46 31.898 46C30.7968 46 29.9321 45.0476 30.1003 43.9594C32.5649 28.0155 45.0901 15.4173 60.947 12.9299C62.0413 12.7582 63 13.6277 63 14.7355Z" />
