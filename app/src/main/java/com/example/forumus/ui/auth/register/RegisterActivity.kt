@@ -1,40 +1,119 @@
 package com.example.forumus.ui.auth.register
 
+import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.SpannableString
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
-import android.widget.TextView
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.ContextCompat
 import com.example.forumus.R
+import com.example.forumus.data.model.UserRole
+import com.example.forumus.databinding.ActivityRegisterBinding
+import com.example.forumus.ui.auth.login.LoginActivity
+import com.example.forumus.ui.auth.verification.VerificationActivity
+import com.example.forumus.utils.Resource
 
 class RegisterActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityRegisterBinding
+    private val viewModel: RegisterViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_register)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        setupClickListeners()
+        setupLoginText()
+        observeRegisterState()
+    }
+
+    private fun setupClickListeners() {
+        binding.btnRegister.setOnClickListener {
+            val fullName = binding.etFullName.text.toString().trim()
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString()
+            val confirmPassword = binding.etConfirmPassword.text.toString()
+            val isTermsAccepted = binding.cbTerms.isChecked
+
+            val role = when (binding.rgRole.checkedRadioButtonId) {
+                binding.rbTeacher.id -> UserRole.TEACHER
+                else -> UserRole.STUDENT
+            }
+
+            if (!isTermsAccepted) {
+                Toast.makeText(this, "Please accept the Terms and Conditions", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            viewModel.register(fullName, email, password, confirmPassword, role)
         }
+    }
+
+    private fun observeRegisterState() {
+        viewModel.registerState.observe(this) { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    showLoading(true)
+                }
+
+                is Resource.Success -> {
+                    showLoading(false)
+                    val email = binding.etEmail.text.toString().trim()
+                    val intent = Intent(this, VerificationActivity::class.java)
+                    intent.putExtra(VerificationActivity.EXTRA_EMAIL, email)
+                    startActivity(intent)
+                    finish() // Close registration activity
+                }
+
+                is Resource.Error -> {
+                    showLoading(false)
+                    Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+//        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        binding.btnRegister.isEnabled = !isLoading
     }
 
     private fun setupLoginText() {
-        val loginTv = findViewById<TextView>(R.id.tv_log_in)
-        val spanString = SpannableString(getString(R.string.already_member_login))
+        val fullText = "${getString(R.string.already_member)} ${getString(R.string.login_now)}"
+        val spannableString = SpannableString(fullText)
 
-        val loginClick = object : ClickableSpan() {
-            override fun onClick(widget: android.view.View) {
-                Toast.makeText(this@RegisterActivity, "Login clicked", Toast.LENGTH_SHORT).show()
+        val linkColor = ContextCompat.getColor(this, R.color.link_color)
+
+        val loginStart = fullText.indexOf(getString(R.string.already_member))
+        val loginEnd = loginStart + getString(R.string.login_now).length
+
+        spannableString.setSpan(object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
             }
-        }
+        }, loginStart, loginEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        val startIndex = spanString.indexOf("Log In")
-        val endIndex = startIndex + "Log In".length
-        spanString.setSpan(loginClick, startIndex, endIndex, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(
+            ForegroundColorSpan(linkColor),
+            loginStart, loginEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        spannableString.setSpan(
+            StyleSpan(Typeface.BOLD),
+            loginStart, loginEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        binding.tvLoginLink.text = spannableString
+        binding.tvLoginLink.movementMethod = LinkMovementMethod.getInstance()
     }
+
 }

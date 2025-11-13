@@ -1,4 +1,17 @@
 package com.example.forumus.data.model
 
-class User {
+data class User (
+    val uid: String = "",
+    val email: String = "",
+    val fullName: String = "",
+    val role: UserRole = UserRole.STUDENT,
+    val profilePictureUrl: String? = null,
+    val createdAt: Long = System.currentTimeMillis(),
+    val isEmailVerified: Boolean = false
+)
+
+enum class UserRole {
+    STUDENT,
+    TEACHER,
+    ADMIN
 }

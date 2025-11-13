@@ -48,6 +48,9 @@ class VerificationActivity : AppCompatActivity() {
         setupOtpInputs()
         observeViewModel()
         startCountdown()
+        
+        // Send initial OTP when screen opens
+        viewModel.sendInitialOTP(userEmail)
     }
     
     private fun setupUI() {
@@ -143,25 +146,45 @@ class VerificationActivity : AppCompatActivity() {
         viewModel.verificationResult.observe(this) { result ->
             if (result.isSuccess) {
                 // Handle successful verification
-                // Navigate to next screen or show success
+                // Navigate to success screen
+                val intent = Intent(this, com.example.forumus.ui.auth.success.SuccessActivity::class.java)
+                startActivity(intent)
+                finish() // Close verification activity
             } else {
                 // Handle verification error
                 clearOtpInputs()
-                // Show error message
+                android.widget.Toast.makeText(
+                    this, 
+                    result.exceptionOrNull()?.message ?: "Verification failed. Please try again.", 
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
             }
         }
-        
+
         viewModel.resendResult.observe(this) { result ->
             if (result.isSuccess) {
                 // Restart countdown
                 startCountdown()
-                // Show success message
+                android.widget.Toast.makeText(
+                    this, 
+                    "Verification code has been resent to your email.", 
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
             } else {
-                // Show error message
+                android.widget.Toast.makeText(
+                    this, 
+                    result.exceptionOrNull()?.message ?: "Failed to resend code. Please try again.", 
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
             }
         }
+        
+        viewModel.isLoading.observe(this) { isLoading ->
+            binding.btnVerify.isEnabled = !isLoading
+            binding.tvDidntReceive.isEnabled = !isLoading
+            binding.btnVerify.text = if (isLoading) "Verifying..." else "Verify"
+        }
     }
-    
     private fun verifyOtp() {
         val otp = getOtpFromInputs()
         if (otp.length == 6) {

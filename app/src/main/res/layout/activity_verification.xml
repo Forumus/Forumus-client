@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -114,7 +116,7 @@
         android:fontFamily="@font/montserrat_semibold"
         android:text="@string/verify"
         android:textAllCaps="false"
-        android:textColor="@color/button_text"
+        android:textColor="@color/background_light"
         android:textSize="20sp"
         android:elevation="12dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -127,7 +129,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="27dp"
-        android:fontFamily="@font/arial_bold"
+        android:textStyle="bold"
         android:text="@string/didnt_receive_code"
         android:textColor="@color/text_primary"
         android:textSize="13sp"
@@ -141,7 +143,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:fontFamily="@font/arial_regular"
         android:text="@string/request_new_code_timer"
         android:textColor="@color/hint_text"
         android:textSize="13sp"
@@ -150,3 +151,4 @@
         app:layout_constraintTop_toBottomOf="@id/tv_didnt_receive" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

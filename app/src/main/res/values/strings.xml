@@ -9,15 +9,14 @@
     <string name="valid_email">Valid email</string>
     <string name="phone_number">Phone number</string>
     <string name="strong_password">Strong Password</string>
+    <string name="confirm_password">Confirm Password</string>
     <string name="next">Next</string>
+    <string name="register">Register</string>
+    <string name="already_member_login">Already a member? Log in</string>
     <string name="already_member">Already a member?</string>
-    <string name="log_in">Log In</string>
-    <string name="terms_conditions_start">By checking the box you agree to our</string>
-    <string name="terms">Terms</string>
-    <string name="and">and</string>
-    <string name="conditions">Conditions</string>
-    <string name="terms_conditions_end">.</string>
-    
+    <string name="login_now">Login now</string>
+    <string name="terms_conditions">By checking the box you agree to our Terms and Conditions</string>
+
     <!-- Verification screen -->
     <string name="back">Back</string>
     <string name="almost_there">Almost there</string>

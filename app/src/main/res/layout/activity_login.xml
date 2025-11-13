@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light"
@@ -140,7 +141,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:fontFamily="@font/arial_regular"
             android:text="@string/remember_me"
             android:textColor="@color/text_primary"
             android:textSize="9sp" />
@@ -149,7 +149,6 @@
             android:id="@+id/tv_forgot_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/arial_regular"
             android:text="@string/forgot_password"
             android:textColor="@color/link_color"
             android:textSize="9sp" />
@@ -171,7 +170,7 @@
         android:text="@string/login"
         android:textAllCaps="false"
         android:textAlignment="center"
-        android:textColor="@color/button_text"
+        android:textColor="@color/background_light"
         android:textSize="20sp"
         android:elevation="12dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -193,3 +192,4 @@
         app:layout_constraintTop_toBottomOf="@id/btn_login" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

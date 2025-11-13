@@ -4,30 +4,37 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
+import com.example.forumus.data.model.User
+import com.example.forumus.data.repository.AuthRepository
+import com.example.forumus.utils.Resource
+import com.example.forumus.utils.ValidationUtils
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
+
+    private val authRepository = AuthRepository(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance())
     
-    private val _loginResult = MutableLiveData<Result<Boolean>>()
-    val loginResult: LiveData<Result<Boolean>> = _loginResult
-    
-    fun login(email: String, password: String, rememberMe: Boolean) {
+    private val _loginState = MutableLiveData<Resource<User>>()
+    val loginState: LiveData<Resource<User>> = _loginState
+
+    fun login(email: String, password: String) {
+        if (!ValidationUtils.isValidEmail(email)) {
+            _loginState.value = Resource.Error("Please enter a valid email")
+            return
+        }
+
+        if (password.isBlank()) {
+            _loginState.value = Resource.Error("Please enter your password")
+            return
+        }
+
+        _loginState.value = Resource.Loading()
+
         viewModelScope.launch {
-            try {
-                // TODO: Implement actual login logic
-                // This is a placeholder implementation
-                delay(1000) // Simulate network delay
-                
-                // Mock login validation - accept demo credentials
-                if (email == "demo@forumus.com" && password == "demo123") {
-                    _loginResult.value = Result.success(true)
-                } else {
-                    _loginResult.value = Result.failure(Exception("Invalid email or password"))
-                }
-            } catch (e: Exception) {
-                _loginResult.value = Result.failure(e)
-            }
+            val result = authRepository.login(email, password)
+            _loginState.value = result
         }
     }
 }

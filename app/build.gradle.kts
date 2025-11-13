@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -37,6 +38,22 @@ android {
     buildFeatures {
         dataBinding = true
     }
+    packaging {
+        resources {
+            excludes += listOf(
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/NOTICE.md",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/LICENSE.md",
+                "META-INF/DEPENDENCIES",
+                "META-INF/DEPENDENCIES.txt",
+                "META-INF/ASL2.0",
+                "META-INF/LGPL2.1"
+            )
+        }
+    }
 }
 
 dependencies {
@@ -50,49 +67,15 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Lifecycle & ViewModel
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+    implementation("com.google.firebase:firebase-auth-ktx:23.2.1")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.2")
+
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 
-    // Navigation Component
-    implementation("androidx.navigation:navigation-fragment-ktx:2.9.6")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
-
-    // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-
-    // Retrofit (for API calls)
-    implementation("com.squareup.retrofit2:retrofit:3.0.0")
-    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.3.0")
-
-    // Dependency Injection - Hilt
-    implementation("com.google.dagger:hilt-android:2.57.2")
-    kapt("com.google.dagger:hilt-compiler:2.48")
-
-    // Image Loading - Coil (modern alternative to Glide)
-    implementation("io.coil-kt:coil:2.7.0")
-
-    // DataStore (for storing tokens and preferences)
-    implementation("androidx.datastore:datastore-preferences:1.1.7")
-
-    // SwipeRefreshLayout
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-
-    // Paging 3 (for infinite scroll)
-    implementation("androidx.paging:paging-runtime-ktx:3.3.6")
-
-    // File Picker
-    implementation("com.github.dhaval2404:imagepicker:2.1")
-
-    // Rich Text Editor (for post creation)
-    implementation("io.github.pknujsp:richtext-editor:1.0.0")
-    // Or use: implementation("jp.wasabeef:richeditor-android:2.0.0")
-
-    // Markdown Parser (if you want markdown support)
-    implementation("io.noties.markwon:core:4.6.2")
-    implementation("io.noties.markwon:image:4.6.2")
+    // Email dependencies for OTP sending
+    implementation("com.sun.mail:android-mail:1.6.8")
+    implementation("com.sun.mail:android-activation:1.6.8")
 }

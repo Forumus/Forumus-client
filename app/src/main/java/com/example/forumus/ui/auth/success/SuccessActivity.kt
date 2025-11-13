@@ -13,6 +13,10 @@ class SuccessActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnFinish.setOnClickListener {
+            // Navigate back to login screen after successful registration and verification
+            val intent = android.content.Intent(this, com.example.forumus.ui.auth.login.LoginActivity::class.java)
+            intent.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
             finish()
         }
     }
