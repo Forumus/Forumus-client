@@ -52,4 +52,22 @@
     <!-- Slide screen -->
     <string name="slide_title">Learn Together</string>
     <string name="slide_subtitle">Discover topics you care about, ask questions, and get insights from real learners and experts.</string>
+
+    <!-- Home screen -->
+    <string name="menu">Menu</string>
+    <string name="search">Search</string>
+    <string name="profile">Profile</string>
+    <string name="home">Home</string>
+    <string name="explore">Explore</string>
+    <string name="create">Create</string>
+    <string name="alerts">Alerts</string>
+    <string name="chat">Chat</string>
+    <string name="upvote">Upvote</string>
+    <string name="downvote">Downvote</string>
+    <string name="comments">Comments</string>
+    <string name="share">Share</string>
+    <string name="view_profile">View Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="settings">Settings</string>
 </resources>

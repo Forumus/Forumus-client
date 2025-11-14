@@ -95,4 +95,7 @@ dependencies {
     // Markdown Parser (if you want markdown support)
     implementation("io.noties.markwon:core:4.6.2")
     implementation("io.noties.markwon:image:4.6.2")
+
+    // ViewBinding
+    implementation("androidx.databinding:databinding-runtime:8.7.0")
 }
