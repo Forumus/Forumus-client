@@ -65,7 +65,7 @@
             app:boxCornerRadiusTopStart="10dp"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="0dp"
-            app:endIconDrawable="@drawable/ic_user"
+            app:endIconDrawable="@drawable/ic_default_profile"
             app:endIconMode="custom"
             app:hintTextColor="@color/hint_text"
             app:layout_constraintEnd_toEndOf="parent"
