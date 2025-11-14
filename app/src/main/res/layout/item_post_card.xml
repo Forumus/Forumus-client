@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/post_background"
+    android:orientation="vertical">
+
+    <!-- Post Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
+
+        <!-- Community Avatar -->
+        <FrameLayout
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/button_primary_background">
+
+            <TextView
+                android:id="@+id/tv_community_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="S"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- Community Name -->
+        <TextView
+            android:id="@+id/tv_community_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="c/Sports_Athletics"
+            android:textColor="@color/text_primary"
+            android:textSize="12sp"
+            tools:ignore="TextViewEdits" />
+
+        <!-- Time Posted -->
+        <TextView
+            android:id="@+id/tv_time_posted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="• 1h"
+            android:textColor="@color/text_secondary_light"
+            android:textSize="12sp"
+            tools:ignore="TextViewEdits" />
+    </LinearLayout>
+
+    <!-- Post Title -->
+    <TextView
+        android:id="@+id/tv_post_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_regular"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="8dp"
+        android:text="Intramural Sports Week - Highlights from Day 1!"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        tools:ignore="TextViewEdits" />
+
+    <!-- Post Content -->
+    <TextView
+        android:id="@+id/tv_post_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_regular"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:text="What an amazing start to our annual sports week! Check out these action shots from soccer, basketball, tennis, track, gym, and swimming events. Go team!"
+        android:textColor="@color/text_tertiary"
+        android:textSize="13sp"
+        android:textStyle="normal"
+        tools:ignore="TextViewEdits" />
+
+    <!-- Post Images Container -->
+    <GridLayout
+        android:id="@+id/gl_post_images"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:rowCount="2"
+        android:useDefaultMargins="false" />
+
+    <!-- Post Actions -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
+
+        <!-- Votes Container -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1">
+
+            <FrameLayout
+                android:layout_width="110dp"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:background="@drawable/button_primary_background"
+                android:elevation="0dp"
+                app:cornerRadius="20dp">
+
+                <!-- Upvote Button -->
+                <ImageButton
+                    android:id="@+id/btn_upvote"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical|start"
+                    android:layout_marginStart="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/upvote"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_arrow_right"
+                    android:tint="@color/white" />
+
+                <!-- Vote Count -->
+                <TextView
+                    android:id="@+id/tv_vote_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="156"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    tools:ignore="TextViewEdits" />
+
+                <!-- Downvote Button -->
+                <ImageButton
+                    android:id="@+id/btn_downvote"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/downvote"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_arrow_back"
+                    android:tint="@color/white" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.5" />
+
+        <!-- Comment and Share -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingEnd="8dp">
+
+            <!-- Comments Button -->
+            <FrameLayout
+                android:layout_width="65dp"
+                android:layout_height="37dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/button_primary_background"
+                app:cornerRadius="18dp">
+
+                <ImageButton
+                    android:id="@+id/btn_comments"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center_vertical|start"
+                    android:layout_marginStart="12dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/comments"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_mail"
+                    android:tint="@color/white" />
+
+                <TextView
+                    android:id="@+id/tv_comment_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="10dp"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="43"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    tools:ignore="TextViewEdits" />
+            </FrameLayout>
+
+            <!-- Share Button -->
+            <ImageButton
+                android:id="@+id/btn_share"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/button_primary_background"
+                android:contentDescription="@string/share"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_next_arrow"
+                android:tint="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+</LinearLayout>
