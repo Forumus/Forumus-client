@@ -117,10 +117,12 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
                     android:orientation="vertical">
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:contentDescription="@string/home"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_home"
@@ -131,7 +133,8 @@
                         android:layout_marginTop="4dp"
                         android:fontFamily="@font/montserrat_regular"
                         android:text="@string/home"
-                        android:textSize="11sp" />
+                        android:textColor="#666666"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <!-- Explore -->
@@ -141,10 +144,12 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
                     android:orientation="vertical">
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:contentDescription="@string/explore"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_explore"
@@ -156,7 +161,7 @@
                         android:fontFamily="@font/montserrat_regular"
                         android:text="@string/explore"
                         android:textColor="#666666"
-                        android:textSize="11sp" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <!-- Create Post Button -->
@@ -193,10 +198,12 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
                     android:orientation="vertical">
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:contentDescription="@string/alerts"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_notification"
@@ -208,7 +215,7 @@
                         android:fontFamily="@font/montserrat_regular"
                         android:text="@string/alerts"
                         android:textColor="#666666"
-                        android:textSize="11sp" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <!-- Chat -->
@@ -218,10 +225,12 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
                     android:orientation="vertical">
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:contentDescription="@string/chat"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_chat"
@@ -233,7 +242,7 @@
                         android:fontFamily="@font/montserrat_regular"
                         android:text="@string/chat"
                         android:textColor="#666666"
-                        android:textSize="11sp" />
+                        android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
         </FrameLayout>
