@@ -179,7 +179,7 @@
                         android:layout_gravity="center"
                         android:translationY="-20dp"
                         android:background="@drawable/button_create_background"
-                        android:elevation="6dp">
+                        android:elevation="10dp">
 
                         <ImageView
                             android:id="@+id/btn_create_post"
@@ -235,10 +235,12 @@
                         android:contentDescription="@string/chat"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_chat"
+                        android:translationY="1dp"
                         app:tint="#666666" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:translationY="-3dp"
                         android:layout_marginTop="4dp"
                         android:fontFamily="@font/montserrat_regular"
                         android:text="@string/chat"
@@ -257,7 +259,7 @@
         android:layout_gravity="top|end"
         android:layout_marginTop="70dp"
         android:layout_marginEnd="8dp"
-        android:background="@color/white"
+        android:background="@drawable/popup_profile_background"
         android:elevation="4dp"
         android:orientation="vertical"
         android:padding="8dp"
@@ -279,7 +281,7 @@
                 android:layout_height="18dp"
                 android:contentDescription="@string/view_profile"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_default_profile" />
+                android:src="@drawable/ic_user_profile" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -307,7 +309,7 @@
                 android:layout_height="18dp"
                 android:contentDescription="@string/edit_profile"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_mail" />
+                android:src="@drawable/ic_user_profile" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -342,7 +344,7 @@
                 android:layout_height="18dp"
                 android:contentDescription="@string/dark_mode"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_lock" />
+                android:src="@drawable/ic_theme" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -370,7 +372,7 @@
                 android:layout_height="18dp"
                 android:contentDescription="@string/settings"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_smartphone" />
+                android:src="@drawable/ic_settings" />
 
             <TextView
                 android:layout_width="wrap_content"
