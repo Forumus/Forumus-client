@@ -1,5 +1,6 @@
 package com.example.forumus.service
 
+import android.util.Log
 import com.example.forumus.utils.EmailConfig
 import com.example.forumus.utils.Resource
 import kotlinx.coroutines.Dispatchers
@@ -12,95 +13,132 @@ import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 
 class EmailService {
-    
+
     /**
      * Send OTP email to user
      */
     suspend fun sendOTPEmail(
-        recipientEmail: String, 
+        recipientEmail: String,
         otpCode: String
     ): Resource<Boolean> = withContext(Dispatchers.IO) {
         try {
+            Log.d("EmailService", "Starting OTP email send to: $recipientEmail")
+
             // Validate email format
             if (!android.util.Patterns.EMAIL_ADDRESS.matcher(recipientEmail).matches()) {
+                Log.e("EmailService", "Invalid email format: $recipientEmail")
                 return@withContext Resource.Error("Invalid email address format")
             }
-            
+
             // Create email session
             val session = createEmailSession()
-            
-            // Create message
+            Log.d("EmailService", "Email session created successfully")
+
+            val multipart = MimeMultipart("alternative")
+
+            // Create simple HTML content (similar to working welcome email)
+            val otpHtml = createOTPEmailHTML(otpCode, recipientEmail)
+
+            val textPart = MimeBodyPart()
+            textPart.setText("Your Forumus verification code is: $otpCode")
+
+            val htmlPart = MimeBodyPart()
+            htmlPart.setContent(otpHtml, "text/html; charset=utf-8")
+
+            multipart.addBodyPart(textPart)
+            multipart.addBodyPart(htmlPart)
+
+            // Create message - simplified like the working welcome email
             val message = MimeMessage(session).apply {
                 setFrom(InternetAddress(EmailConfig.EMAIL_FROM, EmailConfig.EMAIL_FROM_NAME))
                 addRecipient(Message.RecipientType.TO, InternetAddress(recipientEmail))
-                subject = EmailConfig.SUBJECT_OTP
-                
-                // Create multipart message (HTML + plain text)
-                val multipart = MimeMultipart("alternative")
-                
-                // Plain text part
-                val textPart = MimeBodyPart().apply {
-                    setContent(EmailConfig.getOTPEmailPlainText(otpCode), "text/plain; charset=utf-8")
-                }
-                
-                // HTML part
-                val htmlPart = MimeBodyPart().apply {
-                    setContent(
-                        EmailConfig.getOTPEmailTemplate(otpCode, recipientEmail), 
-                        "text/html; charset=utf-8"
-                    )
-                }
-                
-                multipart.addBodyPart(textPart)
-                multipart.addBodyPart(htmlPart)
-                setContent(multipart)
+                subject = "Your Forumus Verification Code"
+                setContent(otpHtml, "text/html; charset=utf-8")
             }
-            
+
+            message.setContent(multipart)
+
             // Send email
+            Log.d("EmailService", "Attempting to send email...")
             Transport.send(message)
-            
+            Log.d("EmailService", "Email sent successfully to $recipientEmail!")
+
             Resource.Success(true)
-            
+
         } catch (e: AuthenticationFailedException) {
+            Log.e("EmailService", "AuthenticationFailedException: ${e.message}", e)
             Resource.Error("Email authentication failed. Please check email credentials.")
         } catch (e: MessagingException) {
+            Log.e("EmailService", "MessagingException: ${e.message}", e)
             Resource.Error("Failed to send email: ${e.message}")
         } catch (e: Exception) {
+            Log.e("EmailService", "Exception: ${e.message}", e)
             Resource.Error("Unexpected error occurred: ${e.message}")
         }
     }
-    
+
+    /**
+     * Create OTP email HTML content
+     */
+    private fun createOTPEmailHTML(otpCode: String, recipientEmail: String): String {
+        return """
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: Arial, sans-serif; background:#ffffff; padding:20px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin:auto; border:1px solid #e0e0e0; border-radius:8px;">
+              <tr>
+                <td style="background:#4a64d8; padding:20px; text-align:center; color:white; font-size:22px; border-radius:8px 8px 0 0;">
+                  Forumus Email Verification
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:25px; color:#333; font-size:15px;">
+                  <p style="margin:0 0 12px 0;">Hi $recipientEmail,</p>
+                  <p style="margin:0 0 12px 0;">Use the verification code below to continue:</p>
+                  <p style="font-size:32px; margin:25px 0; text-align:center; font-weight:bold; color:#4a64d8;">
+                    $otpCode
+                  </p>
+                  <p style="margin:0 0 12px 0;">This code expires in 5 minutes.</p>
+                  <p style="margin:0;">If you didn’t request this code, you can ignore this email.</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="background:#f5f5f5; padding:15px; text-align:center; font-size:13px; color:#666; border-radius:0 0 8px 8px;">
+                  Forumus – Learning Community
+                </td>
+              </tr>
+            </table>
+          </body>
+        </html>
+        """.trimIndent()
+    }
+
     /**
      * Create email session with SMTP configuration
      */
     private fun createEmailSession(): Session {
         val props = Properties().apply {
             put("mail.smtp.auth", "true")
-            put("mail.smtp.starttls.enable", "true")
+            put("mail.smtp.ssl.enable", "true")
             put("mail.smtp.host", EmailConfig.SMTP_HOST)
             put("mail.smtp.port", EmailConfig.SMTP_PORT.toString())
             put("mail.smtp.ssl.protocols", "TLSv1.2")
-            
-            // Additional security settings
-            put("mail.smtp.ssl.trust", EmailConfig.SMTP_HOST)
-            put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory")
-            put("mail.smtp.socketFactory.fallback", "false")
         }
-        
+
         return Session.getInstance(props, object : Authenticator() {
             override fun getPasswordAuthentication(): PasswordAuthentication {
                 return PasswordAuthentication(EmailConfig.EMAIL_FROM, EmailConfig.EMAIL_PASSWORD)
             }
         })
     }
-    
+
     /**
      * Test email configuration without sending actual email
      */
     suspend fun testEmailConfiguration(): Resource<Boolean> = withContext(Dispatchers.IO) {
         try {
             val session = createEmailSession()
-            
+
             // Try to connect to SMTP server
             val transport = session.getTransport("smtp")
             transport.connect(
@@ -110,9 +148,9 @@ class EmailService {
                 EmailConfig.EMAIL_PASSWORD
             )
             transport.close()
-            
+
             Resource.Success(true)
-            
+
         } catch (e: AuthenticationFailedException) {
             Resource.Error("Email authentication failed. Please check your email credentials.")
         } catch (e: MessagingException) {
@@ -121,7 +159,7 @@ class EmailService {
             Resource.Error("Email configuration test failed: ${e.message}")
         }
     }
-    
+
     /**
      * Send welcome email after successful verification (optional)
      */
@@ -131,7 +169,7 @@ class EmailService {
     ): Resource<Boolean> = withContext(Dispatchers.IO) {
         try {
             val session = createEmailSession()
-            
+
             val welcomeHtml = """
                 <!DOCTYPE html>
                 <html>
@@ -166,17 +204,17 @@ class EmailService {
                 </body>
                 </html>
             """.trimIndent()
-            
+
             val message = MimeMessage(session).apply {
                 setFrom(InternetAddress(EmailConfig.EMAIL_FROM, EmailConfig.EMAIL_FROM_NAME))
                 addRecipient(Message.RecipientType.TO, InternetAddress(recipientEmail))
                 subject = "Welcome to Forumus! 🎉"
                 setContent(welcomeHtml, "text/html; charset=utf-8")
             }
-            
+
             Transport.send(message)
             Resource.Success(true)
-            
+
         } catch (e: Exception) {
             Resource.Error("Failed to send welcome email: ${e.message}")
         }

@@ -56,7 +56,9 @@ class LoginActivity : AppCompatActivity() {
                     val user = resource.data
 
                     if (user?.isEmailVerified == false) {
-                        startActivity(Intent(this, VerificationActivity::class.java))
+                        val intent = Intent(this, VerificationActivity::class.java)
+                        intent.putExtra(VerificationActivity.EXTRA_EMAIL, user.email)
+                        startActivity(intent)
                     } else {
                         // Navigate to main screen
                         startActivity(Intent(this, MainActivity::class.java))

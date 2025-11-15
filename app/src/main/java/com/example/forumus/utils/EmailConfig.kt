@@ -3,12 +3,12 @@ package com.example.forumus.utils
 object EmailConfig {
     // For Gmail SMTP
     const val SMTP_HOST = "smtp.gmail.com"
-    const val SMTP_PORT = 587
+    const val SMTP_PORT = 465
     
     // Email credentials - In production, use BuildConfig or encrypted storage
     // For now, using placeholder values - you'll need to replace these
     const val EMAIL_FROM = "longto.xp@gmail.com"
-    const val EMAIL_PASSWORD = "entnhjeooiboefoj" // Use App Password, not regular password
+    const val EMAIL_PASSWORD = "snftiqxpyagjnuos" // Use App Password, not regular password
     const val EMAIL_FROM_NAME = "Forumus App"
     
     // Email template settings

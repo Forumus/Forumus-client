@@ -27,7 +27,7 @@ class AuthRepository (
             val firebaseUser = authResult.user ?: throw Exception("User creation failed")
 
             // Send email verification
-            firebaseUser.sendEmailVerification().await()
+//            firebaseUser.sendEmailVerification().await()
 
             // Create user document in Firestore
             val user = User(

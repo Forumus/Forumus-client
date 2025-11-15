@@ -24,6 +24,14 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.auth.verification.VerificationActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.auth.success.SuccessActivity"
+            android:exported="false" />
+
         <!-- Register Activity -->
         <activity
             android:name=".ui.auth.register.RegisterActivity"

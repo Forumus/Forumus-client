@@ -18,7 +18,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.forumus.R
 import com.example.forumus.databinding.ActivityVerificationBinding
-import com.example.forumus.ui.auth.register.RegisterActivity
 
 class VerificationActivity : AppCompatActivity() {
     
