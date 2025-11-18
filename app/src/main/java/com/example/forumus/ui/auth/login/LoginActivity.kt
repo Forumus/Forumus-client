@@ -2,14 +2,14 @@ package com.example.forumus.ui.auth.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.example.forumus.databinding.ActivityLoginBinding
 import com.example.forumus.ui.auth.register.RegisterActivity
-import com.example.forumus.ui.main.MainActivity
+import com.example.forumus.ui.home.HomeActivity
 import com.example.forumus.utils.Resource
 import android.text.SpannableString
 import androidx.core.content.ContextCompat
@@ -26,6 +26,10 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: LoginViewModel by viewModels()
+
+    companion object {
+        const val VERIFICATION_TYPE = "verification_type"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,16 +58,18 @@ class LoginActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     showLoading(false)
                     val user = resource.data
+                    val intent = Intent(this, VerificationActivity::class.java)
+                    intent.putExtra(VerificationActivity.EXTRA_EMAIL, user?.email)
 
-                    if (user?.isEmailVerified == false) {
-                        val intent = Intent(this, VerificationActivity::class.java)
-                        intent.putExtra(VerificationActivity.EXTRA_EMAIL, user.email)
-                        startActivity(intent)
+                    if (user?.emailVerified == false) {
+                        Log.d("LoginActivity", "User not verified, setting email_verification type")
+                        intent.putExtra(VERIFICATION_TYPE, "email_verification")
                     } else {
-                        // Navigate to main screen
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
+                        Log.d("LoginActivity", "User already verified, setting login_verification type")
+                        intent.putExtra(VERIFICATION_TYPE, "login_verification")
                     }
+                    startActivity(intent)
+
                 }
                 is Resource.Error -> {
                     showLoading(false)

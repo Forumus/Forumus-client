@@ -7,7 +7,7 @@ data class User (
     val role: UserRole = UserRole.STUDENT,
     val profilePictureUrl: String? = null,
     val createdAt: Long = System.currentTimeMillis(),
-    val isEmailVerified: Boolean = false
+    val emailVerified: Boolean = false
 )
 
 enum class UserRole {

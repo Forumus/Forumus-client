@@ -1,5 +1,6 @@
 package com.example.forumus.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.forumus.data.model.User
@@ -35,7 +36,7 @@ class AuthRepository (
                 email = email,
                 fullName = fullName,
                 role = role,
-                isEmailVerified = false
+                emailVerified = false
             )
 
             firestore.collection("users")
@@ -63,6 +64,7 @@ class AuthRepository (
             val user = userDoc.toObject(User::class.java)
                 ?: throw Exception("User data not found")
 
+            Log.d("AuthRepository", "Login successful - User: ${user.email}, emailVerified: ${user.emailVerified}")
             Resource.Success(user)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Login failed")
@@ -130,21 +132,33 @@ class AuthRepository (
         return try {
             val currentUser = firebaseAuth.currentUser
             if (currentUser != null && currentUser.email == email) {
-                // Update user document in Firestore
-                firestore.collection("users")
-                    .document(currentUser.uid)
-                    .update("isEmailVerified", true)
-                    .await()
-                
-                // Send welcome email
+                // Get current user document to check verification status
                 val userDoc = firestore.collection("users")
                     .document(currentUser.uid)
                     .get()
                     .await()
-                
+
                 val user = userDoc.toObject(User::class.java)
-                if (user != null) {
+                Log.d("AuthRepository", user?.toString() ?: "User document is null")
+                val wasAlreadyVerified = user?.emailVerified == true
+
+                // Update user document in Firestore only if not already verified
+                if (!wasAlreadyVerified) {
+                    firestore.collection("users")
+                        .document(currentUser.uid)
+                        .update("emailVerified", true)
+                        .await()
+                }
+
+                // Only send welcome email for email verification (registration), never for login verification
+                Log.d("AuthRepository", "completeEmailVerification - wasAlreadyVerified: $wasAlreadyVerified,")
+                
+                // NEVER send welcome email for login verification, only for email verification of new users
+                if (!wasAlreadyVerified && user != null) {
+                    Log.d("AuthRepository", "Sending welcome email to: $email")
                     emailService.sendWelcomeEmail(email, user.fullName)
+                } else {
+                    Log.d("AuthRepository", "NOT sending welcome email, wasAlreadyVerified: $wasAlreadyVerified")
                 }
                 
                 Resource.Success(true)
@@ -168,8 +182,6 @@ class AuthRepository (
                 email = firebaseUser.email ?: "",
                 fullName = firebaseUser.displayName ?: "",
                 role = UserRole.STUDENT, // Default role; should fetch from Firestore in real app
-                profilePictureUrl = firebaseUser.photoUrl?.toString(),
-                isEmailVerified = firebaseUser.isEmailVerified
             )
         } else null
     }

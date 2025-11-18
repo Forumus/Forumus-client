@@ -1,4 +1,4 @@
 package com.example.forumus.ui.home
 
-class HomeViewModel {
+class MainViewModel {
 }

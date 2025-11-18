@@ -11,13 +11,15 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.graphics.Typeface
 import android.view.KeyEvent
-import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.forumus.R
 import com.example.forumus.databinding.ActivityVerificationBinding
+import com.example.forumus.ui.auth.success.SuccessActivity
+import com.example.forumus.ui.home.HomeActivity
+import android.util.Log
 
 class VerificationActivity : AppCompatActivity() {
     
@@ -26,10 +28,11 @@ class VerificationActivity : AppCompatActivity() {
     private lateinit var otpEditTexts: Array<EditText>
     private var countDownTimer: CountDownTimer? = null
     private var userEmail: String = "longto@discord.com" // Default or passed from intent
+    private var verificationType: String = "registration"
     
     companion object {
         const val EXTRA_EMAIL = "extra_email"
-        private const val COUNTDOWN_TIME = 30000L // 30 seconds
+        private const val COUNTDOWN_TIME = 5 * 60 * 1000L // 5 minutes in milliseconds
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +45,9 @@ class VerificationActivity : AppCompatActivity() {
         
         // Get email from intent if available
         userEmail = intent.getStringExtra(EXTRA_EMAIL) ?: userEmail
+
+        // Get verification type from intent if needed
+        verificationType = intent.getStringExtra("verification_type") ?: "registration"
         
         setupUI()
         setupOtpInputs()
@@ -145,10 +151,16 @@ class VerificationActivity : AppCompatActivity() {
         viewModel.verificationResult.observe(this) { result ->
             if (result.isSuccess) {
                 // Handle successful verification
-                // Navigate to success screen
-                val intent = Intent(this, com.example.forumus.ui.auth.success.SuccessActivity::class.java)
-                startActivity(intent)
-                finish() // Close verification activity
+                if (verificationType == "registration") {
+                    val intent = Intent(this, SuccessActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    val intent = Intent(this, HomeActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    Log.i("VerificationActivity", "2FA successful, navigating to HomeActivity")
+                    startActivity(intent)
+                }
+                finish()
             } else {
                 // Handle verification error
                 clearOtpInputs()
@@ -216,7 +228,7 @@ class VerificationActivity : AppCompatActivity() {
         countDownTimer = object : CountDownTimer(COUNTDOWN_TIME, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 val seconds = millisUntilFinished / 1000
-                val timeText = String.format("00:%02d", seconds)
+                val timeText = String.format("%02d:%02d", seconds / 60, seconds % 60)
                 binding.tvResendTimer.text = getString(R.string.request_new_code_timer, timeText + "s")
             }
             

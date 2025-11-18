@@ -32,7 +32,6 @@ class EmailService {
 
             // Create email session
             val session = createEmailSession()
-            Log.d("EmailService", "Email session created successfully")
 
             val multipart = MimeMultipart("alternative")
 
@@ -59,7 +58,6 @@ class EmailService {
             message.setContent(multipart)
 
             // Send email
-            Log.d("EmailService", "Attempting to send email...")
             Transport.send(message)
             Log.d("EmailService", "Email sent successfully to $recipientEmail!")
 
@@ -130,34 +128,6 @@ class EmailService {
                 return PasswordAuthentication(EmailConfig.EMAIL_FROM, EmailConfig.EMAIL_PASSWORD)
             }
         })
-    }
-
-    /**
-     * Test email configuration without sending actual email
-     */
-    suspend fun testEmailConfiguration(): Resource<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val session = createEmailSession()
-
-            // Try to connect to SMTP server
-            val transport = session.getTransport("smtp")
-            transport.connect(
-                EmailConfig.SMTP_HOST,
-                EmailConfig.SMTP_PORT,
-                EmailConfig.EMAIL_FROM,
-                EmailConfig.EMAIL_PASSWORD
-            )
-            transport.close()
-
-            Resource.Success(true)
-
-        } catch (e: AuthenticationFailedException) {
-            Resource.Error("Email authentication failed. Please check your email credentials.")
-        } catch (e: MessagingException) {
-            Resource.Error("SMTP connection failed: ${e.message}")
-        } catch (e: Exception) {
-            Resource.Error("Email configuration test failed: ${e.message}")
-        }
     }
 
     /**

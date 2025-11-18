@@ -37,6 +37,11 @@
             android:name=".ui.auth.register.RegisterActivity"
             android:exported="false" />
 
+        <!-- Home Activity -->
+        <activity
+            android:name=".ui.home.HomeActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

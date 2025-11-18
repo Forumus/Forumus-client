@@ -34,7 +34,7 @@ object ValidationUtils {
         // Common university email domains
         val universityDomains = listOf(
             "edu", "ac.uk", "edu.au", "edu.sg", "edu.my", 
-            "student.university.edu", "student.hcmus.edu.vn",
+            "student.forumus.me", "student.hcmus.edu.vn",
             "gmail.com", "outlook.com", "hotmail.com" // Allow common domains for demo
         )
         
