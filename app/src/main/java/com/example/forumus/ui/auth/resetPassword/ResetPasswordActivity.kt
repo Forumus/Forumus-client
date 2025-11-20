@@ -2,6 +2,7 @@ package com.example.forumus.ui.auth.resetPassword
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import com.example.forumus.databinding.ActivityResetPasswordBinding
 import com.example.forumus.ui.auth.login.LoginActivity
 import com.example.forumus.utils.ValidationUtils
 import com.example.forumus.utils.Resource
+import com.example.forumus.R
 
 class ResetPasswordActivity : AppCompatActivity() {
     private val viewModel: ResetPasswordViewModel by viewModels()
@@ -72,9 +74,9 @@ class ResetPasswordActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        binding.progressBar.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         binding.btnConfirm.isEnabled = !isLoading
-        binding.btnConfirm.text = if (isLoading) "" else getString(com.example.forumus.R.string.confirm)
+        binding.btnConfirm.text = if (isLoading) "" else getString(R.string.confirm)
         binding.btnCancel.isEnabled = !isLoading
     }
 }

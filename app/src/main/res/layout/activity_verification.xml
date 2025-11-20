@@ -123,6 +123,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ll_otp_container" />
 
+    <!-- Verify Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progress_bar_verify"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:indeterminateTint="@color/background_light"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/btn_verify"
+        app:layout_constraintEnd_toEndOf="@id/btn_verify"
+        app:layout_constraintStart_toStartOf="@id/btn_verify"
+        app:layout_constraintTop_toTopOf="@id/btn_verify" />
+
     <!-- Didn't receive code text -->
     <TextView
         android:id="@+id/tv_didnt_receive"

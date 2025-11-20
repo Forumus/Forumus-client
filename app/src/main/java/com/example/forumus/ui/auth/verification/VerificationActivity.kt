@@ -208,9 +208,10 @@ class VerificationActivity : AppCompatActivity() {
         }
         
         viewModel.isLoading.observe(this) { isLoading ->
+            binding.progressBarVerify.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
             binding.btnVerify.isEnabled = !isLoading
             binding.tvDidntReceive.isEnabled = !isLoading
-            binding.btnVerify.text = if (isLoading) "Verifying..." else "Verify"
+            binding.btnVerify.text = if (isLoading) "" else getString(R.string.verify)
         }
     }
     private fun verifyOtp() {

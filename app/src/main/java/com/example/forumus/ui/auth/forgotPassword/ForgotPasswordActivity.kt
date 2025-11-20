@@ -2,12 +2,14 @@ package com.example.forumus.ui.auth.forgotPassword
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.forumus.databinding.ActivityForgotPasswordBinding
 import com.example.forumus.ui.auth.verification.VerificationActivity
 import com.example.forumus.utils.ValidationUtils
 import com.example.forumus.utils.Resource
+import com.example.forumus.R
 
 class ForgotPasswordActivity : AppCompatActivity() {
     private val viewModel: ForgotPasswordViewModel by viewModels()
@@ -70,7 +72,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        binding.progressBar.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
+        binding.progressBarSubmit.visibility = if (isLoading) View.VISIBLE else View.GONE
         binding.btnSubmit.isEnabled = !isLoading
+        binding.btnSubmit.text = if (isLoading) "" else getString(R.string.submit)
     }
 }
