@@ -19,7 +19,7 @@ import com.example.forumus.R
 import com.example.forumus.databinding.ActivityVerificationBinding
 import com.example.forumus.ui.auth.success.SuccessActivity
 import com.example.forumus.ui.home.HomeActivity
-import android.util.Log
+import com.example.forumus.ui.auth.resetPassword.ResetPasswordActivity
 
 class VerificationActivity : AppCompatActivity() {
     
@@ -77,13 +77,23 @@ class VerificationActivity : AppCompatActivity() {
     }
     
     private fun setupDescriptionText() {
-        val descriptionText = getString(R.string.verification_description, userEmail)
+        val hiddenUserEmail = if (userEmail.length > 4) {
+            val atIndex = userEmail.indexOf('@')
+            if (atIndex > 2) {
+                userEmail.substring(0, 2) + "****" + userEmail.substring(atIndex)
+            } else {
+                "****" + userEmail.substring(atIndex)
+            }
+        } else {
+            userEmail
+        }
+        val descriptionText = getString(R.string.verification_description, hiddenUserEmail)
         val spannableString = SpannableString(descriptionText)
         
         // Find email in the text and make it bold and colored
-        val emailStart = descriptionText.indexOf(userEmail)
+        val emailStart = descriptionText.indexOf(hiddenUserEmail)
         if (emailStart != -1) {
-            val emailEnd = emailStart + userEmail.length
+            val emailEnd = emailStart + hiddenUserEmail.length
             
             spannableString.setSpan(
                 StyleSpan(Typeface.BOLD),
@@ -151,16 +161,23 @@ class VerificationActivity : AppCompatActivity() {
         viewModel.verificationResult.observe(this) { result ->
             if (result.isSuccess) {
                 // Handle successful verification
-                if (verificationType == "registration") {
-                    val intent = Intent(this, SuccessActivity::class.java)
-                    startActivity(intent)
-                } else {
-                    val intent = Intent(this, HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    Log.i("VerificationActivity", "2FA successful, navigating to HomeActivity")
-                    startActivity(intent)
+                when (verificationType) {
+                    "email_verification" -> {
+                        val intent = Intent(this, SuccessActivity::class.java)
+                        startActivity(intent)
+                    }
+                    "login_verification" -> {
+                        val intent = Intent(this, HomeActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                    }
+                    "forgot_password" -> {
+                        val intent = Intent(this, ResetPasswordActivity::class.java)
+                        intent.putExtra("user_email", userEmail)
+                        startActivity(intent)
+                    }
+                    else -> finish()
                 }
-                finish()
             } else {
                 // Handle verification error
                 clearOtpInputs()

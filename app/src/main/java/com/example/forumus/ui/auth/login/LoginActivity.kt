@@ -9,7 +9,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.forumus.databinding.ActivityLoginBinding
 import com.example.forumus.ui.auth.register.RegisterActivity
-import com.example.forumus.ui.home.HomeActivity
 import com.example.forumus.utils.Resource
 import android.text.SpannableString
 import androidx.core.content.ContextCompat
@@ -20,6 +19,7 @@ import android.text.style.StyleSpan
 import android.text.method.LinkMovementMethod
 import android.graphics.Typeface
 import com.example.forumus.R
+import com.example.forumus.ui.auth.forgotPassword.ForgotPasswordActivity
 import com.example.forumus.ui.auth.verification.VerificationActivity
 
 class LoginActivity : AppCompatActivity() {
@@ -38,6 +38,7 @@ class LoginActivity : AppCompatActivity() {
 
         setupClickListeners()
         setupRegisterText()
+        setupForgotPasswordText()
         observeLoginState()
     }
 
@@ -84,45 +85,61 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogin.isEnabled = !isLoading
     }
 
-//    private fun showEmailNotVerifiedDialog() {
-//        MaterialAlertDialogBuilder(this)
-//            .setTitle("Email Not Verified")
-//            .setMessage("Please verify your email address before logging in. Check your inbox for the verification email.")
-//            .setPositiveButton("OK", null)
-//            .setNegativeButton("Resend Email") { _, _ ->
-//                // TODO: Implement resend verification email
-//                Toast.makeText(this, "Verification email sent", Toast.LENGTH_SHORT).show()
-//            }
-//            .show()
-//    }
-
     private fun setupRegisterText() {
         val fullText = "${getString(R.string.new_member)} ${getString(R.string.register_now)}"
-        val spannableString = SpannableString(fullText)
+        val clickableText = getString(R.string.register_now)
+        
+        createClickableText(
+            textView = binding.tvRegisterLink,
+            fullText = fullText,
+            clickableText = clickableText
+        ) {
+            startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
+        }
+    }
 
+    private fun setupForgotPasswordText() {
+        val fullText = getString(R.string.forgot_password)
+        val clickableText = getString(R.string.forgot_password)
+
+        createClickableText(
+            textView = binding.tvForgotPassword,
+            fullText = fullText,
+            clickableText = clickableText
+        ) {
+            startActivity(Intent(this@LoginActivity, ForgotPasswordActivity::class.java))
+        }
+    }
+
+    private fun createClickableText(
+        textView: android.widget.TextView,
+        fullText: String,
+        clickableText: String,
+        onClick: () -> Unit
+    ) {
+        val spannableString = SpannableString(fullText)
         val linkColor = ContextCompat.getColor(this, R.color.link_color)
 
-        // Find and make "Register now" clickable
-        val registerStart = fullText.indexOf(getString(R.string.register_now))
-        val registerEnd = registerStart + getString(R.string.register_now).length
+        val clickableStart = fullText.indexOf(clickableText)
+        val clickableEnd = clickableStart + clickableText.length
 
         spannableString.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
-                startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
+                onClick()
             }
-        }, registerStart, registerEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }, clickableStart, clickableEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         spannableString.setSpan(
             ForegroundColorSpan(linkColor),
-            registerStart, registerEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            clickableStart, clickableEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
         spannableString.setSpan(
             StyleSpan(Typeface.BOLD),
-            registerStart, registerEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            clickableStart, clickableEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
-        binding.tvRegisterLink.text = spannableString
-        binding.tvRegisterLink.movementMethod = LinkMovementMethod.getInstance()
+        textView.text = spannableString
+        textView.movementMethod = LinkMovementMethod.getInstance()
     }
 }

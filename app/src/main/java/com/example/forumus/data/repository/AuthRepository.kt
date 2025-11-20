@@ -1,13 +1,16 @@
 package com.example.forumus.data.repository
 
 import android.util.Log
+import com.example.forumus.data.model.ResetPasswordRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.forumus.data.model.User
 import com.example.forumus.data.model.UserRole
+import com.example.forumus.data.remote.NetworkService
 import com.example.forumus.service.EmailService
 import com.example.forumus.service.OTPService
 import com.example.forumus.utils.Resource
+import com.example.forumus.utils.ApiConstants
 import kotlinx.coroutines.tasks.await
 
 class AuthRepository (
@@ -187,4 +190,53 @@ class AuthRepository (
     }
 
     fun isUserLoggedIn(): Boolean = firebaseAuth.currentUser != null
+
+    suspend fun checkAccountExists(email: String): Resource<Boolean> {
+        return try {
+            val userDoc = firestore.collection("users")
+                .whereEqualTo("email", email)
+                .get()
+                .await()
+            val exists = !userDoc.isEmpty
+            Resource.Success(exists)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Failed to check account existence")
+        }
+    }
+
+    /**
+     * Reset user password using server API with custom secret key
+     */
+    suspend fun resetPassword(email: String, newPassword: String, secretKey: String): Resource<Boolean> {
+        return try {
+            val request = ResetPasswordRequest(
+                secretKey = secretKey,
+                email = email,
+                newPassword = newPassword
+            )
+            
+            val response = NetworkService.apiService.resetPassword(request)
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody?.success == true) {
+                    Resource.Success(true)
+                } else {
+                    Resource.Error(responseBody?.message ?: "Password reset failed")
+                }
+            } else {
+                Resource.Error("Server error: ${response.code()} ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error("Network error: ${e.message}")
+        }
+    }
+
+    /**
+     * Reset user password using server API with default secret key
+     */
+    suspend fun resetPassword(email: String, newPassword: String): Resource<Boolean> {
+        return resetPassword(email, newPassword, ApiConstants.SECRET_KEY)
+    }
+
 }

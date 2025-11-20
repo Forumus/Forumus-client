@@ -49,6 +49,9 @@ object ValidationUtils {
      */
     fun isValidPassword(password: String): Boolean {
         return password.length >= 6
+                && password.length <= 32
+                && !password.contains(" ")
+                && password.all { it.isLetterOrDigit() || "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~".contains(it) }
     }
 
     /**
