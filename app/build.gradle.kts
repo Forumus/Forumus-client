@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.forumus"
+    namespace = "com.hcmus.forumus_client"
     compileSdk = 36
 
     defaultConfig {
