@@ -70,4 +70,27 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="settings">Settings</string>
+
+    <!-- Drawer Menu -->
+    <string name="browse_filter">Browse &amp; Filter</string>
+    <string name="sort_by">SORT BY</string>
+    <string name="popular_tags">POPULAR TAGS</string>
+    <string name="new">New</string>
+    <string name="trending">Trending</string>
+    <string name="close">Close</string>
+
+    <!-- Category Tags -->
+    <string name="computer_science">Computer Science</string>
+    <string name="mathematics">Mathematics</string>
+    <string name="engineering">Engineering</string>
+    <string name="sciences">Sciences</string>
+    <string name="business_school">Business School</string>
+    <string name="arts_humanities">Arts &amp; Humanities</string>
+    <string name="social_sciences">Social Sciences</string>
+    <string name="study_groups">Study Groups</string>
+    <string name="campus_events">Campus Events</string>
+    <string name="career_services">Career Services</string>
+    <string name="library_resources">Library &amp; Resources</string>
+    <string name="residence_life">Residence Life</string>
+    <string name="financial_aid">Financial Aid</string>
 </resources>

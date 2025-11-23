@@ -94,11 +94,16 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_posts"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="499dp"
                 android:layout_weight="1"
                 android:clipToPadding="false"
                 android:paddingBottom="60dp"
                 tools:listitem="@layout/item_post_card" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <!-- Bottom Navigation -->
             <FrameLayout

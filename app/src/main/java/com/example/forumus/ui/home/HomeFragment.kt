@@ -20,6 +20,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     
     private lateinit var postAdapter: PostAdapter
+    private var drawerMenuHandler: DrawerMenuHandler? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,6 +35,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         setupRecyclerView()
+        setupDrawerMenu()
         setupClickListeners()
         observeViewModel()
     }
@@ -46,9 +48,19 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun setupDrawerMenu() {
+        // Initialize drawer menu handler
+        drawerMenuHandler = DrawerMenuHandler(binding.drawerLayout, binding.navView)
+        
+        // Setup sort options in header
+        binding.navView.getHeaderView(0)?.let { headerView ->
+            drawerMenuHandler?.setupSortOptions(headerView)
+        }
+    }
+
     private fun setupClickListeners() {
         binding.btnMenu.setOnClickListener {
-            toggleUserMenu()
+            binding.drawerLayout.openDrawer(binding.navView)
         }
         
         binding.btnProfile.setOnClickListener {

@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/post_background"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginBottom="10dp"
+    android:clipChildren="false">
 
     <!-- Post Header -->
     <LinearLayout
@@ -22,7 +24,7 @@
         <FrameLayout
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:background="@drawable/button_primary_background">
+            android:background="@drawable/default_avatar_background">
 
             <TextView
                 android:id="@+id/tv_community_icon"
@@ -81,15 +83,14 @@
         android:id="@+id/tv_post_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:fontFamily="@font/montserrat_regular"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingBottom="12dp"
-        android:maxLines="3"
-        android:ellipsize="end"
         android:text="What an amazing start to our annual sports week! Check out these action shots from soccer, basketball, tennis, track, gym, and swimming events. Go team!"
         android:textColor="@color/text_tertiary"
-        android:textSize="13sp"
+        android:textSize="14sp"
         android:textStyle="normal"
         tools:ignore="TextViewEdits" />
 
@@ -108,6 +109,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:clipChildren="false"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:paddingTop="12dp"
@@ -115,62 +117,52 @@
 
         <!-- Votes Container -->
         <FrameLayout
-            android:layout_width="0dp"
+            android:layout_width="110dp"
             android:layout_height="40dp"
-            android:layout_weight="1">
+            android:layout_margin="8dp"
+            android:background="@drawable/button_vote_background_"
+            android:elevation="5dp">
 
-            <FrameLayout
-                android:layout_width="110dp"
-                android:layout_height="40dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/button_primary_background"
-                android:elevation="0dp"
-                app:cornerRadius="20dp">
+            <!-- Upvote Button -->
+            <ImageButton
+                android:id="@+id/btn_upvote"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical|start"
+                android:layout_marginStart="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/upvote"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_upvote"/>
 
-                <!-- Upvote Button -->
-                <ImageButton
-                    android:id="@+id/btn_upvote"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_marginStart="4dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/upvote"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_arrow_right"
-                    android:tint="@color/white" />
+            <!-- Vote Count -->
+            <TextView
+                android:id="@+id/tv_vote_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/montserrat_regular"
+                android:text="156"
+                android:textSize="14sp"
+                tools:ignore="TextViewEdits" />
 
-                <!-- Vote Count -->
-                <TextView
-                    android:id="@+id/tv_vote_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:text="156"
-                    android:textColor="@color/white"
-                    android:textSize="13sp"
-                    tools:ignore="TextViewEdits" />
-
-                <!-- Downvote Button -->
-                <ImageButton
-                    android:id="@+id/btn_downvote"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center_vertical|end"
-                    android:layout_marginEnd="4dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/downvote"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_arrow_back"
-                    android:tint="@color/white" />
-            </FrameLayout>
+            <!-- Downvote Button -->
+            <ImageButton
+                android:id="@+id/btn_downvote"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/downvote"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_downvote" />
         </FrameLayout>
 
         <Space
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_weight="0.5" />
+            android:layout_weight="1" />
 
         <!-- Comment and Share -->
         <LinearLayout
@@ -178,27 +170,25 @@
             android:layout_height="40dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingEnd="8dp">
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
 
             <!-- Comments Button -->
             <FrameLayout
-                android:layout_width="65dp"
-                android:layout_height="37dp"
+                android:layout_width="70dp"
+                android:layout_height="40dp"
                 android:layout_margin="4dp"
-                android:background="@drawable/button_primary_background"
-                app:cornerRadius="18dp">
+                android:background="@drawable/button_comment_background">
 
                 <ImageButton
                     android:id="@+id/btn_comments"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_gravity="center_vertical|start"
-                    android:layout_marginStart="12dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/comments"
                     android:scaleType="centerInside"
-                    android:src="@drawable/ic_mail"
-                    android:tint="@color/white" />
+                    android:src="@drawable/ic_comment" />
 
                 <TextView
                     android:id="@+id/tv_comment_count"
@@ -208,22 +198,27 @@
                     android:layout_marginEnd="10dp"
                     android:fontFamily="@font/montserrat_regular"
                     android:text="43"
-                    android:textColor="@color/white"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     tools:ignore="TextViewEdits" />
             </FrameLayout>
 
             <!-- Share Button -->
-            <ImageButton
-                android:id="@+id/btn_share"
+            <FrameLayout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_margin="4dp"
-                android:background="@drawable/button_primary_background"
-                android:contentDescription="@string/share"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_next_arrow"
-                android:tint="@color/white" />
+                android:background="@drawable/button_share_background">
+
+                <ImageButton
+                    android:id="@+id/btn_share"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/share"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_share" />
+            </FrameLayout>
         </LinearLayout>
     </LinearLayout>
 

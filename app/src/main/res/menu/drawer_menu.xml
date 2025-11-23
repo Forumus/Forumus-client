@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <!-- POPULAR TAGS Group -->
+    <group
+        android:id="@+id/group_tags"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/menu_computer_science"
+            android:icon="@drawable/ic_cs"
+            android:title="computer_science" />
+
+
+        <item
+            android:id="@+id/menu_mathematics"
+            android:icon="@drawable/ic_mathematics"
+            android:title="mathematics" />
+
+        <item
+            android:id="@+id/menu_engineering"
+            android:icon="@drawable/ic_engineering"
+            android:title="engineering" />
+
+        <item
+            android:id="@+id/menu_sciences"
+            android:icon="@drawable/ic_sciences"
+            android:title="sciences" />
+
+        <item
+            android:id="@+id/menu_business_school"
+            android:icon="@drawable/ic_business_school"
+            android:title="business_school" />
+
+        <item
+            android:id="@+id/menu_arts_humanities"
+            android:icon="@drawable/ic_arts_humanities"
+            android:title="arts_humanities" />
+
+        <item
+            android:id="@+id/menu_social_sciences"
+            android:icon="@drawable/ic_social_sciences"
+            android:title="social_sciences" />
+
+        <item
+            android:id="@+id/menu_study_groups"
+            android:icon="@drawable/ic_study_groups"
+            android:title="study_groups" />
+
+        <item
+            android:id="@+id/menu_campus_events"
+            android:icon="@drawable/ic_campus_events"
+            android:title="campus_events" />
+
+        <item
+            android:id="@+id/menu_career_services"
+            android:icon="@drawable/ic_career_services"
+            android:title="career_services" />
+
+        <item
+            android:id="@+id/menu_library_resources"
+            android:icon="@drawable/ic_library_resources"
+            android:title="library_resources" />
+
+        <item
+            android:id="@+id/menu_residence_life"
+            android:icon="@drawable/ic_residence_life"
+            android:title="residence_life" />
+
+        <item
+            android:id="@+id/menu_financial_aid"
+            android:icon="@drawable/ic_financial_aid"
+            android:title="financial_aid" />
+
+    </group>
+
+</menu>
