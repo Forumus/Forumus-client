@@ -22,6 +22,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupClickListeners()
+        setupTextChangeListeners()
         observeAccountExistsState()
     }
 
@@ -29,19 +30,37 @@ class ForgotPasswordActivity : AppCompatActivity() {
         binding.btnSubmit.setOnClickListener {
             userEmail = binding.etEmail.text.toString().trim()
 
-            if (userEmail.isEmpty()) {
-                binding.etEmail.error = "Please enter your email"
+            // Clear previous errors
+            binding.tilEmail.isErrorEnabled = false
+            
+            if (userEmail.isBlank()) {
+                binding.tilEmail.isErrorEnabled = true
+                binding.tilEmail.error = "Please enter your email"
                 return@setOnClickListener
             }
 
             if (!ValidationUtils.isValidEmail(userEmail)) {
-                binding.etEmail.error = "Please enter a valid email"
+                binding.tilEmail.isErrorEnabled = true
+                binding.tilEmail.error = "Please enter a valid email"
                 return@setOnClickListener
             }
 
             viewModel.checkAccountExists(userEmail)
 
         }
+    }
+    
+    private fun setupTextChangeListeners() {
+        binding.etEmail.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.tilEmail.error != null) {
+                    binding.tilEmail.error = null
+                    binding.tilEmail.isErrorEnabled = false
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
     }
 
     private fun observeAccountExistsState() {
@@ -60,12 +79,14 @@ class ForgotPasswordActivity : AppCompatActivity() {
                             putExtra("verification_type", "forgot_password")
                         })
                     } else {
-                        binding.etEmail.error = "No account found with this email"
+                        binding.tilEmail.isErrorEnabled = true
+                        binding.tilEmail.error = "No account found with this email"
                     }
                 }
                 is Resource.Error -> {
                     showLoading(false)
-                    binding.etEmail.error = resource.message ?: "An error occurred"
+                    binding.tilEmail.isErrorEnabled = true
+                    binding.tilEmail.error = resource.message ?: "An error occurred"
                 }
             }
         }

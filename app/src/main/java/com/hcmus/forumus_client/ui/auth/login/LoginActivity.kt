@@ -37,6 +37,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupClickListeners()
+        setupTextChangeListeners()
         setupRegisterText()
         setupForgotPasswordText()
         observeLoginState()
@@ -46,8 +47,57 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString()
+            
+            // Clear previous errors
+            binding.tilEmail.isErrorEnabled = false
+            binding.tilPassword.isErrorEnabled = false
+            
+            // Validate email
+            if (email.isBlank()) {
+                binding.tilEmail.isErrorEnabled = true
+                binding.tilEmail.error = "Please enter your email"
+                return@setOnClickListener
+            }
+            
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.tilEmail.isErrorEnabled = true
+                binding.tilEmail.error = "Please enter a valid email address"
+                return@setOnClickListener
+            }
+            
+            // Validate password
+            if (password.isBlank()) {
+                binding.tilPassword.isErrorEnabled = true
+                binding.tilPassword.error = "Please enter your password"
+                return@setOnClickListener
+            }
+            
             viewModel.login(email, password)
         }
+    }
+    
+    private fun setupTextChangeListeners() {
+        binding.etEmail.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.tilEmail.error != null) {
+                    binding.tilEmail.error = null
+                    binding.tilEmail.isErrorEnabled = false
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+        
+        binding.etPassword.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.tilPassword.error != null) {
+                    binding.tilPassword.error = null
+                    binding.tilPassword.isErrorEnabled = false
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
     }
 
     private fun observeLoginState() {
@@ -74,7 +124,23 @@ class LoginActivity : AppCompatActivity() {
                 }
                 is Resource.Error -> {
                     showLoading(false)
-                    Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show()
+                    val errorMessage = resource.message ?: "Login failed"
+                    
+                    // Show specific field errors based on error message
+                    when {
+                        errorMessage.contains("credential", ignoreCase = true) -> {
+                            binding.tilPassword.isErrorEnabled = true
+                            binding.tilPassword.error = "Invalid password"
+                        }
+                        errorMessage.contains("email", ignoreCase = true) || 
+                        errorMessage.contains("user", ignoreCase = true) -> {
+                            binding.tilEmail.isErrorEnabled = true
+                            binding.tilEmail.error = "No account found with this email"
+                        }
+                        else -> {
+                            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+                        }
+                    }
                 }
             }
         }

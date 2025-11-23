@@ -15,15 +15,10 @@
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/Theme.Forumus">
-        <!-- Login Activity as Launcher -->
+        <!-- Login Activity -->
         <activity
             android:name=".ui.auth.login.LoginActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
 
         <activity
             android:name=".ui.auth.verification.VerificationActivity"
@@ -52,6 +47,27 @@
         <activity
             android:name=".ui.auth.resetPassword.ResetPasswordActivity"
             android:exported="false" />
+
+        <!-- Slide Activity -->
+        <activity
+            android:name=".ui.onboarding.slide.SlideActivity"
+            android:exported="false" />
+
+        <!-- Welcome Activity -->
+        <activity
+            android:name=".ui.onboarding.welcome.WelcomeActivity"
+            android:exported="false" />
+
+        <!-- Splash Activity as Launcher -->
+        <activity
+            android:name=".ui.splash.SplashActivity"
+            android:exported="true"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
     </application>
 

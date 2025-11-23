@@ -7,6 +7,12 @@
 
     <style name="Theme.Forumus" parent="Base.Theme.Forumus" />
     
+    <!-- Splash Theme -->
+    <style name="SplashTheme" parent="Theme.Forumus">
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:statusBarColor">@color/background_light</item>
+    </style>
+    
     <!-- OTP Digit Style -->
     <style name="OtpDigitStyle">
         <item name="android:layout_width">44dp</item>

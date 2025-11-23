@@ -22,7 +22,7 @@
     <string name="almost_there">Almost there</string>
     <string name="verification_description">Please enter the 6-digit code sent to your email %s for verification.</string>
     <string name="verify">Verify</string>
-    <string name="didnt_receive_code">Didn\'t receive any code? Resend Again</string>
+    <string name="didnt_receive_code">Didn\'t receive any code? Resend</string>
     <string name="request_new_code_timer">Request new code in %s</string>
     <string name="otp_digit_hint">0</string>
     
@@ -62,6 +62,14 @@
     <string name="privacy_policy_text">By providing your information, you consent to the processing of your data in accordance with our <u>Privacy Policy</u></string>
 
     <!-- Slide screen -->
-    <string name="slide_title">Learn Together</string>
-    <string name="slide_subtitle">Discover topics you care about, ask questions, and get insights from real learners and experts.</string>
+    <string name="slide_title_1">Learn Together</string>
+    <string name="slide_subtitle_1">Discover topics you care about, ask questions, and get insights from real learners and experts.</string>
+    <string name="slide_title_2">Share Knowledge</string>
+    <string name="slide_subtitle_2">Help others grow by posting answers, tutorials, or sharing your experience — every contribution counts</string>
+    <string name="slide_title_3">Join Community</string>
+    <string name="slide_subtitle_3">Connect with like-minded individuals, participate in discussions, and be part of a supportive learning community.</string>
+
+    <string name="select_role">Select Role</string>
+    <string name="student">Student</string>
+    <string name="teacher">Teacher</string>
 </resources>

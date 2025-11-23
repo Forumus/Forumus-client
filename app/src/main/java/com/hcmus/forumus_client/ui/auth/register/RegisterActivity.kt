@@ -32,6 +32,7 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupClickListeners()
+        setupTextChangeListeners()
         setupLoginText()
         observeRegisterState()
     }
@@ -43,6 +44,58 @@ class RegisterActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString()
             val confirmPassword = binding.etConfirmPassword.text.toString()
             val isTermsAccepted = binding.cbTerms.isChecked
+
+            // Clear previous errors
+            binding.tilFullName.isErrorEnabled = false
+            binding.tilEmail.isErrorEnabled = false
+            binding.tilPassword.isErrorEnabled = false
+            binding.tilConfirmPassword.isErrorEnabled = false
+
+            // Validate full name
+            if (fullName.isBlank()) {
+                binding.tilFullName.isErrorEnabled = true
+                binding.tilFullName.error = "Please enter your full name"
+                return@setOnClickListener
+            }
+
+            // Validate email
+            if (email.isBlank()) {
+                binding.tilEmail.isErrorEnabled = true
+                binding.tilEmail.error = "Please enter your email"
+                return@setOnClickListener
+            }
+
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.tilEmail.isErrorEnabled = true
+                binding.tilEmail.error = "Please enter a valid email address"
+                return@setOnClickListener
+            }
+
+            // Validate password
+            if (password.isBlank()) {
+                binding.tilPassword.isErrorEnabled = true
+                binding.tilPassword.error = "Please enter a password"
+                return@setOnClickListener
+            }
+
+            if (password.length < 8) {
+                binding.tilPassword.isErrorEnabled = true
+                binding.tilPassword.error = "Password must be at least 8 characters"
+                return@setOnClickListener
+            }
+
+            // Validate confirm password
+            if (confirmPassword.isBlank()) {
+                binding.tilConfirmPassword.isErrorEnabled = true
+                binding.tilConfirmPassword.error = "Please confirm your password"
+                return@setOnClickListener
+            }
+
+            if (password != confirmPassword) {
+                binding.tilConfirmPassword.isErrorEnabled = true
+                binding.tilConfirmPassword.error = "Passwords do not match"
+                return@setOnClickListener
+            }
 
             val role = when (binding.rgRole.checkedRadioButtonId) {
                 binding.rbTeacher.id -> UserRole.TEACHER
@@ -56,6 +109,52 @@ class RegisterActivity : AppCompatActivity() {
 
             viewModel.register(fullName, email, password, confirmPassword, role)
         }
+    }
+    
+    private fun setupTextChangeListeners() {
+        binding.etFullName.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.tilFullName.error != null) {
+                    binding.tilFullName.error = null
+                    binding.tilFullName.isErrorEnabled = false
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+        
+        binding.etEmail.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.tilEmail.error != null) {
+                    binding.tilEmail.error = null
+                    binding.tilEmail.isErrorEnabled = false
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+        
+        binding.etPassword.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.tilPassword.error != null) {
+                    binding.tilPassword.error = null
+                    binding.tilPassword.isErrorEnabled = false
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+        
+        binding.etConfirmPassword.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.tilConfirmPassword.error != null) {
+                    binding.tilConfirmPassword.error = null
+                    binding.tilConfirmPassword.isErrorEnabled = false
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
     }
 
     private fun observeRegisterState() {
@@ -76,7 +175,27 @@ class RegisterActivity : AppCompatActivity() {
 
                 is Resource.Error -> {
                     showLoading(false)
-                    Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show()
+                    val errorMessage = resource.message ?: "Registration failed"
+                    
+                    // Show specific field errors based on error message
+                    when {
+                        errorMessage.contains("email", ignoreCase = true) && 
+                        errorMessage.contains("already", ignoreCase = true) -> {
+                            binding.tilEmail.isErrorEnabled = true
+                            binding.tilEmail.error = "An account with this email already exists"
+                        }
+                        errorMessage.contains("email", ignoreCase = true) -> {
+                            binding.tilEmail.isErrorEnabled = true
+                            binding.tilEmail.error = "Invalid email address"
+                        }
+                        errorMessage.contains("password", ignoreCase = true) -> {
+                            binding.tilPassword.isErrorEnabled = true
+                            binding.tilPassword.error = "Password requirements not met"
+                        }
+                        else -> {
+                            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+                        }
+                    }
                 }
             }
         }

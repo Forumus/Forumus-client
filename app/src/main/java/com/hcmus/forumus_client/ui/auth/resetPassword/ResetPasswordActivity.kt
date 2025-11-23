@@ -26,6 +26,7 @@ class ResetPasswordActivity : AppCompatActivity() {
         userEmail = intent.getStringExtra("user_email") ?: userEmail
 
         setupClickListeners()
+        setupTextChangeListeners()
         observeResetPasswordState()
     }
 
@@ -34,23 +35,54 @@ class ResetPasswordActivity : AppCompatActivity() {
             val newPassword = binding.etPassword.text.toString()
             val confirmPassword = binding.etConfirmPassword.text.toString()
 
+            // Clear previous errors
+            binding.tilPassword.isErrorEnabled = false
+            binding.tilConfirmPassword.isErrorEnabled = false
+            
             if (newPassword.isBlank()) {
-                binding.etPassword.error = "Please enter a new password"
+                binding.tilPassword.isErrorEnabled = true
+                binding.tilPassword.error = "Please enter a new password"
                 return@setOnClickListener
             }
 
             if (newPassword != confirmPassword) {
-                binding.etConfirmPassword.error = "Passwords do not match"
+                binding.tilConfirmPassword.isErrorEnabled = true
+                binding.tilConfirmPassword.error = "Passwords do not match"
                 return@setOnClickListener
             }
 
             if (!ValidationUtils.isValidPassword(newPassword)) {
-                binding.etPassword.error = "Password must be at least 8 characters, include uppercase, lowercase, number, and special character"
+                binding.tilPassword.isErrorEnabled = true
+                binding.tilPassword.error = "Password must be at least 8 characters, include uppercase, lowercase, number, and special character"
                 return@setOnClickListener
             }
 
             viewModel.resetPassword(userEmail, newPassword)
         }
+    }
+    
+    private fun setupTextChangeListeners() {
+        binding.etPassword.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.tilPassword.error != null) {
+                    binding.tilPassword.error = null
+                    binding.tilPassword.isErrorEnabled = false
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+        
+        binding.etConfirmPassword.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.tilConfirmPassword.error != null) {
+                    binding.tilConfirmPassword.error = null
+                    binding.tilConfirmPassword.isErrorEnabled = false
+                }
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
     }
 
     private fun observeResetPasswordState() {

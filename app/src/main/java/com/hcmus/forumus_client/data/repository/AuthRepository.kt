@@ -70,6 +70,7 @@ class AuthRepository (
             Log.d("AuthRepository", "Login successful - User: ${user.email}, emailVerified: ${user.emailVerified}")
             Resource.Success(user)
         } catch (e: Exception) {
+            Log.d("AuthRepository", "Login failed: ${e.message}")
             Resource.Error(e.message ?: "Login failed")
         }
     }
