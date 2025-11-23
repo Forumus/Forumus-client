@@ -9,21 +9,20 @@
     <string name="valid_email">Valid email</string>
     <string name="phone_number">Phone number</string>
     <string name="strong_password">Strong Password</string>
+    <string name="confirm_password">Confirm Password</string>
     <string name="next">Next</string>
+    <string name="register">Register</string>
+    <string name="already_member_login">Already a member? Log in</string>
     <string name="already_member">Already a member?</string>
-    <string name="log_in">Log In</string>
-    <string name="terms_conditions_start">By checking the box you agree to our</string>
-    <string name="terms">Terms</string>
-    <string name="and">and</string>
-    <string name="conditions">Conditions</string>
-    <string name="terms_conditions_end">.</string>
-    
+    <string name="login_now">Login now</string>
+    <string name="terms_conditions">By checking the box you agree to our Terms and Conditions</string>
+
     <!-- Verification screen -->
     <string name="back">Back</string>
     <string name="almost_there">Almost there</string>
     <string name="verification_description">Please enter the 6-digit code sent to your email %s for verification.</string>
     <string name="verify">Verify</string>
-    <string name="didnt_receive_code">Didn\'t receive any code? Resend Again</string>
+    <string name="didnt_receive_code">Didn\'t receive any code? Resend</string>
     <string name="request_new_code_timer">Request new code in %s</string>
     <string name="otp_digit_hint">0</string>
     
@@ -33,7 +32,7 @@
     <string name="enter_your_email">Enter your email</string>
     <string name="password">Password</string>
     <string name="remember_me">Remember me</string>
-    <string name="forgot_password">Forget password ?</string>
+    <string name="forgot_password">Forgot password ?</string>
     <string name="login">Login</string>
     <string name="new_member">New Member?</string>
     <string name="register_now">Register now</string>
@@ -45,11 +44,32 @@
     <string name="finish">Finish</string>
     <string name="success_icon">Success icon</string>
 
+    <!-- Forgot Password screen -->
+    <string name="forgot_password_title">Forgot password</string>
+    <string name="forgot_password_subtitle">Pleaser enter the email that you register. If it matches, we will send the <b>verification code</b> to your email.</string>
+    <string name="your_email">Your email</string>
+    <string name="submit">Submit</string>
+
+    <!-- Reset Password screen -->
+    <string name="reset_password_title">Reset password</string>
+    <string name="reset_password_subtitle">Pleaser enter the email that you register. If it matches, we will send the <b>verification code</b> to your email.</string>
+    <string name="retype_password">Retype password</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+
     <!-- Welcome screen -->
     <string name="get_started">Get started</string>
     <string name="privacy_policy_text">By providing your information, you consent to the processing of your data in accordance with our <u>Privacy Policy</u></string>
 
     <!-- Slide screen -->
-    <string name="slide_title">Learn Together</string>
-    <string name="slide_subtitle">Discover topics you care about, ask questions, and get insights from real learners and experts.</string>
+    <string name="slide_title_1">Learn Together</string>
+    <string name="slide_subtitle_1">Discover topics you care about, ask questions, and get insights from real learners and experts.</string>
+    <string name="slide_title_2">Share Knowledge</string>
+    <string name="slide_subtitle_2">Help others grow by posting answers, tutorials, or sharing your experience — every contribution counts</string>
+    <string name="slide_title_3">Join Community</string>
+    <string name="slide_subtitle_3">Connect with like-minded individuals, participate in discussions, and be part of a supportive learning community.</string>
+
+    <string name="select_role">Select Role</string>
+    <string name="student">Student</string>
+    <string name="teacher">Teacher</string>
 </resources>

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -40,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="35dp"
-        android:fontFamily="@font/montserrat_light"
+        android:fontFamily="@font/montserrat_medium"
         android:lineSpacingExtra="4dp"
         android:text="@string/verification_description"
         android:textColor="@color/text_primary"
@@ -114,12 +116,24 @@
         android:fontFamily="@font/montserrat_semibold"
         android:text="@string/verify"
         android:textAllCaps="false"
-        android:textColor="@color/button_text"
+        android:textColor="@color/background_light"
         android:textSize="20sp"
         android:elevation="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ll_otp_container" />
+
+    <!-- Verify Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progress_bar_verify"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:indeterminateTint="@color/background_light"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/btn_verify"
+        app:layout_constraintEnd_toEndOf="@id/btn_verify"
+        app:layout_constraintStart_toStartOf="@id/btn_verify"
+        app:layout_constraintTop_toTopOf="@id/btn_verify" />
 
     <!-- Didn't receive code text -->
     <TextView
@@ -127,7 +141,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="27dp"
-        android:fontFamily="@font/arial_bold"
+        android:textStyle="bold"
         android:text="@string/didnt_receive_code"
         android:textColor="@color/text_primary"
         android:textSize="13sp"
@@ -141,7 +155,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:fontFamily="@font/arial_regular"
         android:text="@string/request_new_code_timer"
         android:textColor="@color/hint_text"
         android:textSize="13sp"
@@ -150,3 +163,4 @@
         app:layout_constraintTop_toBottomOf="@id/tv_didnt_receive" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
