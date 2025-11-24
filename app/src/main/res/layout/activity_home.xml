@@ -5,7 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    android:fitsSystemWindows="true">
 
     <!-- Main Content -->
     <FrameLayout
@@ -23,6 +23,7 @@
 
             <!-- Top App Bar -->
             <LinearLayout
+                android:id="@+id/top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
                 android:background="@color/white"
@@ -94,19 +95,17 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_posts"
                 android:layout_width="match_parent"
-                android:layout_height="499dp"
+                android:layout_height="0dp"
                 android:layout_weight="1"
                 android:clipToPadding="false"
                 android:paddingBottom="60dp"
                 tools:listitem="@layout/item_post_card" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+            <!-- Removed extra Space to let RecyclerView fully expand -->
 
             <!-- Bottom Navigation -->
             <FrameLayout
+                android:id="@+id/bottom_nav_container"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:background="@color/white"
@@ -196,7 +195,7 @@
                                 android:layout_width="55dp"
                                 android:layout_height="55dp"
                                 android:layout_gravity="center"
-                                android:contentDescription="@string/create"
+                                android:contentDescription="Create"
                                 android:scaleType="centerInside"
                                 android:src="@drawable/ic_create_post"/>
                         </FrameLayout>
@@ -215,7 +214,7 @@
                         <ImageView
                             android:layout_width="28dp"
                             android:layout_height="28dp"
-                            android:contentDescription="@string/alerts"
+                            android:contentDescription="Alerts"
                             android:scaleType="centerInside"
                             android:src="@drawable/ic_notification"
                             app:tint="#666666" />
@@ -224,7 +223,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="0dp"
                             android:fontFamily="@font/montserrat_regular"
-                            android:text="@string/alerts"
+                            android:text="Alerts"
                             android:textColor="#666666"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -242,7 +241,7 @@
                         <ImageView
                             android:layout_width="28dp"
                             android:layout_height="28dp"
-                            android:contentDescription="@string/chat"
+                            android:contentDescription="Chat"
                             android:scaleType="centerInside"
                             android:src="@drawable/ic_chat"
                             android:translationY="1dp"
@@ -253,7 +252,7 @@
                             android:translationY="-3dp"
                             android:layout_marginTop="4dp"
                             android:fontFamily="@font/montserrat_regular"
-                            android:text="@string/chat"
+                            android:text="Chat"
                             android:textColor="#666666"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -289,7 +288,7 @@
                 <ImageView
                     android:layout_width="18dp"
                     android:layout_height="18dp"
-                    android:contentDescription="@string/view_profile"
+                    android:contentDescription="View profile"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_user_profile" />
 
@@ -298,7 +297,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:fontFamily="@font/montserrat_regular"
-                    android:text="@string/view_profile"
+                    android:text="View profile"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -317,7 +316,7 @@
                 <ImageView
                     android:layout_width="18dp"
                     android:layout_height="18dp"
-                    android:contentDescription="@string/edit_profile"
+                    android:contentDescription="Edit profile"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_user_profile" />
 
@@ -326,7 +325,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:fontFamily="@font/montserrat_regular"
-                    android:text="@string/edit_profile"
+                    android:text="Edit profile"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -352,7 +351,7 @@
                 <ImageView
                     android:layout_width="18dp"
                     android:layout_height="18dp"
-                    android:contentDescription="@string/dark_mode"
+                    android:contentDescription="Dark mode"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_theme" />
 
@@ -361,7 +360,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:fontFamily="@font/montserrat_regular"
-                    android:text="@string/dark_mode"
+                    android:text="Dark mode"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -380,7 +379,7 @@
                 <ImageView
                     android:layout_width="18dp"
                     android:layout_height="18dp"
-                    android:contentDescription="@string/settings"
+                    android:contentDescription="Settings"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_settings" />
 
@@ -389,7 +388,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:fontFamily="@font/montserrat_regular"
-                    android:text="@string/settings"
+                    android:text="Settings"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
             </LinearLayout>
