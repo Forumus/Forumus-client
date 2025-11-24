@@ -16,4 +16,12 @@
     <!-- Login button gradient colors -->
     <color name="gradient_start">#3F78E0</color>
     <color name="gradient_end">#00D4FF</color>
+
+    <!-- Post colors -->
+    <color name="post_background">#FFFFFF</color>
+    <color name="text_secondary_light">#999999</color>
+    <color name="text_tertiary">#666666</color>
+    <color name="divider">#E0E0E0</color>
+    <color name="button_background_light">#F1F3F5</color>
+    <color name="button_background_lighter">#F8F9FA</color>
 </resources>
