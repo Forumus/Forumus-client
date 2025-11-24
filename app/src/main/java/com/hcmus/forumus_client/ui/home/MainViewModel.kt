@@ -3,6 +3,7 @@ package com.hcmus.forumus_client.ui.home
 import android.graphics.Rect
 import android.view.MotionEvent
 import com.hcmus.forumus_client.data.model.Post
+import com.hcmus.forumus_client.data.model.VoteState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -44,7 +45,8 @@ class MainViewModel : ViewModel() {
 					content = "Amazing start to sports week with soccer, basketball, tennis and more.",
 					voteCount = 156,
 					commentCount = 43,
-					imageUrls = emptyList()
+					imageUrls = emptyList(),
+					userVote = VoteState.NONE
 				),
 				Post(
 					id = "2",
@@ -55,7 +57,8 @@ class MainViewModel : ViewModel() {
 					content = "Don't forget to register and bring your energy! Prizes for top 3 teams.",
 					voteCount = 89,
 					commentCount = 12,
-					imageUrls = emptyList()
+					imageUrls = emptyList(),
+					userVote = VoteState.NONE
 				),
 				Post(
 					id = "3",
@@ -66,9 +69,46 @@ class MainViewModel : ViewModel() {
 					content = "Share your favorite quiet or collaborative spaces around campus.",
 					voteCount = 42,
 					commentCount = 18,
-					imageUrls = emptyList()
+					imageUrls = emptyList(),
+					userVote = VoteState.NONE
+				),
+				Post(
+					id = "4",
+					communityName = "c/Information_Technology",
+					communityIconLetter = "C",
+					timePosted = "2h",
+					title = "Finding teammates for a group project",
+					content = "I'm currently working on an android application project for the mobile development class." +
+							"\nWe need a team of 5 and currently short 2 people." +
+							"\nRequirements are in comments. ",
+					voteCount = 23,
+					commentCount = 36,
+					imageUrls = emptyList(),
+					userVote = VoteState.NONE
 				)
 			)
+		}
+	}
+
+	fun onUpvote(postId: String) {
+		_posts.value = _posts.value?.map { post ->
+			if (post.id != postId) return@map post
+			when (post.userVote) {
+				VoteState.UP -> post.copy(userVote = VoteState.NONE, voteCount = post.voteCount - 1)
+				VoteState.DOWN -> post.copy(userVote = VoteState.UP, voteCount = post.voteCount + 2)
+				VoteState.NONE -> post.copy(userVote = VoteState.UP, voteCount = post.voteCount + 1)
+			}
+		}
+	}
+
+	fun onDownvote(postId: String) {
+		_posts.value = _posts.value?.map { post ->
+			if (post.id != postId) return@map post
+			when (post.userVote) {
+				VoteState.DOWN -> post.copy(userVote = VoteState.NONE, voteCount = post.voteCount + 1) // remove downvote adds 1 back
+				VoteState.UP -> post.copy(userVote = VoteState.DOWN, voteCount = post.voteCount - 2)
+				VoteState.NONE -> post.copy(userVote = VoteState.DOWN, voteCount = post.voteCount - 1)
+			}
 		}
 	}
 

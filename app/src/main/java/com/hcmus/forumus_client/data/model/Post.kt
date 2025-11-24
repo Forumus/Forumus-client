@@ -9,5 +9,6 @@ data class Post(
 	val content: String,
 	val voteCount: Int,
 	val commentCount: Int,
-	val imageUrls: List<String> = emptyList()
+	val imageUrls: List<String> = emptyList(),
+	val userVote: VoteState = VoteState.NONE
 )

@@ -34,6 +34,8 @@
                 android:paddingEnd="16dp">
 
                 <!-- Menu Button -->
+
+                <!-- Logo and App Name -->
                 <ImageButton
                     android:id="@+id/btn_menu"
                     android:layout_width="48dp"
@@ -43,7 +45,6 @@
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_hamburger_button" />
 
-                <!-- Logo and App Name -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

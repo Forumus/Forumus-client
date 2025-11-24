@@ -4,6 +4,8 @@ import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.MotionEvent
+import android.graphics.drawable.ColorDrawable
+import android.content.res.Configuration
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -13,9 +15,11 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.R
@@ -121,7 +125,17 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupRecycler() {
-        postAdapter = PostAdapter()
+        postAdapter = PostAdapter(object : PostAdapter.PostInteractionListener {
+            override fun onUpvote(post: com.hcmus.forumus_client.data.model.Post) {
+                viewModel.onUpvote(post.id)
+            }
+            override fun onDownvote(post: com.hcmus.forumus_client.data.model.Post) {
+                viewModel.onDownvote(post.id)
+            }
+            override fun onComments(post: com.hcmus.forumus_client.data.model.Post) { /* TODO */ }
+            override fun onShare(post: com.hcmus.forumus_client.data.model.Post) { /* TODO */ }
+            override fun onPostClicked(post: com.hcmus.forumus_client.data.model.Post) { /* TODO */ }
+        })
         postsRecycler.layoutManager = LinearLayoutManager(this)
         postsRecycler.adapter = postAdapter
         viewModel.posts.observe(this) { list ->
@@ -143,6 +157,12 @@ class HomeActivity : AppCompatActivity() {
             )
             insets
         }
+
+        // Set status bar icon appearance based on actual top bar background luminance
+        val bgColor = (topAppBar.background as? ColorDrawable)?.color
+            ?: ContextCompat.getColor(this, R.color.background_light)
+        val isLightBackground = ColorUtils.calculateLuminance(bgColor) > 0.5
+        WindowInsetsControllerCompat(window, root).isAppearanceLightStatusBars = isLightBackground
     }
 
     private fun applyInactiveStyle(container: View) {
@@ -152,9 +172,15 @@ class HomeActivity : AppCompatActivity() {
             val label = container.getChildAt(1) as? TextView
             // Clear any special backgrounds from home icon
             icon?.background = null
-            val inactive = ContextCompat.getColor(this, R.color.text_tertiary)
-            icon?.imageTintList = ColorStateList.valueOf(inactive)
-            label?.setTextColor(inactive)
+            val inactiveColor = ContextCompat.getColor(this, R.color.text_tertiary)
+            when (container) {
+                navHome -> icon?.setImageResource(R.drawable.ic_home)
+                navExplore -> icon?.setImageResource(R.drawable.ic_explore)
+                navAlerts -> icon?.setImageResource(R.drawable.ic_notification)
+                navChat -> icon?.setImageResource(R.drawable.ic_chat)
+            }
+            icon?.imageTintList = ColorStateList.valueOf(inactiveColor)
+            label?.setTextColor(inactiveColor)
         }
     }
 
@@ -166,7 +192,25 @@ class HomeActivity : AppCompatActivity() {
             val icon = container.getChildAt(0) as? ImageView
             val label = container.getChildAt(1) as? TextView
             icon?.background = null
-            icon?.imageTintList = ColorStateList.valueOf(blue)
+            when (container) {
+                navHome -> {
+                    icon?.setImageResource(R.drawable.ic_home_filled)
+                    icon?.imageTintList = null
+                }
+                navExplore -> {
+                    icon?.setImageResource(R.drawable.ic_explore_filled)
+                    icon?.imageTintList = null
+                }
+                navAlerts -> {
+                    icon?.setImageResource(R.drawable.ic_notification_filled)
+                    icon?.imageTintList = null
+                }
+                navChat -> {
+                    icon?.setImageResource(R.drawable.ic_chat_filled)
+                    icon?.imageTintList = null
+                }
+            }
+            // Other non-icon changes
             label?.setTextColor(blue)
         }
     }
@@ -179,14 +223,4 @@ class HomeActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
-    // You can now safely remove the old onBackPressed method.
-    /*
-    override fun onBackPressed() {
-        if (viewModel.menuVisible.value == true) {
-            viewModel.hideMenu()
-        } else {
-            super.onBackPressed()
-        }
-    }
-    */
 }

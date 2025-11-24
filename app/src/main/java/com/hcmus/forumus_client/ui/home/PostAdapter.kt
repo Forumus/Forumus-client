@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.Post
+import com.hcmus.forumus_client.data.model.VoteState
 
 class PostAdapter(
     private val listener: PostInteractionListener? = null
@@ -60,6 +61,29 @@ class PostAdapter(
             tvTitle.text = post.title
             tvContent.text = post.content
             tvVoteCount.text = post.voteCount.toString()
+
+            // Swap drawables to show filled icons when voted; outline with gray tint when inactive
+            val inactive = itemView.context.getColor(R.color.text_secondary_light)
+            when (post.userVote) {
+                VoteState.UP -> {
+                    btnUpvote.setImageResource(R.drawable.ic_upvote_filled)
+                    btnUpvote.imageTintList = null
+                    btnDownvote.setImageResource(R.drawable.ic_downvote)
+                    btnDownvote.imageTintList = android.content.res.ColorStateList.valueOf(inactive)
+                }
+                VoteState.DOWN -> {
+                    btnDownvote.setImageResource(R.drawable.ic_downvote_filled)
+                    btnDownvote.imageTintList = null
+                    btnUpvote.setImageResource(R.drawable.ic_upvote)
+                    btnUpvote.imageTintList = android.content.res.ColorStateList.valueOf(inactive)
+                }
+                VoteState.NONE -> {
+                    btnUpvote.setImageResource(R.drawable.ic_upvote)
+                    btnDownvote.setImageResource(R.drawable.ic_downvote)
+                    btnUpvote.imageTintList = android.content.res.ColorStateList.valueOf(inactive)
+                    btnDownvote.imageTintList = android.content.res.ColorStateList.valueOf(inactive)
+                }
+            }
             tvCommentCount.text = post.commentCount.toString()
 
             // Simple image handling placeholder: remove previous children

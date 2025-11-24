@@ -3,5 +3,12 @@
     <style name="Base.Theme.Forumus" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- Night theme config: light icons on status bar -->
+    <style name="Theme.Forumus" parent="Base.Theme.Forumus">
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

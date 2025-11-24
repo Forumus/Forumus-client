@@ -3,9 +3,16 @@
     <style name="Base.Theme.Forumus" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Draw behind system bars for edge-to-edge -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="Theme.Forumus" parent="Base.Theme.Forumus" />
+    <!-- Light theme config -->
+    <style name="Theme.Forumus" parent="Base.Theme.Forumus">
+        <!-- Dark icons/text on light status bar background -->
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
     
     <!-- Splash Theme -->
     <style name="SplashTheme" parent="Theme.Forumus">
