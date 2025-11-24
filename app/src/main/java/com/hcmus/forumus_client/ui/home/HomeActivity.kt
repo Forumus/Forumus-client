@@ -144,21 +144,20 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun configureEdgeToEdge() {
-        // Edge-to-edge with only top inset applied.
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val root = findViewById<View>(R.id.drawer_layout)
         ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
-            val sysBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            topAppBar.setPadding(
-                topAppBar.paddingLeft,
-                sysBars.top,
-                topAppBar.paddingRight,
-                topAppBar.paddingBottom
-            )
+            val sys = insets.getInsets(WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout())
+            // Apply top inset as margin to the app bar to prevent overlap
+            (topAppBar.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                if (lp.topMargin != sys.top) {
+                    lp.topMargin = sys.top
+                    topAppBar.layoutParams = lp
+                }
+            }
             insets
         }
-
-        // Set status bar icon appearance based on actual top bar background luminance
+        ViewCompat.requestApplyInsets(root)
         val bgColor = (topAppBar.background as? ColorDrawable)?.color
             ?: ContextCompat.getColor(this, R.color.background_light)
         val isLightBackground = ColorUtils.calculateLuminance(bgColor) > 0.5

@@ -4,18 +4,5 @@
     android:height="28dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-
-    <!-- Circle -->
-    <path
-        android:fillColor="@color/link_color"
-        android:pathData="M10,2
-                          A8,8 0 1,1 9.999,2Z"/>
-
-    <!-- Handle -->
-    <path
-        android:fillColor="@color/link_color"
-        android:pathData="M15.5,15.5
-                          L20,20
-                          L18.6,21.4
-                          L14.1,16.9Z"/>
+    <path android:fillColor="@color/link_color" android:pathData="M11,2C6.032,2 2,6.032 2,11C2,15.968 6.032,20 11,20C12.995,20 14.833,19.394 16.332,18.338L20.293,22.293C20.481,22.481 20.735,22.586 21,22.586C21.265,22.586 21.519,22.481 21.707,22.293C22.095,21.905 22.095,21.274 21.707,20.886L17.752,16.931C18.811,15.428 19.417,13.593 19.417,11.6C19.417,6.632 15.368,2.6 10.4,2.6C10.267,2.6 10.133,2.603 10,2.608C10.334,2.535 10.667,2.5 11,2.5Z" />
 </vector>

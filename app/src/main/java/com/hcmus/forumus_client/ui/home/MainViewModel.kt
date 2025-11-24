@@ -79,8 +79,8 @@ class MainViewModel : ViewModel() {
 					timePosted = "2h",
 					title = "Finding teammates for a group project",
 					content = "I'm currently working on an android application project for the mobile development class." +
-							"\nWe need a team of 5 and currently short 2 people." +
-							"\nRequirements are in comments. ",
+						"\nWe need a team of 5 and currently short 2 people." +
+						"\nRequirements are in comments. ",
 					voteCount = 23,
 					commentCount = 36,
 					imageUrls = emptyList(),
@@ -91,23 +91,25 @@ class MainViewModel : ViewModel() {
 	}
 
 	fun onUpvote(postId: String) {
-		_posts.value = _posts.value?.map { post ->
-			if (post.id != postId) return@map post
-			when (post.userVote) {
-				VoteState.UP -> post.copy(userVote = VoteState.NONE, voteCount = post.voteCount - 1)
-				VoteState.DOWN -> post.copy(userVote = VoteState.UP, voteCount = post.voteCount + 2)
-				VoteState.NONE -> post.copy(userVote = VoteState.UP, voteCount = post.voteCount + 1)
+		_posts.value = _posts.value?.map { p ->
+			if (p.id != postId) p else {
+				when (p.userVote) {
+					VoteState.UP -> p.copy(userVote = VoteState.NONE, voteCount = p.voteCount - 1)
+					VoteState.DOWN -> p.copy(userVote = VoteState.UP, voteCount = p.voteCount + 2)
+					VoteState.NONE -> p.copy(userVote = VoteState.UP, voteCount = p.voteCount + 1)
+				}
 			}
 		}
 	}
 
 	fun onDownvote(postId: String) {
-		_posts.value = _posts.value?.map { post ->
-			if (post.id != postId) return@map post
-			when (post.userVote) {
-				VoteState.DOWN -> post.copy(userVote = VoteState.NONE, voteCount = post.voteCount + 1) // remove downvote adds 1 back
-				VoteState.UP -> post.copy(userVote = VoteState.DOWN, voteCount = post.voteCount - 2)
-				VoteState.NONE -> post.copy(userVote = VoteState.DOWN, voteCount = post.voteCount - 1)
+		_posts.value = _posts.value?.map { p ->
+			if (p.id != postId) p else {
+				when (p.userVote) {
+					VoteState.DOWN -> p.copy(userVote = VoteState.NONE, voteCount = p.voteCount + 1) // remove downvote (+1 net)
+					VoteState.UP -> p.copy(userVote = VoteState.DOWN, voteCount = p.voteCount - 2)
+					VoteState.NONE -> p.copy(userVote = VoteState.DOWN, voteCount = p.voteCount - 1)
+				}
 			}
 		}
 	}

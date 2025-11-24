@@ -1,5 +1,7 @@
 package com.hcmus.forumus_client.data.model
 
+import com.hcmus.forumus_client.data.model.VoteState
+
 data class Post(
 	val id: String,
 	val communityName: String,
