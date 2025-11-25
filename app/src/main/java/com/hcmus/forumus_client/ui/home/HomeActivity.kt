@@ -22,6 +22,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
@@ -47,6 +48,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var bottomNavContainer: View
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var hamburgerButton: View
+    private lateinit var navView: NavigationView
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -102,6 +104,7 @@ class HomeActivity : AppCompatActivity() {
         bottomNavContainer = findViewById(R.id.bottom_nav_container)
         drawerLayout = findViewById(R.id.drawer_layout)
         hamburgerButton = findViewById(R.id.btn_menu)
+        navView = findViewById(R.id.nav_view)
     }
 
     private fun setupObservers() {
@@ -226,6 +229,15 @@ class HomeActivity : AppCompatActivity() {
             insets
         }
         ViewCompat.requestApplyInsets(coordinatorRoot)
+        // Also pad the drawer to respect the notch/status bar when it slides in
+        ViewCompat.setOnApplyWindowInsetsListener(navView) { v, insets ->
+            val sys = insets.getInsets(WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout())
+            if (v.paddingTop != sys.top) {
+                v.setPadding(v.paddingLeft, sys.top, v.paddingRight, v.paddingBottom)
+            }
+            insets
+        }
+        ViewCompat.requestApplyInsets(navView)
         // Decide status bar icon color based on top bar (white) vs light/dark background.
         val bgColor = (topAppBar.background as? ColorDrawable)?.color
             ?: ContextCompat.getColor(this, R.color.background_light)
