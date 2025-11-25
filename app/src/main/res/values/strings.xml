@@ -72,4 +72,11 @@
     <string name="select_role">Select Role</string>
     <string name="student">Student</string>
     <string name="teacher">Teacher</string>
+        <!-- Your other strings -->
+
+        <string name="menu">Menu</string>
+        <string name="search">Search</string>
+        <string name="profile">Profile</string>
+        <string name="home">Home</string>
+        <string name="explore">Explore</string>
 </resources>
