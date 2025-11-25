@@ -21,6 +21,13 @@ class MainViewModel : ViewModel() {
 	private val _posts = MutableLiveData<List<Post>>(emptyList())
 	val posts: LiveData<List<Post>> = _posts
 
+	private val _barsHidden = MutableLiveData(false)
+	val barsHidden: LiveData<Boolean> = _barsHidden
+
+	fun setBarsHidden(hidden: Boolean) {
+		if (_barsHidden.value != hidden) _barsHidden.value = hidden
+	}
+
 	fun onProfileIconClicked() {
 		_menuVisible.value = !(_menuVisible.value ?: false)
 	}
@@ -81,6 +88,34 @@ class MainViewModel : ViewModel() {
 					content = "I'm currently working on an android application project for the mobile development class." +
 						"\nWe need a team of 5 and currently short 2 people." +
 						"\nRequirements are in comments. ",
+					voteCount = 23,
+					commentCount = 36,
+					imageUrls = emptyList(),
+					userVote = VoteState.NONE
+				),
+				Post(
+					id = "5",
+					communityName = "c/Information_Technology",
+					communityIconLetter = "C",
+					timePosted = "2h",
+					title = "Finding teammates for a group project",
+					content = "I'm currently working on an android application project for the mobile development class." +
+							"\nWe need a team of 5 and currently short 2 people." +
+							"\nRequirements are in comments. ",
+					voteCount = 23,
+					commentCount = 36,
+					imageUrls = emptyList(),
+					userVote = VoteState.NONE
+				),
+				Post(
+					id = "6",
+					communityName = "c/Information_Technology",
+					communityIconLetter = "C",
+					timePosted = "2h",
+					title = "Finding teammates for a group project",
+					content = "I'm currently working on an android application project for the mobile development class." +
+							"\nWe need a team of 5 and currently short 2 people." +
+							"\nRequirements are in comments. ",
 					voteCount = 23,
 					commentCount = 36,
 					imageUrls = emptyList(),
