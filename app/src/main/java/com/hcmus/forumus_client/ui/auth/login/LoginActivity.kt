@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.hcmus.forumus_client.databinding.ActivityLoginBinding
 import com.hcmus.forumus_client.ui.auth.register.RegisterActivity
 import com.hcmus.forumus_client.utils.Resource
@@ -33,8 +34,12 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Force light theme regardless of device night mode.
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        setupHintBehavior()
 
         setupClickListeners()
         setupTextChangeListeners()
@@ -74,6 +79,32 @@ class LoginActivity : AppCompatActivity() {
             
             viewModel.login(email, password)
         }
+    }
+
+    private fun setupHintBehavior() {
+        // Clear hint on focus, restore if empty on blur
+        applyHintFocusBehavior(binding.etEmail, binding.tilEmail, getString(R.string.enter_your_email))
+        applyHintFocusBehavior(binding.etPassword, binding.tilPassword, getString(R.string.password))
+    }
+
+    private fun applyHintFocusBehavior(editText: com.google.android.material.textfield.TextInputEditText,
+                                       layout: com.google.android.material.textfield.TextInputLayout,
+                                       originalHint: String) {
+        // Ensure TextInputLayout itself has no hint to prevent floating label
+        layout.hint = null
+        editText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                // Remove hint when focusing
+                if (editText.hint != null) editText.hint = ""
+            } else {
+                // Restore only if no text entered
+                if (editText.text.isNullOrEmpty()) {
+                    editText.hint = originalHint
+                }
+            }
+        }
+        // Initial restore if empty (after configuration changes)
+        if (editText.text.isNullOrEmpty()) editText.hint = originalHint
     }
     
     private fun setupTextChangeListeners() {
