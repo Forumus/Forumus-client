@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.hcmus.forumus_client.databinding.ActivityForgotPasswordBinding
 import com.hcmus.forumus_client.ui.auth.verification.VerificationActivity
 import com.hcmus.forumus_client.utils.ValidationUtils
@@ -18,11 +19,13 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         binding = ActivityForgotPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupClickListeners()
         setupTextChangeListeners()
+        setupHintBehavior()
         observeAccountExistsState()
     }
 
@@ -61,6 +64,26 @@ class ForgotPasswordActivity : AppCompatActivity() {
             }
             override fun afterTextChanged(s: android.text.Editable?) {}
         })
+    }
+
+    private fun setupHintBehavior() {
+        applyHintFocusBehavior(binding.etEmail, binding.tilEmail, getString(R.string.your_email))
+    }
+
+    private fun applyHintFocusBehavior(
+        editText: com.google.android.material.textfield.TextInputEditText,
+        layout: com.google.android.material.textfield.TextInputLayout,
+        originalHint: String
+    ) {
+        layout.hint = null
+        editText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                if (editText.hint != null) editText.hint = ""
+            } else if (editText.text.isNullOrEmpty()) {
+                editText.hint = originalHint
+            }
+        }
+        if (editText.text.isNullOrEmpty()) editText.hint = originalHint
     }
 
     private fun observeAccountExistsState() {

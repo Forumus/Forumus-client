@@ -34,6 +34,7 @@ class RegisterActivity : AppCompatActivity() {
         setupClickListeners()
         setupTextChangeListeners()
         setupLoginText()
+        setupHintBehavior()
         observeRegisterState()
     }
 
@@ -234,6 +235,29 @@ class RegisterActivity : AppCompatActivity() {
 
         binding.tvLoginLink.text = spannableString
         binding.tvLoginLink.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    private fun setupHintBehavior() {
+        applyHintFocusBehavior(binding.etFullName, binding.tilFullName, getString(R.string.full_name))
+        applyHintFocusBehavior(binding.etEmail, binding.tilEmail, getString(R.string.valid_email))
+        applyHintFocusBehavior(binding.etPassword, binding.tilPassword, getString(R.string.strong_password))
+        applyHintFocusBehavior(binding.etConfirmPassword, binding.tilConfirmPassword, getString(R.string.confirm_password))
+    }
+
+    private fun applyHintFocusBehavior(
+        editText: com.google.android.material.textfield.TextInputEditText,
+        layout: com.google.android.material.textfield.TextInputLayout,
+        originalHint: String
+    ) {
+        layout.hint = null
+        editText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                if (editText.hint != null) editText.hint = ""
+            } else {
+                if (editText.text.isNullOrEmpty()) editText.hint = originalHint
+            }
+        }
+        if (editText.text.isNullOrEmpty()) editText.hint = originalHint
     }
 
 }
