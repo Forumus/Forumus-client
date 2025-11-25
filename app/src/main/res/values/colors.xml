@@ -12,6 +12,7 @@
     <color name="button_primary">#2C2C2C</color>
     <color name="link_color">#3F78E0</color>
     <color name="checkbox_border">#CBCBCB</color>
+    <color name="complementary_text">#999999</color>
     
     <!-- Login button gradient colors -->
     <color name="gradient_start">#3F78E0</color>

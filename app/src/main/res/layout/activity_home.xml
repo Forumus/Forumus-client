@@ -380,7 +380,10 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/drawer_menu" />
+        android:background="@color/background_light"
+        app:itemIconTint="@color/text_secondary">
+
+        <include layout="@layout/drawer_menu"/>
+    </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

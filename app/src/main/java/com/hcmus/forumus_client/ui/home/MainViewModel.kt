@@ -24,6 +24,18 @@ class MainViewModel : ViewModel() {
 	private val _barsHidden = MutableLiveData(false)
 	val barsHidden: LiveData<Boolean> = _barsHidden
 
+	// Drawer state (true = open, false = closed)
+	private val _drawerOpen = MutableLiveData(false)
+	val drawerOpen: LiveData<Boolean> = _drawerOpen
+
+	fun toggleDrawer() {
+		_drawerOpen.value = !(_drawerOpen.value ?: false)
+	}
+
+	fun setDrawerOpen(open: Boolean) {
+		if (_drawerOpen.value != open) _drawerOpen.value = open
+	}
+
 	fun setBarsHidden(hidden: Boolean) {
 		if (_barsHidden.value != hidden) _barsHidden.value = hidden
 	}

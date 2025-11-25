@@ -20,6 +20,8 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
@@ -43,6 +45,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var topAppBar: View
     private lateinit var appBarLayout: AppBarLayout
     private lateinit var bottomNavContainer: View
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var hamburgerButton: View
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -96,6 +100,8 @@ class HomeActivity : AppCompatActivity() {
         topAppBar = findViewById(R.id.top_app_bar)
         appBarLayout = findViewById(R.id.app_bar_layout)
         bottomNavContainer = findViewById(R.id.bottom_nav_container)
+        drawerLayout = findViewById(R.id.drawer_layout)
+        hamburgerButton = findViewById(R.id.btn_menu)
     }
 
     private fun setupObservers() {
@@ -113,6 +119,13 @@ class HomeActivity : AppCompatActivity() {
             tabMap.values.forEach { applyInactiveStyle(it) }
             tabMap[tab]?.let { applyActiveStyle(it) }
         }
+        viewModel.drawerOpen.observe(this) { open ->
+            if (open) {
+                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) drawerLayout.openDrawer(GravityCompat.START)
+            } else {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) drawerLayout.closeDrawer(GravityCompat.START)
+            }
+        }
     }
 
     private fun attachClickListeners() {
@@ -127,6 +140,14 @@ class HomeActivity : AppCompatActivity() {
         navExplore.setOnClickListener { viewModel.onTabSelected(NavTab.EXPLORE) }
         navAlerts.setOnClickListener { viewModel.onTabSelected(NavTab.ALERTS) }
         navChat.setOnClickListener { viewModel.onTabSelected(NavTab.CHAT) }
+        hamburgerButton.setOnClickListener { viewModel.toggleDrawer() }
+
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) { /* no-op */ }
+            override fun onDrawerOpened(drawerView: View) { viewModel.setDrawerOpen(true) }
+            override fun onDrawerClosed(drawerView: View) { viewModel.setDrawerOpen(false) }
+            override fun onDrawerStateChanged(newState: Int) { /* no-op */ }
+        })
     }
 
     private fun setupRecycler() {
