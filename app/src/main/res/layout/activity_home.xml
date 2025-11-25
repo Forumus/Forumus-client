@@ -102,13 +102,17 @@
             android:layout_height="60dp"
             android:layout_gravity="bottom"
             android:background="@color/white"
-            android:elevation="5dp">
+            android:elevation="5dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
                 <LinearLayout
                     android:id="@+id/nav_home"
@@ -166,12 +170,12 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:clipChildren="false">
                     <FrameLayout
                         android:layout_width="55dp"
                         android:layout_height="55dp"
-                        android:layout_gravity="center"
-                        android:translationY="-20dp"
+                        android:layout_gravity="center|top"
                         android:background="@drawable/button_create_background"
                         android:elevation="10dp">
                         <ImageView
