@@ -162,19 +162,22 @@ class VerificationActivity : AppCompatActivity() {
             if (result.isSuccess) {
                 // Handle successful verification
                 when (verificationType) {
-                    "email_verification" -> {
+                    "email_verification", "registration" -> {
                         val intent = Intent(this, SuccessActivity::class.java)
                         startActivity(intent)
+                        finish()
                     }
                     "login_verification" -> {
                         val intent = Intent(this, HomeActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
+                        finish()
                     }
                     "forgot_password" -> {
                         val intent = Intent(this, ResetPasswordActivity::class.java)
                         intent.putExtra("user_email", userEmail)
                         startActivity(intent)
+                        finish()
                     }
                     else -> finish()
                 }
