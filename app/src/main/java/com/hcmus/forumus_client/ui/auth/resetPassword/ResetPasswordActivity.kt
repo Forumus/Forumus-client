@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.hcmus.forumus_client.databinding.ActivityResetPasswordBinding
 import com.hcmus.forumus_client.ui.auth.login.LoginActivity
 import com.hcmus.forumus_client.utils.ValidationUtils
@@ -19,6 +20,7 @@ class ResetPasswordActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         binding = ActivityResetPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -27,6 +29,7 @@ class ResetPasswordActivity : AppCompatActivity() {
 
         setupClickListeners()
         setupTextChangeListeners()
+        setupHintBehavior()
         observeResetPasswordState()
     }
 
@@ -83,6 +86,27 @@ class ResetPasswordActivity : AppCompatActivity() {
             }
             override fun afterTextChanged(s: android.text.Editable?) {}
         })
+    }
+
+    private fun setupHintBehavior() {
+        applyHintFocusBehavior(binding.etPassword, binding.tilPassword, getString(R.string.strong_password))
+        applyHintFocusBehavior(binding.etConfirmPassword, binding.tilConfirmPassword, getString(R.string.retype_password))
+    }
+
+    private fun applyHintFocusBehavior(
+        editText: com.google.android.material.textfield.TextInputEditText,
+        layout: com.google.android.material.textfield.TextInputLayout,
+        originalHint: String
+    ) {
+        layout.hint = null
+        editText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                if (editText.hint != null) editText.hint = ""
+            } else if (editText.text.isNullOrEmpty()) {
+                editText.hint = originalHint
+            }
+        }
+        if (editText.text.isNullOrEmpty()) editText.hint = originalHint
     }
 
     private fun observeResetPasswordState() {
