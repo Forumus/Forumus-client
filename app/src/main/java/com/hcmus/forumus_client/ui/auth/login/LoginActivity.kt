@@ -19,6 +19,7 @@ import android.text.style.StyleSpan
 import android.text.method.LinkMovementMethod
 import android.graphics.Typeface
 import com.hcmus.forumus_client.R
+import com.hcmus.forumus_client.data.local.PreferencesManager
 import com.hcmus.forumus_client.ui.auth.forgotPassword.ForgotPasswordActivity
 import com.hcmus.forumus_client.ui.auth.verification.VerificationActivity
 
@@ -36,17 +37,26 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupRememberMe()
         setupClickListeners()
         setupTextChangeListeners()
         setupRegisterText()
         setupForgotPasswordText()
         observeLoginState()
     }
+    
+    private fun setupRememberMe() {
+        val preferencesManager = PreferencesManager(this)
+        
+        // Set initial checkbox state from saved preference
+        binding.cbRemember.isChecked = preferencesManager.rememberMe
+    }
 
     private fun setupClickListeners() {
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString()
+            val rememberMe = binding.cbRemember.isChecked
             
             // Clear previous errors
             binding.tilEmail.isErrorEnabled = false
@@ -72,7 +82,7 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             
-            viewModel.login(email, password)
+            viewModel.login(email, password, rememberMe)
         }
     }
     
@@ -109,6 +119,8 @@ class LoginActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     showLoading(false)
                     val user = resource.data
+                    // All users go through verification, then to home
+                    // Remember Me checkbox only affects auto-login on next app start
                     val intent = Intent(this, VerificationActivity::class.java)
                     intent.putExtra(VerificationActivity.EXTRA_EMAIL, user?.email)
 
@@ -125,15 +137,15 @@ class LoginActivity : AppCompatActivity() {
                 is Resource.Error -> {
                     showLoading(false)
                     val errorMessage = resource.message ?: "Login failed"
-                    
+
                     // Show specific field errors based on error message
                     when {
                         errorMessage.contains("credential", ignoreCase = true) -> {
                             binding.tilPassword.isErrorEnabled = true
-                            binding.tilPassword.error = "Invalid password"
+                            binding.tilPassword.error = "Invalid email or password"
                         }
-                        errorMessage.contains("email", ignoreCase = true) || 
-                        errorMessage.contains("user", ignoreCase = true) -> {
+                        errorMessage.contains("email", ignoreCase = true) ||
+                                errorMessage.contains("user", ignoreCase = true) -> {
                             binding.tilEmail.isErrorEnabled = true
                             binding.tilEmail.error = "No account found with this email"
                         }
