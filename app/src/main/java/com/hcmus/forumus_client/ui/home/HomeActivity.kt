@@ -9,9 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-// Import the OnBackPressedCallback
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import android.content.Intent
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -23,10 +26,14 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.hcmus.forumus_client.R
+import com.hcmus.forumus_client.data.local.TokenManager
+import com.hcmus.forumus_client.data.repository.AuthRepository
+import com.hcmus.forumus_client.ui.auth.login.LoginActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeActivity : AppCompatActivity() {
 
@@ -52,6 +59,9 @@ class HomeActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
+    private lateinit var authRepository: AuthRepository
+    private lateinit var tokenManager: TokenManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -63,7 +73,14 @@ class HomeActivity : AppCompatActivity() {
         viewModel.loadSamplePosts()
         configureEdgeToEdge()
 
-        // --- NEW CODE STARTS HERE ---
+        authRepository = AuthRepository(
+            FirebaseAuth.getInstance(),
+            FirebaseFirestore.getInstance(),
+            context = this
+        )
+        tokenManager = TokenManager(this)
+
+        logSessionInfo()
 
         // 1. Create a new OnBackPressedCallback
         val onBackPressedCallback = object : OnBackPressedCallback(true) { // 'true' means the callback is enabled
@@ -82,8 +99,25 @@ class HomeActivity : AppCompatActivity() {
 
         // 4. Add the callback to the dispatcher
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
-        // --- NEW CODE ENDS HERE ---
+    }
+    
+    private fun logSessionInfo() {
+        if (tokenManager.hasValidSession()) {
+            val user = authRepository.getCurrentUserFromSession()
+            val remainingTime = authRepository.getRemainingSessionTime()
+            val hoursRemaining = remainingTime / (60 * 60 * 1000)
+            
+            Log.d("HomeActivity", "Current user: ${user?.email}")
+            Log.d("HomeActivity", "Session remaining: ${hoursRemaining} hours")
+        } else {
+            Log.d("HomeActivity", "No saved session - user didn't check Remember Me")
+        }
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        // No session validity check - users can access app regardless of Remember Me choice
+        // Session validation only happens at app startup in SplashActivity
     }
 
     private fun bindViews() {

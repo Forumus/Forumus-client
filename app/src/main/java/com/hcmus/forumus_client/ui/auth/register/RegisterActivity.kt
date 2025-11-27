@@ -170,6 +170,7 @@ class RegisterActivity : AppCompatActivity() {
                     val email = binding.etEmail.text.toString().trim()
                     val intent = Intent(this, VerificationActivity::class.java)
                     intent.putExtra(VerificationActivity.EXTRA_EMAIL, email)
+                    intent.putExtra("verification_type", "email_verification")
                     startActivity(intent)
                     finish() // Close registration activity
                 }

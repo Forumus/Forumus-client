@@ -1,6 +1,9 @@
 package com.hcmus.forumus_client.data.repository
 
+import android.content.Context
 import android.util.Log
+import com.hcmus.forumus_client.data.local.TokenManager
+import com.hcmus.forumus_client.data.local.PreferencesManager
 import com.hcmus.forumus_client.data.model.ResetPasswordRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,8 +20,12 @@ class AuthRepository (
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val otpService: OTPService = OTPService(firestore),
-    private val emailService: EmailService = EmailService()
+    private val emailService: EmailService = EmailService(),
+    private val context: Context? = null
 ) {
+    
+    private val tokenManager: TokenManager? = context?.let { TokenManager(it) }
+    private val preferencesManager: PreferencesManager? = context?.let { PreferencesManager(it) }
     suspend fun register(
         email: String,
         password: String,
@@ -53,7 +60,7 @@ class AuthRepository (
         }
     }
 
-    suspend fun login(email: String, password: String): Resource<User> {
+    suspend fun login(email: String, password: String, rememberMe: Boolean = false): Resource<User> {
         return try {
             val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
             val firebaseUser = authResult.user ?: throw Exception("Login failed")
@@ -66,6 +73,35 @@ class AuthRepository (
 
             val user = userDoc.toObject(User::class.java)
                 ?: throw Exception("User data not found")
+
+            // Only save session if rememberMe is true
+            if (rememberMe) {
+                tokenManager?.let { tm ->
+                    preferencesManager?.let { pm ->
+                        val sessionDuration = pm.getSessionTimeoutMs()
+                        tm.saveUserSession(
+                            userId = user.uid,
+                            email = user.email,
+                            fullName = user.fullName,
+                            role = user.role.name,
+                            emailVerified = user.emailVerified,
+                            sessionDurationMs = sessionDuration
+                        )
+                        
+                        // Mark that session was saved with remember me
+                        pm.rememberMe = true
+                        
+                        Log.d("AuthRepository", "Session saved for user: ${user.email}, expires in ${sessionDuration / (24 * 60 * 60 * 1000)} days")
+                    }
+                }
+            } else {
+                // Clear any existing session when remember me is not checked
+                tokenManager?.clearSession()
+                preferencesManager?.let { pm ->
+                    pm.rememberMe = false
+                }
+                Log.d("AuthRepository", "Remember Me not checked - no session saved")
+            }
 
             Log.d("AuthRepository", "Login successful - User: ${user.email}, emailVerified: ${user.emailVerified}")
             Resource.Success(user)
@@ -176,6 +212,33 @@ class AuthRepository (
 
     fun logout() {
         firebaseAuth.signOut()
+        tokenManager?.clearSession()
+    }
+    
+    fun hasValidSession(): Boolean {
+        return tokenManager?.hasValidSession() == true
+    }
+    
+    fun isSessionExpired(): Boolean {
+        return tokenManager?.let { !it.isSessionValid() } ?: true
+    }
+    
+    fun getCurrentUserFromSession(): User? {
+        return tokenManager?.let { tm ->
+            if (tm.hasValidSession()) {
+                User(
+                    uid = tm.getUserId() ?: "",
+                    email = tm.getEmail() ?: "",
+                    fullName = tm.getFullName() ?: "",
+                    role = UserRole.valueOf(tm.getRole() ?: "STUDENT"),
+                    emailVerified = tm.isEmailVerified()
+                )
+            } else null
+        }
+    }
+    
+    fun getRemainingSessionTime(): Long {
+        return tokenManager?.getRemainingSessionTime() ?: 0L
     }
 
     fun getCurrentUser(): User? {
