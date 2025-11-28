@@ -1,5 +1,6 @@
 package com.hcmus.forumus_client.ui.splash
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -14,12 +15,10 @@ import com.hcmus.forumus_client.data.local.PreferencesManager
 import com.hcmus.forumus_client.ui.auth.login.LoginActivity
 import com.hcmus.forumus_client.ui.home.HomeActivity
 import com.hcmus.forumus_client.ui.onboarding.welcome.WelcomeActivity
-import com.hcmus.forumus_client.utils.PreferenceManager
 
 class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
-    private lateinit var preferenceManager: PreferenceManager
-    private lateinit var sessionPrefsManager: PreferencesManager
+    private lateinit var preferenceManager: PreferencesManager
     private lateinit var tokenManager: TokenManager
     private val splashTimeOut: Long = 1500 // 1.5 seconds
 
@@ -28,8 +27,7 @@ class SplashActivity : AppCompatActivity() {
         
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
         
-        preferenceManager = PreferenceManager(this)
-        sessionPrefsManager = PreferencesManager(this)
+        preferenceManager = PreferencesManager(this)
         tokenManager = TokenManager(this)
         
         // Navigate after splash timeout
@@ -44,8 +42,8 @@ class SplashActivity : AppCompatActivity() {
                 Log.d("SplashActivity", "First time user - showing onboarding")
                 WelcomeActivity::class.java
             }
-            sessionPrefsManager.isAutoLoginEnabled && 
-            sessionPrefsManager.rememberMe && 
+            preferenceManager.isAutoLoginEnabled &&
+            preferenceManager.rememberMe &&
             tokenManager.hasValidSession() -> {
                 val remainingTime = tokenManager.getRemainingSessionTime()
                 val daysRemaining = remainingTime / (24 * 60 * 60 * 1000)

@@ -11,11 +11,11 @@ import androidx.databinding.DataBindingUtil
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ActivitySlideBinding
 import com.hcmus.forumus_client.ui.auth.login.LoginActivity
-import com.hcmus.forumus_client.utils.PreferenceManager
+import com.hcmus.forumus_client.data.local.PreferencesManager
 
 class SlideActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySlideBinding
-    private lateinit var preferenceManager: PreferenceManager
+    private lateinit var preferenceManager: PreferencesManager
     private var currentSlide = 1
     private val totalSlides = 3
 
@@ -37,7 +37,7 @@ class SlideActivity : AppCompatActivity() {
         
         binding = DataBindingUtil.setContentView(this, R.layout.activity_slide)
 
-        preferenceManager = PreferenceManager(this)
+        preferenceManager = PreferencesManager(this)
         
         setupUI()
         initializeFirstSlide()
