@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.hcmus.forumus_client.databinding.ActivitySuccessBinding
 import com.hcmus.forumus_client.data.local.TokenManager
 import com.hcmus.forumus_client.data.local.PreferencesManager
-import com.hcmus.forumus_client.ui.home.HomeActivity
+import com.hcmus.forumus_client.ui.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class SuccessActivity : AppCompatActivity() {
@@ -62,7 +62,7 @@ class SuccessActivity : AppCompatActivity() {
     }
     
     private fun navigateToHome() {
-        val intent = android.content.Intent(this, HomeActivity::class.java)
+        val intent = android.content.Intent(this, MainActivity::class.java)
         intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

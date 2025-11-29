@@ -28,4 +28,12 @@
     <!-- Voting colors -->
     <color name="vote_up_blue">@color/link_color</color>
     <color name="vote_down_red">#E04141</color>
+    
+    <!-- Chat screen colors -->
+    <color name="chat_time_blue">#155DFC</color>
+    <color name="chat_time_gray">#6A7282</color>
+    <color name="chat_message_unread">#101828</color>
+    <color name="chat_message_read">#6A7282</color>
+    <color name="chat_border">#E5E7EB</color>
+    <color name="chat_filter_unselected">#4A5565</color>
 </resources>

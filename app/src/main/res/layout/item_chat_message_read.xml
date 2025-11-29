@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+<!-- Chat item content -->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="89dp"
+    android:background="@color/white"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="1dp">
+
+    <!-- Profile Image -->
+    <ImageView
+        android:id="@+id/profile_image"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/circular_image_background"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_default_profile" />
+
+    <!-- Message content container -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="46dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Name and time container -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginBottom="2dp">
+
+            <TextView
+                android:id="@+id/contact_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:fontFamily="@font/montserrat_regular"
+                android:text="Emma Williams"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/message_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:fontFamily="@font/montserrat_regular"
+                android:text="1h"
+                android:textColor="@color/chat_time_gray"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+
+        <!-- Last message container (read message style) -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="20dp">
+
+            <TextView
+                android:id="@+id/last_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:ellipsize="end"
+                android:fontFamily="@font/montserrat_regular"
+                android:maxLines="1"
+                android:text="See you tomorrow at 3pm 👋"
+                android:textColor="@color/chat_message_read"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
+
+<!-- Bottom border -->
+<View
+    android:layout_width="match_parent"
+    android:layout_height="1.1dp"
+    android:background="@color/chat_border" />
+
+</LinearLayout>

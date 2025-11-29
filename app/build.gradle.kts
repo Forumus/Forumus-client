@@ -35,6 +35,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        viewBinding = true
         dataBinding = true
     }
     packaging {
@@ -73,6 +74,7 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.fragment.ktx)
 
     // Email dependencies for OTP sending
     implementation(libs.android.mail)

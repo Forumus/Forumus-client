@@ -33,9 +33,9 @@
             android:name=".ui.auth.register.RegisterActivity"
             android:exported="false" />
 
-        <!-- Home Activity -->
+        <!-- Main Activity -->
         <activity
-            android:name=".ui.home.HomeActivity"
+            android:name=".ui.MainActivity"
             android:exported="false" />
 
         <!-- Forgot Password Activity -->
