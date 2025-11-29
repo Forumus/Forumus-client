@@ -3,19 +3,25 @@ package com.hcmus.forumus_client.data.local
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import java.util.prefs.Preferences
 
 class PreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences = 
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     
     companion object {
-        private const val PREFS_NAME = "forumus_session_prefs"
+        private const val PREFS_NAME = "forumus_prefs"
+        private const val KEY_FIRST_TIME = "is_first_time"
         private const val KEY_AUTO_LOGIN = "auto_login_enabled"
         private const val KEY_REMEMBER_ME = "remember_me"
         private const val KEY_SESSION_TIMEOUT_DAYS = "session_timeout_days"
         
         const val DEFAULT_SESSION_TIMEOUT_DAYS = 7
     }
+
+    var isFirstTime: Boolean
+        get() = sharedPreferences.getBoolean(KEY_FIRST_TIME, true)
+        set(value) = sharedPreferences.edit { putBoolean(KEY_FIRST_TIME, value) }
     
     var isAutoLoginEnabled: Boolean
         get() = sharedPreferences.getBoolean(KEY_AUTO_LOGIN, true)

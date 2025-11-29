@@ -33,9 +33,8 @@ object ValidationUtils {
         
         // Common university email domains
         val universityDomains = listOf(
-            "edu", "ac.uk", "edu.au", "edu.sg", "edu.my", 
             "student.forumus.me", "student.hcmus.edu.vn",
-            "gmail.com", "outlook.com", "hotmail.com" // Allow common domains for demo
+            "gmail.com", "outlook.com"
         )
         
         val domain = email.substringAfter("@").lowercase()
