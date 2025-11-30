@@ -32,6 +32,7 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.local.TokenManager
 import com.hcmus.forumus_client.data.repository.AuthRepository
 import com.hcmus.forumus_client.ui.auth.login.LoginActivity
+import com.hcmus.forumus_client.ui.post.create.CreatePostActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -56,6 +57,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var hamburgerButton: View
     private lateinit var navView: NavigationView
+
+    private lateinit var btnCreatePost: View
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -139,6 +142,7 @@ class HomeActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawer_layout)
         hamburgerButton = findViewById(R.id.btn_menu)
         navView = findViewById(R.id.nav_view)
+        btnCreatePost = findViewById(R.id.btn_create_post)
     }
 
     private fun setupObservers() {
@@ -185,6 +189,10 @@ class HomeActivity : AppCompatActivity() {
             override fun onDrawerClosed(drawerView: View) { viewModel.setDrawerOpen(false) }
             override fun onDrawerStateChanged(newState: Int) { /* no-op */ }
         })
+        btnCreatePost.setOnClickListener {
+            val intent = android.content.Intent(this, CreatePostActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupRecycler() {
