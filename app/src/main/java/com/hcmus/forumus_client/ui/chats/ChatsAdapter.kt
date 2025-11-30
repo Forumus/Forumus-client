@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ItemChatMessageBinding
+import android.util.Log
 
 class ChatsAdapter(
     private val onChatClick: (ChatItem) -> Unit
@@ -30,6 +31,19 @@ class ChatsAdapter(
     inner class ChatViewHolder(
         private val binding: ItemChatMessageBinding
     ) : RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            // Set up click listener once in init
+            Log.d("ChatsAdapter", "Setting up click listener for ViewHolder")
+            binding.chatItemContainer.setOnClickListener {
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val chatItem = getItem(position)
+                    Log.d("ChatsAdapter", "Chat item clicked: ${chatItem.contactName}")
+                    onChatClick(chatItem)
+                }
+            }
+        }
 
         fun bind(chatItem: ChatItem) {
             binding.contactName.text = chatItem.contactName
@@ -69,11 +83,6 @@ class ChatsAdapter(
             
             // Set profile image (placeholder for now)
             binding.profileImage.setImageResource(R.drawable.ic_default_profile)
-            
-            // Handle click
-            binding.root.setOnClickListener {
-                onChatClick(chatItem)
-            }
         }
     }
 

@@ -8,6 +8,7 @@
 
 <!-- Chat item content -->
 <LinearLayout
+    android:id="@+id/chat_item_container"
     android:layout_width="match_parent"
     android:layout_height="89dp"
     android:background="@color/white"

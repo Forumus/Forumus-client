@@ -10,11 +10,8 @@ import androidx.activity.viewModels
 import android.util.Log
 import androidx.databinding.DataBindingUtil
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
@@ -245,10 +242,10 @@ class MainActivity : AppCompatActivity(), NavbarFragment.OnNavigationItemSelecte
         }
         ViewCompat.requestApplyInsets(navView)
         
-        val bgColor = (topAppBar.background as? ColorDrawable)?.color
-            ?: ContextCompat.getColor(this, R.color.background_light)
-        val isLightBackground = ColorUtils.calculateLuminance(bgColor) > 0.5
-        WindowInsetsControllerCompat(window, coordinatorRoot).isAppearanceLightStatusBars = isLightBackground
+//        val bgColor = (topAppBar.background as? ColorDrawable)?.color
+//            ?: ContextCompat.getColor(this, R.color.background_light)
+//        val isLightBackground = ColorUtils.calculateLuminance(bgColor) > 0.5
+//        WindowInsetsControllerCompat(window, coordinatorRoot).isAppearanceLightStatusBars = isLightBackground
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {

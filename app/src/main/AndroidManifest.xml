@@ -48,6 +48,11 @@
             android:name=".ui.auth.resetPassword.ResetPasswordActivity"
             android:exported="false" />
 
+        <!-- Chat Activity -->
+        <activity
+            android:name=".ui.message.MessageActivity"
+            android:exported="false" />
+
         <!-- Slide Activity -->
         <activity
             android:name=".ui.onboarding.slide.SlideActivity"

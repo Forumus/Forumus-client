@@ -1,5 +1,6 @@
 package com.hcmus.forumus_client.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.databinding.FragmentChatsBinding
 import com.hcmus.forumus_client.ui.chats.ChatsAdapter
 import com.hcmus.forumus_client.ui.chats.ChatItem
+import com.hcmus.forumus_client.ui.message.MessageActivity
 
 class ChatsFragment : Fragment() {
 
@@ -36,7 +38,7 @@ class ChatsFragment : Fragment() {
     private fun setupRecyclerView() {
         chatsAdapter = ChatsAdapter { chatItem ->
             // Handle chat item click - navigate to individual chat
-            // TODO: Implement navigation to chat detail screen
+            navigateToChatActivity(chatItem)
         }
         
         binding.recyclerChats.apply {
@@ -121,7 +123,21 @@ class ChatsFragment : Fragment() {
             )
         )
         
+        android.util.Log.d("ChatsFragment", "Loading ${sampleChats.size} chat items")
         chatsAdapter.submitList(sampleChats)
+    }
+
+    private fun navigateToChatActivity(chatItem: ChatItem) {
+        try {
+            android.util.Log.d("ChatsFragment", "Navigating to chat with: ${chatItem.contactName}")
+            val intent = Intent(requireContext(), MessageActivity::class.java).apply {
+                putExtra(MessageActivity.EXTRA_USER_NAME, chatItem.contactName)
+                putExtra(MessageActivity.EXTRA_USER_EMAIL, "${chatItem.contactName.lowercase().replace(" ", "")}@example.com")
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            android.util.Log.e("ChatsFragment", "Error navigating to chat", e)
+        }
     }
 
     override fun onDestroyView() {
