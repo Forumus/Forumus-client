@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ItemChatMessageBinding
 import android.util.Log
+import com.bumptech.glide.Glide
 
 class ChatsAdapter(
     private val onChatClick: (ChatItem) -> Unit
@@ -48,6 +49,12 @@ class ChatsAdapter(
         fun bind(chatItem: ChatItem) {
             binding.contactName.text = chatItem.contactName
             binding.lastMessage.text = chatItem.lastMessage
+
+            Glide.with(itemView.context)
+                .load(chatItem.profilePictureUrl)
+                .placeholder(R.drawable.ic_default_profile)
+                .circleCrop()
+                .into(binding.profileImage)
             
             // Set timestamp and color based on unread status
             binding.messageTime.text = chatItem.timestamp

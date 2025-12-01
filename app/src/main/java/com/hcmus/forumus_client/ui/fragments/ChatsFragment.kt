@@ -5,12 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.databinding.FragmentChatsBinding
 import com.hcmus.forumus_client.ui.chats.ChatsAdapter
 import com.hcmus.forumus_client.ui.chats.ChatItem
-import com.hcmus.forumus_client.ui.message.MessageActivity
+import com.hcmus.forumus_client.ui.conversation.ConversationActivity
 
 class ChatsFragment : Fragment() {
 
@@ -18,6 +21,7 @@ class ChatsFragment : Fragment() {
     private val binding get() = _binding!!
     
     private lateinit var chatsAdapter: ChatsAdapter
+    private val viewModel: ChatsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,7 +36,10 @@ class ChatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         setupRecyclerView()
-        loadSampleChats()
+        setupObservers()
+        
+        // Load chats from Firebase
+        viewModel.loadChats()
     }
 
     private fun setupRecyclerView() {
@@ -47,92 +54,35 @@ class ChatsFragment : Fragment() {
         }
     }
 
-    private fun loadSampleChats() {
-        val sampleChats = listOf(
-            ChatItem(
-                id = "1",
-                contactName = "Sarah Johnson",
-                lastMessage = "Hey! Did you see the photos from last weekend?",
-                timestamp = "2m",
-                isUnread = true,
-                unreadCount = 3,
-                profileImageUrl = null
-            ),
-            ChatItem(
-                id = "2",
-                contactName = "Michael Chen",
-                lastMessage = "Thanks for your help with the project!",
-                timestamp = "15m",
-                isUnread = true,
-                unreadCount = 1,
-                profileImageUrl = null
-            ),
-            ChatItem(
-                id = "3",
-                contactName = "Emma Williams",
-                lastMessage = "See you tomorrow at 3pm 👋",
-                timestamp = "1h",
-                isUnread = false,
-                unreadCount = 0,
-                profileImageUrl = null
-            ),
-            ChatItem(
-                id = "4",
-                contactName = "James Rodriguez",
-                lastMessage = "The meeting has been rescheduled",
-                timestamp = "3h",
-                isUnread = true,
-                unreadCount = 2,
-                profileImageUrl = null
-            ),
-            ChatItem(
-                id = "5",
-                contactName = "Olivia Taylor",
-                lastMessage = "Perfect! I'll send you the details",
-                timestamp = "5h",
-                isUnread = false,
-                unreadCount = 0,
-                profileImageUrl = null
-            ),
-            ChatItem(
-                id = "6",
-                contactName = "David Martinez",
-                lastMessage = "Can we catch up this week?",
-                timestamp = "1d",
-                isUnread = false,
-                unreadCount = 0,
-                profileImageUrl = null
-            ),
-            ChatItem(
-                id = "7",
-                contactName = "Sophia Anderson",
-                lastMessage = "I loved that restaurant recommendation!",
-                timestamp = "1d",
-                isUnread = false,
-                unreadCount = 0,
-                profileImageUrl = null
-            ),
-            ChatItem(
-                id = "8",
-                contactName = "Daniel Brown",
-                lastMessage = "Just sent you the files",
-                timestamp = "2d",
-                isUnread = false,
-                unreadCount = 0,
-                profileImageUrl = null
-            )
-        )
-        
-        android.util.Log.d("ChatsFragment", "Loading ${sampleChats.size} chat items")
-        chatsAdapter.submitList(sampleChats)
+    private fun setupObservers() {
+        viewModel.chats.observe(viewLifecycleOwner, Observer { chats ->
+            android.util.Log.d("ChatsFragment", "Received ${chats.size} chats from Firebase")
+            chatsAdapter.submitList(chats)
+        })
+
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            // Show/hide loading indicator
+            // binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        })
+
+        viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
+            if (errorMessage != null) {
+                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                viewModel.clearError()
+            }
+        })
     }
+
+
 
     private fun navigateToChatActivity(chatItem: ChatItem) {
         try {
             android.util.Log.d("ChatsFragment", "Navigating to chat with: ${chatItem.contactName}")
-            val intent = Intent(requireContext(), MessageActivity::class.java).apply {
-                putExtra(MessageActivity.EXTRA_USER_NAME, chatItem.contactName)
-                putExtra(MessageActivity.EXTRA_USER_EMAIL, "${chatItem.contactName.lowercase().replace(" ", "")}@example.com")
+            val intent = Intent(requireContext(), ConversationActivity::class.java).apply {
+                putExtra(ConversationActivity.EXTRA_CHAT_ID, chatItem.id)
+                putExtra(ConversationActivity.EXTRA_USER_NAME, chatItem.contactName)
+                putExtra(ConversationActivity.EXTRA_USER_EMAIL, chatItem.email)
+                putExtra(ConversationActivity.EXTRA_USER_PICTURE_URL, chatItem.profilePictureUrl)
             }
             startActivity(intent)
         } catch (e: Exception) {

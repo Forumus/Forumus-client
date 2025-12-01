@@ -241,11 +241,6 @@ class MainActivity : AppCompatActivity(), NavbarFragment.OnNavigationItemSelecte
             insets
         }
         ViewCompat.requestApplyInsets(navView)
-        
-//        val bgColor = (topAppBar.background as? ColorDrawable)?.color
-//            ?: ContextCompat.getColor(this, R.color.background_light)
-//        val isLightBackground = ColorUtils.calculateLuminance(bgColor) > 0.5
-//        WindowInsetsControllerCompat(window, coordinatorRoot).isAppearanceLightStatusBars = isLightBackground
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {

@@ -1,23 +1,38 @@
-package com.hcmus.forumus_client.ui.message
+package com.hcmus.forumus_client.ui.conversation
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.hcmus.forumus_client.data.model.Message
 import com.hcmus.forumus_client.databinding.ItemMessageReceivedBinding
 import com.hcmus.forumus_client.databinding.ItemMessageSentBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
-class MessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ConversationAdapter(private val currentUserId: String) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val messages = mutableListOf<Message>()
 
     companion object {
         private const val VIEW_TYPE_SENT = 1
         private const val VIEW_TYPE_RECEIVED = 2
+
+        fun formatTimestamp(timestamp: Timestamp?): String {
+            return try {
+                if (timestamp == null) return "unknown"
+
+                val date = timestamp.toDate()
+                val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+                timeFormat.format(date)
+            } catch (e: Exception) {
+                "unknown"
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (messages[position].isSentByCurrentUser) {
+        return if (messages[position].isSentByCurrentUser(currentUserId)) {
             VIEW_TYPE_SENT
         } else {
             VIEW_TYPE_RECEIVED
@@ -72,7 +87,7 @@ class MessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         fun bind(message: Message) {
             binding.tvMessageText.text = message.content
-            binding.tvTimestamp.text = message.timestamp
+            binding.tvTimestamp.text = formatTimestamp(message.timestamp)
         }
     }
 
@@ -81,7 +96,7 @@ class MessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         fun bind(message: Message) {
             binding.tvMessageText.text = message.content
-            binding.tvTimestamp.text = message.timestamp
+            binding.tvTimestamp.text = formatTimestamp(message.timestamp)
         }
     }
 }
