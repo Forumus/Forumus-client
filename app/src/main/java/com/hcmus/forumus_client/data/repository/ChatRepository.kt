@@ -11,8 +11,8 @@ import com.hcmus.forumus_client.data.model.MessageType
 import com.hcmus.forumus_client.ui.chats.ChatItem
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
 import java.util.*
+import com.hcmus.forumus_client.data.model.User
 
 class ChatRepository {
     
@@ -21,7 +21,7 @@ class ChatRepository {
     
     private val chatsCollection = firestore.collection("chats")
 
-    private val UserRepository = UserRepository()
+    private val userRepository = UserRepository()
     companion object {
         private const val TAG = "ChatRepository"
         private const val MESSAGES_SUBCOLLECTION = "messages"
@@ -72,7 +72,7 @@ class ChatRepository {
                                     if (otherUserId != null) {
                                         try {
                                             // Assuming getUserById is blocking or suspending
-                                            val user = UserRepository.getUserById(otherUserId)
+                                            val user = userRepository.getUserById(otherUserId)
                                             chat.contactName = user.fullName
                                             chat.profilePictureUrl = user.profilePictureUrl
                                             chat.email = user.email
@@ -143,7 +143,7 @@ class ChatRepository {
             val currentUserId = getCurrentUserId()
                 ?: return Result.failure(Exception("User not authenticated"))
             
-            val messageId = UUID.randomUUID().toString()
+            val messageId = "message_" + System.currentTimeMillis()
             val timestamp = getCurrentTimestamp()
             
             val message = Message(
@@ -181,12 +181,12 @@ class ChatRepository {
     }
     
     // Create a new chat
-    suspend fun createChat(otherUserId: String): Result<String> {
+    suspend fun createChat(otherUserId: String): ChatItem {
         return try {
             val currentUserId = getCurrentUserId()
-                ?: return Result.failure(Exception("User not authenticated"))
-            
-            val chatId = UUID.randomUUID().toString()
+                ?: throw Exception("User not authenticated")
+
+            val chatId = "chat_" + System.currentTimeMillis()
             val timestamp = getCurrentTimestamp()
             
             val chatItem = ChatItem(
@@ -202,18 +202,18 @@ class ChatRepository {
                 .set(chatItem)
                 .await()
             
-            Result.success(chatId)
+            chatItem
         } catch (e: Exception) {
             Log.e(TAG, "Error creating chat", e)
-            Result.failure(e)
+            throw e
         }
     }
     
     // Get or create chat between two users
-    suspend fun getOrCreateChat(otherUserId: String): Result<String> {
+    suspend fun getOrCreateChat(otherUserId: String): ChatItem {
         return try {
             val currentUserId = getCurrentUserId()
-                ?: return Result.failure(Exception("User not authenticated"))
+                ?: throw Exception("User not authenticated")
             
             // First, try to find existing chat
             val existingChats = chatsCollection
@@ -225,15 +225,40 @@ class ChatRepository {
                 val userIds = doc.get("userIds") as? List<*>
                 userIds?.contains(otherUserId) == true
             }
-            
-            if (existingChat != null) {
-                Result.success(existingChat.id)
+
+            val chat: ChatItem = if (existingChat != null) {
+                ChatItem(
+                    id = existingChat.id,
+                    lastMessage = existingChat.getString("lastMessage") ?: "",
+                    lastUpdate = existingChat.getTimestamp("lastUpdate"),
+                    unreadCount = (existingChat.getLong("unreadCount") ?: 0L).toInt(),
+                    userIds = existingChat.get("userIds") as? List<String> ?: emptyList()
+                )
             } else {
                 createChat(otherUserId)
             }
+
+            val otherUserId = chat.userIds.firstOrNull { it != currentUserId }
+            if (otherUserId != null) {
+                try {
+                    // Assuming getUserById is blocking or suspending
+                    val user = userRepository.getUserById(otherUserId)
+                    chat.contactName = user.fullName
+                    chat.profilePictureUrl = user.profilePictureUrl
+                    chat.email = user.email
+                    Log.d(TAG, "Fetched contact name: ${chat.contactName}")
+                } catch (e: Exception) {
+                    chat.contactName = "Unknown"
+                    Log.e(TAG, "Failed to fetch user name", e)
+                }
+            } else {
+                chat.contactName = "Me"
+            }
+
+            chat
         } catch (e: Exception) {
             Log.e(TAG, "Error getting or creating chat", e)
-            Result.failure(e)
+            throw e
         }
     }
     
@@ -279,60 +304,12 @@ class ChatRepository {
     suspend fun getUserName(userId: String): String {
         return try {
             val userDoc = firestore.collection("users").document(userId).get().await()
-            val user = userDoc.toObject(com.hcmus.forumus_client.data.model.User::class.java)
+            val user = userDoc.toObject(User::class.java)
             user?.fullName ?: "Unknown User"
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching user name", e)
             "Unknown User"
         }
     }
-    
-    // Helper method to create sample chats for testing (call this once to populate Firebase)
-    suspend fun createSampleChats(): Result<Unit> {
-        return try {
-            val currentUserId = getCurrentUserId()
-                ?: return Result.failure(Exception("User not authenticated"))
-            
-            val timestamp = getCurrentTimestamp()
-            
-            // Sample chat 1 with Sarah Johnson
-            val chat1 = ChatItem(
-                id = "chat1",
-                lastMessage = "Hey! Did you see the photos from last weekend?",
-                lastUpdate = timestamp,
-                unreadCount = 2,
-                userIds = listOf(currentUserId, "user1")
-            )
-            
-            // Sample chat 2 with Michael Chen
-            val chat2 = ChatItem(
-                id = "chat2", 
-                lastMessage = "Thanks for your help with the project!",
-                lastUpdate = timestamp,
-                unreadCount = 1,
-                userIds = listOf(currentUserId, "user2")
-            )
-            
-            // Create the chats
-            chatsCollection.document("chat1").set(chat1).await()
-            chatsCollection.document("chat2").set(chat2).await()
-            
-            // Add some sample messages to chat1
-            val messages1 = listOf(
-                Message("msg1", "Hey! How are you doing?", timestamp, "user1", MessageType.TEXT),
-                Message("msg2", "I'm doing great! Thanks for asking 😊", timestamp, currentUserId, MessageType.TEXT),
-                Message("msg3", "Did you see the photos from last weekend?", timestamp, "user1", MessageType.TEXT),
-                Message("msg4", "Yes! They were amazing! I loved the sunset shots", timestamp, currentUserId, MessageType.TEXT)
-            )
-            
-            messages1.forEach { message ->
-                chatsCollection.document("chat1").collection("messages").document(message.id).set(message).await()
-            }
-            
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error creating sample chats", e)
-            Result.failure(e)
-        }
-    }
+
 }

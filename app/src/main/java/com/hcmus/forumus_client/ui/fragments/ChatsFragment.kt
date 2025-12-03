@@ -2,10 +2,17 @@ package com.hcmus.forumus_client.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -13,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.databinding.FragmentChatsBinding
 import com.hcmus.forumus_client.ui.chats.ChatsAdapter
 import com.hcmus.forumus_client.ui.chats.ChatItem
+import com.hcmus.forumus_client.ui.chats.UserSearchAdapter
 import com.hcmus.forumus_client.ui.conversation.ConversationActivity
 
 class ChatsFragment : Fragment() {
@@ -21,7 +29,11 @@ class ChatsFragment : Fragment() {
     private val binding get() = _binding!!
     
     private lateinit var chatsAdapter: ChatsAdapter
+    private lateinit var userSearchAdapter: UserSearchAdapter
     private val viewModel: ChatsViewModel by viewModels()
+    
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +48,9 @@ class ChatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         setupRecyclerView()
+        setupSearchView()
         setupObservers()
+        setupClickListeners()
         
         // Load chats from Firebase
         viewModel.loadChats()
@@ -71,13 +85,96 @@ class ChatsFragment : Fragment() {
                 viewModel.clearError()
             }
         })
+        
+        // Search observers
+        viewModel.isSearchVisible.observe(viewLifecycleOwner, Observer { isVisible ->
+            binding.searchContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
+            if (isVisible) {
+                binding.editSearch.requestFocus()
+                showKeyboard()
+            } else {
+                hideKeyboard()
+            }
+        })
+        
+        viewModel.searchResults.observe(viewLifecycleOwner, Observer { users ->
+            userSearchAdapter.submitList(users)
+            binding.textEmptySearch.visibility = 
+                if (users.isEmpty() && binding.editSearch.text.toString().isNotBlank()) 
+                    View.VISIBLE else View.GONE
+        })
+        
+        viewModel.isSearching.observe(viewLifecycleOwner, Observer { isSearching ->
+            binding.progressSearch.visibility = if (isSearching) View.VISIBLE else View.GONE
+        })
+
+        viewModel.chatResult.observe(viewLifecycleOwner, Observer { chatItem ->
+            Log.d("ChatsFragment", "Chat started with user, navigating to chat $chatItem")
+            chatItem?.let {
+                navigateToChatActivity(it)
+            }
+        })
     }
 
-
+    private fun setupSearchView() {
+        userSearchAdapter = UserSearchAdapter { user ->
+            viewModel.startChatWithUser(user)
+        }
+        
+        binding.recyclerSearchResults.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = userSearchAdapter
+        }
+        
+        // Setup search text watcher with debouncing
+        binding.editSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Cancel previous search
+                searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                
+                // Schedule new search with 1 second delay
+                searchRunnable = Runnable {
+                    val query = s?.toString()?.trim() ?: ""
+                    if (query.isNotBlank()) {
+                        viewModel.searchUsers(query)
+                    } else {
+                        userSearchAdapter.submitList(emptyList())
+                        binding.textEmptySearch.visibility = View.GONE
+                    }
+                }
+                searchHandler.postDelayed(searchRunnable!!, 1000)
+            }
+            
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+    
+    private fun setupClickListeners() {
+        binding.icSearch.setOnClickListener {
+            viewModel.toggleSearchVisibility()
+        }
+        
+        binding.btnBackSearch.setOnClickListener {
+            viewModel.hideSearch()
+            binding.editSearch.text.clear()
+        }
+    }
+    
+    private fun showKeyboard() {
+        val imm = getSystemService(requireContext(), InputMethodManager::class.java)
+        imm?.showSoftInput(binding.editSearch, InputMethodManager.SHOW_IMPLICIT)
+    }
+    
+    private fun hideKeyboard() {
+        val imm = getSystemService(requireContext(), InputMethodManager::class.java)
+        imm?.hideSoftInputFromWindow(binding.editSearch.windowToken, 0)
+    }
 
     private fun navigateToChatActivity(chatItem: ChatItem) {
         try {
-            android.util.Log.d("ChatsFragment", "Navigating to chat with: ${chatItem.contactName}")
+            Log.d("ChatsFragment", "Navigating to chat with: ${chatItem.contactName}")
             val intent = Intent(requireContext(), ConversationActivity::class.java).apply {
                 putExtra(ConversationActivity.EXTRA_CHAT_ID, chatItem.id)
                 putExtra(ConversationActivity.EXTRA_USER_NAME, chatItem.contactName)
@@ -86,12 +183,13 @@ class ChatsFragment : Fragment() {
             }
             startActivity(intent)
         } catch (e: Exception) {
-            android.util.Log.e("ChatsFragment", "Error navigating to chat", e)
+            Log.e("ChatsFragment", "Error navigating to chat", e)
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        searchRunnable?.let { searchHandler.removeCallbacks(it) }
         _binding = null
     }
 }

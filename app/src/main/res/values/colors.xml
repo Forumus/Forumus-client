@@ -23,6 +23,7 @@
     <color name="text_secondary_light">#999999</color>
     <color name="text_tertiary">#666666</color>
     <color name="divider">#E0E0E0</color>
+    <color name="light_gray">#E5E7EB</color>
     <color name="button_background_light">#F1F3F5</color>
     <color name="button_background_lighter">#F8F9FA</color>
     <!-- Voting colors -->

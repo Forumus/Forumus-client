@@ -86,4 +86,5 @@ dependencies {
     implementation(libs.logging.interceptor)
 
     implementation(libs.glide)
+    implementation(libs.circleimageview)
 }
