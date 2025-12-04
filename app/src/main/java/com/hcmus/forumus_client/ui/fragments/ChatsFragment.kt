@@ -16,12 +16,16 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.databinding.FragmentChatsBinding
 import com.hcmus.forumus_client.ui.chats.ChatsAdapter
 import com.hcmus.forumus_client.ui.chats.ChatItem
 import com.hcmus.forumus_client.ui.chats.UserSearchAdapter
 import com.hcmus.forumus_client.ui.conversation.ConversationActivity
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class ChatsFragment : Fragment() {
 
@@ -69,10 +73,17 @@ class ChatsFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.chats.observe(viewLifecycleOwner, Observer { chats ->
-            android.util.Log.d("ChatsFragment", "Received ${chats.size} chats from Firebase")
-            chatsAdapter.submitList(chats)
-        })
+        lifecycleScope.launch {
+            // repeatOnLifecycle pauses the collection when the app is in the background
+            // This saves battery and prevents crashes when the view is destroyed
+            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+
+                // Listen to the flow
+                viewModel.chats.collectLatest { chats ->
+                    chatsAdapter.submitList(chats)
+                }
+            }
+        }
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             // Show/hide loading indicator

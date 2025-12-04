@@ -1,13 +1,17 @@
 package com.hcmus.forumus_client.ui.conversation
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
+import android.os.Environment
+import android.util.Log
 import android.widget.Toast
+import androidx.core.content.FileProvider
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -16,10 +20,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ActivityConversationBinding
 import com.hcmus.forumus_client.ui.image.FullscreenImageActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collectLatest
 
 class ConversationActivity : AppCompatActivity() {
 
@@ -29,6 +39,8 @@ class ConversationActivity : AppCompatActivity() {
     private val viewModel: ConversationViewModel by viewModels()
     private var chatId: String? = null
     private var selectedImageUris: MutableList<Uri> = mutableListOf()
+    private var currentPhotoPath: String? = null
+    private var photoUri: Uri = Uri.EMPTY
     
     companion object {
         const val EXTRA_CHAT_ID = "extra_chat_id"
@@ -57,13 +69,45 @@ class ConversationActivity : AppCompatActivity() {
         }
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
+    private val takePictureLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            if (selectedImageUris.size < MAX_IMAGES) {
+                selectedImageUris.add(photoUri)
+                updateImagePreview()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Maximum $MAX_IMAGES images allowed",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else {
+            // Delete the file if capture failed
+            currentPhotoPath?.let { path ->
+                File(path).delete()
+            }
+        }
+    }
+
+    private val requestStoragePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
             openImagePicker()
         } else {
-            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val requestCameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            openCamera()
+        } else {
+            Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -111,17 +155,23 @@ class ConversationActivity : AppCompatActivity() {
 
     }
 
+    private val viewPool = RecyclerView.RecycledViewPool()
+
     private fun setupRecyclerView() {
         val currentUserId = viewModel.getCurrentUserId() ?: ""
-        
-        // Setup message adapter with image click handler
-        messageAdapter = ConversationAdapter(currentUserId) { imageUrls, initialPosition ->
+
+        // PASS THE POOL HERE
+        messageAdapter = ConversationAdapter(currentUserId, viewPool) { imageUrls, initialPosition ->
             openFullscreenImageView(imageUrls, initialPosition)
         }
-        
+
         binding.rvMessages.apply {
             adapter = messageAdapter
-            layoutManager = LinearLayoutManager(this@ConversationActivity)
+            // Optimization: Cache more view holders offscreen to prevent re-binding on small scrolls
+            setItemViewCacheSize(20)
+            layoutManager = LinearLayoutManager(this@ConversationActivity).apply {
+                stackFromEnd = true // Keeps view at bottom
+            }
         }
 
         // Setup image preview adapter
@@ -136,16 +186,45 @@ class ConversationActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.messages.observe(this, Observer { messages ->
-            messageAdapter.setMessages(messages)
-            // Scroll to bottom when new messages arrive
-            if (messages.isNotEmpty()) {
-                binding.rvMessages.scrollToPosition(messages.size - 1)
-            }
-        })
+        lifecycleScope.launch {
+            // repeatOnLifecycle pauses the collection when the app is in the background
+            // This saves battery and prevents crashes when the view is destroyed
+            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
 
-        viewModel.isLoading.observe(this, Observer { isLoading ->
-            // You can show/hide loading indicator here
+                // Listen to the flow
+                viewModel.messages.collectLatest { messages ->
+                    Log.d("ConversationActivity", "Received $messages")
+                    messageAdapter.submitList(messages) {
+                        if (messages.isNotEmpty()) {
+                            binding.rvMessages.scrollToPosition(messages.size - 1)
+                            binding.etMessage.text.clear()
+                        }
+                    }
+                }
+            }
+        }
+
+//        viewModel.isLoading.observe(this, Observer { isLoading ->
+//            // Update UI to show loading state
+//            binding.btnSend.isEnabled = !isLoading
+//            binding.btnAttachment.isEnabled = !isLoading
+//
+//            if (isLoading) {
+//                binding.btnSend.visibility = android.view.View.GONE
+//                binding.pbSending.visibility = android.view.View.VISIBLE
+//            } else {
+//                binding.btnSend.visibility = android.view.View.VISIBLE
+//                binding.pbSending.visibility = android.view.View.GONE
+//            }
+//        })
+
+        viewModel.isUploading.observe(this, Observer { isUploading ->
+            // Additional feedback for image uploads
+            if (isUploading) {
+                binding.etMessage.hint = "Uploading images..."
+            } else {
+                binding.etMessage.hint = "Message..."
+            }
         })
 
         viewModel.error.observe(this, Observer { errorMessage ->
@@ -157,9 +236,11 @@ class ConversationActivity : AppCompatActivity() {
 
         viewModel.sendMessageResult.observe(this, Observer { success ->
             if (success == true) {
-                binding.etMessage.text.clear()
-                selectedImageUris.clear()
-                updateImagePreview()
+                // Clear inputs on main thread - this is lightweight
+                runOnUiThread {
+                    binding.etMessage.text.clear()
+                    clearSelectedImages()
+                }
             }
             viewModel.clearSendResult()
         })
@@ -179,11 +260,7 @@ class ConversationActivity : AppCompatActivity() {
         }
         
         binding.btnAttachment.setOnClickListener {
-            // Handle attachment
-        }
-        
-        binding.btnImage.setOnClickListener {
-            checkPermissionAndPickImages()
+            showImageSelectionDialog()
         }
         
         binding.btnVoice.setOnClickListener {
@@ -213,13 +290,61 @@ class ConversationActivity : AppCompatActivity() {
                 openImagePicker()
             }
             else -> {
-                requestPermissionLauncher.launch(permission)
+                requestStoragePermissionLauncher.launch(permission)
+            }
+        }
+    }
+
+    private fun checkPermissionAndOpenCamera() {
+        when {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
+                openCamera()
+            }
+            else -> {
+                requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
         }
     }
 
     private fun openImagePicker() {
         pickImageLauncher.launch("image/*")
+    }
+
+    private fun openCamera() {
+        try {
+            // Create image file
+            val imageFile = createImageFile()
+            photoUri = FileProvider.getUriForFile(
+                this,
+                "${packageName}.fileprovider",
+                imageFile
+            )
+            
+            // Launch camera
+            takePictureLauncher.launch(photoUri)
+        } catch (ex: Exception) {
+            Toast.makeText(this, "Error opening camera: ${ex.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @Throws(java.io.IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        
+        if (storageDir != null && !storageDir.exists()) {
+            storageDir.mkdirs()
+        }
+        
+        return File.createTempFile(
+            "JPEG_${timeStamp}_",
+            ".jpg",
+            storageDir
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            currentPhotoPath = absolutePath
+        }
     }
 
     private fun updateImagePreview() {
@@ -242,16 +367,57 @@ class ConversationActivity : AppCompatActivity() {
             return
         }
         
-        val imageUriStrings = selectedImageUris.map { it.toString() }
-        viewModel.sendMessage(messageText, imageUriStrings as MutableList<String>)
+        // Disable send button immediately to prevent multiple sends
+        binding.btnSend.isEnabled = false
         
-        // Clear inputs
-        binding.etMessage.text.clear()
-        selectedImageUris.clear()
+        // Convert URIs to strings on main thread (lightweight operation)
+        val imageUriStrings = selectedImageUris.map { it.toString() }.toMutableList()
+        
+        // Send message (heavy operations will be done in background)
+        viewModel.sendMessage(messageText, imageUriStrings)
     }
 
     private fun openFullscreenImageView(imageUrls: List<String>, initialPosition: Int) {
         val intent = FullscreenImageActivity.createIntent(this, imageUrls, initialPosition)
         startActivity(intent)
+    }
+    
+    private fun clearSelectedImages() {
+        selectedImageUris.clear()
+        currentPhotoPath = null
+        photoUri = Uri.EMPTY
+        updateImagePreview()
+    }
+
+    private fun showImageSelectionDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_image_selection, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        // Set custom background
+        dialog.window?.setBackgroundDrawableResource(R.drawable.dialog_background)
+
+        dialogView.findViewById<android.view.View>(R.id.ll_camera).setOnClickListener {
+            dialog.dismiss()
+            checkPermissionAndOpenCamera()
+        }
+
+        dialogView.findViewById<android.view.View>(R.id.ll_gallery).setOnClickListener {
+            dialog.dismiss()
+            checkPermissionAndPickImages()
+        }
+
+        dialog.show()
+    }
+
+    override fun onDestroy() {
+        // MEMORY FIX: Clean up all resources to prevent leaks
+        selectedImageUris.clear()
+        currentPhotoPath = null
+        photoUri = Uri.EMPTY
+
+        super.onDestroy()
     }
 }

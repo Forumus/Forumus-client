@@ -10,17 +10,20 @@ import com.hcmus.forumus_client.data.repository.ChatRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
 import com.hcmus.forumus_client.data.model.User
 import com.hcmus.forumus_client.ui.chats.ChatItem
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+
 
 class ChatsViewModel : ViewModel() {
     
     private val chatRepository = ChatRepository()
     private val userRepository = UserRepository()
-    private var chatsListener: ListenerRegistration? = null
-    
-    private val _chats = MutableLiveData<List<ChatItem>>()
-    val chats: LiveData<List<ChatItem>> = _chats
-    
+
+    private val _chats = MutableStateFlow<List<ChatItem>>(emptyList())
+    val chats: StateFlow<List<ChatItem>> = _chats
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
     
@@ -46,22 +49,16 @@ class ChatsViewModel : ViewModel() {
     
     fun loadChats() {
         _isLoading.value = true
-        
-        // Stop previous listener
-        chatsListener?.remove()
-        
-        chatsListener = chatRepository.listenToUserChats(
-            onChatsChanged = { chatList ->
-                _chats.value = chatList
-                _isLoading.value = false
-                Log.d(TAG, "Loaded ${chatList.size} chats")
-            },
-            onError = { exception ->
-                _error.value = exception.message ?: "Error loading chats"
-                _isLoading.value = false
-                Log.e(TAG, "Error loading chats", exception)
-            }
-        )
+
+        viewModelScope.launch {
+            chatRepository.getUserChatsFlow()
+                .catch { e ->
+                    Log.e("ViewModel", "Error loading chats", e)
+                }
+                .collect { chatList ->
+                    _chats.value = chatList
+                }
+        }
     }
     
     fun searchUsers(query: String) {
@@ -109,9 +106,5 @@ class ChatsViewModel : ViewModel() {
     fun clearError() {
         _error.value = ""
     }
-    
-    override fun onCleared() {
-        super.onCleared()
-        chatsListener?.remove()
-    }
+
 }

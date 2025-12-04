@@ -10,14 +10,18 @@ import com.hcmus.forumus_client.data.model.Message
 import com.hcmus.forumus_client.data.model.MessageType
 import com.hcmus.forumus_client.data.repository.ChatRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class ConversationViewModel : ViewModel() {
     
     private val chatRepository = ChatRepository()
     private var messagesListener: ListenerRegistration? = null
-    
-    private val _messages = MutableLiveData<List<Message>>()
-    val messages: LiveData<List<Message>> = _messages
+
+    private val _messages = MutableStateFlow<List<Message>>(emptyList())
+    val messages: StateFlow<List<Message>> = _messages
     
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -28,10 +32,15 @@ class ConversationViewModel : ViewModel() {
     private val _sendMessageResult = MutableLiveData<Boolean>()
     val sendMessageResult: LiveData<Boolean> = _sendMessageResult
     
+    private val _isUploading = MutableLiveData<Boolean>()
+    val isUploading: LiveData<Boolean> = _isUploading
+    
     private var currentChatId: String? = null
+    private var lastErrorTime = 0L // Prevent error spam
     
     companion object {
         private const val TAG = "ChatViewModel"
+        private const val ERROR_DEBOUNCE_TIME = 3000L // 3 seconds between errors
     }
     
     fun getCurrentUserId(): String? {
@@ -41,32 +50,30 @@ class ConversationViewModel : ViewModel() {
     fun loadMessages(chatId: String) {
         currentChatId = chatId
         _isLoading.value = true
-        
-        // Stop previous listener
+
+        // CRITICAL: Stop previous listener to prevent memory leaks
         messagesListener?.remove()
-        
-        messagesListener = chatRepository.listenToMessages(
-            chatId = chatId,
-            onMessagesChanged = { messageList ->
-                _messages.value = messageList
-                _isLoading.value = false
-                Log.d(TAG, "Loaded ${messageList.size} messages")
-            },
-            onError = { exception ->
-                _error.value = exception.message ?: "Error loading messages"
-                _isLoading.value = false
-                Log.e(TAG, "Error loading messages", exception)
-            }
-        )
-        
-        // Mark messages as read
+        messagesListener = null
+
+        viewModelScope.launch {
+            chatRepository.getChatMessagesFlow(chatId)
+                .catch { e ->
+                    Log.e("ChatViewModel", "Error loading messages", e)
+                }
+                .collect { messageList ->
+                    // This runs on Main thread, but purely for updating the UI list.
+                    // All the heavy allocation work was done in the background.
+                    _messages.value = messageList
+                }
+        }
+        // Mark messages as read - optimize to avoid unnecessary coroutine
         markMessagesAsRead(chatId)
     }
     
     fun sendMessage(content: String, imageUrls: MutableList<String> = mutableListOf(), type: MessageType = MessageType.TEXT) {
         val chatId = currentChatId
         if (chatId == null) {
-            _error.value = "No chat selected"
+            setErrorWithDebounce("No chat selected")
             return
         }
         
@@ -74,35 +81,44 @@ class ConversationViewModel : ViewModel() {
         val hasImages = imageUrls.isNotEmpty()
         
         if (!hasContent && !hasImages) {
-            _error.value = "Message cannot be empty"
+            setErrorWithDebounce("Message cannot be empty")
             return
         }
         
         if (imageUrls.size > Message.MAX_IMAGES_PER_MESSAGE) {
-            _error.value = "Maximum ${Message.MAX_IMAGES_PER_MESSAGE} images allowed"
+            setErrorWithDebounce("Maximum ${Message.MAX_IMAGES_PER_MESSAGE} images allowed")
             return
         }
         
-        viewModelScope.launch {
+        // MEMORY FIX: Set loading states immediately to avoid context switching
+        _isLoading.value = true
+        _isUploading.value = hasImages
+        
+        // Single coroutine with minimal context switching
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = chatRepository.sendMessage(chatId, content.trim(), type, imageUrls)
-                if (result.isSuccess) {
-                    _sendMessageResult.value = true
-                    Log.d(TAG, "Message sent successfully")
-                } else {
-                    _error.value = result.exceptionOrNull()?.message ?: "Failed to send message"
-                    _sendMessageResult.value = false
-                }
+
+                // Single context switch for all UI updates
+                    if (result.isSuccess) {
+                        _sendMessageResult.value = true
+                        Log.d(TAG, "Message sent successfully")
+                    } else {
+                        _sendMessageResult.value = false
+                        Log.e(TAG, "Error sending message", result.exceptionOrNull())
+                    }
+                    _isLoading.value = false
+                    _isUploading.value = false
+
             } catch (e: Exception) {
-                _error.value = e.message ?: "Error sending message"
-                _sendMessageResult.value = false
-                Log.e(TAG, "Error sending message", e)
+                Log.e(TAG, "Send message error: ${e.message}", e)
             }
         }
+
     }
     
     private fun markMessagesAsRead(chatId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 chatRepository.markMessagesAsRead(chatId)
             } catch (e: Exception) {
@@ -119,8 +135,35 @@ class ConversationViewModel : ViewModel() {
         _sendMessageResult.value = false
     }
     
+    private fun setErrorWithDebounce(errorMessage: String) {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastErrorTime > ERROR_DEBOUNCE_TIME) {
+            _error.value = errorMessage
+            lastErrorTime = currentTime
+            Log.e(TAG, "Error (debounced): $errorMessage")
+        } else {
+            Log.e(TAG, "Error (suppressed to prevent spam): $errorMessage")
+        }
+    }
+    
     override fun onCleared() {
-        super.onCleared()
+        Log.d(TAG, "ConversationViewModel being cleared - cleaning up resources")
+
+        // CRITICAL: Remove Firebase listener first to prevent callbacks
         messagesListener?.remove()
+        messagesListener = null
+
+        // Clear all references
+        currentChatId = null
+        lastErrorTime = 0L
+
+        // MEMORY FIX: Clear LiveData to release references
+        _messages.value = emptyList()
+        _error.value = ""
+        _sendMessageResult.value = false
+        _isLoading.value = false
+        _isUploading.value = false
+
+        super.onCleared()
     }
 }

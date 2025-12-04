@@ -150,26 +150,27 @@
         android:background="@color/white"
         android:layout_alignParentBottom="true">
 
-        <!-- Attachment button -->
+        <!-- Image attachment button -->
         <ImageButton
             android:id="@+id/btn_attachment"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_add"
-            android:contentDescription="Attachment"
+            android:contentDescription="Add Image"
             android:layout_marginEnd="8dp"
             app:tint="@color/text_tertiary" />
 
-        <!-- Image button -->
+        <!-- Additional attachment button (for future features) -->
         <ImageButton
             android:id="@+id/btn_image"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_camera"
-            android:contentDescription="Image"
+            android:src="@drawable/ic_add"
+            android:contentDescription="Attachment"
             android:layout_marginEnd="8dp"
+            android:visibility="gone"
             app:tint="@color/text_tertiary" />
 
         <!-- Message input container -->
@@ -209,15 +210,29 @@
 
         </LinearLayout>
 
-        <!-- Send button -->
-        <ImageButton
-            android:id="@+id/btn_send"
+        <!-- Send button container with progress -->
+        <FrameLayout
             android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_send"
-            android:contentDescription="Send"
-            app:tint="@color/text_tertiary" />
+            android:layout_height="24dp">
+
+            <ImageButton
+                android:id="@+id/btn_send"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_send"
+                android:contentDescription="Send"
+                app:tint="@color/text_tertiary" />
+
+            <ProgressBar
+                android:id="@+id/pb_sending"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:indeterminateTint="@color/text_tertiary" />
+
+        </FrameLayout>
 
     </LinearLayout>
 
