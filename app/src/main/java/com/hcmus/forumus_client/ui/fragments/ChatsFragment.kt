@@ -134,7 +134,7 @@ class ChatsFragment : Fragment() {
                 // Cancel previous search
                 searchRunnable?.let { searchHandler.removeCallbacks(it) }
                 
-                // Schedule new search with 1 second delay
+                // Schedule new search with 500ms delay
                 searchRunnable = Runnable {
                     val query = s?.toString()?.trim() ?: ""
                     if (query.isNotBlank()) {
@@ -144,7 +144,7 @@ class ChatsFragment : Fragment() {
                         binding.textEmptySearch.visibility = View.GONE
                     }
                 }
-                searchHandler.postDelayed(searchRunnable!!, 1000)
+                searchHandler.postDelayed(searchRunnable!!, 500)
             }
             
             override fun afterTextChanged(s: Editable?) {}

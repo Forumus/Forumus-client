@@ -12,13 +12,13 @@ import com.hcmus.forumus_client.ui.chats.ChatItem
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.util.*
-import com.hcmus.forumus_client.data.model.User
+import com.google.firebase.storage.FirebaseStorage
+import androidx.core.net.toUri
 
 class ChatRepository {
     
     private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-    
+
     private val chatsCollection = firestore.collection("chats")
 
     private val userRepository = UserRepository()
@@ -132,12 +132,28 @@ class ChatRepository {
                 onMessagesChanged(messages)
             }
     }
+
+    suspend fun uploadChatImage(imageUri: String, chatId: String, fileName: String): Result<String> {
+        return try {
+            val storageRef = FirebaseStorage.getInstance().reference
+            val imageRef = storageRef.child("chat_images/$chatId/$fileName")
+
+            val uploadTask = imageRef.putFile(imageUri.toUri()).await()
+            val downloadUrl = imageRef.downloadUrl.await().toString()
+
+            Result.success(downloadUrl)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error uploading image", e)
+            Result.failure(e)
+        }
+    }
     
     // Send a message
     suspend fun sendMessage(
         chatId: String,
         content: String,
-        type: MessageType = MessageType.TEXT
+        type: MessageType = MessageType.TEXT,
+        imageUrls: MutableList<String> = mutableListOf()
     ): Result<String> {
         return try {
             val currentUserId = getCurrentUserId()
@@ -145,13 +161,26 @@ class ChatRepository {
             
             val messageId = "message_" + System.currentTimeMillis()
             val timestamp = getCurrentTimestamp()
+
+            // Upload images if any
+            imageUrls.forEachIndexed { index, imageUrl ->
+                if (imageUrl.startsWith("content://") || imageUrl.startsWith("file://")) {
+                    val uploadResult = uploadChatImage(imageUrl, chatId, "${messageId}_img_$index")
+                    if (uploadResult.isSuccess) {
+                        imageUrls[index] = uploadResult.getOrThrow()
+                    } else {
+                        Log.e(TAG, "Failed to upload image: $imageUrl")
+                    }
+                }
+            }
             
             val message = Message(
                 id = messageId,
                 content = content,
                 timestamp = timestamp,
                 senderId = currentUserId,
-                type = type
+                type = type,
+                imageUrls = imageUrls
             )
             
             // Add message to subcollection
@@ -297,18 +326,6 @@ class ChatRepository {
             }
         } catch (e: Exception) {
             "unknown"
-        }
-    }
-    
-    // Method to fetch user name asynchronously for future use
-    suspend fun getUserName(userId: String): String {
-        return try {
-            val userDoc = firestore.collection("users").document(userId).get().await()
-            val user = userDoc.toObject(User::class.java)
-            user?.fullName ?: "Unknown User"
-        } catch (e: Exception) {
-            Log.e(TAG, "Error fetching user name", e)
-            "Unknown User"
         }
     }
 

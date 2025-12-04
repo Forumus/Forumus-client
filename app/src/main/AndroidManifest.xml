@@ -52,6 +52,13 @@
         <!-- Conversation Activity -->
         <activity
             android:name=".ui.conversation.ConversationActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+
+        <!-- Fullscreen Image Activity -->
+        <activity
+            android:name=".ui.image.FullscreenImageActivity"
+            android:theme="@style/Theme.Forumus.Fullscreen"
             android:exported="false" />
 
         <!-- Slide Activity -->

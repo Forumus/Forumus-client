@@ -2,18 +2,24 @@ package com.hcmus.forumus_client.ui.conversation
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.hcmus.forumus_client.data.model.Message
 import com.hcmus.forumus_client.databinding.ItemMessageReceivedBinding
 import com.hcmus.forumus_client.databinding.ItemMessageSentBinding
+import com.hcmus.forumus_client.ui.image.FullscreenImageActivity
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.core.net.toUri
 
-class ConversationAdapter(private val currentUserId: String) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ConversationAdapter(
+    private val currentUserId: String,
+    private val onImageClick: ((List<String>, Int) -> Unit)? = null
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val messages = mutableListOf<Message>()
-
+    
     companion object {
         private const val VIEW_TYPE_SENT = 1
         private const val VIEW_TYPE_RECEIVED = 2
@@ -47,7 +53,10 @@ class ConversationAdapter(private val currentUserId: String) : RecyclerView.Adap
                     parent,
                     false
                 )
-                SentMessageViewHolder(binding)
+                SentMessageViewHolder(
+                    binding,
+                    onImageClick
+                )
             }
             VIEW_TYPE_RECEIVED -> {
                 val binding = ItemMessageReceivedBinding.inflate(
@@ -55,7 +64,7 @@ class ConversationAdapter(private val currentUserId: String) : RecyclerView.Adap
                     parent,
                     false
                 )
-                ReceivedMessageViewHolder(binding)
+                ReceivedMessageViewHolder(binding, onImageClick)
             }
             else -> throw IllegalArgumentException("Invalid view type")
         }
@@ -82,21 +91,83 @@ class ConversationAdapter(private val currentUserId: String) : RecyclerView.Adap
         notifyItemInserted(messages.size - 1)
     }
 
-    class SentMessageViewHolder(private val binding: ItemMessageSentBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class SentMessageViewHolder(
+        private val binding: ItemMessageSentBinding,
+        private val onImageClick: ((List<String>, Int) -> Unit)?
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(message: Message) {
-            binding.tvMessageText.text = message.content
+            // Handle text content
+            if (message.content.trim().isNotEmpty()) {
+                binding.tvMessageText.text = message.content
+                binding.tvMessageText.visibility = android.view.View.VISIBLE
+            } else {
+                binding.tvMessageText.visibility = android.view.View.GONE
+            }
+            
             binding.tvTimestamp.text = formatTimestamp(message.timestamp)
+
+            // Handle images
+            if (message.imageUrls.isNotEmpty()) {
+                binding.rvMessageImages.visibility = android.view.View.VISIBLE
+                
+                val messageImageAdapter = MessageImageAdapter { imageUrl, position ->
+                    onImageClick?.invoke(message.imageUrls, position)
+                }
+                
+                messageImageAdapter.setImageUrls(message.imageUrls)
+                
+                binding.rvMessageImages.apply {
+                    adapter = messageImageAdapter
+                    layoutManager = LinearLayoutManager(
+                        binding.root.context,
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                    )
+                }
+            } else {
+                binding.rvMessageImages.visibility = android.view.View.GONE
+            }
         }
     }
 
-    class ReceivedMessageViewHolder(private val binding: ItemMessageReceivedBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class ReceivedMessageViewHolder(
+        private val binding: ItemMessageReceivedBinding,
+        private val onImageClick: ((List<String>, Int) -> Unit)?
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(message: Message) {
-            binding.tvMessageText.text = message.content
+            // Handle text content
+            if (message.content.trim().isNotEmpty()) {
+                binding.tvMessageText.text = message.content
+                binding.tvMessageText.visibility = android.view.View.VISIBLE
+            } else {
+                binding.tvMessageText.visibility = android.view.View.GONE
+            }
+            
             binding.tvTimestamp.text = formatTimestamp(message.timestamp)
+
+            // Handle images
+            if (message.imageUrls.isNotEmpty()) {
+                binding.rvMessageImages.visibility = android.view.View.VISIBLE
+                
+                val messageImageAdapter = MessageImageAdapter { imageUrl, position ->
+                    onImageClick?.invoke(message.imageUrls, position)
+                }
+                
+                messageImageAdapter.setImageUrls(message.imageUrls)
+                
+                binding.rvMessageImages.apply {
+                    adapter = messageImageAdapter
+                    layoutManager = LinearLayoutManager(
+                        binding.root.context,
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                    )
+                }
+            } else {
+                binding.rvMessageImages.visibility = android.view.View.GONE
+            }
         }
     }
 }

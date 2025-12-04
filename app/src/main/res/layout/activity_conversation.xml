@@ -2,20 +2,21 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<LinearLayout
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/white">
 
     <!-- Header -->
     <LinearLayout
+        android:id="@+id/header_layout"
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:layout_alignParentTop="true">
 
         <!-- Back button -->
         <ImageButton
@@ -82,17 +83,21 @@
 
     <!-- Header border -->
     <View
+        android:id="@+id/header_border"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/divider" />
+        android:background="@color/divider"
+        android:layout_below="@id/header_layout" />
 
     <!-- Messages container -->
     <LinearLayout
+        android:id="@+id/messages_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/background_light">
+        android:background="@color/background_light"
+        android:layout_below="@id/header_border"
+        android:layout_above="@id/input_border">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_messages"
@@ -107,18 +112,43 @@
 
     <!-- Input area with border -->
     <View
+        android:id="@+id/input_border"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/divider" />
+        android:background="@color/divider"
+        android:layout_above="@id/image_preview_container" />
+
+    <!-- Image preview container -->
+    <LinearLayout
+        android:id="@+id/image_preview_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:layout_above="@id/input_layout"
+        android:visibility="gone">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_image_preview"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:scrollbars="horizontal" />
+
+    </LinearLayout>
     
     <LinearLayout
+        android:id="@+id/input_layout"
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
         android:paddingVertical="13dp"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:layout_alignParentBottom="true">
 
         <!-- Attachment button -->
         <ImageButton
@@ -191,6 +221,6 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
 
 </layout>

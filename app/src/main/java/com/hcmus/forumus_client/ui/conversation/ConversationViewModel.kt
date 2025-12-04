@@ -63,21 +63,29 @@ class ConversationViewModel : ViewModel() {
         markMessagesAsRead(chatId)
     }
     
-    fun sendMessage(content: String, type: MessageType = MessageType.TEXT) {
+    fun sendMessage(content: String, imageUrls: MutableList<String> = mutableListOf(), type: MessageType = MessageType.TEXT) {
         val chatId = currentChatId
         if (chatId == null) {
             _error.value = "No chat selected"
             return
         }
         
-        if (content.trim().isEmpty()) {
+        val hasContent = content.trim().isNotEmpty()
+        val hasImages = imageUrls.isNotEmpty()
+        
+        if (!hasContent && !hasImages) {
             _error.value = "Message cannot be empty"
+            return
+        }
+        
+        if (imageUrls.size > Message.MAX_IMAGES_PER_MESSAGE) {
+            _error.value = "Maximum ${Message.MAX_IMAGES_PER_MESSAGE} images allowed"
             return
         }
         
         viewModelScope.launch {
             try {
-                val result = chatRepository.sendMessage(chatId, content.trim(), type)
+                val result = chatRepository.sendMessage(chatId, content.trim(), type, imageUrls)
                 if (result.isSuccess) {
                     _sendMessageResult.value = true
                     Log.d(TAG, "Message sent successfully")
