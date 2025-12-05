@@ -172,6 +172,21 @@ class ConversationActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@ConversationActivity).apply {
                 stackFromEnd = true // Keeps view at bottom
             }
+            
+            // Add scroll listener to detect when user scrolls to top
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                    // Check if we are at the top (index 0) and not currently loading
+                    if (firstVisibleItemPosition == 0 && dy < 0) { // dy < 0 means scrolling up
+                        viewModel.loadPreviousMessages()
+                    }
+                }
+            })
         }
 
         // Setup image preview adapter
@@ -193,9 +208,21 @@ class ConversationActivity : AppCompatActivity() {
 
                 // Listen to the flow
                 viewModel.messages.collectLatest { messages ->
+                    val layoutManager = binding.rvMessages.layoutManager as LinearLayoutManager
+                    val firstVisibleItemIndex = layoutManager.findFirstVisibleItemPosition()
+                    val oldItemCount = messageAdapter.itemCount
+
                     Log.d("ConversationActivity", "Received $messages")
                     messageAdapter.submitList(messages) {
-                        if (messages.isNotEmpty()) {
+                        if (messages.size > oldItemCount && oldItemCount > 0) {
+                            val newItemsCount = messages.size - oldItemCount
+                            // Scroll to the item that WAS at the top, so the view doesn't jump
+                            val targetPosition = firstVisibleItemIndex + newItemsCount
+                            // scrollToPositionWithOffset is smoother than scrollToPosition
+                            layoutManager.scrollToPositionWithOffset(targetPosition, 0)
+                        }
+                        // If it's the INITIAL load (oldItemCount == 0), scroll to bottom
+                        else if (oldItemCount == 0 && messages.isNotEmpty()) {
                             binding.rvMessages.scrollToPosition(messages.size - 1)
                             binding.etMessage.text.clear()
                         }
@@ -204,19 +231,12 @@ class ConversationActivity : AppCompatActivity() {
             }
         }
 
-//        viewModel.isLoading.observe(this, Observer { isLoading ->
-//            // Update UI to show loading state
-//            binding.btnSend.isEnabled = !isLoading
-//            binding.btnAttachment.isEnabled = !isLoading
-//
-//            if (isLoading) {
-//                binding.btnSend.visibility = android.view.View.GONE
-//                binding.pbSending.visibility = android.view.View.VISIBLE
-//            } else {
-//                binding.btnSend.visibility = android.view.View.VISIBLE
-//                binding.pbSending.visibility = android.view.View.GONE
-//            }
-//        })
+        viewModel.isLoadingMore.observe(this, Observer { isLoadingMore ->
+            // Show/hide loading indicator when fetching previous messages
+            if (isLoadingMore) {
+                Log.d("ConversationActivity", "Loading more messages...")
+            }
+        })
 
         viewModel.isUploading.observe(this, Observer { isUploading ->
             // Additional feedback for image uploads

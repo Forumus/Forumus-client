@@ -26,6 +26,9 @@ class ConversationViewModel : ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
     
+    private val _isLoadingMore = MutableLiveData<Boolean>()
+    val isLoadingMore: LiveData<Boolean> = _isLoadingMore
+    
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
     
@@ -41,6 +44,7 @@ class ConversationViewModel : ViewModel() {
     companion object {
         private const val TAG = "ChatViewModel"
         private const val ERROR_DEBOUNCE_TIME = 3000L // 3 seconds between errors
+        private const val MESSAGES_PER_PAGE = 50
     }
     
     fun getCurrentUserId(): String? {
@@ -56,7 +60,7 @@ class ConversationViewModel : ViewModel() {
         messagesListener = null
 
         viewModelScope.launch {
-            chatRepository.getChatMessagesFlow(chatId)
+            chatRepository.getChatMessagesFlow(chatId, MESSAGES_PER_PAGE)
                 .catch { e ->
                     Log.e("ChatViewModel", "Error loading messages", e)
                 }
@@ -64,12 +68,61 @@ class ConversationViewModel : ViewModel() {
                     // This runs on Main thread, but purely for updating the UI list.
                     // All the heavy allocation work was done in the background.
                     _messages.value = messageList
+                    _isLoading.value = false
                 }
         }
         // Mark messages as read - optimize to avoid unnecessary coroutine
         markMessagesAsRead(chatId)
     }
-    
+
+    fun loadPreviousMessages() {
+        val chatId = currentChatId
+        if (chatId == null) {
+            setErrorWithDebounce("No chat selected")
+            return
+        }
+
+        val currentMessages = _messages.value
+        if (currentMessages.isEmpty()) {
+            return
+        }
+
+        // Get timestamp of the first (oldest) message
+        val oldestMessage = currentMessages.firstOrNull()
+        if (oldestMessage?.timestamp == null) {
+            return
+        }
+
+        _isLoadingMore.postValue(true)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val oldestTimestampMillis = oldestMessage.timestamp!!.toDate().time
+                val result = chatRepository.loadPreviousMessages(
+                    chatId,
+                    oldestTimestampMillis,
+                    MESSAGES_PER_PAGE
+                )
+
+                if (result.isSuccess) {
+                    val previousMessages = result.getOrNull() ?: emptyList()
+                    if (previousMessages.isNotEmpty()) {
+                        // Prepend previous messages to the beginning
+                        val updatedMessages = previousMessages + currentMessages
+                        _messages.value = updatedMessages
+                        Log.d(TAG, "Loaded ${previousMessages.size} previous messages")
+                    }
+                } else {
+                    Log.e(TAG, "Failed to load previous messages", result.exceptionOrNull())
+                }
+                _isLoadingMore.postValue(false)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading previous messages", e)
+                _isLoadingMore.postValue(false)
+            }
+        }
+    }
+
     fun sendMessage(content: String, imageUrls: MutableList<String> = mutableListOf(), type: MessageType = MessageType.TEXT) {
         val chatId = currentChatId
         if (chatId == null) {
@@ -163,6 +216,7 @@ class ConversationViewModel : ViewModel() {
         _sendMessageResult.value = false
         _isLoading.value = false
         _isUploading.value = false
+        _isLoadingMore.value = false
 
         super.onCleared()
     }

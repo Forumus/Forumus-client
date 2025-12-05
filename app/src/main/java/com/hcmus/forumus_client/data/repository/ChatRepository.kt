@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.hcmus.forumus_client.data.model.Message
 import com.hcmus.forumus_client.data.model.MessageType
@@ -111,13 +110,13 @@ class ChatRepository {
         }
     }
 
-    // Listen to messages in a specific chat
-    fun getChatMessagesFlow(chatId: String): Flow<List<Message>> = callbackFlow {
+    // Listen to messages in a specific chat with pagination
+    fun getChatMessagesFlow(chatId: String, limit: Int = 50): Flow<List<Message>> = callbackFlow {
         val listener = chatsCollection
             .document(chatId)
             .collection(MESSAGES_SUBCOLLECTION)
             .orderBy("timestamp", Query.Direction.ASCENDING)
-            .limitToLast(50)
+            .limitToLast(limit.toLong())
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.e(TAG, "Error listening to messages", error)
@@ -134,6 +133,34 @@ class ChatRepository {
             }
         awaitClose { listener.remove() }
     }.flowOn(Dispatchers.IO)
+
+    // Load previous messages before a specific timestamp for pagination
+    suspend fun loadPreviousMessages(
+        chatId: String,
+        beforeTimestamp: Long,
+        limit: Int = 50
+    ): Result<List<Message>> {
+        return try {
+            val com = com.google.firebase.Timestamp(beforeTimestamp / 1000, ((beforeTimestamp % 1000) * 1000000).toInt())
+            
+            val messages = chatsCollection
+                .document(chatId)
+                .collection(MESSAGES_SUBCOLLECTION)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .startAfter(com)
+                .limit(limit.toLong())
+                .get()
+                .await()
+                .toObjects(Message::class.java)
+                .reversed() // Reverse to get ascending order
+            
+            Log.d(TAG, "Loaded ${messages.size} previous messages before timestamp $beforeTimestamp")
+            Result.success(messages)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading previous messages", e)
+            Result.failure(e)
+        }
+    }
 
     suspend fun uploadChatImage(imageUri: String, chatId: String, fileName: String): Result<String> {
         return try {
