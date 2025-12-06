@@ -72,11 +72,17 @@
     <string name="select_role">Select Role</string>
     <string name="student">Student</string>
     <string name="teacher">Teacher</string>
-        <!-- Your other strings -->
 
-        <string name="menu">Menu</string>
-        <string name="search">Search</string>
-        <string name="profile">Profile</string>
-        <string name="home">Home</string>
-        <string name="explore">Explore</string>
+    <!-- Your other strings -->
+    <string name="menu">Menu</string>
+    <string name="search">Search</string>
+    <string name="profile">Profile</string>
+    <string name="home">Home</string>
+    <string name="explore">Explore</string>
+
+    <!-- Profile Popup Menu -->
+    <string name="view_profile">View Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="settings">Setting</string>
 </resources>
