@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,6 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.hcmus.forumus_client.data.model.ChatType
 import com.hcmus.forumus_client.databinding.FragmentChatsBinding
 import com.hcmus.forumus_client.ui.chats.ChatsAdapter
 import com.hcmus.forumus_client.ui.chats.ChatItem
@@ -55,9 +57,12 @@ class ChatsFragment : Fragment() {
         setupSearchView()
         setupObservers()
         setupClickListeners()
-        
-        // Load chats from Firebase
-        viewModel.loadChats()
+        setupLoadChats(ChatType.DEFAULT_CHATS)
+    }
+
+    private fun setupLoadChats(chatType: Enum<ChatType>) {
+        viewModel.resetChatResult()
+        viewModel.loadChats(chatType)
     }
 
     private fun setupRecyclerView() {
@@ -81,13 +86,19 @@ class ChatsFragment : Fragment() {
                 // Listen to the flow
                 viewModel.chats.collectLatest { chats ->
                     chatsAdapter.submitList(chats)
+
+                    if (chats.isEmpty()) {
+                        binding.textEmptyChats.visibility = if (viewModel.isLoading.value == true) View.GONE else View.VISIBLE
+                    } else {
+                        binding.textEmptyChats.visibility = View.GONE
+                    }
                 }
             }
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             // Show/hide loading indicator
-            // binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.loadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
@@ -170,6 +181,24 @@ class ChatsFragment : Fragment() {
         binding.btnBackSearch.setOnClickListener {
             viewModel.hideSearch()
             binding.editSearch.text.clear()
+        }
+
+        binding.btnAllChats.setOnClickListener {
+            binding.btnAllChats.background = AppCompatResources.getDrawable(
+                requireContext(),
+                com.hcmus.forumus_client.R.drawable.chat_filter_button_selected_background
+            )
+            binding.btnUnreadChats.background = null
+            setupLoadChats(ChatType.DEFAULT_CHATS)
+        }
+
+        binding.btnUnreadChats.setOnClickListener {
+            binding.btnUnreadChats.background = AppCompatResources.getDrawable(
+                requireContext(),
+                com.hcmus.forumus_client.R.drawable.chat_filter_button_selected_background
+            )
+            binding.btnAllChats.background = null
+            setupLoadChats(ChatType.UNREAD_CHATS)
         }
     }
     

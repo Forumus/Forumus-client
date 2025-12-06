@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ListenerRegistration
+import com.hcmus.forumus_client.data.model.ChatType
 import com.hcmus.forumus_client.data.repository.ChatRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
 import com.hcmus.forumus_client.data.model.User
@@ -46,17 +47,24 @@ class ChatsViewModel : ViewModel() {
     companion object {
         private const val TAG = "ChatsViewModel"
     }
+
+    fun resetChatResult() {
+        _chats.value = emptyList()
+        _chatResult.value = null
+    }
     
-    fun loadChats() {
+    fun loadChats(chatType: Enum<ChatType>) {
         _isLoading.value = true
 
         viewModelScope.launch {
-            chatRepository.getUserChatsFlow()
+            chatRepository.getUserChatsFlow(chatType)
                 .catch { e ->
                     Log.e("ViewModel", "Error loading chats", e)
                 }
                 .collect { chatList ->
                     _chats.value = chatList
+                    _isLoading.value = false
+                    Log.d(TAG, "Chats loaded: ${chatList.size} items")
                 }
         }
     }

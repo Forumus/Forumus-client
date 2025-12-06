@@ -42,7 +42,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_message_images"
-            android:layout_width="400dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:paddingHorizontal="8dp"
             android:paddingTop="12dp"

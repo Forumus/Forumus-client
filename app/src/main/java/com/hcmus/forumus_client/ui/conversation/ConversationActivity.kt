@@ -117,7 +117,7 @@ class ConversationActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
@@ -206,6 +206,29 @@ class ConversationActivity : AppCompatActivity() {
             // This saves battery and prevents crashes when the view is destroyed
             repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
 
+                launch {
+                    viewModel.isUploading.collectLatest { isUploading ->
+                        if (isUploading) {
+                            binding.etMessage.hint = "Uploading images..."
+                        } else {
+                            binding.etMessage.hint = "Message..."
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.sendMessageResult.collectLatest { success ->
+                        if (success) {
+                            // Clear inputs on main thread - this is lightweight
+                            runOnUiThread {
+                                binding.etMessage.text.clear()
+                                clearSelectedImages()
+                            }
+                        }
+                        viewModel.clearSendResult()
+                    }
+                }
+
                 // Listen to the flow
                 viewModel.messages.collectLatest { messages ->
                     val layoutManager = binding.rvMessages.layoutManager as LinearLayoutManager
@@ -224,8 +247,9 @@ class ConversationActivity : AppCompatActivity() {
                         // If it's the INITIAL load (oldItemCount == 0), scroll to bottom
                         else if (oldItemCount == 0 && messages.isNotEmpty()) {
                             binding.rvMessages.scrollToPosition(messages.size - 1)
-                            binding.etMessage.text.clear()
                         }
+                        binding.etMessage.text.clear()
+
                     }
                 }
             }
@@ -238,31 +262,11 @@ class ConversationActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.isUploading.observe(this, Observer { isUploading ->
-            // Additional feedback for image uploads
-            if (isUploading) {
-                binding.etMessage.hint = "Uploading images..."
-            } else {
-                binding.etMessage.hint = "Message..."
-            }
-        })
-
         viewModel.error.observe(this, Observer { errorMessage ->
             if (errorMessage != null) {
                 Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
                 viewModel.clearError()
             }
-        })
-
-        viewModel.sendMessageResult.observe(this, Observer { success ->
-            if (success == true) {
-                // Clear inputs on main thread - this is lightweight
-                runOnUiThread {
-                    binding.etMessage.text.clear()
-                    clearSelectedImages()
-                }
-            }
-            viewModel.clearSendResult()
         })
     }
 
@@ -386,9 +390,9 @@ class ConversationActivity : AppCompatActivity() {
             Toast.makeText(this, "Please enter a message or select images", Toast.LENGTH_SHORT).show()
             return
         }
-        
+
         // Disable send button immediately to prevent multiple sends
-        binding.btnSend.isEnabled = false
+//        binding.btnSend.isEnabled = false
         
         // Convert URIs to strings on main thread (lightweight operation)
         val imageUriStrings = selectedImageUris.map { it.toString() }.toMutableList()

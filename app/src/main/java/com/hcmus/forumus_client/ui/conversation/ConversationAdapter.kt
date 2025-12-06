@@ -100,7 +100,9 @@ class ConversationAdapter(
             // 2. Setup RecyclerView ONLY ONCE
             binding.rvMessageImages.apply {
                 setRecycledViewPool(viewPool) // SHARE VIEWS
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
+                    stackFromEnd = true
+                }
                 adapter = messageImageAdapter // Attach adapter immediately
                 setHasFixedSize(true) // Optimization
                 isNestedScrollingEnabled = false // Optimization for smooth scrolling
@@ -148,7 +150,9 @@ class ConversationAdapter(
         init {
             binding.rvMessageImages.apply {
                 setRecycledViewPool(viewPool)
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
+                    stackFromEnd = true
+                }
                 adapter = messageImageAdapter
                 setHasFixedSize(true)
                 isNestedScrollingEnabled = false

@@ -13,6 +13,7 @@ import kotlinx.coroutines.tasks.await
 import java.util.*
 import com.google.firebase.storage.FirebaseStorage
 import androidx.core.net.toUri
+import com.hcmus.forumus_client.data.model.ChatType
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -35,7 +36,7 @@ class ChatRepository {
     }
 
     // Listen to all chats for current user
-    fun getUserChatsFlow(): Flow<List<ChatItem>> = callbackFlow {
+    fun getUserChatsFlow(chatType: Enum<ChatType>): Flow<List<ChatItem>> = callbackFlow {
         val currentUserId = getCurrentUserId()
         Log.d(TAG, "Current user ID: $currentUserId")
 
@@ -48,6 +49,7 @@ class ChatRepository {
         // 2. Setup the Firestore listener
         val listener = chatsCollection
             .whereArrayContains("userIds", currentUserId)
+            .whereNotEqualTo("unreadCount", if (chatType == ChatType.UNREAD_CHATS) 0 else null)
             .orderBy("lastUpdate", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -194,10 +196,9 @@ class ChatRepository {
         return try {
             val currentUserId = getCurrentUserId()
                 ?: return Result.failure(Exception("User not authenticated"))
-            
+
             val messageId = "message_" + System.currentTimeMillis()
             val timestamp = getCurrentTimestamp()
-
 
             // Upload images sequentially to avoid memory issues
             if (imageUrls.isNotEmpty()) {
@@ -230,7 +231,7 @@ class ChatRepository {
                 type = type,
                 imageUrls = imageUrls
             )
-            
+
             // Save message to Firestore without nested timeouts
             try {
                 chatsCollection
@@ -260,7 +261,7 @@ class ChatRepository {
             } catch (e: Exception) {
                 Log.w(TAG, "Chat metadata update failed, but message was sent: ${e.message}")
             }
-            
+
             Result.success(messageId)
         } catch (e: Exception) {
             Log.e(TAG, "Error sending message", e)

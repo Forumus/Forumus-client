@@ -11,6 +11,7 @@ import com.hcmus.forumus_client.data.model.MessageType
 import com.hcmus.forumus_client.data.repository.ChatRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,8 +24,8 @@ class ConversationViewModel : ViewModel() {
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages
     
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
     
     private val _isLoadingMore = MutableLiveData<Boolean>()
     val isLoadingMore: LiveData<Boolean> = _isLoadingMore
@@ -32,11 +33,11 @@ class ConversationViewModel : ViewModel() {
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
     
-    private val _sendMessageResult = MutableLiveData<Boolean>()
-    val sendMessageResult: LiveData<Boolean> = _sendMessageResult
+    private val _sendMessageResult = MutableStateFlow(false)
+    val sendMessageResult: StateFlow<Boolean> = _sendMessageResult
     
-    private val _isUploading = MutableLiveData<Boolean>()
-    val isUploading: LiveData<Boolean> = _isUploading
+    private val _isUploading = MutableStateFlow(false)
+    val isUploading: StateFlow<Boolean> = _isUploading
     
     private var currentChatId: String? = null
     private var lastErrorTime = 0L // Prevent error spam
@@ -93,16 +94,18 @@ class ConversationViewModel : ViewModel() {
             return
         }
 
-        _isLoadingMore.postValue(true)
+        _isLoadingMore.value = true
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 val oldestTimestampMillis = oldestMessage.timestamp!!.toDate().time
-                val result = chatRepository.loadPreviousMessages(
-                    chatId,
-                    oldestTimestampMillis,
-                    MESSAGES_PER_PAGE
-                )
+                val result = withContext(Dispatchers.IO) {
+                    chatRepository.loadPreviousMessages(
+                        chatId,
+                        oldestTimestampMillis,
+                        MESSAGES_PER_PAGE
+                    )
+                }
 
                 if (result.isSuccess) {
                     val previousMessages = result.getOrNull() ?: emptyList()
@@ -115,10 +118,10 @@ class ConversationViewModel : ViewModel() {
                 } else {
                     Log.e(TAG, "Failed to load previous messages", result.exceptionOrNull())
                 }
-                _isLoadingMore.postValue(false)
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading previous messages", e)
-                _isLoadingMore.postValue(false)
+            } finally {
+                _isLoadingMore.value = false
             }
         }
     }
@@ -129,39 +132,39 @@ class ConversationViewModel : ViewModel() {
             setErrorWithDebounce("No chat selected")
             return
         }
-        
+
         val hasContent = content.trim().isNotEmpty()
         val hasImages = imageUrls.isNotEmpty()
-        
+
         if (!hasContent && !hasImages) {
             setErrorWithDebounce("Message cannot be empty")
             return
         }
-        
+
         if (imageUrls.size > Message.MAX_IMAGES_PER_MESSAGE) {
             setErrorWithDebounce("Maximum ${Message.MAX_IMAGES_PER_MESSAGE} images allowed")
             return
         }
-        
+
         // MEMORY FIX: Set loading states immediately to avoid context switching
         _isLoading.value = true
         _isUploading.value = hasImages
-        
+
         // Single coroutine with minimal context switching
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = chatRepository.sendMessage(chatId, content.trim(), type, imageUrls)
 
                 // Single context switch for all UI updates
-                    if (result.isSuccess) {
-                        _sendMessageResult.value = true
-                        Log.d(TAG, "Message sent successfully")
-                    } else {
-                        _sendMessageResult.value = false
-                        Log.e(TAG, "Error sending message", result.exceptionOrNull())
-                    }
-                    _isLoading.value = false
-                    _isUploading.value = false
+                if (result.isSuccess) {
+                    _sendMessageResult.value = true
+                    Log.d(TAG, "Message sent successfully")
+                } else {
+                    _sendMessageResult.value = false
+                    Log.e(TAG, "Error sending message", result.exceptionOrNull())
+                }
+                _isLoading.value = false
+                _isUploading.value = false
 
             } catch (e: Exception) {
                 Log.e(TAG, "Send message error: ${e.message}", e)
