@@ -19,7 +19,7 @@ import androidx.core.view.WindowInsetsCompat
  */
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var postAdapter: HomeAdapter
+    private lateinit var homeAdapter: HomeAdapter
     private val viewModel: HomeViewModel by viewModels()
     private val navigator by lazy { AppNavigator(this) }
 
@@ -96,7 +96,7 @@ class HomeActivity : AppCompatActivity() {
      * Configures post action callbacks for upvote, downvote, and navigation.
      */
     private fun setupRecyclerView() {
-        postAdapter = HomeAdapter(emptyList()) { post, action ->
+        homeAdapter = HomeAdapter(emptyList()) { post, action ->
             when (action) {
                 PostAction.OPEN -> navigator.onDetailPost(post.id)
                 PostAction.UPVOTE -> viewModel.onPostAction(post, PostAction.UPVOTE)
@@ -109,7 +109,7 @@ class HomeActivity : AppCompatActivity() {
 
         binding.postRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@HomeActivity)
-            adapter = postAdapter
+            adapter = homeAdapter
         }
     }
 
@@ -134,7 +134,7 @@ class HomeActivity : AppCompatActivity() {
      */
     private fun observeViewModel() {
         viewModel.posts.observe(this) {
-            postAdapter.submitList(it)
+            homeAdapter.submitList(it)
         }
 
         viewModel.currentUser.observe(this) { user ->

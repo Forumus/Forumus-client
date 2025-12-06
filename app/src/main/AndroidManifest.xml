@@ -38,6 +38,11 @@
             android:name=".ui.home.HomeActivity"
             android:exported="false" />
 
+        <!-- Profile Activity -->
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:exported="false" />
+
         <!-- Forgot Password Activity -->
         <activity
             android:name=".ui.auth.forgotPassword.ForgotPasswordActivity"
