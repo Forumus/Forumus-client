@@ -57,6 +57,7 @@ android {
 
 dependencies {
 
+    // AndroidX dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -66,11 +67,13 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    // Firebase dependencies
     implementation(libs.play.services.maps)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
 
+    // Lifecycle dependencies for ViewModel and LiveData
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
 
@@ -78,8 +81,13 @@ dependencies {
     implementation(libs.android.mail)
     implementation(libs.android.activation)
 
+    // Retrofit for API calls
     implementation(libs.retrofit)
     implementation(libs.converter.moshi)
     implementation(libs.moshi.kotlin)
     implementation(libs.logging.interceptor)
+
+    // Coil for image loading
+    implementation("io.coil-kt:coil:2.7.0")
+    implementation("io.coil-kt:coil-base:2.7.0")
 }
