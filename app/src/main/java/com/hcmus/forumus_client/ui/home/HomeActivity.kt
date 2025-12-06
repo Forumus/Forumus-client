@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.databinding.ActivityHomeBinding
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
 import com.hcmus.forumus_client.ui.navigation.AppNavigator
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
+import androidx.core.view.WindowInsetsCompat
 
 /**
  * Home activity displaying a feed of posts with voting and interaction features.
@@ -26,6 +28,7 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupWindowInsetsHandling()
         setupTopAppBar()
         setupRecyclerView()
         setupBottomNavigationBar()
@@ -39,6 +42,20 @@ class HomeActivity : AppCompatActivity() {
         super.onResume()
         // Refresh posts when returning to home screen
         viewModel.loadPosts()
+    }
+
+    /**
+     * Handle system window insets by applying padding to avoid overlap with status bar,
+     * navigation bar and keyboard (IME).
+    */
+    private fun setupWindowInsetsHandling() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
+            )
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
     }
 
     /**
@@ -125,10 +142,3 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 }
-
-        viewModel.currentUser.observe(this) { user ->
-            binding.topAppBar.setProfileImage(user?.profilePictureUrl)
-        }
-    }
-}
-
