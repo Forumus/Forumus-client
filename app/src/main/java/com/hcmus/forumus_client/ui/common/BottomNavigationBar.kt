@@ -113,4 +113,8 @@ class BottomNavigationBar @JvmOverloads constructor(
         binding.textChat.setTextColor(gray)
         binding.iconChat.setColorFilter(gray)
     }
+
+    enum class Tab {
+        HOME, EXPLORE, ALERTS, CHAT, NONE
+    }
 }

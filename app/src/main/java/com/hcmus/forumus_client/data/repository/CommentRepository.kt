@@ -27,8 +27,8 @@ class CommentRepository(
 
         // Recalculate upvote and downvote counts from votedUsers map
         val votes = votedUsers.values
-        this.upvoteCount = votes.count { it == VoteState.UP }
-        this.downvoteCount = votes.count { it == VoteState.DOWN }
+        this.upvoteCount = votes.count { it == VoteState.UPVOTE }
+        this.downvoteCount = votes.count { it == VoteState.DOWNVOTE }
 
         return this
     }
@@ -206,20 +206,20 @@ class CommentRepository(
         var downvoteChange = 0
 
         when (currentVote) {
-            VoteState.UP -> {
+            VoteState.UPVOTE -> {
                 // Currently upvoted, remove the vote
                 comment.votedUsers.remove(userId)
                 upvoteChange = -1
             }
-            VoteState.DOWN -> {
+            VoteState.DOWNVOTE -> {
                 // Currently downvoted, switch to upvote
-                comment.votedUsers[userId] = VoteState.UP
+                comment.votedUsers[userId] = VoteState.UPVOTE
                 upvoteChange = 1
                 downvoteChange = -1
             }
             else -> {
                 // No vote or NONE state, create new upvote
-                comment.votedUsers[userId] = VoteState.UP
+                comment.votedUsers[userId] = VoteState.UPVOTE
                 upvoteChange = 1
             }
         }
@@ -253,20 +253,20 @@ class CommentRepository(
         var downvoteChange = 0
 
         when (currentVote) {
-            VoteState.DOWN -> {
+            VoteState.DOWNVOTE -> {
                 // Currently downvoted, remove the vote
                 comment.votedUsers.remove(userId)
                 downvoteChange = -1
             }
-            VoteState.UP -> {
+            VoteState.UPVOTE -> {
                 // Currently upvoted, switch to downvote
-                comment.votedUsers[userId] = VoteState.DOWN
+                comment.votedUsers[userId] = VoteState.DOWNVOTE
                 downvoteChange = 1
                 upvoteChange = -1
             }
             else -> {
                 // No vote or NONE state, create new downvote
-                comment.votedUsers[userId] = VoteState.DOWN
+                comment.votedUsers[userId] = VoteState.DOWNVOTE
                 downvoteChange = 1
             }
         }
