@@ -8,6 +8,8 @@ import com.hcmus.forumus_client.ui.profile.ProfileActivity
 import com.hcmus.forumus_client.ui.profile.ProfileActivity.Companion.EXTRA_MODE
 import com.hcmus.forumus_client.ui.profile.ProfileActivity.Companion.EXTRA_USER_ID
 import com.hcmus.forumus_client.ui.profile.ProfileMode
+import com.hcmus.forumus_client.ui.post.detail.PostDetailActivity
+import com.hcmus.forumus_client.ui.post.detail.PostDetailActivity.Companion.EXTRA_POST_ID
 
 class AppNavigator(private val activity: Activity) {
 
@@ -58,11 +60,20 @@ class AppNavigator(private val activity: Activity) {
     }
 
     /**
-     * Opens the post detail screen.
-     * TODO: implement when PostDetailActivity is ready.
+     * Navigates to the Post Detail screen for the given post ID.
+     *
+     * @param postId ID of the post to display
+     * @param clearStack whether to reset the current navigation stack
+     *
+     * This method wraps the navigation logic to PostDetailActivity and ensures
+     * consistent intent flag handling across the application.
      */
     fun onDetailPost(postId: String, clearStack: Boolean = false) {
-        // TODO: Implement navigation to PostDetailActivity
+        val intent = Intent(activity, PostDetailActivity::class.java).apply {
+            putExtra(EXTRA_POST_ID, postId)
+        }
+        applyFlags(intent, clearStack)
+        activity.startActivity(intent)
     }
 
     fun openSearch(clearStack: Boolean = false) {

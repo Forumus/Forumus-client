@@ -206,8 +206,7 @@ class ProfileActivity : AppCompatActivity() {
                         }
                     }
                 }
-            },
-            isDetailMode = false
+            }
         )
 
         binding.contentRecyclerView.adapter = profileAdapter
