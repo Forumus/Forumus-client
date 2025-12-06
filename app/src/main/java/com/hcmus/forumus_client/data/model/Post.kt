@@ -1,16 +1,28 @@
 package com.hcmus.forumus_client.data.model
 
-import com.hcmus.forumus_client.data.model.VoteState
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Exclude
 
 data class Post(
-	val id: String,
-	val communityName: String,
-	val communityIconLetter: String,
-	val timePosted: String, // e.g. "1h" or formatted date
-	val title: String,
-	val content: String,
-	val voteCount: Int,
-	val commentCount: Int,
-	val imageUrls: List<String> = emptyList(),
-	val userVote: VoteState = VoteState.NONE
+	var id: String = "",
+	var authorId: String = "",
+	var authorName: String = "",
+	var authorAvatarUrl: String = "",
+
+	var createdAt: Timestamp? = null,
+	var title: String = "",
+	var content: String = "",
+
+	var upvoteCount: Int = 0,
+	var downvoteCount: Int = 0,
+	var commentCount: Int = 0,
+
+	var imageUrls: MutableList<String> = mutableListOf(),
+	var videoUrls: MutableList<String> = mutableListOf(),
+
+	var votedUsers: MutableMap<String, VoteState> = mutableMapOf(),
+
+	@get:Exclude
+	@set:Exclude
+	var userVote: VoteState = VoteState.NONE
 )
