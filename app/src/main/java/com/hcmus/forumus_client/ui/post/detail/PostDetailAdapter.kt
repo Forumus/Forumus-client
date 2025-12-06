@@ -1,4 +1,4 @@
-package com.hcmus.forumus_client.ui.profile
+package com.hcmus.forumus_client.ui.post.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,11 +13,11 @@ import com.hcmus.forumus_client.ui.common.PostViewHolder
 import com.hcmus.forumus_client.ui.common.CommentViewHolder
 
 /**
- * RecyclerView adapter that displays a mixed list of posts and comments in a user's profile.
+ * RecyclerView adapter that displays a mixed list of posts and comments in post detail.
  *
  * Supports two item types:
  * - PostItem: Shows post content with voting capabilities
- * - CommentItem: Shows comment content with voting
+ * - CommentItem: Shows comment content with voting and detail mode for nesting
  *
  * Uses callbacks to handle user interactions (upvote, downvote, open details, etc.)
  * and delegates rendering to specialized ViewHolder classes (PostViewHolder, CommentViewHolder).
@@ -26,7 +26,7 @@ import com.hcmus.forumus_client.ui.common.CommentViewHolder
  * @param onPostAction Callback when user interacts with a post
  * @param onCommentAction Callback when user interacts with a comment
  */
-class ProfileAdapter(
+class PostDetailAdapter(
     private var items: List<FeedItem> = emptyList(),
     private val onPostAction: (Post, PostAction) -> Unit,
     private val onCommentAction: (Comment, CommentAction) -> Unit,
@@ -103,7 +103,7 @@ class ProfileAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
             is FeedItem.PostItem -> (holder as PostViewHolder).bind(item.post)
-            is FeedItem.CommentItem -> (holder as CommentViewHolder).bind(item.comment, false)
+            is FeedItem.CommentItem -> (holder as CommentViewHolder).bind(item.comment, true)
         }
     }
 
