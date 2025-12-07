@@ -7,7 +7,7 @@ data class Post(
 	var id: String = "",
 	var authorId: String = "",
 	var authorName: String = "",
-	var authorAvatarUrl: String = "",
+	var authorAvatarUrl: String? = "",
 
 	var createdAt: Timestamp? = null,
 	var title: String = "",
