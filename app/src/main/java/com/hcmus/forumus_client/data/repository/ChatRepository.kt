@@ -366,6 +366,81 @@ class ChatRepository {
         }
     }
     
+    // Delete a chat
+    suspend fun deleteChat(chatId: String): Result<Unit> {
+        return try {
+            chatsCollection
+                .document(chatId)
+                .delete()
+                .await()
+            
+            Log.d(TAG, "Chat deleted successfully: $chatId")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting chat", e)
+            Result.failure(e)
+        }
+    }
+    
+    // Delete a message (mark as deleted and remove images from storage)
+    suspend fun deleteMessage(chatId: String, messageId: String): Result<Unit> {
+        return try {
+            val currentUserId = getCurrentUserId()
+                ?: return Result.failure(Exception("User not authenticated"))
+
+            // Get the message first to check ownership and get image URLs
+            val messageDoc = chatsCollection
+                .document(chatId)
+                .collection(MESSAGES_SUBCOLLECTION)
+                .document(messageId)
+                .get()
+                .await()
+
+            val message = messageDoc.toObject(Message::class.java)
+                ?: return Result.failure(Exception("Message not found"))
+
+            // Check if user owns the message
+            if (message.senderId != currentUserId) {
+                return Result.failure(Exception("You can only delete your own messages"))
+            }
+
+            // Delete images from Firebase Storage if any
+            if (message.imageUrls.isNotEmpty()) {
+                val storage = FirebaseStorage.getInstance()
+                for (imageUrl in message.imageUrls) {
+                    try {
+                        val imageRef = storage.getReferenceFromUrl(imageUrl)
+                        imageRef.delete().await()
+                        Log.d(TAG, "Deleted image from storage: $imageUrl")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error deleting image from storage: ${e.message}")
+                        // Continue even if image deletion fails
+                    }
+                }
+            }
+
+            // Update message to mark as deleted
+            val updates = hashMapOf<String, Any>(
+                "type" to MessageType.DELETED,
+                "content" to "Deleted message",
+                "imageUrls" to emptyList<String>()
+            )
+
+            chatsCollection
+                .document(chatId)
+                .collection(MESSAGES_SUBCOLLECTION)
+                .document(messageId)
+                .update(updates)
+                .await()
+
+            Log.d(TAG, "Message marked as deleted: $messageId")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting message", e)
+            Result.failure(e)
+        }
+    }
+    
     private fun getCurrentTimestamp(): Timestamp {
         return Timestamp.now()
     }

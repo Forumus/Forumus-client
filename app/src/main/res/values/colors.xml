@@ -33,6 +33,7 @@
     <!-- Chat screen colors -->
     <color name="chat_time_blue">#155DFC</color>
     <color name="chat_time_gray">#6A7282</color>
+    <color name="chat_message_delete_bg">#DDDDDD</color>
     <color name="chat_message_unread">#101828</color>
     <color name="chat_message_read">#6A7282</color>
     <color name="chat_border">#E5E7EB</color>

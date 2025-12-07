@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
@@ -20,6 +21,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.ChatType
 import com.hcmus.forumus_client.databinding.FragmentChatsBinding
 import com.hcmus.forumus_client.ui.chats.ChatsAdapter
@@ -66,10 +68,13 @@ class ChatsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        chatsAdapter = ChatsAdapter { chatItem ->
+        chatsAdapter = ChatsAdapter({ chatItem ->
             // Handle chat item click - navigate to individual chat
             navigateToChatActivity(chatItem)
-        }
+        }, { chatItem ->
+            // Handle chat item delete
+            deleteChat(chatItem)
+        })
         
         binding.recyclerChats.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -225,6 +230,34 @@ class ChatsFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("ChatsFragment", "Error navigating to chat", e)
         }
+    }
+    
+    private fun deleteChat(chatItem: ChatItem) {
+        Log.d("ChatsFragment", "Attempting to delete chat: ${chatItem.id}")
+        showDeleteChatConfirmationDialog(chatItem)
+    }
+    
+    private fun showDeleteChatConfirmationDialog(chatItem: ChatItem) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_chat, null)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        // Set custom background
+        dialog.window?.setBackgroundDrawableResource(R.drawable.dialog_background)
+
+        dialogView.findViewById<android.widget.Button>(R.id.btn_cancel).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<android.widget.Button>(R.id.btn_delete).setOnClickListener {
+            dialog.dismiss()
+            viewModel.deleteChat(chatItem.id)
+            Toast.makeText(requireContext(), "Chat deleted", Toast.LENGTH_SHORT).show()
+        }
+
+        dialog.show()
     }
 
     override fun onDestroyView() {

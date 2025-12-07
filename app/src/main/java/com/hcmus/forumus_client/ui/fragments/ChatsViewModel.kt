@@ -111,6 +111,23 @@ class ChatsViewModel : ViewModel() {
         }
     }
     
+    fun deleteChat(chatId: String) {
+        viewModelScope.launch {
+            try {
+                val result = chatRepository.deleteChat(chatId)
+                if (result.isSuccess) {
+                    Log.d(TAG, "Chat deleted successfully: $chatId")
+                } else {
+                    _error.value = result.exceptionOrNull()?.message ?: "Error deleting chat"
+                    Log.e(TAG, "Error deleting chat", result.exceptionOrNull())
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Error deleting chat"
+                Log.e(TAG, "Error deleting chat", e)
+            }
+        }
+    }
+    
     fun clearError() {
         _error.value = ""
     }

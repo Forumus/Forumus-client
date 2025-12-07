@@ -3,12 +3,14 @@ package com.hcmus.forumus_client.ui.conversation
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.hcmus.forumus_client.data.model.Message
+import com.hcmus.forumus_client.data.model.MessageType
 import com.hcmus.forumus_client.databinding.ItemMessageReceivedBinding
 import com.hcmus.forumus_client.databinding.ItemMessageSentBinding
 import java.text.SimpleDateFormat
@@ -17,7 +19,8 @@ import java.util.*
 class ConversationAdapter(
     private val currentUserId: String,
     private val viewPool: RecyclerView.RecycledViewPool, // OPTIMIZATION: Shared Pool
-    private val onImageClick: ((List<String>, Int) -> Unit)? = null
+    private val onImageClick: ((List<String>, Int) -> Unit)? = null,
+    private val onMessageLongClick: ((Message) -> Unit)? = null
 ) : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
     companion object {
@@ -53,7 +56,7 @@ class ConversationAdapter(
                     parent,
                     false
                 )
-                SentMessageViewHolder(binding, viewPool, onImageClick)
+                SentMessageViewHolder(binding, viewPool, onImageClick, onMessageLongClick)
             }
             VIEW_TYPE_RECEIVED -> {
                 val binding = ItemMessageReceivedBinding.inflate(
@@ -90,11 +93,13 @@ class ConversationAdapter(
     class SentMessageViewHolder(
         private val binding: ItemMessageSentBinding,
         viewPool: RecyclerView.RecycledViewPool,
-        private val onImageClick: ((List<String>, Int) -> Unit)?
+        private val onImageClick: ((List<String>, Int) -> Unit)?,
+        private val onMessageLongClick: ((Message) -> Unit)?
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // 1. Create the adapter ONLY ONCE
         private val messageImageAdapter = MessageImageAdapter()
+        private var currentMessage: Message? = null
 
         init {
             // 2. Setup RecyclerView ONLY ONCE
@@ -108,9 +113,19 @@ class ConversationAdapter(
                 isNestedScrollingEnabled = false // Optimization for smooth scrolling
                 itemAnimator = null // Remove animations to reduce flicker on scroll
             }
+            
+            // Setup long-click listener on the message container
+            binding.root.setOnLongClickListener {
+                currentMessage?.let { message ->
+                    onMessageLongClick?.invoke(message)
+                }
+                true
+            }
         }
 
         fun bind(message: Message) {
+            currentMessage = message
+            
             if (message.content.trim().isNotEmpty()) {
                 binding.tvMessageText.text = message.content
                 binding.tvMessageText.visibility = View.VISIBLE
@@ -135,6 +150,13 @@ class ConversationAdapter(
                 binding.rvMessageImages.visibility = View.GONE
                 // Clear memory in the adapter if hidden
                 messageImageAdapter.setImageUrls(emptyList())
+            }
+
+            if (message.type == MessageType.DELETED) {
+                binding.llMessageBubble.background = AppCompatResources.getDrawable(
+                    binding.root.context,
+                    com.hcmus.forumus_client.R.drawable.message_delete_background
+                )
             }
         }
     }

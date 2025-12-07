@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
 import com.hcmus.forumus_client.R
+import com.hcmus.forumus_client.data.model.Message
+import com.hcmus.forumus_client.data.model.MessageType
 import com.hcmus.forumus_client.databinding.ActivityConversationBinding
 import com.hcmus.forumus_client.ui.image.FullscreenImageActivity
 import androidx.lifecycle.lifecycleScope
@@ -161,9 +163,12 @@ class ConversationActivity : AppCompatActivity() {
         val currentUserId = viewModel.getCurrentUserId() ?: ""
 
         // PASS THE POOL HERE
-        messageAdapter = ConversationAdapter(currentUserId, viewPool) { imageUrls, initialPosition ->
+        messageAdapter = ConversationAdapter(currentUserId, viewPool, { imageUrls, initialPosition ->
             openFullscreenImageView(imageUrls, initialPosition)
-        }
+        }, { message ->
+            // Handle message long-click for deletion
+            showDeleteMessageDialog(message)
+        })
 
         binding.rvMessages.apply {
             adapter = messageAdapter
@@ -431,6 +436,41 @@ class ConversationActivity : AppCompatActivity() {
         dialogView.findViewById<android.view.View>(R.id.ll_gallery).setOnClickListener {
             dialog.dismiss()
             checkPermissionAndPickImages()
+        }
+
+        dialog.show()
+    }
+    
+    private fun showDeleteMessageDialog(message: Message) {
+        // Only allow deletion of own messages that are not already deleted
+        if (message.type == MessageType.DELETED) {
+            Toast.makeText(this, "This message has already been deleted", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        val currentUserId = viewModel.getCurrentUserId()
+        if (message.senderId != currentUserId) {
+            Toast.makeText(this, "You can only delete your own messages", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_message, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        // Set custom background
+        dialog.window?.setBackgroundDrawableResource(R.drawable.dialog_background)
+
+        dialogView.findViewById<android.widget.Button>(R.id.btn_cancel).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<android.widget.Button>(R.id.btn_delete).setOnClickListener {
+            dialog.dismiss()
+            viewModel.deleteMessage(message.id)
+            Toast.makeText(this, "Message deleted", Toast.LENGTH_SHORT).show()
         }
 
         dialog.show()

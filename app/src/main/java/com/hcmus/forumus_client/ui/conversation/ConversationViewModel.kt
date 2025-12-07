@@ -191,6 +191,26 @@ class ConversationViewModel : ViewModel() {
         _sendMessageResult.value = false
     }
     
+    fun deleteMessage(messageId: String) {
+        val chatId = currentChatId
+        if (chatId == null) {
+            setErrorWithDebounce("No chat selected")
+            return
+        }
+        
+        viewModelScope.launch {
+            try {
+                val result = chatRepository.deleteMessage(chatId, messageId)
+                if (result.isFailure) {
+                    setErrorWithDebounce(result.exceptionOrNull()?.message ?: "Error deleting message")
+                }
+            } catch (e: Exception) {
+                setErrorWithDebounce(e.message ?: "Error deleting message")
+                Log.e(TAG, "Error deleting message", e)
+            }
+        }
+    }
+    
     private fun setErrorWithDebounce(errorMessage: String) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastErrorTime > ERROR_DEBOUNCE_TIME) {

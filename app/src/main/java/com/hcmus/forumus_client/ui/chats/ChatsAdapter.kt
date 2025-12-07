@@ -13,7 +13,8 @@ import android.util.Log
 import com.bumptech.glide.Glide
 
 class ChatsAdapter(
-    private val onChatClick: (ChatItem) -> Unit
+    private val onChatClick: (ChatItem) -> Unit,
+    private val onChatDelete: (ChatItem) -> Unit
 ) : ListAdapter<ChatItem, ChatsAdapter.ChatViewHolder>(ChatDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
@@ -42,6 +43,19 @@ class ChatsAdapter(
                     val chatItem = getItem(position)
                     Log.d("ChatsAdapter", "Chat item clicked: ${chatItem.contactName}")
                     onChatClick(chatItem)
+                }
+            }
+            
+            // Set up long-click listener for context menu
+            binding.chatItemContainer.setOnLongClickListener {
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val chatItem = getItem(position)
+                    Log.d("ChatsAdapter", "Chat item long-clicked: ${chatItem.contactName}")
+                    onChatDelete(chatItem)
+                    true
+                } else {
+                    false
                 }
             }
         }

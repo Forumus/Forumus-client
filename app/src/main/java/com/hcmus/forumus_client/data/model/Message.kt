@@ -27,5 +27,6 @@ data class Message(
 
 enum class MessageType {
     TEXT,
-    IMAGE
+    IMAGE,
+    DELETED
 }
