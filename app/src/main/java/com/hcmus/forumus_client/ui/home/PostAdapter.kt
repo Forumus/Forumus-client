@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.Post
-import com.hcmus.forumus_client.data.model.VoteState
 
 class PostAdapter(
     private val listener: PostInteractionListener? = null
@@ -36,11 +35,11 @@ class PostAdapter(
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = getItem(position)
-        holder.bind(post)
+        holder.bind(getItem(position))
     }
 
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // Ánh xạ View (Giữ nguyên ID của bạn)
         private val tvCommunityIcon: TextView = itemView.findViewById(R.id.tv_community_icon)
         private val tvCommunityName: TextView = itemView.findViewById(R.id.tv_community_name)
         private val tvTimePosted: TextView = itemView.findViewById(R.id.tv_time_posted)
@@ -63,33 +62,30 @@ class PostAdapter(
             tvVoteCount.text = post.voteCount.toString()
             tvCommentCount.text = post.commentCount.toString()
 
-            // Simple image handling placeholder: remove previous children
+            // Xử lý ảnh (Placeholder)
             imagesGrid.removeAllViews()
-            // Could load images with an image library; placeholder icons for now
             val context = itemView.context
             post.imageUrls.take(4).forEach { _ ->
                 val iv = ImageView(context)
-                iv.layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    240 // fixed height placeholder
-                )
+                iv.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 240)
                 iv.scaleType = ImageView.ScaleType.CENTER_CROP
-                iv.setImageResource(R.drawable.ic_default_profile) // placeholder
+                iv.setImageResource(R.drawable.ic_default_profile)
                 imagesGrid.addView(iv)
             }
 
             itemView.setOnClickListener { listener?.onPostClicked(post) }
-            // Set vote icon states based on userVote
+
+            // --- SỬA LỖI LOGIC VOTE (DÙNG STRING) ---
             when (post.userVote) {
-                VoteState.UP -> {
+                "UP" -> {
                     btnUpvote.setImageResource(R.drawable.ic_upvote_filled)
                     btnDownvote.setImageResource(R.drawable.ic_downvote)
                 }
-                VoteState.DOWN -> {
+                "DOWN" -> {
                     btnUpvote.setImageResource(R.drawable.ic_upvote)
                     btnDownvote.setImageResource(R.drawable.ic_downvote_filled)
                 }
-                VoteState.NONE -> {
+                else -> { // "NONE"
                     btnUpvote.setImageResource(R.drawable.ic_upvote)
                     btnDownvote.setImageResource(R.drawable.ic_downvote)
                 }

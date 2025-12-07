@@ -36,6 +36,7 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        viewBinding = true
     }
     packaging {
         resources {
@@ -85,4 +86,7 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation("com.google.guava:guava:31.1-android")
+    implementation("androidx.activity:activity-ktx:1.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
 }

@@ -2,11 +2,10 @@ package com.hcmus.forumus_client.ui.home
 
 import android.graphics.Rect
 import android.view.MotionEvent
-import com.hcmus.forumus_client.data.model.Post
-import com.hcmus.forumus_client.data.model.VoteState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.hcmus.forumus_client.data.model.Post
 
 enum class NavTab { HOME, EXPLORE, ALERTS, CHAT }
 
@@ -24,34 +23,20 @@ class MainViewModel : ViewModel() {
 	private val _barsHidden = MutableLiveData(false)
 	val barsHidden: LiveData<Boolean> = _barsHidden
 
-	// Drawer state (true = open, false = closed)
 	private val _drawerOpen = MutableLiveData(false)
 	val drawerOpen: LiveData<Boolean> = _drawerOpen
 
-	fun toggleDrawer() {
-		_drawerOpen.value = !(_drawerOpen.value ?: false)
-	}
-
-	fun setDrawerOpen(open: Boolean) {
-		if (_drawerOpen.value != open) _drawerOpen.value = open
-	}
-
-	fun setBarsHidden(hidden: Boolean) {
-		if (_barsHidden.value != hidden) _barsHidden.value = hidden
-	}
-
-	fun onProfileIconClicked() {
-		_menuVisible.value = !(_menuVisible.value ?: false)
-	}
-
+	fun toggleDrawer() { _drawerOpen.value = !(_drawerOpen.value ?: false) }
+	fun setDrawerOpen(open: Boolean) { if (_drawerOpen.value != open) _drawerOpen.value = open }
+	fun setBarsHidden(hidden: Boolean) { if (_barsHidden.value != hidden) _barsHidden.value = hidden }
+	fun onProfileIconClicked() { _menuVisible.value = !(_menuVisible.value ?: false) }
 	fun hideMenu() { _menuVisible.value = false }
 
 	fun onTabSelected(tab: NavTab) {
-		if (_activeTab.value != tab) {
-			_activeTab.value = tab
-		}
+		if (_activeTab.value != tab) _activeTab.value = tab
 	}
 
+	// --- SỬA DỮ LIỆU GIẢ KHỚP VỚI MODEL MỚI ---
 	fun loadSamplePosts() {
 		if (_posts.value.isNullOrEmpty()) {
 			_posts.value = listOf(
@@ -61,11 +46,10 @@ class MainViewModel : ViewModel() {
 					communityIconLetter = "S",
 					timePosted = "1h",
 					title = "Intramural Sports Week - Highlights from Day 1!",
-					content = "Amazing start to sports week with soccer, basketball, tennis and more.",
+					content = "Amazing start to sports week with soccer, basketball...",
 					voteCount = 156,
 					commentCount = 43,
-					imageUrls = emptyList(),
-					userVote = VoteState.NONE
+					userVote = "NONE" // Dùng String
 				),
 				Post(
 					id = "2",
@@ -73,11 +57,10 @@ class MainViewModel : ViewModel() {
 					communityIconLetter = "T",
 					timePosted = "3h",
 					title = "Hackathon kicks off tomorrow",
-					content = "Don't forget to register and bring your energy! Prizes for top 3 teams.",
+					content = "Don't forget to register and bring your energy!",
 					voteCount = 89,
 					commentCount = 12,
-					imageUrls = emptyList(),
-					userVote = VoteState.NONE
+					userVote = "NONE"
 				),
 				Post(
 					id = "3",
@@ -85,65 +68,23 @@ class MainViewModel : ViewModel() {
 					communityIconLetter = "C",
 					timePosted = "5h",
 					title = "Study spots recommendation thread",
-					content = "Share your favorite quiet or collaborative spaces around campus.",
+					content = "Share your favorite quiet spaces around campus.",
 					voteCount = 42,
 					commentCount = 18,
-					imageUrls = emptyList(),
-					userVote = VoteState.NONE
-				),
-				Post(
-					id = "4",
-					communityName = "c/Information_Technology",
-					communityIconLetter = "C",
-					timePosted = "2h",
-					title = "Finding teammates for a group project",
-					content = "I'm currently working on an android application project for the mobile development class." +
-						"\nWe need a team of 5 and currently short 2 people." +
-						"\nRequirements are in comments. ",
-					voteCount = 23,
-					commentCount = 36,
-					imageUrls = emptyList(),
-					userVote = VoteState.NONE
-				),
-				Post(
-					id = "5",
-					communityName = "c/Information_Technology",
-					communityIconLetter = "C",
-					timePosted = "2h",
-					title = "Finding teammates for a group project",
-					content = "I'm currently working on an android application project for the mobile development class." +
-							"\nWe need a team of 5 and currently short 2 people." +
-							"\nRequirements are in comments. ",
-					voteCount = 23,
-					commentCount = 36,
-					imageUrls = emptyList(),
-					userVote = VoteState.NONE
-				),
-				Post(
-					id = "6",
-					communityName = "c/Information_Technology",
-					communityIconLetter = "C",
-					timePosted = "2h",
-					title = "Finding teammates for a group project",
-					content = "I'm currently working on an android application project for the mobile development class." +
-							"\nWe need a team of 5 and currently short 2 people." +
-							"\nRequirements are in comments. ",
-					voteCount = 23,
-					commentCount = 36,
-					imageUrls = emptyList(),
-					userVote = VoteState.NONE
+					userVote = "NONE"
 				)
 			)
 		}
 	}
 
+	// --- SỬA LOGIC VOTE (STRING) ---
 	fun onUpvote(postId: String) {
 		_posts.value = _posts.value?.map { p ->
 			if (p.id != postId) p else {
 				when (p.userVote) {
-					VoteState.UP -> p.copy(userVote = VoteState.NONE, voteCount = p.voteCount - 1)
-					VoteState.DOWN -> p.copy(userVote = VoteState.UP, voteCount = p.voteCount + 2)
-					VoteState.NONE -> p.copy(userVote = VoteState.UP, voteCount = p.voteCount + 1)
+					"UP" -> p.copy(userVote = "NONE", voteCount = p.voteCount - 1)
+					"DOWN" -> p.copy(userVote = "UP", voteCount = p.voteCount + 2)
+					else -> p.copy(userVote = "UP", voteCount = p.voteCount + 1) // NONE case
 				}
 			}
 		}
@@ -153,18 +94,14 @@ class MainViewModel : ViewModel() {
 		_posts.value = _posts.value?.map { p ->
 			if (p.id != postId) p else {
 				when (p.userVote) {
-					VoteState.DOWN -> p.copy(userVote = VoteState.NONE, voteCount = p.voteCount + 1) // remove downvote (+1 net)
-					VoteState.UP -> p.copy(userVote = VoteState.DOWN, voteCount = p.voteCount - 2)
-					VoteState.NONE -> p.copy(userVote = VoteState.DOWN, voteCount = p.voteCount - 1)
+					"DOWN" -> p.copy(userVote = "NONE", voteCount = p.voteCount + 1)
+					"UP" -> p.copy(userVote = "DOWN", voteCount = p.voteCount - 2)
+					else -> p.copy(userVote = "DOWN", voteCount = p.voteCount - 1) // NONE case
 				}
 			}
 		}
 	}
 
-	/**
-	 * Handle a raw touch event. The Activity passes global Rects for the popup and profile button.
-	 * If ACTION_DOWN occurs outside both while the menu is visible, hide the menu.
-	 */
 	fun onTouch(action: Int, rawX: Float, rawY: Float, menuRect: Rect?, profileRect: Rect?) {
 		if (action == MotionEvent.ACTION_DOWN && _menuVisible.value == true) {
 			val x = rawX.toInt(); val y = rawY.toInt()
