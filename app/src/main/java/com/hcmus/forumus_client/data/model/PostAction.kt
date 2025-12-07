@@ -6,5 +6,6 @@ enum class PostAction {
     DOWNVOTE,
     REPLY,
     SHARE,
-    AUTHOR_PROFILE
+    AUTHOR_PROFILE,
+    MENU
 }

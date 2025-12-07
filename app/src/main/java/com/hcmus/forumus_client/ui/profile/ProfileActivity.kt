@@ -150,8 +150,7 @@ class ProfileActivity : AppCompatActivity() {
                     }
 
                     ProfileMenuAction.SETTINGS -> {
-                        // TODO: Implement settings navigation
-                        // navigator.openSettings()
+                        navigator.openSettings()
                     }
                 }
             }
@@ -170,7 +169,7 @@ class ProfileActivity : AppCompatActivity() {
         binding.contentRecyclerView.layoutManager = LinearLayoutManager(this)
 
         profileAdapter = ProfileAdapter(
-            onPostAction = { post, action ->
+            onPostAction = { post, action, view ->
                 when (action) {
                     PostAction.UPVOTE, PostAction.DOWNVOTE -> viewModel.onPostAction(post, action)
                     PostAction.OPEN -> {
@@ -184,6 +183,9 @@ class ProfileActivity : AppCompatActivity() {
                     }
                     PostAction.AUTHOR_PROFILE -> {
                         // Already on profile, ignore
+                    }
+                    PostAction.MENU -> {
+                        // TODO: Implement post menu functionality
                     }
                 }
             },

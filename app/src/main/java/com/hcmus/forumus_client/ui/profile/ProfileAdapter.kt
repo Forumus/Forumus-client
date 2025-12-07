@@ -11,6 +11,7 @@ import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.ui.common.PostViewHolder
 import com.hcmus.forumus_client.ui.common.CommentViewHolder
+import android.view.View
 
 /**
  * RecyclerView adapter that displays a mixed list of posts and comments in a user's profile.
@@ -28,7 +29,7 @@ import com.hcmus.forumus_client.ui.common.CommentViewHolder
  */
 class ProfileAdapter(
     private var items: List<FeedItem> = emptyList(),
-    private val onPostAction: (Post, PostAction) -> Unit,
+    private val onPostAction: (Post, PostAction, View) -> Unit,
     private val onCommentAction: (Comment, CommentAction) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
