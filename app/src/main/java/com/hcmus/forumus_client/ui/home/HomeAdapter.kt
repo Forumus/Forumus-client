@@ -7,6 +7,7 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.ui.common.PostViewHolder
+import android.view.View
 
 /**
  * RecyclerView adapter for displaying posts in the home feed.
@@ -17,7 +18,7 @@ import com.hcmus.forumus_client.ui.common.PostViewHolder
  */
 class HomeAdapter(
     private var items: List<Post>,
-    private val onActionClick: (Post, PostAction) -> Unit
+    private val onActionClick: (Post, PostAction, View) -> Unit
 ) : RecyclerView.Adapter<PostViewHolder>() {
 
     /**

@@ -145,8 +145,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingTop="12dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
                     android:background="@color/white">
 
                     <!-- Section header label -->
@@ -154,6 +152,8 @@
                         android:id="@+id/tv_account_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:text="ACCOUNT"
                         android:textSize="14sp"
                         android:textColor="@color/text_tertiary"/>
@@ -165,6 +165,8 @@
                         android:layout_height="72dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:background="?attr/selectableItemBackground">
 
                         <!-- Icon with background container -->
@@ -213,6 +215,8 @@
                         android:layout_height="72dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:background="?attr/selectableItemBackground">
 
                         <!-- Icon with background container -->
@@ -262,8 +266,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingTop="12dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
                     android:background="@color/white">
 
                     <!-- Section header label -->
@@ -271,6 +273,8 @@
                         android:id="@+id/tv_preferences_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:text="PREFERENCES"
                         android:textSize="14sp"
                         android:textColor="@color/text_tertiary"/>
@@ -282,6 +286,8 @@
                         android:layout_height="72dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:background="?attr/selectableItemBackground">
 
                         <!-- Icon with background container -->
@@ -330,6 +336,8 @@
                         android:layout_height="72dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:background="?attr/selectableItemBackground">
 
                         <!-- Icon with background container -->
@@ -378,6 +386,8 @@
                         android:layout_height="72dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:background="?attr/selectableItemBackground">
 
                         <!-- Icon with background container -->
@@ -420,8 +430,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingTop="12dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
                     android:background="@color/white">
 
                     <!-- Section header label -->
@@ -429,6 +437,8 @@
                         android:id="@+id/tv_content_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:text="CONTENT"
                         android:textSize="14sp"
                         android:textColor="@color/text_tertiary"/>
@@ -440,6 +450,8 @@
                         android:layout_height="72dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:background="?attr/selectableItemBackground">
 
                         <!-- Icon with background container -->
@@ -489,8 +501,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingTop="12dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
                     android:background="@color/white">
 
                     <!-- Section header label -->
@@ -498,6 +508,8 @@
                         android:id="@+id/tv_support_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:text="SUPPORT"
                         android:textSize="14sp"
                         android:textColor="@color/text_tertiary"/>
@@ -509,6 +521,8 @@
                         android:layout_height="72dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:background="?attr/selectableItemBackground">
 
                         <!-- Icon with background container -->
@@ -557,6 +571,8 @@
                         android:layout_height="72dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:background="?attr/selectableItemBackground">
 
                         <!-- Icon with background container -->
@@ -605,6 +621,8 @@
                         android:layout_height="72dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:background="?attr/selectableItemBackground">
 
                         <!-- Icon with background container -->

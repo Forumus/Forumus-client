@@ -7,11 +7,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.data.model.PostAction
+import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.databinding.ActivityHomeBinding
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
 import com.hcmus.forumus_client.ui.navigation.AppNavigator
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
+import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import androidx.core.view.WindowInsetsCompat
+import android.view.View
 
 /**
  * Home activity displaying a feed of posts with voting and interaction features.
@@ -96,7 +99,7 @@ class HomeActivity : AppCompatActivity() {
      * Configures post action callbacks for upvote, downvote, and navigation.
      */
     private fun setupRecyclerView() {
-        homeAdapter = HomeAdapter(emptyList()) { post, action ->
+        homeAdapter = HomeAdapter(emptyList()) { post, action, view ->
             when (action) {
                 PostAction.OPEN -> navigator.onDetailPost(post.id)
                 PostAction.UPVOTE -> viewModel.onPostAction(post, PostAction.UPVOTE)
@@ -104,6 +107,7 @@ class HomeActivity : AppCompatActivity() {
                 PostAction.REPLY -> navigator.onDetailPost(post.id)
                 PostAction.SHARE -> Toast.makeText(this, "Share feature coming soon", Toast.LENGTH_SHORT).show()
                 PostAction.AUTHOR_PROFILE -> navigator.openProfile(post.authorId)
+                PostAction.MENU -> showPostMenu(post, view)
             }
         }
 
@@ -111,6 +115,29 @@ class HomeActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@HomeActivity)
             adapter = homeAdapter
         }
+    }
+
+    /**
+     * Shows the post popup menu for the given post.
+     * Allows user to save or report the post.
+     *
+     * @param post The post to show menu for
+     */
+    private fun showPostMenu(post: Post, menuButton: View) {
+        val popupMenu = PopupPostMenu(this)
+        
+        // Handle save button click
+        popupMenu.onSaveClick = {
+            Toast.makeText(this, "Post saved", Toast.LENGTH_SHORT).show()
+        }
+        
+        // Handle violation selection from report menu
+        popupMenu.onReportClick = { violation ->
+            viewModel.saveReport(post, violation)
+        }
+
+        // Show popup at RecyclerView center
+        popupMenu.show(menuButton)
     }
 
     /**

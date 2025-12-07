@@ -151,7 +151,7 @@ class PostDetailActivity : AppCompatActivity() {
      */
     private fun setupRecyclerView() {
         detailAdapter = PostDetailAdapter(
-            onPostAction = { post, action ->
+            onPostAction = { post, action, view ->
                 when (action) {
                     PostAction.OPEN -> {
                         // No action needed - already on detail page
@@ -170,6 +170,9 @@ class PostDetailActivity : AppCompatActivity() {
                     }
                     PostAction.AUTHOR_PROFILE -> {
                         navigator.openProfile(post.authorId)
+                    }
+                    PostAction.MENU -> {
+                        // TODO: Implement post menu functionality
                     }
                 }
             },
