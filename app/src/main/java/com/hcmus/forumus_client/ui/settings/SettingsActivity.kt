@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import coil.load
 import com.hcmus.forumus_client.databinding.ActivitySettingsBinding
 import com.hcmus.forumus_client.ui.navigation.AppNavigator
@@ -37,6 +39,7 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Setup UI components and observe view model
+        setupWindowInsetsHandling()
         setupHeaderActions()
         setupProfileSection()
         setupToggleSwitches()
@@ -46,6 +49,20 @@ class SettingsActivity : AppCompatActivity() {
         // Load current user and saved preferences
         viewModel.loadCurrentUser()
         viewModel.loadSavedPreferences()
+    }
+
+    /**
+     * Handle system window insets by applying padding to avoid overlap with status bar,
+     * navigation bar and keyboard (IME).
+     */
+    private fun setupWindowInsetsHandling() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
+            )
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
     }
 
     /**
