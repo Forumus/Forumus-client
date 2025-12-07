@@ -150,8 +150,7 @@ class ProfileActivity : AppCompatActivity() {
                     }
 
                     ProfileMenuAction.SETTINGS -> {
-                        // TODO: Implement settings navigation
-                        // navigator.openSettings()
+                        navigator.openSettings()
                     }
                 }
             }

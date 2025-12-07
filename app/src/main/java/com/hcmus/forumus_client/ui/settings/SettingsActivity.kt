@@ -25,7 +25,9 @@ import com.hcmus.forumus_client.ui.navigation.AppNavigator
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private val viewModel: SettingsViewModel by viewModels()
+    private val viewModel: SettingsViewModel by viewModels() {
+        SettingsViewModelFactory(application)
+    }
     
     private val navigator by lazy { AppNavigator(this) }
 
@@ -137,7 +139,7 @@ class SettingsActivity : AppCompatActivity() {
             }
             binding.tvUserName.text = user.fullName
             binding.tvUserEmail.text = user.email
-            binding.tvUserStatus.text = "Student" // Default status
+            binding.tvUserStatus.text = user.role.toString()
         }
 
         // Observe dark mode preference

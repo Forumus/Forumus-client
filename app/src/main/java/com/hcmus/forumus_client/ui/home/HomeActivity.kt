@@ -83,7 +83,7 @@ class HomeActivity : AppCompatActivity() {
                         // TODO: Implement dark mode toggle
                     }
                     ProfileMenuAction.SETTINGS -> {
-                        // TODO: Implement settings navigation
+                        navigator.openSettings()
                     }
                 }
             }

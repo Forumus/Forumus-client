@@ -10,6 +10,7 @@ import com.hcmus.forumus_client.ui.profile.ProfileActivity.Companion.EXTRA_USER_
 import com.hcmus.forumus_client.ui.profile.ProfileMode
 import com.hcmus.forumus_client.ui.post.detail.PostDetailActivity
 import com.hcmus.forumus_client.ui.post.detail.PostDetailActivity.Companion.EXTRA_POST_ID
+import com.hcmus.forumus_client.ui.settings.SettingsActivity
 
 class AppNavigator(private val activity: Activity) {
 
@@ -72,6 +73,17 @@ class AppNavigator(private val activity: Activity) {
         val intent = Intent(activity, PostDetailActivity::class.java).apply {
             putExtra(EXTRA_POST_ID, postId)
         }
+        applyFlags(intent, clearStack)
+        activity.startActivity(intent)
+    }
+
+    /**
+     * Navigates to the Settings screen.
+     * This method wraps the navigation logic to SettingsActivity and ensures
+     * consistent intent flag handling across the application.
+     */
+    fun openSettings(clearStack: Boolean = false) {
+        val intent = Intent(activity, SettingsActivity::class.java)
         applyFlags(intent, clearStack)
         activity.startActivity(intent)
     }

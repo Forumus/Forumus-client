@@ -111,7 +111,7 @@ class PostDetailActivity : AppCompatActivity() {
                     }
 
                     ProfileMenuAction.SETTINGS -> {
-                        // TODO: Implement settings navigation
+                        navigator.openSettings()
                     }
                 }
             }
