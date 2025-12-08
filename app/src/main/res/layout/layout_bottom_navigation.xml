@@ -6,10 +6,10 @@
     <FrameLayout
         android:id="@+id/bottomNavContainer"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="68dp"
         android:layout_gravity="bottom"
-        android:background="@color/white"
-        android:elevation="5dp"
+        android:background="@drawable/bottom_nav_shadow_background"
+        android:paddingTop="8dp"
         android:clipChildren="false"
         android:clipToPadding="false">
 

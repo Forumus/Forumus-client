@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Top shadow line to distinguish from main view -->
+    <item android:top="0dp" android:bottom="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#15000000" />
+        </shape>
+    </item>
+    <!-- Main white background -->
+    <item android:top="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white" />
+        </shape>
+    </item>
+</layer-list>
