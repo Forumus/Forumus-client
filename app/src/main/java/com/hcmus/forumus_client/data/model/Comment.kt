@@ -9,7 +9,7 @@ data class Comment(
 
     var authorId: String = "",
     var authorName: String = "",
-    var authorAvatarUrl: String = "",
+    var authorAvatarUrl: String? = "",
 
     var createdAt: Timestamp? = null,
     var isOriginalPoster: Boolean = false,

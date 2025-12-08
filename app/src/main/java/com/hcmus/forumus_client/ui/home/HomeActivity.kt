@@ -7,11 +7,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.data.model.PostAction
+import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.databinding.ActivityHomeBinding
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
 import com.hcmus.forumus_client.ui.navigation.AppNavigator
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
+import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import androidx.core.view.WindowInsetsCompat
+import android.view.View
 
 /**
  * Home activity displaying a feed of posts with voting and interaction features.
@@ -19,7 +22,7 @@ import androidx.core.view.WindowInsetsCompat
  */
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var postAdapter: HomeAdapter
+    private lateinit var homeAdapter: HomeAdapter
     private val viewModel: HomeViewModel by viewModels()
     private val navigator by lazy { AppNavigator(this) }
 
@@ -83,7 +86,7 @@ class HomeActivity : AppCompatActivity() {
                         // TODO: Implement dark mode toggle
                     }
                     ProfileMenuAction.SETTINGS -> {
-                        // TODO: Implement settings navigation
+                        navigator.openSettings()
                     }
                 }
             }
@@ -96,7 +99,7 @@ class HomeActivity : AppCompatActivity() {
      * Configures post action callbacks for upvote, downvote, and navigation.
      */
     private fun setupRecyclerView() {
-        postAdapter = HomeAdapter(emptyList()) { post, action ->
+        homeAdapter = HomeAdapter(emptyList()) { post, action, view ->
             when (action) {
                 PostAction.OPEN -> navigator.onDetailPost(post.id)
                 PostAction.UPVOTE -> viewModel.onPostAction(post, PostAction.UPVOTE)
@@ -104,13 +107,37 @@ class HomeActivity : AppCompatActivity() {
                 PostAction.REPLY -> navigator.onDetailPost(post.id)
                 PostAction.SHARE -> Toast.makeText(this, "Share feature coming soon", Toast.LENGTH_SHORT).show()
                 PostAction.AUTHOR_PROFILE -> navigator.openProfile(post.authorId)
+                PostAction.MENU -> showPostMenu(post, view)
             }
         }
 
         binding.postRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@HomeActivity)
-            adapter = postAdapter
+            adapter = homeAdapter
         }
+    }
+
+    /**
+     * Shows the post popup menu for the given post.
+     * Allows user to save or report the post.
+     *
+     * @param post The post to show menu for
+     */
+    private fun showPostMenu(post: Post, menuButton: View) {
+        val popupMenu = PopupPostMenu(this)
+        
+        // Handle save button click
+        popupMenu.onSaveClick = {
+            Toast.makeText(this, "Post saved", Toast.LENGTH_SHORT).show()
+        }
+        
+        // Handle violation selection from report menu
+        popupMenu.onReportClick = { violation ->
+            viewModel.saveReport(post, violation)
+        }
+
+        // Show popup at RecyclerView center
+        popupMenu.show(menuButton)
     }
 
     /**
@@ -134,7 +161,7 @@ class HomeActivity : AppCompatActivity() {
      */
     private fun observeViewModel() {
         viewModel.posts.observe(this) {
-            postAdapter.submitList(it)
+            homeAdapter.submitList(it)
         }
 
         viewModel.currentUser.observe(this) { user ->

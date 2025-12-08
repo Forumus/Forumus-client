@@ -7,7 +7,7 @@ data class Post(
 	var id: String = "",
 	var authorId: String = "",
 	var authorName: String = "",
-	var authorAvatarUrl: String = "",
+	var authorAvatarUrl: String? = "",
 
 	var createdAt: Timestamp? = null,
 	var title: String = "",
@@ -16,11 +16,13 @@ data class Post(
 	var upvoteCount: Int = 0,
 	var downvoteCount: Int = 0,
 	var commentCount: Int = 0,
+	var reportCount: Int = 0,
 
 	var imageUrls: MutableList<String> = mutableListOf(),
 	var videoUrls: MutableList<String> = mutableListOf(),
 
 	var votedUsers: MutableMap<String, VoteState> = mutableMapOf(),
+	var reportedUsers: MutableList<String> = mutableListOf(),
 
 	@get:Exclude
 	@set:Exclude

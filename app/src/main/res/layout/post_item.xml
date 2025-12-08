@@ -57,12 +57,24 @@
         <!-- Time -->
         <TextView
             android:id="@+id/timestamp"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="2h"
             android:textSize="12sp"
             android:textColor="#999999"
             android:fontFamily="@font/montserrat_regular" />
+
+        <ImageButton
+            android:id="@+id/menuButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_open_actions"
+            android:scaleType="fitCenter"
+            tools:ignore="TouchTargetSizeCheck"/>
+
     </LinearLayout>
 
     <!-- Post Content Section -->

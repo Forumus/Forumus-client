@@ -27,7 +27,7 @@ import com.hcmus.forumus_client.R
  */
 class PostViewHolder(
     itemView: View,
-    private val onActionClick: (Post, PostAction) -> Unit
+    private val onActionClick: (Post, PostAction, View) -> Unit
 ) : RecyclerView.ViewHolder(itemView) {
 
     // Author information views
@@ -48,6 +48,7 @@ class PostViewHolder(
     val replyButton: LinearLayout = itemView.findViewById(R.id.replyButton)
     val replyCount: TextView = itemView.findViewById(R.id.replyCount)
     val shareButton: LinearLayout = itemView.findViewById(R.id.shareButton)
+    val menuButton: ImageButton = itemView.findViewById(R.id.menuButton)
 
     // Root view for click handling
     val rootLayout: LinearLayout = itemView.findViewById(R.id.postItem)
@@ -97,13 +98,14 @@ class PostViewHolder(
         setupImages(post.imageUrls ?: emptyList())
 
         // Set up click listeners for all interactive elements
-        rootLayout.setOnClickListener { onActionClick(post, PostAction.OPEN) }
-        upvoteIcon.setOnClickListener { onActionClick(post, PostAction.UPVOTE) }
-        downvoteIcon.setOnClickListener { onActionClick(post, PostAction.DOWNVOTE) }
-        replyButton.setOnClickListener { onActionClick(post, PostAction.REPLY) }
-        shareButton.setOnClickListener { onActionClick(post, PostAction.SHARE) }
-        authorAvatar.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE) }
-        authorName.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE) }
+        rootLayout.setOnClickListener { onActionClick(post, PostAction.OPEN, it) }
+        upvoteIcon.setOnClickListener { onActionClick(post, PostAction.UPVOTE, it) }
+        downvoteIcon.setOnClickListener { onActionClick(post, PostAction.DOWNVOTE, it) }
+        replyButton.setOnClickListener { onActionClick(post, PostAction.REPLY, it) }
+        shareButton.setOnClickListener { onActionClick(post, PostAction.SHARE, it) }
+        authorAvatar.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE, it) }
+        authorName.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE, it) }
+        menuButton.setOnClickListener { onActionClick(post, PostAction.MENU, it) }
     }
 
     /**
