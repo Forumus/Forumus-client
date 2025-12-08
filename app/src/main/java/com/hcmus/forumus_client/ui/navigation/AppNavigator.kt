@@ -3,6 +3,7 @@ package com.hcmus.forumus_client.ui.navigation
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.hcmus.forumus_client.ui.chats.ChatsActivity
 import com.hcmus.forumus_client.ui.home.HomeActivity
 import com.hcmus.forumus_client.ui.profile.ProfileActivity
 import com.hcmus.forumus_client.ui.profile.ProfileActivity.Companion.EXTRA_MODE
@@ -101,7 +102,9 @@ class AppNavigator(private val activity: Activity) {
     }
 
     fun openChat(clearStack: Boolean = false) {
-        // TODO: Implement chat navigation
+        val intent = Intent(activity, ChatsActivity::class.java)
+        applyFlags(intent, clearStack)
+        activity.startActivity(intent)
     }
 
     fun finish() {

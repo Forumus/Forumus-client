@@ -18,8 +18,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ActivityVerificationBinding
 import com.hcmus.forumus_client.ui.auth.success.SuccessActivity
-import com.hcmus.forumus_client.ui.home.HomeActivity
 import com.hcmus.forumus_client.ui.auth.resetPassword.ResetPasswordActivity
+import com.hcmus.forumus_client.ui.home.HomeActivity
 
 class VerificationActivity : AppCompatActivity() {
     

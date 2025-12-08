@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.hcmus.forumus_client.databinding.ActivitySuccessBinding
 import com.hcmus.forumus_client.data.local.TokenManager
 import com.hcmus.forumus_client.data.local.PreferencesManager
-import com.hcmus.forumus_client.ui.home.HomeActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.hcmus.forumus_client.ui.home.HomeActivity
 
 class SuccessActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySuccessBinding

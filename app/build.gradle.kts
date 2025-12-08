@@ -35,6 +35,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        viewBinding = true
         dataBinding = true
     }
     packaging {
@@ -76,6 +77,7 @@ dependencies {
     // Lifecycle dependencies for ViewModel and LiveData
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.fragment.ktx)
 
     // Email dependencies for OTP sending
     implementation(libs.android.mail)
@@ -88,6 +90,8 @@ dependencies {
     implementation(libs.logging.interceptor)
 
     // Coil for image loading
-    implementation("io.coil-kt:coil:2.7.0")
-    implementation("io.coil-kt:coil-base:2.7.0")
+    implementation(libs.coil)
+    implementation(libs.coil.base)
+    implementation(libs.glide)
+    implementation(libs.circleimageview)
 }
