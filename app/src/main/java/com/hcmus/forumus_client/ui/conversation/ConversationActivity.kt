@@ -222,6 +222,13 @@ class ConversationActivity : AppCompatActivity() {
                 }
 
                 launch {
+                    viewModel.isLoading.collectLatest { isLoading ->
+                        binding.btnSend.visibility = if (isLoading) android.view.View.GONE else android.view.View.VISIBLE
+                        binding.pbSending.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
+                    }
+                }
+
+                launch {
                     viewModel.sendMessageResult.collectLatest { success ->
                         if (success) {
                             // Clear inputs on main thread - this is lightweight
