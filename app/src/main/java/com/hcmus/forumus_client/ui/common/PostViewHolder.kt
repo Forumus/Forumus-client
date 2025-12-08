@@ -6,6 +6,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
@@ -51,6 +52,18 @@ class PostViewHolder(
     // Root view for click handling
     val rootLayout: LinearLayout = itemView.findViewById(R.id.postItem)
 
+    // RecyclerView for displaying post images
+    private val rvPostImages: RecyclerView = itemView.findViewById(R.id.rvPostImages)
+    val imagesAdapter = PostImagesAdapter { clickedIndex ->
+        // TODO: mở full-screen gallery, truyền list + index
+    }
+
+    var imagesLayoutManager: GridLayoutManager? = null
+
+    init {
+        rvPostImages.adapter = imagesAdapter
+    }
+
     /**
      * Binds post data to UI elements and sets up click listeners.
      *
@@ -79,6 +92,9 @@ class PostViewHolder(
 
         // Apply visual feedback for user's vote state
         applyVoteUI(post)
+
+        // Set up images for the post
+        setupImages(post.imageUrls ?: emptyList())
 
         // Set up click listeners for all interactive elements
         rootLayout.setOnClickListener { onActionClick(post, PostAction.OPEN) }
@@ -110,6 +126,58 @@ class PostViewHolder(
                 downvoteIcon.setImageResource(R.drawable.ic_downvote)
             }
         }
+    }
+
+    // Sets up the RecyclerView for displaying post images.
+    private fun setupImages(imageUrls: List<String>) {
+        if (imageUrls.isEmpty()) {
+            rvPostImages.visibility = View.GONE
+            return
+        }
+
+        rvPostImages.visibility = View.VISIBLE
+
+        val context = rvPostImages.context
+        val count = imageUrls.size
+
+        // 1 ảnh: show như 1 cột, có thể dùng LinearLayoutManager hoặc Grid span=1
+        if (count == 1) {
+            if (imagesLayoutManager == null || imagesLayoutManager?.spanCount != 1) {
+                imagesLayoutManager = GridLayoutManager(context, 1)
+                rvPostImages.layoutManager = imagesLayoutManager
+            }
+        } else {
+            // >= 2 ảnh: dùng Grid 2 cột
+            if (imagesLayoutManager == null || imagesLayoutManager?.spanCount != 2) {
+                imagesLayoutManager = GridLayoutManager(context, 2)
+                rvPostImages.layoutManager = imagesLayoutManager
+            }
+
+            imagesLayoutManager?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return when {
+                        // 2 ảnh: cả 2 đều span 1 để nằm ngang
+                        count == 2 -> 1
+
+                        // 3 hoặc >3 ảnh: ảnh đầu tiên full width (span 2)
+                        position == 0 -> 2
+
+                        else -> 1
+                    }
+                }
+            }
+        }
+
+        if (rvPostImages.itemDecorationCount == 0) {
+            val spacingPx = (2 * rvPostImages.resources.displayMetrics.density).toInt()
+            rvPostImages.addItemDecoration(
+                GridSpacingItemDecoration(
+                    spacing = spacingPx
+                )
+            )
+        }
+
+        imagesAdapter.submitImages(imageUrls)
     }
 
     /**
