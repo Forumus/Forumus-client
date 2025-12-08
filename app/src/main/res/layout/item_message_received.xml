@@ -42,8 +42,8 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_message_images"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_width="300dp"
             android:paddingHorizontal="8dp"
             android:paddingTop="12dp"
             android:clipToPadding="false"

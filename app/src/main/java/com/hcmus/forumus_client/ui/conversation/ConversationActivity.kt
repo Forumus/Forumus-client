@@ -227,6 +227,7 @@ class ConversationActivity : AppCompatActivity() {
                             // Clear inputs on main thread - this is lightweight
                             runOnUiThread {
                                 binding.etMessage.text.clear()
+                                binding.btnSend.isEnabled = true
                                 clearSelectedImages()
                             }
                         }
@@ -397,7 +398,7 @@ class ConversationActivity : AppCompatActivity() {
         }
 
         // Disable send button immediately to prevent multiple sends
-//        binding.btnSend.isEnabled = false
+        binding.btnSend.isEnabled = false
         
         // Convert URIs to strings on main thread (lightweight operation)
         val imageUriStrings = selectedImageUris.map { it.toString() }.toMutableList()

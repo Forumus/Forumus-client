@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 class ChatRepository {
     
     private val firestore = FirebaseFirestore.getInstance()
+    private val storage = FirebaseStorage.getInstance()
     private val chatsCollection = firestore.collection("chats")
     private val userRepository = UserRepository()
 
@@ -46,10 +47,16 @@ class ChatRepository {
             return@callbackFlow
         }
 
-        // 2. Setup the Firestore listener
-        val listener = chatsCollection
+        val query = chatsCollection
             .whereArrayContains("userIds", currentUserId)
-            .whereNotEqualTo("unreadCount", if (chatType == ChatType.UNREAD_CHATS) 0 else null)
+
+        val finalQuery = if (chatType == ChatType.UNREAD_CHATS) {
+            query.whereNotEqualTo("unreadCount", 0)
+        } else {
+            query
+        }
+
+        val listener = finalQuery
             .orderBy("lastUpdate", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -66,12 +73,19 @@ class ChatRepository {
                             async {
                                 try {
                                     val chatItem = doc.toObject(ChatItem::class.java)?.copy(id = doc.id)
+
+                                    // Do not load chats marked as deleted by current user
+                                    if (chatItem?.chatDeleted?.get(currentUserId) == true) {
+                                        return@async null
+                                    }
+
                                     chatItem?.let { chat ->
                                         // Set UI properties
                                         chat.timestamp = formatTimestamp(chat.lastUpdate)
                                         chat.isUnread = chat.unreadCount > 0
 
                                         // Fetch Name Logic (Preserved from your original code)
+                                        Log.d(TAG, chat.toString())
                                         val otherUserId = chat.userIds.firstOrNull { it != currentUserId }
                                         if (otherUserId != null) {
                                             try {
@@ -143,7 +157,7 @@ class ChatRepository {
         limit: Int = 50
     ): Result<List<Message>> {
         return try {
-            val com = com.google.firebase.Timestamp(beforeTimestamp / 1000, ((beforeTimestamp % 1000) * 1000000).toInt())
+            val com = Timestamp(beforeTimestamp / 1000, ((beforeTimestamp % 1000) * 1000000).toInt())
             
             val messages = chatsCollection
                 .document(chatId)
@@ -283,7 +297,11 @@ class ChatRepository {
                 lastMessage = "",
                 lastUpdate = timestamp,
                 unreadCount = 0,
-                userIds = listOf(currentUserId, otherUserId)
+                userIds = listOf(currentUserId, otherUserId),
+                chatDeleted = mapOf(
+                    currentUserId to false,
+                    otherUserId to false
+                )
             )
             
             chatsCollection
@@ -327,6 +345,12 @@ class ChatRepository {
                 createChat(otherUserId)
             }
 
+            // Update chatDeleted status for current user
+            chatsCollection
+                .document(chat.id)
+                .update("chatDeleted.$currentUserId", false)
+                .await()
+
             val otherUserId = chat.userIds.firstOrNull { it != currentUserId }
             if (otherUserId != null) {
                 try {
@@ -343,6 +367,8 @@ class ChatRepository {
             } else {
                 chat.contactName = "Me"
             }
+
+            Log.d(TAG, "Returning chat: $chat")
 
             chat
         } catch (e: Exception) {
@@ -369,12 +395,15 @@ class ChatRepository {
     // Delete a chat
     suspend fun deleteChat(chatId: String): Result<Unit> {
         return try {
+            val currentUserId = getCurrentUserId()
+                ?: return Result.failure(Exception("User not authenticated"))
+
+            // Mark chat as deleted for current user
             chatsCollection
                 .document(chatId)
-                .delete()
+                .update("chatDeleted.$currentUserId", true)
                 .await()
-            
-            Log.d(TAG, "Chat deleted successfully: $chatId")
+
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Error deleting chat", e)
@@ -406,7 +435,6 @@ class ChatRepository {
 
             // Delete images from Firebase Storage if any
             if (message.imageUrls.isNotEmpty()) {
-                val storage = FirebaseStorage.getInstance()
                 for (imageUrl in message.imageUrls) {
                     try {
                         val imageRef = storage.getReferenceFromUrl(imageUrl)

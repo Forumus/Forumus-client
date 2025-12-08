@@ -7,7 +7,8 @@ data class ChatItem(
     val lastMessage: String = "",
     val lastUpdate: Timestamp? = null,
     val unreadCount: Int = 0,
-    val userIds: List<String> = emptyList()
+    val userIds: List<String> = emptyList(),
+    val chatDeleted: Map<String, Boolean> = emptyMap()
 ) {
     // UI helper properties
     var contactName: String = ""
