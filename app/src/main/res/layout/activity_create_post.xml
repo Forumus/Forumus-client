@@ -59,6 +59,72 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- User ID Input (For Dev) -->
+            <EditText
+                android:id="@+id/edtUserId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter User ID (Dev)"
+                android:background="@drawable/bg_input_area"
+                android:textSize="12sp"
+                android:padding="8dp"
+                android:layout_marginBottom="16dp"
+                android:inputType="text"/>
+
+            <!-- Author Info Section -->
+            <LinearLayout
+                android:id="@+id/authorInfoSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/ivAuthorAvatar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/default_avatar"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Author Avatar"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:id="@+id/tvAuthorName"
+                        android:text="Loading..."
+                        android:textSize="16sp"
+                        android:textColor="#000000"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/tvAuthorEmail"
+                        android:text="Loading..."
+                        android:textSize="12sp"
+                        android:textColor="#757575"
+                        android:layout_marginTop="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edtTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Title (Optional)"
+                android:background="@null"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:layout_marginBottom="12dp"
+                android:padding="8dp"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,74 +132,44 @@
                 android:layout_marginBottom="12dp">
 
                 <TextView
-                    android:text="John Doe"
-                    android:textSize="16sp"
-                    android:textColor="#000000"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="johndoe@example.com"
+                    android:layout_height="wrap_content"
+                    android:text="Privacy"
                     android:textSize="12sp"
                     android:textColor="#757575"
-                    android:layout_marginTop="2dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="4dp"/>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:background="@drawable/bg_chip_blue"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginEnd="12dp">
-                    <ImageView
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:src="@drawable/ic_lock"
-                        app:tint="#1976D2"/>
-                    <TextView
-                        android:text="Only me"
-                        android:textSize="12sp"
-                        android:textColor="#1976D2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="6dp"/>
-                    <ImageView
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:src="@drawable/ic_arrow_down"
-                        app:tint="#1976D2"/>
-                </LinearLayout>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
 
-                <LinearLayout
-                    android:id="@+id/btnAiSuggest"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:background="@drawable/bg_chip_blue"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="12dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="+ AI tags off"
-                        android:textSize="12sp"
-                        android:textColor="#1976D2"
-                        android:layout_marginEnd="6dp"/>
-                    <ImageView
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:src="@drawable/ic_arrow_down"
-                        app:tint="#1976D2"/>
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_chip_blue"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="12dp"
+                        android:layout_marginEnd="12dp">
+                        <ImageView
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:src="@drawable/ic_lock"
+                            app:tint="#1976D2"/>
+                        <TextView
+                            android:text="Only me"
+                            android:textSize="12sp"
+                            android:textColor="#1976D2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="6dp"/>
+                        <ImageView
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:src="@drawable/ic_arrow_down"
+                            app:tint="#1976D2"/>
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
@@ -147,39 +183,34 @@
                 android:gravity="top"
                 android:padding="16dp"
                 android:textSize="16sp"
-                android:inputType="textMultiLine|textCapSentences"/>
+                android:inputType="textMultiLine|textCapSentences"
+                android:layout_marginBottom="12dp"/>
 
-            <EditText
-                android:id="@+id/edtTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Title (Optional)"
-                android:background="@null"
-                android:textSize="14sp"
-                android:layout_marginTop="8dp"
-                android:visibility="gone"/>
-
+            <!-- Media Preview Section -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvSelectedImages"
+                android:id="@+id/rvSelectedMedia"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="12dp"
-                android:visibility="gone"/>
+                android:layout_marginBottom="12dp"/>
 
+            <!-- Media Upload/Capture Options -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="24dp">
+                android:layout_marginTop="12dp">
 
+                <!-- Pick Image from Gallery -->
                 <LinearLayout
-                    android:id="@+id/btnAttachImage"
+                    android:id="@+id/btnPickImage"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:gravity="center_vertical"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true">
+                    android:clickable="true"
+                    android:focusable="true">
                     <androidx.cardview.widget.CardView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
@@ -190,21 +221,27 @@
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_photo"/>
+                            android:src="@drawable/ic_photo"
+                            app:tint="#4CAF50"/>
                     </androidx.cardview.widget.CardView>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Photo/video"
+                        android:text="Pick Image from Gallery"
                         android:textColor="#000000"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:layout_marginStart="16dp"/>
                 </LinearLayout>
 
+                <!-- Take Photo with Camera -->
                 <LinearLayout
+                    android:id="@+id/btnTakePhoto"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
                     <androidx.cardview.widget.CardView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
@@ -215,121 +252,58 @@
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_tag"/>
+                            android:src="@drawable/ic_camera"
+                            app:tint="#2196F3"/>
                     </androidx.cardview.widget.CardView>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tag people"
+                        android:text="Take Photo with Camera"
                         android:textColor="#000000"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:layout_marginStart="16dp"/>
                 </LinearLayout>
 
+                <!-- Pick Video from Gallery -->
                 <LinearLayout
+                    android:id="@+id/btnPickVideo"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
                     <androidx.cardview.widget.CardView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         app:cardCornerRadius="20dp"
-                        app:cardBackgroundColor="#FFF8E1"
+                        app:cardBackgroundColor="#FCE4EC"
                         app:cardElevation="0dp">
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_emoji"/>
+                            android:src="@drawable/ic_gif"
+                            app:tint="#E91E63"/>
                     </androidx.cardview.widget.CardView>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Feeling/activity"
+                        android:text="Pick Video from Gallery"
                         android:textColor="#000000"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:layout_marginStart="16dp"/>
                 </LinearLayout>
 
+                <!-- Record Video with Camera -->
                 <LinearLayout
+                    android:id="@+id/btnRecordVideo"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:gravity="center_vertical">
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardBackgroundColor="#FFEBEE"
-                        app:cardElevation="0dp">
-                        <ImageView
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_location"/>
-                    </androidx.cardview.widget.CardView>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Check in"
-                        android:textColor="#000000"
-                        android:textSize="16sp"
-                        android:layout_marginStart="16dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:gravity="center_vertical">
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardBackgroundColor="#E0F7FA"
-                        app:cardElevation="0dp">
-                        <ImageView
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_text"/>
-                    </androidx.cardview.widget.CardView>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Background"
-                        android:textColor="#000000"
-                        android:textSize="16sp"
-                        android:layout_marginStart="16dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:gravity="center_vertical">
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardBackgroundColor="#E3F2FD"
-                        app:cardElevation="0dp">
-                        <ImageView
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_camera"/>
-                    </androidx.cardview.widget.CardView>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Camera"
-                        android:textColor="#000000"
-                        android:textSize="16sp"
-                        android:layout_marginStart="16dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
                     <androidx.cardview.widget.CardView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
@@ -340,43 +314,15 @@
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_gif"/>
+                            android:src="@drawable/ic_camera"
+                            app:tint="#009688"/>
                     </androidx.cardview.widget.CardView>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="GIF"
+                        android:text="Record Video with Camera"
                         android:textColor="#000000"
-                        android:textSize="16sp"
-                        android:layout_marginStart="16dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/btnSelectTopic"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true">
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardBackgroundColor="#EDE7F6"
-                        app:cardElevation="0dp">
-                        <ImageView
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_hashtag"/>
-                    </androidx.cardview.widget.CardView>
-                    <TextView
-                        android:id="@+id/tvSelectedTopic"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Topic"
-                        android:textColor="#000000"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:layout_marginStart="16dp"/>
                 </LinearLayout>
 

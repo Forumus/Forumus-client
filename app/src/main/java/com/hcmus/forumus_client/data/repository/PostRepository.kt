@@ -6,6 +6,19 @@ import com.google.firebase.firestore.Query
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.VoteState
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import android.media.MediaMetadataRetriever
+import java.util.UUID
+import android.net.Uri
+import android.util.Log
+import java.io.File
+import java.io.FileOutputStream
+import android.graphics.Bitmap
+import java.text.SimpleDateFormat
+import java.util.*
+import android.content.Context
+import androidx.core.net.toUri
 
 /**
  * Repository for managing post data operations with Firestore.
@@ -41,6 +54,124 @@ class PostRepository(
         this.commentCount = commentsSnapshot.size()
 
         return this
+    }
+
+    fun generatePostId(): String {
+        // Lấy thời gian hiện tại
+        val currentDate = Calendar.getInstance()
+
+        // Định dạng thời gian theo yêu cầu (yyyyMMdd_HHmmss)
+        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+        val formattedDate = dateFormat.format(currentDate.time)
+
+        // Tạo số ngẫu nhiên từ 1000 đến 9999
+        val randomPart = (1000..9999).random()
+
+        // Kết hợp lại thành ID với định dạng "POST_yyyyMMdd_HHmmss_random"
+        return "POST" + "_" + "$formattedDate" + "_" + "$randomPart"
+    }
+
+    suspend fun savePost(context: Context, post: Post) {
+        val storage = FirebaseStorage.getInstance().reference
+        val imageUrls = mutableListOf<String>()
+        val videoUrls = mutableListOf<String>()
+        val videoThumbnailUrls = mutableListOf<String?>()
+
+        // 1. Upload ảnh
+        post.imageUrls.forEach { imageUri ->
+            val imageRef = storage.child("post_images/${UUID.randomUUID()}.jpg")
+            val imageData = Uri.parse(imageUri)
+
+            try {
+                // Upload ảnh
+                val imageUrl = uploadFile(imageRef, imageData)
+                imageUrls.add(imageUrl)
+            } catch (e: Exception) {
+                Log.e("savePost", "Error uploading image: ${e.message}")
+            }
+        }
+
+        // 2. Upload video
+        post.videoUrls.forEach { videoUri ->
+            val videoRef = storage.child("post_videos/${UUID.randomUUID()}.mp4")
+            val videoData = Uri.parse(videoUri)
+
+            try {
+                // Upload video
+                val videoUrl = uploadFile(videoRef, videoData)
+                videoUrls.add(videoUrl)
+
+                // 3. Tạo thumbnail cho video
+                val videoThumbnailUri = getVideoThumbnailUri(context, videoUri)
+                if (videoThumbnailUri != null) {
+                    val thumbRef = storage.child("post_thumbnails/${UUID.randomUUID()}.jpg")
+                    val thumbUrl = uploadFile(thumbRef, videoThumbnailUri)
+                    videoThumbnailUrls.add(thumbUrl)
+                } else {
+                    videoThumbnailUrls.add(null)
+                }
+            } catch (e: Exception) {
+                Log.e("savePost", "Error uploading video: ${e.message}")
+            }
+        }
+
+        val generatedId = generatePostId()
+
+        val postRef = FirebaseFirestore
+            .getInstance()
+            .collection("posts")
+            .document(generatedId)
+
+        val updatedPost = post.copy(
+            id = generatedId,
+            imageUrls = imageUrls,
+            videoUrls = videoUrls,
+            videoThumbnailUrls = videoThumbnailUrls
+        )
+
+        postRef.set(updatedPost).await()
+    }
+
+    private suspend fun uploadFile(ref: StorageReference, uri: Uri): String {
+        return try {
+            val uploadTask = ref.putFile(uri)
+            val downloadUrlTask = uploadTask.continueWithTask { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let { throw it }
+                }
+                ref.downloadUrl
+            }.await()
+
+            downloadUrlTask.toString()
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    fun getVideoThumbnailUri(context: Context, videoUri: String): Uri? {
+        val retriever = MediaMetadataRetriever()
+        return try {
+            val uri = videoUri.toUri()
+            retriever.setDataSource(context, uri)
+
+            val thumbnailBitmap = retriever.getFrameAtTime(
+                0,
+                MediaMetadataRetriever.OPTION_CLOSEST
+            ) ?: return null
+
+            // Tạo file tạm trong cache của app
+            val tempFile = File.createTempFile("video_thumb_", ".jpg", context.cacheDir)
+            FileOutputStream(tempFile).use { out ->
+                thumbnailBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
+            }
+
+            Uri.fromFile(tempFile)
+        } catch (e: Exception) {
+            Log.e("getVideoThumbnailUri", "Error creating thumbnail", e)
+            null
+        } finally {
+            retriever.release()
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import com.hcmus.forumus_client.ui.chats.ChatsActivity
 import com.hcmus.forumus_client.ui.home.HomeActivity
+import com.hcmus.forumus_client.ui.post.create.CreatePostActivity
 import com.hcmus.forumus_client.ui.profile.ProfileActivity
 import com.hcmus.forumus_client.ui.profile.ProfileActivity.Companion.EXTRA_MODE
 import com.hcmus.forumus_client.ui.profile.ProfileActivity.Companion.EXTRA_USER_ID
@@ -94,7 +95,9 @@ class AppNavigator(private val activity: Activity) {
     }
 
     fun openCreatePost(clearStack: Boolean = false) {
-        // TODO: Implement create post navigation
+        val intent = Intent(activity, CreatePostActivity::class.java)
+        applyFlags(intent, clearStack)
+        activity.startActivity(intent)
     }
 
     fun openAlerts(clearStack: Boolean = false) {

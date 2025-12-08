@@ -29,4 +29,13 @@
         android:visibility="gone"
         android:layout_gravity="center" />
 
+    <!-- Icon play cho video -->
+    <ImageView
+        android:id="@+id/ivPlayIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_play_video"
+        android:visibility="gone" />
+
 </FrameLayout>

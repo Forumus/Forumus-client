@@ -20,6 +20,7 @@ data class Post(
 
 	var imageUrls: MutableList<String> = mutableListOf(),
 	var videoUrls: MutableList<String> = mutableListOf(),
+	var videoThumbnailUrls: MutableList<String?> = mutableListOf(),
 
 	var votedUsers: MutableMap<String, VoteState> = mutableMapOf(),
 	var reportedUsers: MutableList<String> = mutableListOf(),

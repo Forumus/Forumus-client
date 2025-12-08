@@ -17,14 +17,8 @@ import com.hcmus.forumus_client.data.model.VoteState
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.hcmus.forumus_client.R
+import kotlin.math.min
 
-/**
- * ViewHolder for displaying a post in a RecyclerView.
- * Handles binding post data to UI elements and managing user interactions.
- *
- * @param itemView The inflated layout view for a single post item
- * @param onActionClick Callback invoked when user performs actions on the post
- */
 class PostViewHolder(
     itemView: View,
     private val onActionClick: (Post, PostAction, View) -> Unit
@@ -53,9 +47,9 @@ class PostViewHolder(
     // Root view for click handling
     val rootLayout: LinearLayout = itemView.findViewById(R.id.postItem)
 
-    // RecyclerView for displaying post images
+    // RecyclerView for displaying post media (ảnh + video)
     private val rvPostImages: RecyclerView = itemView.findViewById(R.id.rvPostImages)
-    val imagesAdapter = PostImagesAdapter { clickedIndex ->
+    val imagesAdapter = PostMediaAdapter { clickedIndex ->
         // TODO: mở full-screen gallery, truyền list + index
     }
 
@@ -65,11 +59,6 @@ class PostViewHolder(
         rvPostImages.adapter = imagesAdapter
     }
 
-    /**
-     * Binds post data to UI elements and sets up click listeners.
-     *
-     * @param post The post data to display
-     */
     fun bind(post: Post) {
         // Bind author information
         authorName.text = post.authorName.ifBlank { "Anonymous" }
@@ -94,8 +83,8 @@ class PostViewHolder(
         // Apply visual feedback for user's vote state
         applyVoteUI(post)
 
-        // Set up images for the post
-        setupImages(post.imageUrls ?: emptyList())
+        // Set up media (ảnh + video)
+        setupMedia(post)
 
         // Set up click listeners for all interactive elements
         rootLayout.setOnClickListener { onActionClick(post, PostAction.OPEN, it) }
@@ -108,11 +97,6 @@ class PostViewHolder(
         menuButton.setOnClickListener { onActionClick(post, PostAction.MENU, it) }
     }
 
-    /**
-     * Updates vote icons based on the current user's vote state.
-     *
-     * @param post The post with the user's vote state
-     */
     private fun applyVoteUI(post: Post) {
         when (post.userVote) {
             VoteState.UPVOTE -> {
@@ -130,9 +114,31 @@ class PostViewHolder(
         }
     }
 
-    // Sets up the RecyclerView for displaying post images.
-    private fun setupImages(imageUrls: List<String>) {
-        if (imageUrls.isEmpty()) {
+    /**
+     * Gộp imageUrls + videoThumbnailUrls + videoUrls thành 1 list media,
+     * sau đó set lên RecyclerView. Layout 1–2–3 item vẫn giữ như cũ.
+     */
+    private fun setupMedia(post: Post) {
+        val imageUrls = post.imageUrls ?: emptyList()
+        val videoUrls = post.videoUrls ?: emptyList()
+        val videoThumbs = post.videoThumbnailUrls ?: emptyList()
+
+        val mediaItems = mutableListOf<PostMediaItem>()
+
+        // Thêm ảnh
+        imageUrls.forEach { url ->
+            mediaItems += PostMediaItem.Image(url)
+        }
+
+        // Thêm video (ghép thumbnail + video theo index)
+        val pairCount = min(videoUrls.size, videoThumbs.size)
+        for (i in 0 until pairCount) {
+            val videoUrl = videoUrls[i]
+            val thumbUrl = videoThumbs[i]
+            mediaItems += PostMediaItem.Video(thumbUrl, videoUrl)
+        }
+
+        if (mediaItems.isEmpty()) {
             rvPostImages.visibility = View.GONE
             return
         }
@@ -140,16 +146,16 @@ class PostViewHolder(
         rvPostImages.visibility = View.VISIBLE
 
         val context = rvPostImages.context
-        val count = imageUrls.size
+        val count = mediaItems.size
 
-        // 1 ảnh: show như 1 cột, có thể dùng LinearLayoutManager hoặc Grid span=1
+        // 1 media: full width
         if (count == 1) {
             if (imagesLayoutManager == null || imagesLayoutManager?.spanCount != 1) {
                 imagesLayoutManager = GridLayoutManager(context, 1)
                 rvPostImages.layoutManager = imagesLayoutManager
             }
         } else {
-            // >= 2 ảnh: dùng Grid 2 cột
+            // >= 2 media: dùng Grid 2 cột, item đầu full width khi >=3
             if (imagesLayoutManager == null || imagesLayoutManager?.spanCount != 2) {
                 imagesLayoutManager = GridLayoutManager(context, 2)
                 rvPostImages.layoutManager = imagesLayoutManager
@@ -158,12 +164,10 @@ class PostViewHolder(
             imagesLayoutManager?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return when {
-                        // 2 ảnh: cả 2 đều span 1 để nằm ngang
+                        // 2 media: cả 2 cùng span 1
                         count == 2 -> 1
-
-                        // 3 hoặc >3 ảnh: ảnh đầu tiên full width (span 2)
+                        // 3 hoặc >3: item đầu tiên full width
                         position == 0 -> 2
-
                         else -> 1
                     }
                 }
@@ -179,16 +183,9 @@ class PostViewHolder(
             )
         }
 
-        imagesAdapter.submitImages(imageUrls)
+        imagesAdapter.submitMedia(mediaItems)
     }
 
-    /**
-     * Formats a Firestore timestamp into a human-readable relative time string.
-     * Examples: "now", "5m", "2h", "3d", "Jan 15"
-     *
-     * @param timestamp The Firestore timestamp to format
-     * @return Formatted time string, or "now" if timestamp is null or invalid
-     */
     private fun formatTimestamp(timestamp: Timestamp?): String {
         return if (timestamp != null) {
             try {

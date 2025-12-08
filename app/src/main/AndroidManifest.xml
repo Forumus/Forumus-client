@@ -75,6 +75,11 @@
             android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
 
+        <!-- Create Post Activity -->
+        <activity
+            android:name=".ui.post.create.CreatePostActivity"
+            android:exported="false" />
+
         <!-- Forgot Password Activity -->
         <activity
             android:name=".ui.auth.forgotPassword.ForgotPasswordActivity"
