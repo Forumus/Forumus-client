@@ -65,6 +65,14 @@ class PostDetailViewModel(
     private val _replyTargetComment = MutableLiveData<Comment?>()
     val replyTargetComment: LiveData<Comment?> = _replyTargetComment
 
+    // Loading state indicator
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    // Error message for UI display
+    private val _error = MutableLiveData<String?>()
+    val error: LiveData<String?> = _error
+
     fun loadCurrentUser() {
         viewModelScope.launch {
             try {
@@ -88,6 +96,7 @@ class PostDetailViewModel(
      */
     fun loadPostDetail(postId: String) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 // Load the post
                 val post = postRepository.getPostById(postId)
@@ -103,6 +112,9 @@ class PostDetailViewModel(
                 rebuildItems()
             } catch (e: Exception) {
                 _items.value = emptyList()
+                _error.value = e.message
+            } finally {
+                _isLoading.value = false
             }
         }
     }

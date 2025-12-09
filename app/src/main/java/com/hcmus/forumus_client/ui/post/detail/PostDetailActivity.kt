@@ -1,6 +1,7 @@
 package com.hcmus.forumus_client.ui.post.detail
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -243,6 +244,22 @@ class PostDetailActivity : AppCompatActivity() {
                 else -> "Reply to ${target.authorName}"
             }
             binding.bottomInputBar.setHint(hint)
+        }
+
+        viewModel.error.observe(this) { msg ->
+            if (!msg.isNullOrBlank()) {
+                Toast.makeText(this, "Error: $msg", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading == true) {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.postRecyclerView.visibility = View.GONE
+            } else {
+                binding.progressBar.visibility = View.GONE
+                binding.postRecyclerView.visibility = View.VISIBLE
+            }
         }
     }
 }

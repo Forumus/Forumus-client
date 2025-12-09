@@ -167,5 +167,21 @@ class HomeActivity : AppCompatActivity() {
         viewModel.currentUser.observe(this) { user ->
             binding.topAppBar.setProfileImage(user?.profilePictureUrl)
         }
+
+        viewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading == true) {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.postRecyclerView.visibility = View.GONE
+            } else {
+                binding.progressBar.visibility = View.GONE
+                binding.postRecyclerView.visibility = View.VISIBLE
+            }
+        }
+
+        viewModel.error.observe(this) { msg ->
+            if (!msg.isNullOrBlank()) {
+                Toast.makeText(this, "Error: $msg", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

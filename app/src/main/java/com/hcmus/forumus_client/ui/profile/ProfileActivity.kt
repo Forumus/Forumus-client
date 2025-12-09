@@ -2,6 +2,7 @@ package com.hcmus.forumus_client.ui.profile
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -304,8 +305,14 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         // Monitor loading state (can show/hide ProgressBar if needed)
-        viewModel.isLoading.observe(this) { loading ->
-            // TODO: Show/hide ProgressBar based on loading state if desired
+        viewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading == true) {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.contentRecyclerView.visibility = View.GONE
+            } else {
+                binding.progressBar.visibility = View.GONE
+                binding.contentRecyclerView.visibility = View.VISIBLE
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import coil.load
 import com.hcmus.forumus_client.R
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ProgressBar
 
 class PostMediaAdapter(
     private val onMediaClick: (position: Int) -> Unit
@@ -31,22 +32,34 @@ class PostMediaAdapter(
         private val overlay: View = itemView.findViewById(R.id.overlay)
         private val tvMoreCount: TextView = itemView.findViewById(R.id.tvMoreCount)
         private val ivPlayIcon: ImageView = itemView.findViewById(R.id.ivPlayIcon)
+        private val progressBar: ProgressBar = itemView.findViewById(R.id.mediaProgress)
 
         fun bind(item: PostMediaItem, position: Int) {
+            progressBar.visibility = View.VISIBLE
+            ivPlayIcon.visibility = View.GONE
+
             when (item) {
                 is PostMediaItem.Image -> {
                     ivPostImage.load(item.imageUrl) {
                         crossfade(true)
-                        placeholder(R.drawable.image_loading)
                         error(R.drawable.error_image)
+
+                        listener(
+                            onStart = { progressBar.visibility = View.VISIBLE },
+                            onSuccess = { _, _ -> progressBar.visibility = View.GONE },
+                            onError = { _, _ -> progressBar.visibility = View.GONE }
+                        )
                     }
-                    ivPlayIcon.visibility = View.GONE
                 }
                 is PostMediaItem.Video -> {
                     ivPostImage.load(item.thumbnailUrl) {
                         crossfade(true)
-                        placeholder(R.drawable.image_loading)
                         error(R.drawable.gray_background)
+                        listener(
+                            onStart = { progressBar.visibility = View.VISIBLE },
+                            onSuccess = { _, _ -> progressBar.visibility = View.GONE },
+                            onError = { _, _ -> progressBar.visibility = View.GONE }
+                        )
                     }
                     // Hiển thị icon play cho video
                     ivPlayIcon.visibility = View.VISIBLE
@@ -73,7 +86,7 @@ class PostMediaAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_post_image, parent, false)
+            .inflate(R.layout.item_post_media, parent, false)
         return ImageViewHolder(view)
     }
 

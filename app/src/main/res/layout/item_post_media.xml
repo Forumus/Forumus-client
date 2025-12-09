@@ -10,6 +10,14 @@
         android:adjustViewBounds="true"
         android:scaleType="centerCrop" />
 
+    <!-- Loading indicator -->
+    <ProgressBar
+        android:id="@+id/mediaProgress"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
     <!-- Overlay +N -->
     <View
         android:id="@+id/overlay"
