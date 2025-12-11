@@ -1,20 +1,32 @@
 package com.hcmus.forumus_client.ui.home
 
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.hcmus.forumus_client.data.model.PostAction
+import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.Post
+import com.hcmus.forumus_client.data.model.PostAction
+import com.hcmus.forumus_client.data.model.Topic
 import com.hcmus.forumus_client.databinding.ActivityHomeBinding
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
-import com.hcmus.forumus_client.ui.navigation.AppNavigator
-import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.common.PopupPostMenu
-import androidx.core.view.WindowInsetsCompat
-import android.view.View
+import com.hcmus.forumus_client.ui.common.ProfileMenuAction
+import com.hcmus.forumus_client.ui.navigation.AppNavigator
 
 /**
  * Home activity displaying a feed of posts with voting and interaction features.
@@ -36,10 +48,12 @@ class HomeActivity : AppCompatActivity() {
         setupSwipeRefresh()
         setupRecyclerView()
         setupBottomNavigationBar()
+        setupDrawer()
         observeViewModel()
 
         viewModel.loadCurrentUser()
         viewModel.loadPosts()
+        viewModel.loadTopics()
     }
 
     override fun onResume() {
@@ -51,22 +65,27 @@ class HomeActivity : AppCompatActivity() {
     /**
      * Handle system window insets by applying padding to avoid overlap with status bar,
      * navigation bar and keyboard (IME).
-    */
-    /**
-     * Handle system window insets by applying padding to avoid overlap with status bar,
-     * navigation bar and keyboard (IME).
      */
     private fun setupWindowInsetsHandling() {
         // Enable edge-to-edge
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+        
+        // Apply padding to CoordinatorLayout (content) to avoid system bars
+        // We do NOT apply to binding.root (DrawerLayout) so that the drawer can slide under the status bar
+        ViewCompat.setOnApplyWindowInsetsListener(binding.coordinatorRoot) { v, insets ->
             val systemBars = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
             )
-            // Apply padding to root to avoid notch/system bars
-            // Note: If we want transparency behind bars, we would set padding on content only
-            // but for simplicity and existing behavior, padding root works.
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        // Apply padding to Navigation Drawer to avoid notch overlap
+        ViewCompat.setOnApplyWindowInsetsListener(binding.navView) { v, insets ->
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            v.setPadding(0, systemBars.top, 0, systemBars.bottom)
             insets
         }
     }
@@ -79,8 +98,10 @@ class HomeActivity : AppCompatActivity() {
             // Hide search button in home screen
             setSearchVisibility(false)
             
-            // Menu button - placeholder for navigation drawer
-            onMenuClick = { Toast.makeText(this@HomeActivity, "Menu clicked", Toast.LENGTH_SHORT).show() }
+            // Menu button - toggles navigation drawer
+            onMenuClick = { 
+                binding.drawerLayout.openDrawer(GravityCompat.START)
+            }
             // Logo navigates to home
             onHomeClick = { navigator.openHome() }
             // Search icon opens search functionality
@@ -114,10 +135,6 @@ class HomeActivity : AppCompatActivity() {
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.loadPosts()
         }
-        
-        // Ensure the refresh indicator doesn't overlap with system bars if necessary, 
-        // though standard behavior usually handles this well.
-        // Check if we need to adjust progress view end target or offset based on top inset.
     }
 
     /**
@@ -142,8 +159,8 @@ class HomeActivity : AppCompatActivity() {
             adapter = homeAdapter
 
             // Show bars when scrolling up
-            addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     if (dy < 0) { // Scrolling up
                         binding.appBarLayout.setExpanded(true, true)
                     }
@@ -195,6 +212,85 @@ class HomeActivity : AppCompatActivity() {
     }
 
     /**
+     * Initializes the navigation drawer callbacks.
+     */
+    private fun setupDrawer() {
+        val drawerContent = binding.navView.findViewById<ImageButton>(R.id.btn_close_drawer)
+        drawerContent?.setOnClickListener {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+        }
+    }
+
+    /**
+     * Populates the topics linear layout with dynamic views.
+     */
+    private fun populateTopics(topics: List<Topic>) {
+        val container = binding.navView.findViewById<LinearLayout>(R.id.topics_container) ?: return
+        container.removeAllViews()
+
+        val density = resources.displayMetrics.density
+
+        // Resolve selectableItemBackground
+        val typedValue = TypedValue()
+        theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+        val selectableBackground = typedValue.resourceId
+
+        for (topic in topics) {
+            val itemView = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    (48 * density).toInt()
+                ).apply {
+                    bottomMargin = (12 * density).toInt()
+                }
+                gravity = Gravity.CENTER_VERTICAL
+                if (selectableBackground != 0) {
+                    setBackgroundResource(selectableBackground)
+                }
+                isClickable = true
+                isFocusable = true
+            }
+
+            val iconView = ImageView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    (24 * density).toInt(),
+                    (24 * density).toInt()
+                )
+                
+                // Assuming we use a default placeholder or logic to map topic names to icons
+                // For now using a placeholder logic or if icon string is a URL use coil
+                if (topic.icon.isNotEmpty()) {
+                    // Try to load as URL
+                   this.load(topic.icon) {
+                       placeholder(R.drawable.ic_study_groups)
+                       error(R.drawable.ic_study_groups)
+                   }
+                } else {
+                    setImageResource(R.drawable.ic_study_groups)
+                }
+                contentDescription = topic.name
+            }
+
+            val textView = TextView(this).apply {
+                text = topic.name
+                textSize = 14f
+                setTextColor(android.graphics.Color.parseColor("#333333"))
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    marginStart = (16 * density).toInt()
+                }
+            }
+
+            itemView.addView(iconView)
+            itemView.addView(textView)
+            container.addView(itemView)
+        }
+    }
+
+    /**
      * Observes ViewModel data and updates UI accordingly.
      * - Posts: Updates adapter with new post list
      * - Current user: Updates top app bar profile image
@@ -202,6 +298,10 @@ class HomeActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.posts.observe(this) {
             homeAdapter.submitList(it)
+        }
+        
+        viewModel.topics.observe(this) { topics ->
+            populateTopics(topics)
         }
         
         viewModel.isLoading.observe(this) { isLoading ->

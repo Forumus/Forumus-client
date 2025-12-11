@@ -12,6 +12,7 @@ import com.hcmus.forumus_client.data.model.Violation
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
 
 /**
@@ -39,6 +40,10 @@ class HomeViewModel(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
+    // List of topics for the drawer
+    private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
+    val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
+
     /**
      * Loads the currently authenticated user from the repository.
      */
@@ -46,6 +51,22 @@ class HomeViewModel(
         viewModelScope.launch {
             val user = userRepository.getCurrentUser()
             _currentUser.value = user
+        }
+    }
+
+    /**
+     * Fetches topics from Firestore.
+     */
+    fun loadTopics() {
+        viewModelScope.launch {
+            try {
+                val snapshot = FirebaseFirestore.getInstance().collection("topics").get().await()
+                val topicList = snapshot.toObjects(com.hcmus.forumus_client.data.model.Topic::class.java)
+                _topics.value = topicList
+            } catch (e: Exception) {
+                // Handle error or use default topics if needed
+                e.printStackTrace()
+            }
         }
     }
 
