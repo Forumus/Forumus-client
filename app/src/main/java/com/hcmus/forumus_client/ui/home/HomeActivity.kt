@@ -33,6 +33,7 @@ class HomeActivity : AppCompatActivity() {
 
         setupWindowInsetsHandling()
         setupTopAppBar()
+        setupSwipeRefresh()
         setupRecyclerView()
         setupBottomNavigationBar()
         observeViewModel()
@@ -43,8 +44,8 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh posts when returning to home screen
-        viewModel.loadPosts()
+        // No session validity check - users can access app regardless of Remember Me choice
+        // Session validation only happens at app startup in SplashActivity
     }
 
     /**
@@ -101,6 +102,19 @@ class HomeActivity : AppCompatActivity() {
             }
             setProfileImage(null)
         }
+    }
+
+    /**
+     * Sets up SwipeRefreshLayout to reload posts on pull-to-refresh.
+     */
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.loadPosts()
+        }
+        
+        // Ensure the refresh indicator doesn't overlap with system bars if necessary, 
+        // though standard behavior usually handles this well.
+        // Check if we need to adjust progress view end target or offset based on top inset.
     }
 
     /**
@@ -185,6 +199,10 @@ class HomeActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.posts.observe(this) {
             homeAdapter.submitList(it)
+        }
+        
+        viewModel.isLoading.observe(this) { isLoading ->
+             binding.swipeRefresh.isRefreshing = isLoading
         }
 
         viewModel.currentUser.observe(this) { user ->
