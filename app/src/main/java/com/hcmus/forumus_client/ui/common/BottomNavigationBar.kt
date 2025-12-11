@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.LayoutBottomNavigationBinding
+import androidx.core.view.doOnLayout
 
 /**
  * A custom bottom navigation bar component for the main app navigation.
@@ -112,6 +113,22 @@ class BottomNavigationBar @JvmOverloads constructor(
         binding.iconChat.setImageResource(R.drawable.ic_chat)
         binding.textChat.setTextColor(gray)
         binding.iconChat.setColorFilter(gray)
+    }
+
+    /**
+     * Synchronizes this bottom navigation bar with an AppBarLayout.
+     * The bar will slide down (hide) as the AppBarLayout collapses (scrolls up).
+     */
+    fun syncWithAppBar(appBarLayout: com.google.android.material.appbar.AppBarLayout, onBarsHiddenChanged: (Boolean) -> Unit) {
+        doOnLayout {
+            appBarLayout.addOnOffsetChangedListener(com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener { layout, verticalOffset ->
+                val total = layout.totalScrollRange.takeIf { it > 0 } ?: return@OnOffsetChangedListener
+                val progress = (-verticalOffset).coerceAtLeast(0).toFloat() / total.toFloat()
+                this.translationY = progress * this.height
+                val fullyHidden = progress >= 0.95f
+                onBarsHiddenChanged(fullyHidden)
+            })
+        }
     }
 
     enum class Tab {

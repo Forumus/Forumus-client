@@ -51,11 +51,20 @@ class HomeActivity : AppCompatActivity() {
      * Handle system window insets by applying padding to avoid overlap with status bar,
      * navigation bar and keyboard (IME).
     */
+    /**
+     * Handle system window insets by applying padding to avoid overlap with status bar,
+     * navigation bar and keyboard (IME).
+     */
     private fun setupWindowInsetsHandling() {
+        // Enable edge-to-edge
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(
-                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
             )
+            // Apply padding to root to avoid notch/system bars
+            // Note: If we want transparency behind bars, we would set padding on content only
+            // but for simplicity and existing behavior, padding root works.
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
@@ -114,6 +123,15 @@ class HomeActivity : AppCompatActivity() {
         binding.postRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@HomeActivity)
             adapter = homeAdapter
+
+            // Show bars when scrolling up
+            addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                    if (dy < 0) { // Scrolling up
+                        binding.appBarLayout.setExpanded(true, true)
+                    }
+                }
+            })
         }
     }
 
@@ -151,6 +169,11 @@ class HomeActivity : AppCompatActivity() {
             onAlertsClick = { navigator.openAlerts() }
             onChatClick = { navigator.openChat() }
             setActiveTab(BottomNavigationBar.Tab.HOME)
+
+            // Sync with AppBarLayout for swiping animation
+            syncWithAppBar(binding.appBarLayout) { isHidden ->
+                 // Optionally handle hidden state
+            }
         }
     }
 
