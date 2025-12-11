@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ActivityPostDetailBinding
 import com.hcmus.forumus_client.ui.navigation.AppNavigator
 import androidx.core.view.ViewCompat
@@ -92,7 +93,10 @@ class PostDetailActivity : AppCompatActivity() {
      */
     private fun setupTopAppBar() {
         binding.topAppBar.apply {
-            onMenuClick = { Toast.makeText(this@PostDetailActivity, "Menu clicked", Toast.LENGTH_SHORT).show() }
+            // Set back button icon and action
+            setNavigationIcon(R.drawable.ic_back)
+            onMenuClick = { finish() }
+            
             onHomeClick = { navigator.openHome() }
             onSearchClick = { navigator.openSearch() }
             onProfileMenuAction = onProfileMenuAction@{ action ->

@@ -69,6 +69,22 @@ class TopAppBar @JvmOverloads constructor(
     }
 
     /**
+     * Changes the navigation icon (menu button).
+     * @param resId Drawable resource ID for the icon
+     */
+    fun setNavigationIcon(resId: Int) {
+        binding.menuButton.setImageResource(resId)
+    }
+
+    /**
+     * Controls visibility of the search button.
+     * @param visible True to show, false to hide (GONE)
+     */
+    fun setSearchVisibility(visible: Boolean) {
+        binding.btnSearch.visibility = if (visible) VISIBLE else GONE
+    }
+
+    /**
      * Creates and displays a dropdown menu for profile-related actions.
      * The menu appears below the profile image with offset positioning.
      */

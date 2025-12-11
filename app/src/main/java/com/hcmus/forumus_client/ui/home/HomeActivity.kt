@@ -76,6 +76,9 @@ class HomeActivity : AppCompatActivity() {
      */
     private fun setupTopAppBar() {
         binding.topAppBar.apply {
+            // Hide search button in home screen
+            setSearchVisibility(false)
+            
             // Menu button - placeholder for navigation drawer
             onMenuClick = { Toast.makeText(this@HomeActivity, "Menu clicked", Toast.LENGTH_SHORT).show() }
             // Logo navigates to home
