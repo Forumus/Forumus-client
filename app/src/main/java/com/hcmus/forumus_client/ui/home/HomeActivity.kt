@@ -223,7 +223,13 @@ class HomeActivity : AppCompatActivity() {
 
         val newItem = binding.navView.findViewById<LinearLayout>(R.id.item_new)
         newItem?.setOnClickListener {
-            viewModel.toggleSortByNew()
+            viewModel.toggleSort(HomeViewModel.SortOption.NEW)
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+        }
+
+        val trendingItem = binding.navView.findViewById<LinearLayout>(R.id.item_trending)
+        trendingItem?.setOnClickListener {
+            viewModel.toggleSort(HomeViewModel.SortOption.TRENDING)
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
     }
@@ -355,18 +361,27 @@ class HomeActivity : AppCompatActivity() {
             updateTopicSelectionUI(selected)
         }
 
-        viewModel.isSortedByNew.observe(this) { isSorted ->
-            val newItem = binding.navView.findViewById<LinearLayout>(R.id.item_new) ?: return@observe
-            if (isSorted) {
-                newItem.setBackgroundColor(android.graphics.Color.parseColor("#E1E1E1")) // Slightly darker
+        viewModel.sortOption.observe(this) { sortOption ->
+            val newItem = binding.navView.findViewById<LinearLayout>(R.id.item_new)
+            val trendingItem = binding.navView.findViewById<LinearLayout>(R.id.item_trending)
+            
+            // Resolve selectableItemBackground once
+            val typedValue = TypedValue()
+            theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+            val selectableBackground = if (typedValue.resourceId != 0) typedValue.resourceId else 0
+
+            // Update New item
+            if (sortOption == HomeViewModel.SortOption.NEW) {
+                newItem?.setBackgroundColor(android.graphics.Color.parseColor("#E1E1E1"))
             } else {
-                val typedValue = TypedValue()
-                theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
-                if (typedValue.resourceId != 0) {
-                    newItem.setBackgroundResource(typedValue.resourceId)
-                } else {
-                    newItem.setBackgroundResource(0)
-                }
+                newItem?.setBackgroundResource(selectableBackground)
+            }
+
+            // Update Trending item
+            if (sortOption == HomeViewModel.SortOption.TRENDING) {
+                trendingItem?.setBackgroundColor(android.graphics.Color.parseColor("#E1E1E1"))
+            } else {
+                trendingItem?.setBackgroundResource(selectableBackground)
             }
         }
     }

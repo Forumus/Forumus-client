@@ -44,9 +44,13 @@ class HomeViewModel(
     private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
     val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
 
+    enum class SortOption {
+        NONE, NEW, TRENDING
+    }
+
     // Sorting state
-    private val _isSortedByNew = MutableLiveData(false)
-    val isSortedByNew: LiveData<Boolean> = _isSortedByNew
+    private val _sortOption = MutableLiveData(SortOption.NONE)
+    val sortOption: LiveData<SortOption> = _sortOption
 
     // Selected topics for filtering
     private val _selectedTopics = MutableLiveData<Set<String>>(emptySet())
@@ -118,19 +122,32 @@ class HomeViewModel(
              }
         }
 
-        if (_isSortedByNew.value == true) {
-             filteredList = filteredList.sortedByDescending { it.createdAt }
+        val sort = _sortOption.value ?: SortOption.NONE
+        filteredList = when (sort) {
+            SortOption.NEW -> filteredList.sortedByDescending { it.createdAt }
+            SortOption.TRENDING -> filteredList.sortedByDescending { 
+                // Trending score = Total interactions (upvotes + downvotes + comments)
+                it.upvoteCount + it.downvoteCount + it.commentCount 
+            }
+            SortOption.NONE -> filteredList
         }
         
         _posts.value = filteredList
     }
 
     /**
-     * Toggles the sort by new state.
+     * Toggles the sort option.
+     * If the same option is clicked, it toggles off to NONE.
+     *
+     * @param option The sort option to toggle
      */
-    fun toggleSortByNew() {
-        val newState = !(_isSortedByNew.value ?: false)
-        _isSortedByNew.value = newState
+    fun toggleSort(option: SortOption) {
+        val current = _sortOption.value ?: SortOption.NONE
+        if (current == option) {
+            _sortOption.value = SortOption.NONE
+        } else {
+            _sortOption.value = option
+        }
         applyFilters()
     }
 
