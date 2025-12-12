@@ -12,6 +12,7 @@ import com.hcmus.forumus_client.data.model.Violation
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
 
 /**
@@ -39,6 +40,25 @@ class HomeViewModel(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
+    // List of topics for the drawer
+    private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
+    val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
+
+    enum class SortOption {
+        NONE, NEW, TRENDING
+    }
+
+    // Sorting state
+    private val _sortOption = MutableLiveData(SortOption.NONE)
+    val sortOption: LiveData<SortOption> = _sortOption
+
+    // Selected topics for filtering
+    private val _selectedTopics = MutableLiveData<Set<String>>(emptySet())
+    val selectedTopics: LiveData<Set<String>> = _selectedTopics
+
+    // Keep track of the original list to support un-sorting
+    private var originalPosts: List<Post> = emptyList()
+
     /**
      * Loads the currently authenticated user from the repository.
      */
@@ -46,6 +66,22 @@ class HomeViewModel(
         viewModelScope.launch {
             val user = userRepository.getCurrentUser()
             _currentUser.value = user
+        }
+    }
+
+    /**
+     * Fetches topics from Firestore.
+     */
+    fun loadTopics() {
+        viewModelScope.launch {
+            try {
+                val snapshot = FirebaseFirestore.getInstance().collection("topics").get().await()
+                val topicList = snapshot.toObjects(com.hcmus.forumus_client.data.model.Topic::class.java)
+                _topics.value = topicList
+            } catch (e: Exception) {
+                // Handle error or use default topics if needed
+                e.printStackTrace()
+            }
         }
     }
 
@@ -58,7 +94,10 @@ class HomeViewModel(
             _isLoading.value = true
             try {
                 val result = postRepository.getPosts()
-                _posts.value = result
+                originalPosts = result // Save original order
+                
+                applyFilters()
+                
                 _error.value = null
             } catch (e: Exception) {
                 _error.value = e.message
@@ -66,6 +105,77 @@ class HomeViewModel(
                 _isLoading.value = false
             }
         }
+    }
+
+    /**
+     * Applie filtering logic.
+     */
+    private fun applyFilters() {
+        val selected = _selectedTopics.value ?: emptySet()
+        var filteredList = if (selected.isEmpty()) {
+            originalPosts
+        } else {
+             originalPosts.filter { post ->
+                 // Post must have at least one topic in the selected set
+                 // Note: post.topicIds is List<String>, selected is Set<String>
+                 post.topicIds.any { it in selected }
+             }
+        }
+
+        val sort = _sortOption.value ?: SortOption.NONE
+        filteredList = when (sort) {
+            SortOption.NEW -> filteredList.sortedByDescending { it.createdAt }
+            SortOption.TRENDING -> filteredList.sortedByDescending { 
+                // Trending score = Total interactions (upvotes + downvotes + comments)
+                it.upvoteCount + it.downvoteCount + it.commentCount 
+            }
+            SortOption.NONE -> filteredList
+        }
+        
+        _posts.value = filteredList
+    }
+
+    /**
+     * Toggles the sort option.
+     * If the same option is clicked, it toggles off to NONE.
+     *
+     * @param option The sort option to toggle
+     */
+    fun toggleSort(option: SortOption) {
+        val current = _sortOption.value ?: SortOption.NONE
+        if (current == option) {
+            _sortOption.value = SortOption.NONE
+        } else {
+            _sortOption.value = option
+        }
+        applyFilters()
+    }
+
+    /**
+     * Toggles the selection of a topic for filtering.
+     * Enforces a maximum of 5 selected topics.
+     *
+     * @param topicId The ID of the topic to toggle
+     */
+    fun toggleTopicSelection(topicId: String) {
+        val currentSelection = _selectedTopics.value?.toMutableSet() ?: mutableSetOf()
+        
+        if (currentSelection.contains(topicId)) {
+            currentSelection.remove(topicId)
+        } else {
+            if (currentSelection.size < 5) {
+                currentSelection.add(topicId)
+            } else {
+                // Determine what to do if limit reached?
+                // For now, simple logic: Do nothing or replace oldest? 
+                // User requirement: "up to 5", usually implies adding more is blocked.
+                // We will just return to block adding the 6th.
+                 return
+            }
+        }
+        
+        _selectedTopics.value = currentSelection
+        applyFilters()
     }
 
     /**
@@ -99,11 +209,12 @@ class HomeViewModel(
                     postRepository.toggleDownvote(post)
                 }
 
-                // Update posts list with the updated post
-                val currentList = _posts.value ?: emptyList()
-                _posts.value = currentList.map { p ->
+                // Update original list so unsorting keeps the update
+                originalPosts = originalPosts.map { p ->
                     if (p.id == post.id) updatedPost else p
                 }
+
+                applyFilters()
 
             } catch (e: Exception) {
                 _error.value = e.message
@@ -156,6 +267,11 @@ class HomeViewModel(
 
                 // Update post in Firebase via repository
                 postRepository.updatePost(updatedPost)
+
+                // Update original list
+                originalPosts = originalPosts.map { p ->
+                    if (p.id == post.id) updatedPost else p
+                }
 
                 // Update posts list with the updated post
                 val currentList = _posts.value ?: emptyList()

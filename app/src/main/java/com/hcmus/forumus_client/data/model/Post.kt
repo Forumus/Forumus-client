@@ -1,6 +1,7 @@
 package com.hcmus.forumus_client.data.model
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.Exclude
 
 data class Post(
@@ -23,6 +24,10 @@ data class Post(
 
 	var votedUsers: MutableMap<String, VoteState> = mutableMapOf(),
 	var reportedUsers: MutableList<String> = mutableListOf(),
+
+    @get:PropertyName("topics")
+    @set:PropertyName("topics")
+    var topicIds: List<String> = emptyList(),
 
 	@get:Exclude
 	@set:Exclude
