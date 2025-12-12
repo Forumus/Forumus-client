@@ -91,7 +91,7 @@ class PostViewHolder(
             val paddingH = (12 * density).toInt()
             val paddingV = (6 * density).toInt()
 
-            post.topicIds.take(3).forEach { topicId ->
+            post.topicIds.take(5).forEach { topicId ->
                 val topicName = topicMap[topicId] ?: topicId // Fallback to ID if name not found
                 
                 val textView = TextView(itemView.context).apply {

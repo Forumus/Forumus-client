@@ -108,14 +108,19 @@
             android:textSize="13sp" />
 
         <!-- Topic Tags Container -->
-        <LinearLayout
-            android:id="@+id/topicContainer"
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="0dp"
+            android:scrollbars="none"
             android:layout_marginBottom="10dp">
-        </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/topicContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </HorizontalScrollView>
 
     </LinearLayout>
 
