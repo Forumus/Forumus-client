@@ -162,21 +162,10 @@ class CreatePostViewModel(
             try {
                 // Create post object
                 val post = Post(
-                    authorId = user.uid,
-                    authorName = user.fullName,
-                    authorAvatarUrl = user.profilePictureUrl,
-                    createdAt = Timestamp.now(),
                     title = _postTitle.value ?: "",
                     content = content,
-                    upvoteCount = 0,
-                    downvoteCount = 0,
-                    commentCount = 0,
-                    reportCount = 0,
                     imageUrls = _selectedImageUris.value ?: mutableListOf(),
                     videoUrls = _selectedVideoUris.value ?: mutableListOf(),
-                    videoThumbnailUrls = mutableListOf(),
-                    votedUsers = mutableMapOf(),
-                    reportedUsers = mutableListOf()
                 )
 
                 // Call repository to save post

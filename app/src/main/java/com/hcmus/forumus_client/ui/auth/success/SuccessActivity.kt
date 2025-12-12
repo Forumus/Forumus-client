@@ -9,7 +9,7 @@ import com.hcmus.forumus_client.databinding.ActivitySuccessBinding
 import com.hcmus.forumus_client.data.local.TokenManager
 import com.hcmus.forumus_client.data.local.PreferencesManager
 import com.google.firebase.auth.FirebaseAuth
-import com.hcmus.forumus_client.ui.home.HomeActivity
+import com.hcmus.forumus_client.ui.main.MainActivity
 
 class SuccessActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySuccessBinding
@@ -24,11 +24,11 @@ class SuccessActivity : AppCompatActivity() {
 
         // Auto-navigate to Home after short delay to reduce confusion
         Handler(Looper.getMainLooper()).postDelayed({
-            navigateToHome()
+            navigateToMainActivity()
         }, 1800)
 
         binding.btnFinish.setOnClickListener {
-            navigateToHome()
+            navigateToMainActivity()
         }
     }
     
@@ -61,8 +61,8 @@ class SuccessActivity : AppCompatActivity() {
         }
     }
     
-    private fun navigateToHome() {
-        val intent = android.content.Intent(this, HomeActivity::class.java)
+    private fun navigateToMainActivity() {
+        val intent = android.content.Intent(this, MainActivity::class.java)
         intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
