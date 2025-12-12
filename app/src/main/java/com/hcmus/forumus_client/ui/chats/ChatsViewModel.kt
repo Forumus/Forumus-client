@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-class ChatsViewModel : ViewModel() {
+class ChatsViewModel() : ViewModel() {
 
     private val chatRepository = ChatRepository()
     private val userRepository = UserRepository()
