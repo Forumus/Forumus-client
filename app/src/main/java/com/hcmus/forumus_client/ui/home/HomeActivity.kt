@@ -216,10 +216,7 @@ class HomeActivity : AppCompatActivity() {
      * Initializes the navigation drawer callbacks.
      */
     private fun setupDrawer() {
-        val drawerContent = binding.navView.findViewById<ImageButton>(R.id.btn_close_drawer)
-        drawerContent?.setOnClickListener {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        }
+
 
         val newItem = binding.navView.findViewById<LinearLayout>(R.id.item_new)
         newItem?.setOnClickListener {

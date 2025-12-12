@@ -27,14 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
 
-            <ImageButton
-                android:id="@+id/btn_close_drawer"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_close"
-                android:scaleType="centerInside"
-                android:contentDescription="Close"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
+
         </LinearLayout>
 
         <!-- SORT BY Section -->
