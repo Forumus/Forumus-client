@@ -256,6 +256,7 @@ class HomeActivity : AppCompatActivity() {
                 }
                 isClickable = true
                 isFocusable = true
+                tag = topic.id // Set tag for identification
             }
 
             val iconView = ImageView(this).apply {
@@ -290,9 +291,39 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
 
+            itemView.setOnClickListener {
+                viewModel.toggleTopicSelection(topic.id)
+            }
+
             itemView.addView(iconView)
             itemView.addView(textView)
             container.addView(itemView)
+        }
+    }
+    
+    // Updates the visual state of topic items in the drawer based on selection
+    private fun updateTopicSelectionUI(selectedTopics: Set<String>) {
+        val topicListContainer = binding.navView.findViewById<LinearLayout>(R.id.topics_container) ?: return
+        
+        // Iterate through all child views (topic items)
+        for (i in 0 until topicListContainer.childCount) {
+             val itemView = topicListContainer.getChildAt(i) as? LinearLayout ?: continue
+             
+             // We need to associate the view with the topic ID. 
+             // Ideally we set it as a tag in populateTopics.
+             val topicId = itemView.tag as? String ?: continue
+             
+             if (selectedTopics.contains(topicId)) {
+                 itemView.setBackgroundColor(android.graphics.Color.parseColor("#E1E1E1"))
+             } else {
+                 val typedValue = TypedValue()
+                 theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+                 if (typedValue.resourceId != 0) {
+                     itemView.setBackgroundResource(typedValue.resourceId)
+                 } else {
+                     itemView.setBackgroundResource(0)
+                 }
+             }
         }
     }
 
@@ -317,6 +348,10 @@ class HomeActivity : AppCompatActivity() {
 
         viewModel.currentUser.observe(this) { user ->
             binding.topAppBar.setProfileImage(user?.profilePictureUrl)
+        }
+
+        viewModel.selectedTopics.observe(this) { selected ->
+            updateTopicSelectionUI(selected)
         }
 
         viewModel.isSortedByNew.observe(this) { isSorted ->

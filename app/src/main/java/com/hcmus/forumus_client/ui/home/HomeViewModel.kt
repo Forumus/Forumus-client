@@ -48,6 +48,10 @@ class HomeViewModel(
     private val _isSortedByNew = MutableLiveData(false)
     val isSortedByNew: LiveData<Boolean> = _isSortedByNew
 
+    // Selected topics for filtering
+    private val _selectedTopics = MutableLiveData<Set<String>>(emptySet())
+    val selectedTopics: LiveData<Set<String>> = _selectedTopics
+
     // Keep track of the original list to support un-sorting
     private var originalPosts: List<Post> = emptyList()
 
@@ -88,12 +92,7 @@ class HomeViewModel(
                 val result = postRepository.getPosts()
                 originalPosts = result // Save original order
                 
-                // Apply sort if needed
-                if (_isSortedByNew.value == true) {
-                    _posts.value = result.sortedByDescending { it.createdAt }
-                } else {
-                    _posts.value = result
-                }
+                applyFilters()
                 
                 _error.value = null
             } catch (e: Exception) {
@@ -105,19 +104,61 @@ class HomeViewModel(
     }
 
     /**
+     * Applie filtering logic.
+     */
+    private fun applyFilters() {
+        val selected = _selectedTopics.value ?: emptySet()
+        var filteredList = if (selected.isEmpty()) {
+            originalPosts
+        } else {
+             originalPosts.filter { post ->
+                 // Post must have at least one topic in the selected set
+                 // Note: post.topicIds is List<String>, selected is Set<String>
+                 post.topicIds.any { it in selected }
+             }
+        }
+
+        if (_isSortedByNew.value == true) {
+             filteredList = filteredList.sortedByDescending { it.createdAt }
+        }
+        
+        _posts.value = filteredList
+    }
+
+    /**
      * Toggles the sort by new state.
      */
     fun toggleSortByNew() {
         val newState = !(_isSortedByNew.value ?: false)
         _isSortedByNew.value = newState
+        applyFilters()
+    }
 
-        if (newState) {
-            // Sort by new
-            _posts.value = _posts.value?.sortedByDescending { it.createdAt }
+    /**
+     * Toggles the selection of a topic for filtering.
+     * Enforces a maximum of 5 selected topics.
+     *
+     * @param topicId The ID of the topic to toggle
+     */
+    fun toggleTopicSelection(topicId: String) {
+        val currentSelection = _selectedTopics.value?.toMutableSet() ?: mutableSetOf()
+        
+        if (currentSelection.contains(topicId)) {
+            currentSelection.remove(topicId)
         } else {
-            // Restore original order
-            _posts.value = originalPosts
+            if (currentSelection.size < 5) {
+                currentSelection.add(topicId)
+            } else {
+                // Determine what to do if limit reached?
+                // For now, simple logic: Do nothing or replace oldest? 
+                // User requirement: "up to 5", usually implies adding more is blocked.
+                // We will just return to block adding the 6th.
+                 return
+            }
         }
+        
+        _selectedTopics.value = currentSelection
+        applyFilters()
     }
 
     /**
@@ -156,11 +197,7 @@ class HomeViewModel(
                     if (p.id == post.id) updatedPost else p
                 }
 
-                // Update posts list with the updated post
-                val currentList = _posts.value ?: emptyList()
-                _posts.value = currentList.map { p ->
-                    if (p.id == post.id) updatedPost else p
-                }
+                applyFilters()
 
             } catch (e: Exception) {
                 _error.value = e.message
