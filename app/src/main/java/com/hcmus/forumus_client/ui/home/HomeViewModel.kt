@@ -44,6 +44,13 @@ class HomeViewModel(
     private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
     val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
 
+    // Sorting state
+    private val _isSortedByNew = MutableLiveData(false)
+    val isSortedByNew: LiveData<Boolean> = _isSortedByNew
+
+    // Keep track of the original list to support un-sorting
+    private var originalPosts: List<Post> = emptyList()
+
     /**
      * Loads the currently authenticated user from the repository.
      */
@@ -79,13 +86,37 @@ class HomeViewModel(
             _isLoading.value = true
             try {
                 val result = postRepository.getPosts()
-                _posts.value = result
+                originalPosts = result // Save original order
+                
+                // Apply sort if needed
+                if (_isSortedByNew.value == true) {
+                    _posts.value = result.sortedByDescending { it.createdAt }
+                } else {
+                    _posts.value = result
+                }
+                
                 _error.value = null
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    /**
+     * Toggles the sort by new state.
+     */
+    fun toggleSortByNew() {
+        val newState = !(_isSortedByNew.value ?: false)
+        _isSortedByNew.value = newState
+
+        if (newState) {
+            // Sort by new
+            _posts.value = _posts.value?.sortedByDescending { it.createdAt }
+        } else {
+            // Restore original order
+            _posts.value = originalPosts
         }
     }
 
@@ -118,6 +149,11 @@ class HomeViewModel(
                     postRepository.toggleUpvote(post)
                 } else {
                     postRepository.toggleDownvote(post)
+                }
+
+                // Update original list so unsorting keeps the update
+                originalPosts = originalPosts.map { p ->
+                    if (p.id == post.id) updatedPost else p
                 }
 
                 // Update posts list with the updated post
@@ -177,6 +213,11 @@ class HomeViewModel(
 
                 // Update post in Firebase via repository
                 postRepository.updatePost(updatedPost)
+
+                // Update original list
+                originalPosts = originalPosts.map { p ->
+                    if (p.id == post.id) updatedPost else p
+                }
 
                 // Update posts list with the updated post
                 val currentList = _posts.value ?: emptyList()

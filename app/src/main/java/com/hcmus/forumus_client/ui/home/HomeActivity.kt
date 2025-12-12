@@ -219,6 +219,12 @@ class HomeActivity : AppCompatActivity() {
         drawerContent?.setOnClickListener {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
+
+        val newItem = binding.navView.findViewById<LinearLayout>(R.id.item_new)
+        newItem?.setOnClickListener {
+            viewModel.toggleSortByNew()
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+        }
     }
 
     /**
@@ -310,6 +316,21 @@ class HomeActivity : AppCompatActivity() {
 
         viewModel.currentUser.observe(this) { user ->
             binding.topAppBar.setProfileImage(user?.profilePictureUrl)
+        }
+
+        viewModel.isSortedByNew.observe(this) { isSorted ->
+            val newItem = binding.navView.findViewById<LinearLayout>(R.id.item_new) ?: return@observe
+            if (isSorted) {
+                newItem.setBackgroundColor(android.graphics.Color.parseColor("#E1E1E1")) // Slightly darker
+            } else {
+                val typedValue = TypedValue()
+                theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+                if (typedValue.resourceId != 0) {
+                    newItem.setBackgroundResource(typedValue.resourceId)
+                } else {
+                    newItem.setBackgroundResource(0)
+                }
+            }
         }
     }
 }
