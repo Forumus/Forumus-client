@@ -39,6 +39,9 @@ class PostDetailAdapter(
         private const val TYPE_COMMENT = 2
     }
 
+    // Map of topic id to topic name
+    private var topicMap: Map<String, String> = emptyMap()
+
     /**
      * Updates the adapter with a new list of items and refreshes the entire view.
      *
@@ -49,6 +52,16 @@ class PostDetailAdapter(
      */
     fun submitList(newItems: List<FeedItem>) {
         items = newItems
+        notifyDataSetChanged()
+    }
+
+    /**
+     * Updates the adapter with the list of topics.
+     *
+     * @param topics The list of topics to map
+     */
+    fun setTopics(topics: List<com.hcmus.forumus_client.data.model.Topic>) {
+        topicMap = topics.associate { it.id to it.name }
         notifyDataSetChanged()
     }
 
@@ -103,7 +116,7 @@ class PostDetailAdapter(
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is FeedItem.PostItem -> (holder as PostViewHolder).bind(item.post)
+            is FeedItem.PostItem -> (holder as PostViewHolder).bind(item.post, topicMap)
             is FeedItem.CommentItem -> (holder as CommentViewHolder).bind(item.comment, true)
         }
     }

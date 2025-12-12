@@ -65,6 +65,7 @@ class PostDetailActivity : AppCompatActivity() {
         viewModel.loadCurrentUser()
         observeViewModel()
 
+        viewModel.loadTopics()
         viewModel.loadPostDetail(postId)
     }
 
@@ -247,6 +248,11 @@ class PostDetailActivity : AppCompatActivity() {
                 else -> "Reply to ${target.authorName}"
             }
             binding.bottomInputBar.setHint(hint)
+        }
+
+        // Update topics
+        viewModel.topics.observe(this) { topics ->
+            detailAdapter.setTopics(topics)
         }
     }
 }
