@@ -107,6 +107,16 @@
             android:layout_marginBottom="10dp"
             android:textSize="13sp" />
 
+        <!-- Topic Tags Container -->
+        <LinearLayout
+            android:id="@+id/topicContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="10dp">
+        </LinearLayout>
+
     </LinearLayout>
 
     <!-- Action Bar Section -->

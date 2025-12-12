@@ -308,6 +308,7 @@ class HomeActivity : AppCompatActivity() {
         
         viewModel.topics.observe(this) { topics ->
             populateTopics(topics)
+            homeAdapter.setTopics(topics)
         }
         
         viewModel.isLoading.observe(this) { isLoading ->

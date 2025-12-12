@@ -51,13 +51,15 @@ class PostViewHolder(
 
     // Root view for click handling
     val rootLayout: LinearLayout = itemView.findViewById(R.id.postItem)
+    val topicContainer: LinearLayout = itemView.findViewById(R.id.topicContainer)
 
     /**
      * Binds post data to UI elements and sets up click listeners.
      *
      * @param post The post data to display
+     * @param topicMap Map of topic IDs to names
      */
-    fun bind(post: Post) {
+    fun bind(post: Post, topicMap: Map<String, String>? = null) {
         // Bind author information
         authorName.text = post.authorName.ifBlank { "Anonymous" }
         timestamp.text = formatTimestamp(post.createdAt)
@@ -80,6 +82,34 @@ class PostViewHolder(
 
         // Apply visual feedback for user's vote state
         applyVoteUI(post)
+
+        // Bind topic tags
+        topicContainer.removeAllViews()
+        if (topicMap != null && post.topicIds.isNotEmpty()) {
+            val density = itemView.resources.displayMetrics.density
+            val marginEnd = (8 * density).toInt()
+            val paddingH = (12 * density).toInt()
+            val paddingV = (6 * density).toInt()
+
+            post.topicIds.take(3).forEach { topicId ->
+                val topicName = topicMap[topicId] ?: topicId // Fallback to ID if name not found
+                
+                val textView = TextView(itemView.context).apply {
+                    text = topicName
+                    textSize = 12f
+                        setTextColor(android.graphics.Color.parseColor("#4285F4")) // Google Blue 500
+                        setBackgroundResource(R.drawable.bg_topic_tag)
+                        setPadding(paddingH, paddingV, paddingH, paddingV)
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 0, marginEnd, 0)
+                        }
+                    }
+                    topicContainer.addView(textView)
+            }
+        }
 
         // Set up click listeners for all interactive elements
         rootLayout.setOnClickListener { onActionClick(post, PostAction.OPEN, it) }
