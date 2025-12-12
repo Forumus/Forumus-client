@@ -30,6 +30,10 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="false" />
+
         <!-- Login Activity -->
         <activity
             android:name=".ui.auth.login.LoginActivity"
@@ -50,31 +54,6 @@
             android:name=".ui.auth.register.RegisterActivity"
             android:exported="false" />
 
-        <!-- Home Activity -->
-        <activity
-            android:name=".ui.home.HomeActivity"
-            android:exported="false" />
-
-        <!-- Chats Activity -->
-        <activity
-            android:name=".ui.chats.ChatsActivity"
-            android:exported="false" />
-
-        <!-- Profile Activity -->
-        <activity
-            android:name=".ui.profile.ProfileActivity"
-            android:exported="false" />
-
-        <!-- Post Detail Activity -->
-        <activity
-            android:name=".ui.post.detail.PostDetailActivity"
-            android:exported="false" />
-
-        <!-- Settings Activity -->
-        <activity
-            android:name=".ui.settings.SettingsActivity"
-            android:exported="false" />
-
         <!-- Create Post Activity -->
         <activity
             android:name=".ui.post.create.CreatePostActivity"
@@ -88,12 +67,6 @@
         <!-- Reset Password Activity -->
         <activity
             android:name=".ui.auth.resetPassword.ResetPasswordActivity"
-            android:exported="false" />
-
-        <!-- Conversation Activity -->
-        <activity
-            android:name=".ui.conversation.ConversationActivity"
-            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
 
         <!-- Fullscreen Image Activity -->
