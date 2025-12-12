@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.PostAction
+import com.hcmus.forumus_client.data.model.Topic
 import com.hcmus.forumus_client.ui.common.PostViewHolder
 import android.view.View
 
@@ -22,8 +23,8 @@ class HomeAdapter(
 ) : RecyclerView.Adapter<PostViewHolder>() {
 
 
-    // Map of topic id to topic name
-    private var topicMap: Map<String, String> = emptyMap()
+    // Map of topic id to Topic object
+    private var topicMap: Map<String, Topic> = emptyMap()
 
     /**
      * Creates a new PostViewHolder instance for each post item.
@@ -71,8 +72,8 @@ class HomeAdapter(
      *
      * @param topics The list of topics to map
      */
-    fun setTopics(topics: List<com.hcmus.forumus_client.data.model.Topic>) {
-        topicMap = topics.associate { it.id to it.name }
+    fun setTopics(topics: List<Topic>) {
+        topicMap = topics.associateBy { it.id }
         notifyDataSetChanged()
     }
 }

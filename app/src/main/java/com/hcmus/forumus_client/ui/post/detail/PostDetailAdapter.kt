@@ -9,6 +9,7 @@ import com.hcmus.forumus_client.data.model.FeedItem
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.R
+import com.hcmus.forumus_client.data.model.Topic
 import com.hcmus.forumus_client.ui.common.PostViewHolder
 import com.hcmus.forumus_client.ui.common.CommentViewHolder
 import android.view.View
@@ -39,8 +40,8 @@ class PostDetailAdapter(
         private const val TYPE_COMMENT = 2
     }
 
-    // Map of topic id to topic name
-    private var topicMap: Map<String, String> = emptyMap()
+    // Map of topic id to Topic object
+    private var topicMap: Map<String, Topic> = emptyMap()
 
     /**
      * Updates the adapter with a new list of items and refreshes the entire view.
@@ -60,8 +61,8 @@ class PostDetailAdapter(
      *
      * @param topics The list of topics to map
      */
-    fun setTopics(topics: List<com.hcmus.forumus_client.data.model.Topic>) {
-        topicMap = topics.associate { it.id to it.name }
+    fun setTopics(topics: List<Topic>) {
+        this.topicMap = topics.associateBy { it.id }
         notifyDataSetChanged()
     }
 
