@@ -5,20 +5,13 @@
     android:viewportHeight="32">
   <path
       android:pathData="M0,15.999C0,7.163 7.163,0 15.999,0C24.835,0 31.999,7.163 31.999,15.999C31.999,24.835 24.835,31.999 15.999,31.999C7.163,31.999 0,24.835 0,15.999Z"
-      android:fillColor="#3F78E0"
+      android:fillColor="#06B6D4"
       android:fillAlpha="0.125"/>
   <path
-      android:pathData="M18.826,20.249L23.076,15.999L18.826,11.749"
+      android:pathData="M15.993,23.083C17.308,23.083 18.569,22.56 19.499,21.63C20.429,20.701 20.952,19.439 20.952,18.124C20.952,16.708 20.243,15.362 18.827,14.228C17.41,13.095 16.347,11.395 15.993,9.624C15.639,11.395 14.577,13.095 13.16,14.228C11.743,15.362 11.035,16.708 11.035,18.124C11.035,19.439 11.557,20.701 12.487,21.63C13.417,22.56 14.678,23.083 15.993,23.083Z"
       android:strokeLineJoin="round"
       android:strokeWidth="1.41666"
       android:fillColor="#00000000"
-      android:strokeColor="#3F78E0"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M13.16,11.749L8.91,15.999L13.16,20.249"
-      android:strokeLineJoin="round"
-      android:strokeWidth="1.41666"
-      android:fillColor="#00000000"
-      android:strokeColor="#3F78E0"
+      android:strokeColor="#06B6D4"
       android:strokeLineCap="round"/>
 </vector>

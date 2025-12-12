@@ -272,16 +272,43 @@ class HomeActivity : AppCompatActivity() {
                     (24 * density).toInt()
                 )
                 
-                // Assuming we use a default placeholder or logic to map topic names to icons
-                // For now using a placeholder logic or if icon string is a URL use coil
-                if (topic.icon.isNotEmpty()) {
-                    // Try to load as URL
-                   this.load(topic.icon) {
-                       placeholder(R.drawable.ic_study_groups)
-                       error(R.drawable.ic_study_groups)
-                   }
+                // improved icon lookup logic
+                val iconName = topic.icon.ifEmpty { topic.name }
+                val normalizedName = iconName.lowercase().replace(" ", "_").replace("&", "").replace("__", "_")
+                
+                // Try multiple patterns
+                // 1. Exact match (e.g. "ic_biology")
+                var resId = resources.getIdentifier(iconName, "drawable", packageName)
+                
+                // 2. Try adding ic_ prefix if not present (e.g. "biology" -> "ic_biology")
+                if (resId == 0) {
+                     if (!iconName.startsWith("ic_")) {
+                         resId = resources.getIdentifier("ic_$iconName", "drawable", packageName)
+                     }
+                }
+
+                // 3. Try normalized name with ic_ prefix (e.g. "Computer Science" -> "ic_computer_science")
+                if (resId == 0) {
+                    resId = resources.getIdentifier("ic_$normalizedName", "drawable", packageName)
+                }
+
+                // 4. Try just normalized name (e.g. "computer_science")
+                if (resId == 0) {
+                    resId = resources.getIdentifier(normalizedName, "drawable", packageName)
+                }
+
+                if (resId != 0) {
+                    setImageResource(resId)
                 } else {
-                    setImageResource(R.drawable.ic_study_groups)
+                    // Fallback to URL or default
+                    if (topic.icon.isNotEmpty() && (topic.icon.startsWith("http") || topic.icon.startsWith("content"))) {
+                        this.load(topic.icon) {
+                            placeholder(R.drawable.ic_study_groups)
+                            error(R.drawable.ic_study_groups)
+                        }
+                    } else {
+                         setImageResource(R.drawable.ic_study_groups)
+                    }
                 }
                 contentDescription = topic.name
             }
