@@ -35,11 +35,21 @@ class BottomNavigationBar @JvmOverloads constructor(
         orientation = HORIZONTAL
 
         // Attach click listeners to all navigation items
-        binding.navHome.setOnClickListener { onHomeClick?.invoke() }
-        binding.navExplore.setOnClickListener { onExploreClick?.invoke() }
-        binding.btnCreatePost.setOnClickListener { onCreatePostClick?.invoke() }
-        binding.navAlerts.setOnClickListener { onAlertsClick?.invoke() }
-        binding.navChat.setOnClickListener { onChatClick?.invoke() }
+        binding.navHome.setOnClickListener {
+            setActiveTab(Tab.HOME)
+            onHomeClick?.invoke() }
+        binding.navExplore.setOnClickListener {
+            setActiveTab(Tab.EXPLORE)
+            onExploreClick?.invoke() }
+        binding.btnCreatePost.setOnClickListener {
+            setActiveTab(Tab.NONE)
+            onCreatePostClick?.invoke() }
+        binding.navAlerts.setOnClickListener {
+            setActiveTab(Tab.ALERTS)
+            onAlertsClick?.invoke() }
+        binding.navChat.setOnClickListener {
+            setActiveTab(Tab.CHAT)
+            onChatClick?.invoke() }
     }
 
     /**

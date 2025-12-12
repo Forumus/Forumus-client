@@ -15,6 +15,7 @@ import com.hcmus.forumus_client.data.model.createdAtMillis
 import com.hcmus.forumus_client.data.repository.CommentRepository
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
+import android.util.Log
 import kotlinx.coroutines.launch
 
 /**
@@ -86,10 +87,6 @@ class ProfileViewModel(
     private val _upvotesCount = MutableLiveData<Int>(0)
     val upvotesCount: LiveData<Int> = _upvotesCount
 
-    // Current logged-in user (for top app bar and permission checks)
-    private val _currentUser = MutableLiveData<User?>()
-    val currentUser: LiveData<User?> = _currentUser
-
     init {
         // Set up MediatorLiveData sources to automatically recompute visible items
         // when any of these LiveData values change
@@ -108,9 +105,9 @@ class ProfileViewModel(
      * @param userId The ID of the user whose profile to display
      * @param initialMode The initial display mode (GENERAL, POSTS, or REPLIES)
      */
-    fun init(userId: String, initialMode: ProfileMode) {
+    fun init(userId: String) {
         this.userId = userId
-        _mode.value = initialMode
+        _mode.value = ProfileMode.GENERAL
 
         loadUserInfo()
         loadUserContent()
@@ -138,23 +135,14 @@ class ProfileViewModel(
     private fun loadUserInfo() {
         viewModelScope.launch {
             try {
+                Log.d("ProfileViewModel-x", "loadUserInfo for $userId")
                 val userData = userRepository.getUserById(userId)
+                Log.d("ProfileViewModel-x", "Successfully loaded user info: $userData")
                 _user.value = userData
             } catch (e: Exception) {
+                Log.d("ProfileViewModel-x", "Error loading user info", e)
                 _error.value = e.message
             }
-        }
-    }
-
-    /**
-     * Loads the current logged-in user's information for UI display.
-     *
-     * Used to populate the top app bar with the current user's avatar.
-     */
-    fun loadCurrentUser() {
-        viewModelScope.launch {
-            val user = userRepository.getCurrentUser()
-            _currentUser.value = user
         }
     }
 
@@ -197,6 +185,7 @@ class ProfileViewModel(
                 _error.value = null
             } catch (e: Exception) {
                 _error.value = e.message
+                Log.d("ProfileViewModel-x", "Error loadUserContent", e)
             } finally {
                 _isLoading.value = false
             }

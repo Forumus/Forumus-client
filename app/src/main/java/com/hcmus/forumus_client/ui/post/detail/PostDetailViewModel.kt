@@ -40,10 +40,6 @@ class PostDetailViewModel(
     private val postRepository: PostRepository = PostRepository(),
     private val commentRepository: CommentRepository = CommentRepository()
 ) : ViewModel() {
-
-    private val _currentUser = MutableLiveData<User?>()
-    val currentUser: LiveData<User?> = _currentUser
-
     // List of FeedItems (posts and comments) to display in RecyclerView
     private val _items = MutableLiveData<List<FeedItem>>(emptyList())
     val items: LiveData<List<FeedItem>> = _items
@@ -72,17 +68,6 @@ class PostDetailViewModel(
     // Error message for UI display
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
-
-    fun loadCurrentUser() {
-        viewModelScope.launch {
-            try {
-                val user = userRepository.getCurrentUser()
-                _currentUser.value = user
-            } catch (e: Exception) {
-                _currentUser.value = null
-            }
-        }
-    }
 
     /**
      * Loads the post detail and all associated comments from repositories.
@@ -118,7 +103,6 @@ class PostDetailViewModel(
             }
         }
     }
-
 
     /**
      * Rebuilds the items list by organizing comments hierarchically and respecting expansion state.
@@ -309,7 +293,6 @@ class PostDetailViewModel(
         val text = rawText.trim()
         if (text.isBlank()) return
 
-        val user = _currentUser.value ?: return
         val post = currentPost ?: return
 
         // If null, replying to post; if not null, replying to that comment
@@ -317,11 +300,10 @@ class PostDetailViewModel(
 
         viewModelScope.launch {
             try {
+                val user = userRepository.getCurrentUser() ?: return@launch
+
                 val comment = Comment(
                     postId = post.id,
-                    authorId = user.uid,
-                    authorName = user.fullName,
-                    authorAvatarUrl = user.profilePictureUrl ?: "",
                     content = text,
                     isOriginalPoster = user.uid == post.authorId,
                     parentCommentId = targetComment?.id,          // null = reply to post, otherwise = reply to comment
@@ -329,7 +311,7 @@ class PostDetailViewModel(
                     replyToUserName = targetComment?.authorName
                 )
 
-                val newComment = commentRepository.addComment(comment)
+                val newComment = commentRepository.saveComment(comment)
 
                 // Increment post's comment count
                 post.commentCount++

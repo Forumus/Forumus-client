@@ -4,12 +4,12 @@ import android.widget.Toast
 import androidx.lifecycle.*
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
+import com.hcmus.forumus_client.data.repository.ReportRepository
 import com.hcmus.forumus_client.data.model.Post
-import com.hcmus.forumus_client.data.model.User
+import com.hcmus.forumus_client.data.model.PostStatus
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.data.model.Report
 import com.hcmus.forumus_client.data.model.Violation
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
@@ -20,12 +20,9 @@ import okhttp3.internal.platform.PlatformRegistry.applicationContext
  */
 class HomeViewModel(
     private val userRepository: UserRepository = UserRepository(),
-    private val postRepository: PostRepository = PostRepository()
+    private val postRepository: PostRepository = PostRepository(),
+    private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
-
-    // Current user profile
-    private val _currentUser = MutableLiveData<User?>()
-    val currentUser: LiveData<User?> = _currentUser
 
     // List of posts for the home feed
     private val _posts = MutableLiveData<List<Post>>(emptyList())
@@ -40,16 +37,6 @@ class HomeViewModel(
     val error: LiveData<String?> = _error
 
     /**
-     * Loads the currently authenticated user from the repository.
-     */
-    fun loadCurrentUser() {
-        viewModelScope.launch {
-            val user = userRepository.getCurrentUser()
-            _currentUser.value = user
-        }
-    }
-
-    /**
      * Fetches posts from the repository and updates the posts LiveData.
      * Manages loading state and error handling.
      */
@@ -57,7 +44,7 @@ class HomeViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val result = postRepository.getPosts()
+                val result = postRepository.getPosts(100)
                 _posts.value = result
                 _error.value = null
             } catch (e: Exception) {
@@ -67,6 +54,24 @@ class HomeViewModel(
             }
         }
     }
+
+    fun addFieldForPosts() {
+        viewModelScope.launch {
+            try {
+                // Lấy trực tiếp danh sách post từ Firestore
+                val posts = postRepository.getPosts(1000) // tăng limit nếu cần
+
+                posts.forEach { post ->
+                    val updated = post.copy(status = PostStatus.APPROVED)
+                    postRepository.updatePost(updated)
+                }
+
+            } catch (e: Exception) {
+                _error.value = "Failed to migrate post status: ${e.message}"
+            }
+        }
+    }
+
 
     /**
      * Handles post actions such as voting.
@@ -133,7 +138,6 @@ class HomeViewModel(
 
                 // Create report object
                 val report = Report(
-                    id = FirebaseFirestore.getInstance().collection("reports").document().id,
                     postId = post.id,
                     authorId = userId,
                     nameViolation = violation.name,
@@ -141,10 +145,7 @@ class HomeViewModel(
                 )
 
                 // Save report to Firebase
-                FirebaseFirestore.getInstance()
-                    .collection("reports")
-                    .document(report.id)
-                    .set(report)
+                reportRepository.saveReport(report)
 
                 Toast.makeText(applicationContext, "Post reported", Toast.LENGTH_SHORT).show()
 
@@ -169,16 +170,5 @@ class HomeViewModel(
                 _error.value = "Failed to report post: ${e.message}"
             }
         }
-    }
-
-    /**
-     * Saves a post to user's bookmarks.
-     * (To be implemented with actual bookmark functionality)
-     *
-     * @param post The post to bookmark
-     */
-    fun savePostToBookmarks(post: Post) {
-        // TODO: Implement bookmark functionality
-        // This would typically save the post ID to user's bookmarks in Firebase
     }
 }
