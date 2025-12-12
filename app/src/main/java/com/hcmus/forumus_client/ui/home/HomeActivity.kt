@@ -69,6 +69,7 @@ class HomeActivity : AppCompatActivity() {
     private fun setupWindowInsetsHandling() {
         // Enable edge-to-edge
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        androidx.core.view.WindowInsetsControllerCompat(window, binding.root).isAppearanceLightStatusBars = true
         
         // Apply padding to CoordinatorLayout (content) to avoid system bars
         // We do NOT apply to binding.root (DrawerLayout) so that the drawer can slide under the status bar

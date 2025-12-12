@@ -6,6 +6,7 @@
         <item name="backgroundColor">#FFFFFF</item>
         <item name="android:windowBackground">#FFFFFF</item>
          <item name="colorPrimary">@color/white</item>
+         <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.Forumus" parent="Base.Theme.Forumus" />
