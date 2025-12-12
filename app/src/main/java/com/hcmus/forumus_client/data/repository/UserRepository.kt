@@ -32,29 +32,8 @@ class UserRepository(
             val document = usersCollection.document(userId).get().await()
             document.toObject(User::class.java) ?: User()
         } catch (e: Exception) {
-            Log.e("UserRepository", "Error fetching user by ID: $userId", e)
+            Log.e("UserRepositoryx", "Error fetching user by ID: $userId", e)
             User()
-        }
-    }
-
-    /**
-     * Retrieves a user by their email address.
-     *
-     * @param email The email address of the user
-     * @return The user object, or null if not found
-     */
-    suspend fun getUserByEmail(email: String): User? {
-        return try {
-            val result = usersCollection
-                .whereEqualTo("email", email)
-                .limit(1)
-                .get()
-                .await()
-
-            if (result.isEmpty) null else result.documents[0].toObject(User::class.java)
-        } catch (e: Exception) {
-            Log.e("UserRepository", "Error fetching user by email: $email", e)
-            null
         }
     }
 

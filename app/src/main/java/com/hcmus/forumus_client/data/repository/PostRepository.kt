@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.content.Context
 import androidx.core.net.toUri
+import com.google.firebase.Timestamp
 
 /**
  * Repository for managing post data operations with Firestore.
@@ -26,7 +27,8 @@ import androidx.core.net.toUri
  */
 class PostRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val userRepository: UserRepository = UserRepository()
 ) {
 
     /**
@@ -115,6 +117,9 @@ class PostRepository(
             }
         }
 
+        val userId = auth.currentUser!!.uid
+        val user = userRepository.getUserById(userId)
+
         val generatedId = generatePostId()
 
         val postRef = FirebaseFirestore
@@ -122,8 +127,14 @@ class PostRepository(
             .collection("posts")
             .document(generatedId)
 
+        val now = Timestamp.now()
+
         val updatedPost = post.copy(
             id = generatedId,
+            authorId = user.uid,
+            authorName = user.fullName,
+            authorAvatarUrl = user.profilePictureUrl,
+            createdAt = now,
             imageUrls = imageUrls,
             videoUrls = videoUrls,
             videoThumbnailUrls = videoThumbnailUrls

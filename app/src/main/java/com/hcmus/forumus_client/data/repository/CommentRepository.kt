@@ -7,6 +7,9 @@ import com.google.firebase.firestore.Query
 import com.hcmus.forumus_client.data.model.Comment
 import com.hcmus.forumus_client.data.model.VoteState
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 /**
  * Repository for managing comment data operations with Firestore.
@@ -14,7 +17,8 @@ import kotlinx.coroutines.tasks.await
  */
 class CommentRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val userRepository: UserRepository = UserRepository()
 ) {
 
     /**
@@ -148,6 +152,21 @@ class CommentRepository(
         return comments
     }
 
+    fun generateCommentId(): String {
+        // Lấy thời gian hiện tại
+        val currentDate = Calendar.getInstance()
+
+        // Định dạng thời gian theo yêu cầu (yyyyMMdd_HHmmss)
+        val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+        val formattedDate = dateFormat.format(currentDate.time)
+
+        // Tạo số ngẫu nhiên từ 1000 đến 9999
+        val randomPart = (1000..9999).random()
+
+        // Kết hợp lại thành ID với định dạng "POST_yyyyMMdd_HHmmss_random"
+        return "COMMENT" + "_" + "$formattedDate" + "_" + "$randomPart"
+    }
+
     /**
      * Creates and saves a new comment to Firestore.
      * Generates a unique ID if not provided and sets creation timestamp.
@@ -156,35 +175,30 @@ class CommentRepository(
      * @return The created comment with generated ID and timestamp
      * @throws IllegalArgumentException if postId is blank
      */
-    suspend fun addComment(comment: Comment): Comment {
-        if (comment.postId.isBlank()) {
-            throw IllegalArgumentException("addComment: postId is blank")
-        }
+    suspend fun saveComment(comment: Comment): Comment {
+        val userId = auth.currentUser!!.uid
+        val user = userRepository.getUserById(userId)
 
-        // Generate unique ID if not provided
-        val finalId = comment.id.ifBlank {
-            firestore.collection("posts")
-                .document(comment.postId)
-                .collection("comments")
-                .document()
-                .id
-        }
+        val generatedId = generateCommentId()
+
+        val commentRef = firestore.collection("posts")
+            .document(comment.postId)
+            .collection("comments")
+            .document(generatedId)
 
         val now = Timestamp.now()
 
-        val preparedComment = comment.copy(
-            id = finalId,
-            createdAt = comment.createdAt ?: now,
+        val updatedComment = comment.copy(
+            id = generatedId,
+            authorId = user.uid,
+            authorName = user.fullName,
+            authorAvatarUrl = user.profilePictureUrl ?: "",
+            createdAt = now,
         )
 
-        firestore.collection("posts")
-            .document(preparedComment.postId)
-            .collection("comments")
-            .document(preparedComment.id)
-            .set(preparedComment)
-            .await()
+        commentRef.set(updatedComment).await()
 
-        return preparedComment
+        return updatedComment
     }
 
     /**

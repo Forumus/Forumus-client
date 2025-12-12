@@ -25,6 +25,8 @@ data class Post(
 	var votedUsers: MutableMap<String, VoteState> = mutableMapOf(),
 	var reportedUsers: MutableList<String> = mutableListOf(),
 
+	var status: PostStatus = PostStatus.PENDING,
+
 	@get:Exclude
 	@set:Exclude
 	var userVote: VoteState = VoteState.NONE
