@@ -19,12 +19,22 @@ data class Post(
 	var reportCount: Int = 0,
 
 	var imageUrls: MutableList<String> = mutableListOf(),
+	var videoThumbnailUrls: MutableList<String> = mutableListOf(),
 	var videoUrls: MutableList<String> = mutableListOf(),
 
 	var votedUsers: MutableMap<String, VoteState> = mutableMapOf(),
 	var reportedUsers: MutableList<String> = mutableListOf(),
 
+	var status: PostStatus = PostStatus.PENDING,
+
 	@get:Exclude
 	@set:Exclude
 	var userVote: VoteState = VoteState.NONE
-)
+);
+
+enum class PostStatus {
+	APPROVED,
+	REJECTED,
+	PENDING,
+	DELETED
+}

@@ -1,6 +1,7 @@
 package com.hcmus.forumus_client.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,12 @@ import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import androidx.core.view.WindowInsetsCompat
 import android.view.View
+import com.google.firebase.messaging.FirebaseMessaging
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 
 /**
  * Home activity displaying a feed of posts with voting and interaction features.
@@ -31,6 +38,31 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Request permission on Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // Permission already granted
+                    Log.d("HomeActivity", "Notification permission already granted")
+                    initializeFCM()
+                }
+                else -> {
+                    // Request permission
+                    Log.d("HomeActivity", "Requesting notification permission")
+                    requestNotificationPermission.launch(
+                        Manifest.permission.POST_NOTIFICATIONS
+                    )
+                }
+            }
+        } else {
+            // Android 12 and below - notifications allowed by default
+            Log.d("HomeActivity", "Android 12 or below - initializing FCM")
+            initializeFCM()
+        }
+
         setupWindowInsetsHandling()
         setupTopAppBar()
         setupRecyclerView()
@@ -39,6 +71,9 @@ class HomeActivity : AppCompatActivity() {
 
         viewModel.loadCurrentUser()
         viewModel.loadPosts()
+        
+        // Initialize FCM and get token
+        initializeFCM()
     }
 
     override fun onResume() {
@@ -59,6 +94,69 @@ class HomeActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private val requestNotificationPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Log.d("HomeActivity", "Notification permission granted")
+            initializeFCM()
+        } else {
+            Log.d("HomeActivity", "Notification permission denied")
+            Toast.makeText(
+                this,
+                "You won't receive chat notifications",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+    
+    /**
+     * Initialize FCM and retrieve the token
+     */
+    private fun initializeFCM() {
+        Log.d("HomeActivity", "Initializing FCM...")
+        
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.e("HomeActivity", "Failed to get FCM token", task.exception)
+                return@addOnCompleteListener
+            }
+
+            // Get the token
+            val token = task.result
+            Log.d("HomeActivity", "FCM Token retrieved: $token")
+            
+            // The token will be automatically saved to Firestore by ForumusFirebaseMessagingService.onNewToken()
+            // But we can also manually trigger a save here to ensure it's stored
+            saveFcmTokenToFirestore(token)
+        }
+    }
+    
+    /**
+     * Manually save FCM token to Firestore
+     */
+    private fun saveFcmTokenToFirestore(token: String) {
+        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+        
+        if (userId == null) {
+            Log.w("HomeActivity", "User not logged in, cannot save FCM token")
+            return
+        }
+        
+        Log.d("HomeActivity", "Saving FCM token for user: $userId")
+        
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .update("fcmToken", token)
+            .addOnSuccessListener {
+                Log.d("HomeActivity", "FCM token saved to Firestore successfully")
+            }
+            .addOnFailureListener { e ->
+                Log.e("HomeActivity", "Failed to save FCM token to Firestore", e)
+            }
     }
 
     /**

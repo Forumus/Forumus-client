@@ -10,7 +10,8 @@ data class User (
     val emailVerified: Boolean = false,
     val followedPostIds: List<String> = emptyList(),
     val reportCount: Int = 0,
-    val status: UserStatus = UserStatus.NORMAL
+    val status: UserStatus = UserStatus.NORMAL,
+    val fcmToken: String? = null
 )
 
 enum class UserRole {
