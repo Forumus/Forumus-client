@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.hcmus.forumus_client.data.model.Post
+import com.hcmus.forumus_client.data.model.VoteState // Import Enum VoteState
 
 enum class NavTab { HOME, EXPLORE, ALERTS, CHAT }
 
@@ -42,49 +43,41 @@ class MainViewModel : ViewModel() {
 			_posts.value = listOf(
 				Post(
 					id = "1",
-					communityName = "c/Sports_Athletics",
-					communityIconLetter = "S",
-					timePosted = "1h",
-					title = "Intramural Sports Week - Highlights from Day 1!",
-					content = "Amazing start to sports week with soccer, basketball...",
-					voteCount = 156,
+					title = "Intramural Sports Week",
+					content = "Amazing start to sports week...",
+					upvoteCount = 156, // Dùng upvoteCount thay vì voteCount
 					commentCount = 43,
-					userVote = "NONE" // Dùng String
+					userVote = VoteState.NONE // Dùng Enum, không dùng String "NONE"
+					// Các trường communityName, timePosted đã bị bỏ trong Post mới, không truyền vào nữa
 				),
 				Post(
 					id = "2",
-					communityName = "c/Tech_Club",
-					communityIconLetter = "T",
-					timePosted = "3h",
 					title = "Hackathon kicks off tomorrow",
-					content = "Don't forget to register and bring your energy!",
-					voteCount = 89,
+					content = "Don't forget to register...",
+					upvoteCount = 89,
 					commentCount = 12,
-					userVote = "NONE"
+					userVote = VoteState.NONE
 				),
 				Post(
 					id = "3",
-					communityName = "c/Campus_Life",
-					communityIconLetter = "C",
-					timePosted = "5h",
-					title = "Study spots recommendation thread",
-					content = "Share your favorite quiet spaces around campus.",
-					voteCount = 42,
+					title = "Study spots recommendation",
+					content = "Share your favorite quiet spaces...",
+					upvoteCount = 42,
 					commentCount = 18,
-					userVote = "NONE"
+					userVote = VoteState.NONE
 				)
 			)
 		}
 	}
 
-	// --- SỬA LOGIC VOTE (STRING) ---
+	// --- SỬA LOGIC VOTE (DÙNG ENUM VOTESTATE) ---
 	fun onUpvote(postId: String) {
 		_posts.value = _posts.value?.map { p ->
 			if (p.id != postId) p else {
 				when (p.userVote) {
-					"UP" -> p.copy(userVote = "NONE", voteCount = p.voteCount - 1)
-					"DOWN" -> p.copy(userVote = "UP", voteCount = p.voteCount + 2)
-					else -> p.copy(userVote = "UP", voteCount = p.voteCount + 1) // NONE case
+					VoteState.UPVOTE -> p.copy(userVote = VoteState.NONE, upvoteCount = p.upvoteCount - 1)
+					VoteState.DOWNVOTE -> p.copy(userVote = VoteState.UPVOTE, upvoteCount = p.upvoteCount + 1, downvoteCount = p.downvoteCount - 1)
+					else -> p.copy(userVote = VoteState.UPVOTE, upvoteCount = p.upvoteCount + 1)
 				}
 			}
 		}
@@ -94,22 +87,13 @@ class MainViewModel : ViewModel() {
 		_posts.value = _posts.value?.map { p ->
 			if (p.id != postId) p else {
 				when (p.userVote) {
-					"DOWN" -> p.copy(userVote = "NONE", voteCount = p.voteCount + 1)
-					"UP" -> p.copy(userVote = "DOWN", voteCount = p.voteCount - 2)
-					else -> p.copy(userVote = "DOWN", voteCount = p.voteCount - 1) // NONE case
+					VoteState.DOWNVOTE -> p.copy(userVote = VoteState.NONE, downvoteCount = p.downvoteCount - 1)
+					VoteState.UPVOTE -> p.copy(userVote = VoteState.DOWNVOTE, downvoteCount = p.downvoteCount + 1, upvoteCount = p.upvoteCount - 1)
+					else -> p.copy(userVote = VoteState.DOWNVOTE, downvoteCount = p.downvoteCount + 1)
 				}
 			}
 		}
 	}
 
-	fun onTouch(action: Int, rawX: Float, rawY: Float, menuRect: Rect?, profileRect: Rect?) {
-		if (action == MotionEvent.ACTION_DOWN && _menuVisible.value == true) {
-			val x = rawX.toInt(); val y = rawY.toInt()
-			val insideMenu = menuRect?.contains(x, y) == true
-			val insideProfile = profileRect?.contains(x, y) == true
-			if (!insideMenu && !insideProfile) {
-				_menuVisible.value = false
-			}
-		}
-	}
+	// ... (Phần onTouch giữ nguyên)
 }

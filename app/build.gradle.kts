@@ -95,4 +95,5 @@ dependencies {
     implementation("com.google.guava:guava:31.1-android")
     implementation("androidx.activity:activity-ktx:1.8.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

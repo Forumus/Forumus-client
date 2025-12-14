@@ -11,6 +11,7 @@ import com.hcmus.forumus_client.ui.profile.ProfileActivity.Companion.EXTRA_USER_
 import com.hcmus.forumus_client.ui.profile.ProfileMode
 import com.hcmus.forumus_client.ui.post.detail.PostDetailActivity
 import com.hcmus.forumus_client.ui.post.detail.PostDetailActivity.Companion.EXTRA_POST_ID
+import com.hcmus.forumus_client.ui.post.create.CreatePostActivity
 import com.hcmus.forumus_client.ui.settings.SettingsActivity
 
 class AppNavigator(private val activity: Activity) {
@@ -94,7 +95,9 @@ class AppNavigator(private val activity: Activity) {
     }
 
     fun openCreatePost(clearStack: Boolean = false) {
-        // TODO: Implement create post navigation
+        val intent = Intent(activity, CreatePostActivity::class.java)
+        applyFlags(intent, clearStack)
+        activity.startActivity(intent)
     }
 
     fun openAlerts(clearStack: Boolean = false) {

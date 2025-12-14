@@ -1,228 +1,144 @@
 package com.hcmus.forumus_client.data.repository
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.VoteState
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
-/**
- * Repository for managing post data operations with Firestore.
- * Handles CRUD operations, voting, and post enrichment with user-specific data.
- */
 class PostRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 ) {
 
-    /**
-     * Enriches a post with user-specific data including vote state, vote counts, and comment count.
-     *
-     * @param userId The current user's ID (nullable)
-     * @return Enriched post with calculated values
-     */
-    private suspend fun Post.enrichForUser(userId: String?): Post {
-        // Calculate user's vote state from votedUsers map
-        this.userVote = userId?.let { votedUsers[it] } ?: VoteState.NONE
+    // --- HÀM SAVE POST (Tương thích Post.kt gốc) ---
+    suspend fun savePost(post: Post): Result<Boolean> {
+        return try {
+            // 1. Xử lý Upload ẢNH
+            val uploadedImageUrls = mutableListOf<String>()
+            for (uriString in post.imageUrls) {
+                if (uriString.startsWith("http")) {
+                    uploadedImageUrls.add(uriString)
+                } else {
+                    val uri = Uri.parse(uriString)
+                    val fileName = "${UUID.randomUUID()}"
+                    // Lưu vào folder post_images
+                    val ref = storage.reference.child("post_images/$fileName")
+                    ref.putFile(uri).await()
+                    val downloadUrl = ref.downloadUrl.await().toString()
+                    uploadedImageUrls.add(downloadUrl)
+                }
+            }
+            post.imageUrls = uploadedImageUrls
 
-        // Recalculate upvote and downvote counts from votedUsers map
+            // 2. Xử lý Upload VIDEO
+            val uploadedVideoUrls = mutableListOf<String>()
+            for (uriString in post.videoUrls) {
+                if (uriString.startsWith("http")) {
+                    uploadedVideoUrls.add(uriString)
+                } else {
+                    val uri = Uri.parse(uriString)
+                    val fileName = "${UUID.randomUUID()}"
+                    // Lưu vào folder post_videos
+                    val ref = storage.reference.child("post_videos/$fileName")
+                    ref.putFile(uri).await()
+                    val downloadUrl = ref.downloadUrl.await().toString()
+                    uploadedVideoUrls.add(downloadUrl)
+                }
+            }
+            post.videoUrls = uploadedVideoUrls
+
+            // 3. Lưu xuống Firestore (Firebase tự map topicIds thành "topics" nhờ @PropertyName)
+            firestore.collection("posts").document(post.id).set(post).await()
+
+            Result.success(true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
+    // --- CÁC HÀM GET/UPDATE GIỮ NGUYÊN ---
+    private suspend fun Post.enrichForUser(userId: String?): Post {
+        this.userVote = userId?.let { votedUsers[it] } ?: VoteState.NONE
         val votes = votedUsers.values
         this.upvoteCount = votes.count { it == VoteState.UPVOTE }
         this.downvoteCount = votes.count { it == VoteState.DOWNVOTE }
 
-        // Fetch and count comments for this post
-        val commentsSnapshot = firestore.collection("posts")
-            .document(this.id)
-            .collection("comments")
-            .get()
-            .await()
-
-        this.commentCount = commentsSnapshot.size()
-
+        try {
+            val commentsSnapshot = firestore.collection("posts")
+                .document(this.id)
+                .collection("comments").get().await()
+            this.commentCount = commentsSnapshot.size()
+        } catch (e: Exception) {
+            this.commentCount = 0
+        }
         return this
     }
 
-    /**
-     * Updates an existing post in Firestore.
-     *
-     * @param post The post object to update
-     * @return The updated post
-     * @throws IllegalArgumentException if post ID is blank
-     */
     suspend fun updatePost(post: Post): Post {
-        if (post.id.isBlank()) {
-            throw IllegalArgumentException("Post id is blank, cannot update")
-        }
-
-        val postRef = firestore.collection("posts").document(post.id)
-        postRef.set(post).await()
-
+        if (post.id.isBlank()) throw IllegalArgumentException("Post id is blank")
+        firestore.collection("posts").document(post.id).set(post).await()
         return post
     }
 
-    /**
-     * Retrieves a limited number of recent posts, ordered by creation date descending.
-     *
-     * @param limit Maximum number of posts to retrieve
-     * @return List of enriched posts with user-specific data
-     */
     suspend fun getPosts(limit: Long = 50): List<Post> {
         val userId = auth.currentUser?.uid
         return firestore.collection("posts")
             .orderBy("createdAt", Query.Direction.DESCENDING)
-            .limit(limit)
-            .get()
-            .await()
-            .toObjects(Post::class.java)
-            .map { it.enrichForUser(userId) }
+            .limit(limit).get().await()
+            .toObjects(Post::class.java).map { it.enrichForUser(userId) }
     }
 
-    /**
-     * Retrieves all posts from Firestore, ordered by creation date descending.
-     *
-     * @return List of enriched posts with user-specific data
-     */
     suspend fun getAllPosts(): List<Post> {
         val userId = auth.currentUser?.uid
         return firestore.collection("posts")
             .orderBy("createdAt", Query.Direction.DESCENDING)
-            .get()
-            .await()
-            .toObjects(Post::class.java)
-            .map { it.enrichForUser(userId) }
+            .get().await()
+            .toObjects(Post::class.java).map { it.enrichForUser(userId) }
     }
 
-    /**
-     * Retrieves all posts authored by a specific user, ordered by creation date descending.
-     *
-     * @param userId The ID of the author
-     * @param limit Maximum number of posts to retrieve
-     * @return List of enriched posts with user-specific data
-     */
-    suspend fun getPostsByUser(
-        userId: String,
-        limit: Long = 100
-    ): List<Post> {
+    suspend fun getPostsByUser(userId: String, limit: Long = 100): List<Post> {
         val currentUser = auth.currentUser?.uid
-
         return firestore.collection("posts")
             .whereEqualTo("authorId", userId)
             .orderBy("createdAt", Query.Direction.DESCENDING)
-            .limit(limit)
-            .get()
-            .await()
-            .toObjects(Post::class.java)
-            .map { it.enrichForUser(currentUser) }
+            .limit(limit).get().await()
+            .toObjects(Post::class.java).map { it.enrichForUser(currentUser) }
     }
 
-    /**
-     * Retrieves a single post by its ID.
-     *
-     * @param postId The ID of the post to retrieve
-     * @return Enriched post with user-specific data, or null if not found
-     */
     suspend fun getPostById(postId: String): Post? {
         val userId = auth.currentUser?.uid
-        return firestore.collection("posts")
-            .document(postId)
-            .get()
-            .await()
-            .toObject(Post::class.java)
-            ?.enrichForUser(userId)
+        return firestore.collection("posts").document(postId).get().await()
+            .toObject(Post::class.java)?.enrichForUser(userId)
     }
 
-    /**
-     * Toggles upvote for a post by the current user.
-     * If already upvoted, removes the vote.
-     * If downvoted, changes to upvote.
-     * If no vote, creates new upvote.
-     *
-     * @param post The post to upvote
-     * @return Updated post with new vote state
-     * @throws IllegalStateException if user is not logged in
-     */
     suspend fun toggleUpvote(post: Post): Post {
-        val userId = auth.currentUser?.uid
-            ?: throw IllegalStateException("User not logged in")
-
+        val userId = auth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
         val currentVote = post.votedUsers[userId]
-        var upvoteChange = 0
-        var downvoteChange = 0
-
         when (currentVote) {
-            VoteState.UPVOTE -> {
-                // Currently upvoted, remove the vote
-                post.votedUsers.remove(userId)
-                upvoteChange = -1
-            }
-            VoteState.DOWNVOTE -> {
-                // Currently downvoted, switch to upvote
-                post.votedUsers[userId] = VoteState.UPVOTE
-                upvoteChange = 1
-                downvoteChange = -1
-            }
-            else -> {
-                // No vote or NONE state, create new upvote
-                post.votedUsers[userId] = VoteState.UPVOTE
-                upvoteChange = 1
-            }
+            VoteState.UPVOTE -> post.votedUsers.remove(userId)
+            VoteState.DOWNVOTE -> post.votedUsers[userId] = VoteState.UPVOTE
+            else -> post.votedUsers[userId] = VoteState.UPVOTE
         }
-
-        post.upvoteCount += upvoteChange
-        post.downvoteCount += downvoteChange
-        post.userVote = post.votedUsers[userId] ?: VoteState.NONE
-
-        // Persist changes to Firestore
         updatePost(post)
-
-        return post.copy()
+        return post.copy().enrichForUser(userId)
     }
 
-    /**
-     * Toggles downvote for a post by the current user.
-     * If already downvoted, removes the vote.
-     * If upvoted, changes to downvote.
-     * If no vote, creates new downvote.
-     *
-     * @param post The post to downvote
-     * @return Updated post with new vote state
-     * @throws IllegalStateException if user is not logged in
-     */
     suspend fun toggleDownvote(post: Post): Post {
-        val userId = auth.currentUser?.uid
-            ?: throw IllegalStateException("User not logged in")
-
+        val userId = auth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
         val currentVote = post.votedUsers[userId]
-        var upvoteChange = 0
-        var downvoteChange = 0
-
         when (currentVote) {
-            VoteState.DOWNVOTE -> {
-                // Currently downvoted, remove the vote
-                post.votedUsers.remove(userId)
-                downvoteChange = -1
-            }
-            VoteState.UPVOTE -> {
-                // Currently upvoted, switch to downvote
-                post.votedUsers[userId] = VoteState.DOWNVOTE
-                downvoteChange = 1
-                upvoteChange = -1
-            }
-            else -> {
-                // No vote or NONE state, create new downvote
-                post.votedUsers[userId] = VoteState.DOWNVOTE
-                downvoteChange = 1
-            }
+            VoteState.DOWNVOTE -> post.votedUsers.remove(userId)
+            VoteState.UPVOTE -> post.votedUsers[userId] = VoteState.DOWNVOTE
+            else -> post.votedUsers[userId] = VoteState.DOWNVOTE
         }
-
-        post.upvoteCount += upvoteChange
-        post.downvoteCount += downvoteChange
-        post.userVote = post.votedUsers[userId] ?: VoteState.NONE
-
-        // Persist changes to Firestore
         updatePost(post)
-
-        return post.copy()
+        return post.copy().enrichForUser(userId)
     }
 }
