@@ -3,7 +3,6 @@ package com.hcmus.forumus_client.ui.navigation
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
-import com.hcmus.forumus_client.ui.chats.ChatsActivity
 import com.hcmus.forumus_client.ui.post.create.CreatePostActivity
 //import com.hcmus.forumus_client.ui.profile.ProfileActivity.Companion.EXTRA_USER_ID
 import com.hcmus.forumus_client.ui.profile.ProfileMode

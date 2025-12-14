@@ -38,6 +38,7 @@ class ChatsFragment : Fragment (){
     private lateinit var userSearchAdapter: UserSearchAdapter
     private val searchHandler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
+    private var chatType: Enum<ChatType> = ChatType.DEFAULT_CHATS
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,16 +52,23 @@ class ChatsFragment : Fragment (){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupSwipeRefresh()
         setupRecyclerView()
         setupSearchView()
         setupObservers()
         setupClickListeners()
-        setupLoadChats(ChatType.DEFAULT_CHATS)
+        setupLoadChats(chatType)
     }
 
     private fun setupLoadChats(chatType: Enum<ChatType>) {
         viewModel.resetChatResult()
         viewModel.loadChats(chatType)
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            setupLoadChats(chatType)
+        }
     }
 
     private fun setupRecyclerView() {
@@ -101,7 +109,7 @@ class ChatsFragment : Fragment (){
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             // Show/hide loading indicator
-            binding.loadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.swipeRefresh.isRefreshing = isLoading
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
@@ -195,6 +203,7 @@ class ChatsFragment : Fragment (){
             )
             binding.btnUnreadChats.background = null
             setupLoadChats(ChatType.DEFAULT_CHATS)
+            chatType = ChatType.DEFAULT_CHATS
         }
 
         binding.btnUnreadChats.setOnClickListener {
@@ -204,6 +213,7 @@ class ChatsFragment : Fragment (){
             )
             binding.btnAllChats.background = null
             setupLoadChats(ChatType.UNREAD_CHATS)
+            chatType = ChatType.UNREAD_CHATS
         }
     }
 

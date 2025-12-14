@@ -56,22 +56,23 @@ class ProfileFragment : Fragment() {
             return
         }
 
+        setupSwipeRefresh()
         setupFilterButtons()
         setupRecyclerView()
         observeViewModel()
 
         // Initialize view model with user ID and mode
-        viewModel.init(userId)
+        viewModel.loadUserInfo(userId)
         mainSharedViewModel.loadCurrentUser()
     }
 
-    override fun onResume() {
-        super.onResume()
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            val userId = args.userId
 
-        val userId = args.userId
-
-        if (userId.isNotEmpty()) {
-            viewModel.init(userId)
+            if (userId.isNotEmpty()) {
+                viewModel.loadUserInfo(userId)
+            }
         }
     }
 
@@ -194,13 +195,7 @@ class ProfileFragment : Fragment() {
 
         // Monitor loading state (can show/hide ProgressBar if needed)
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading == true) {
-                binding.progressBar.visibility = View.VISIBLE
-                binding.contentRecyclerView.visibility = View.GONE
-            } else {
-                binding.progressBar.visibility = View.GONE
-                binding.contentRecyclerView.visibility = View.VISIBLE
-            }
+            binding.swipeRefresh.isRefreshing = isLoading
         }
     }
 

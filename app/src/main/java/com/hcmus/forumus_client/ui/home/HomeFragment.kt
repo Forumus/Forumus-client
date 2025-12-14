@@ -38,17 +38,12 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupSwipeRefresh()
         setupRecyclerView()
         observeViewModel()
 
         viewModel.loadPosts()
         //viewModel.addFieldForPosts()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Refresh posts when returning to home screen
-        viewModel.loadPosts()
     }
 
     /**
@@ -87,17 +82,22 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.loadPosts()
+        }
+    }
+
     /**
      * Observe all ViewModel LiveData streams and update UI accordingly.
      */
     private fun observeViewModel() {
         viewModel.posts.observe(viewLifecycleOwner) { posts ->
             homeAdapter.submitList(posts)
-            binding.progressBar.visibility = View.GONE
         }
 
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+            binding.swipeRefresh.isRefreshing = loading
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->

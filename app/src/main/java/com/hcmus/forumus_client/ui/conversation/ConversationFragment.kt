@@ -36,13 +36,13 @@ import kotlin.getValue
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.hcmus.forumus_client.data.model.ChatType
 
 class ConversationFragment : Fragment() {
     private lateinit var binding: FragmentConversationBinding
     private lateinit var messageAdapter: ConversationAdapter
     private lateinit var imagePreviewAdapter: ImagePreviewAdapter
     private val viewModel: ConversationViewModel by viewModels()
-    private val navController by lazy { findNavController() }
     private var chatId: String? = null
     private var selectedImageUris: MutableList<Uri> = mutableListOf()
     private var currentPhotoPath: String? = null

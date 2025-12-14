@@ -51,6 +51,7 @@ class PostDetailFragment : Fragment() {
             return
         }
 
+        setupSwipeRefresh()
         setupBottomInputBar()
         setupRecyclerView()
         observeViewModel()
@@ -66,6 +67,13 @@ class PostDetailFragment : Fragment() {
             onSendClick = { text ->
                 viewModel.sendComment(text)
             }
+        }
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            val postId = args.postId
+            viewModel.loadPostDetail(postId)
         }
     }
 
@@ -144,11 +152,10 @@ class PostDetailFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.items.observe(viewLifecycleOwner) { items ->
             detailAdapter.submitList(items)
-            binding.progressBar.visibility = View.GONE
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.swipeRefresh.isRefreshing = isLoading
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
@@ -171,22 +178,6 @@ class PostDetailFragment : Fragment() {
                 else -> "Reply to ${target.authorName}"
             }
             binding.bottomInputBar.setHint(hint)
-        }
-
-        viewModel.error.observe(viewLifecycleOwner) { msg ->
-            if (!msg.isNullOrBlank()) {
-                Toast.makeText(requireContext(), "Error: $msg", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading == true) {
-                binding.progressBar.visibility = View.VISIBLE
-                binding.postRecyclerView.visibility = View.GONE
-            } else {
-                binding.progressBar.visibility = View.GONE
-                binding.postRecyclerView.visibility = View.VISIBLE
-            }
         }
     }
 }

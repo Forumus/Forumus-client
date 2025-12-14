@@ -4,226 +4,226 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <ScrollView
-        android:id="@+id/contentScroll"
+    <LinearLayout
+        android:id="@+id/scrollableContent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
+        <!-- Profile Header (Now scrolls with content) -->
         <LinearLayout
-            android:id="@+id/scrollableContent"
+            android:id="@+id/profileHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:paddingHorizontal="15dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp">
 
-            <!-- Profile Header (Now scrolls with content) -->
+            <!-- Avatar Section -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/userAvatar"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_marginBottom="10dp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircleImage"
+                tools:src="@drawable/default_avatar" />
+
+            <!-- Personal Info Section -->
             <LinearLayout
-                android:id="@+id/profileHeader"
+                android:id="@+id/personalInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:orientation="vertical"
-                android:paddingHorizontal="15dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="5dp">
+                android:layout_marginBottom="10dp"
+                android:orientation="vertical">
 
-                <!-- Avatar Section -->
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/userAvatar"
-                    android:layout_width="88dp"
-                    android:layout_height="88dp"
-                    android:layout_marginBottom="10dp"
-                    android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/CircleImage"
-                    tools:src="@drawable/default_avatar" />
-
-                <!-- Personal Info Section -->
-                <LinearLayout
-                    android:id="@+id/personalInfo"
-                    android:layout_width="match_parent"
+                <!-- Username -->
+                <TextView
+                    android:id="@+id/username"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:orientation="vertical">
+                    android:fontFamily="@font/montserrat_medium"
+                    android:lineSpacingMultiplier="1.17"
+                    android:text="Anonymous"
+                    android:textColor="#333D42"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-                    <!-- Username -->
-                    <TextView
-                        android:id="@+id/username"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/montserrat_medium"
-                        android:lineSpacingMultiplier="1.17"
-                        android:text="Anonymous"
-                        android:textColor="#333D42"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <!-- Email -->
-                    <TextView
-                        android:id="@+id/userEmail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/montserrat_regular"
-                        android:lineSpacingMultiplier="1.36"
-                        android:text="23xxxxxx@student.hcmus.edu.vn"
-                        android:textColor="#5C6C74"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <!-- Stats Section -->
-                <LinearLayout
-                    android:id="@+id/statsContainer"
-                    android:layout_width="match_parent"
+                <!-- Email -->
+                <TextView
+                    android:id="@+id/userEmail"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:lineSpacingMultiplier="1.36"
+                    android:text="23xxxxxx@student.hcmus.edu.vn"
+                    android:textColor="#5C6C74"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Stats Section -->
+            <LinearLayout
+                android:id="@+id/statsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <!-- Posts Stats -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
-                    <!-- Posts Stats -->
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/postsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="20dp"
-                        android:gravity="center"
-                        android:orientation="horizontal">
+                        android:fontFamily="@font/montserrat_regular"
+                        android:text="0"
+                        android:textColor="#2C2C2C"
+                        android:textSize="16sp" />
 
-                        <TextView
-                            android:id="@+id/postsCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_regular"
-                            android:text="0"
-                            android:textColor="#2C2C2C"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_regular"
-                            android:text=" posts"
-                            android:textColor="#666666"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <!-- Replies Stats -->
-                    <LinearLayout
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="20dp"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/repliesCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_regular"
-                            android:text="0"
-                            android:textColor="#2C2C2C"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_regular"
-                            android:text=" replies"
-                            android:textColor="#666666"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <!-- Upvotes Stats -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/upvotesCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_regular"
-                            android:text="0"
-                            android:textColor="#2C2C2C"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_regular"
-                            android:text=" upvotes"
-                            android:textColor="#666666"
-                            android:textSize="13sp" />
-                    </LinearLayout>
+                        android:fontFamily="@font/montserrat_regular"
+                        android:text=" posts"
+                        android:textColor="#666666"
+                        android:textSize="13sp" />
                 </LinearLayout>
 
-                <!-- Filter Buttons Section -->
+                <!-- Replies Stats -->
                 <LinearLayout
-                    android:id="@+id/filterButtons"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/repliesCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_regular"
+                        android:text="0"
+                        android:textColor="#2C2C2C"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_regular"
+                        android:text=" replies"
+                        android:textColor="#666666"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <!-- Upvotes Stats -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingVertical="5dp">
+                    android:orientation="horizontal">
 
-                    <!-- General Button -->
-                    <LinearLayout
-                        android:id="@+id/generalButton"
-                        android:layout_width="100dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="20dp"
-                        android:background="@drawable/filter_button_active"
-                        android:gravity="center">
+                    <TextView
+                        android:id="@+id/upvotesCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_regular"
+                        android:text="0"
+                        android:textColor="#2C2C2C"
+                        android:textSize="16sp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_regular"
-                            android:text="General"
-                            android:textColor="#2C2C2C"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <!-- Post Button -->
-                    <LinearLayout
-                        android:id="@+id/postButton"
-                        android:layout_width="100dp"
-                        android:layout_height="30dp"
-                        android:layout_marginEnd="20dp"
-                        android:background="@drawable/filter_button_inactive"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_regular"
-                            android:text="Post"
-                            android:textColor="#2C2C2C"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <!-- Reply Button -->
-                    <LinearLayout
-                        android:id="@+id/replyButton"
-                        android:layout_width="100dp"
-                        android:layout_height="30dp"
-                        android:background="@drawable/filter_button_inactive"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_regular"
-                            android:text="Reply"
-                            android:textColor="#2C2C2C"
-                            android:textSize="13sp" />
-                    </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_regular"
+                        android:text=" upvotes"
+                        android:textColor="#666666"
+                        android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Posts and Replies Frame -->
-            <FrameLayout
+            <!-- Filter Buttons Section -->
+            <LinearLayout
+                android:id="@+id/filterButtons"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="5dp">
+
+                <!-- General Button -->
+                <LinearLayout
+                    android:id="@+id/generalButton"
+                    android:layout_width="100dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/filter_button_active"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_regular"
+                        android:text="General"
+                        android:textColor="#2C2C2C"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <!-- Post Button -->
+                <LinearLayout
+                    android:id="@+id/postButton"
+                    android:layout_width="100dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/filter_button_inactive"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_regular"
+                        android:text="Post"
+                        android:textColor="#2C2C2C"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <!-- Reply Button -->
+                <LinearLayout
+                    android:id="@+id/replyButton"
+                    android:layout_width="100dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/filter_button_inactive"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_regular"
+                        android:text="Reply"
+                        android:textColor="#2C2C2C"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Posts and Replies Frame -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/contentRecyclerView"
@@ -231,15 +231,9 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"/>
 
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:visibility="gone" />
-            </FrameLayout>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        </LinearLayout>
-    </ScrollView>
+        </FrameLayout>
 
+    </LinearLayout>
 </layout>
