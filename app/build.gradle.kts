@@ -35,8 +35,8 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
-        dataBinding = true
         viewBinding = true
+        dataBinding = true
     }
     packaging {
         resources {
@@ -83,6 +83,12 @@ dependencies {
     implementation(libs.converter.moshi)
     implementation(libs.moshi.kotlin)
     implementation(libs.logging.interceptor)
+
+    // Coil for image loading
+    implementation(libs.coil)
+    implementation(libs.coil.base)
+    implementation(libs.glide)
+    implementation(libs.circleimageview)
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")

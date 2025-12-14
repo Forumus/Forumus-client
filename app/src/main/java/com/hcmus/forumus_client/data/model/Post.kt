@@ -1,34 +1,35 @@
 package com.hcmus.forumus_client.data.model
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.PropertyName
+import com.google.firebase.firestore.Exclude
 
 data class Post(
-	// --- CÁC TRƯỜNG DỮ LIỆU ---
 	var id: String = "",
-	val title: String = "",
-	val content: String = "",
-	val imageUrls: List<String> = emptyList(),
+	var authorId: String = "",
+	var authorName: String = "",
+	var authorAvatarUrl: String? = "",
 
-	// Thông tin Firebase (User & Topic)
-	val authorId: String = "",
-	val authorName: String = "",
-	val authorAvatarUrl: String = "",
-	val topics: List<String> = emptyList(),
+	var createdAt: Timestamp? = null,
+	var title: String = "",
+	var content: String = "",
 
-	// Thông tin UI Home (Giữ tên cũ để không lỗi code cũ)
-	val communityName: String = "General",
-	val communityIconLetter: String = "G",
-	val timePosted: String = "Just now",
+	var upvoteCount: Int = 0,
+	var downvoteCount: Int = 0,
+	var commentCount: Int = 0,
+	var reportCount: Int = 0,
 
-	// Biến đếm
-	val voteCount: Int = 0,
-	val commentCount: Int = 0,
-	val viewCount: Int = 0,
-	val reportedCount: Int = 0,
+	var imageUrls: MutableList<String> = mutableListOf(),
+	var videoUrls: MutableList<String> = mutableListOf(),
 
-	// TRẠNG THÁI VOTE (QUAN TRỌNG: Dùng String "UP", "DOWN", "NONE")
-	val userVote: String = "NONE",
+	var votedUsers: MutableMap<String, VoteState> = mutableMapOf(),
+	var reportedUsers: MutableList<String> = mutableListOf(),
 
-	// Timestamp
-	val createdAt: Timestamp = Timestamp.now()
+    @get:PropertyName("topics")
+    @set:PropertyName("topics")
+    var topicIds: List<String> = emptyList(),
+
+	@get:Exclude
+	@set:Exclude
+	var userVote: VoteState = VoteState.NONE
 )

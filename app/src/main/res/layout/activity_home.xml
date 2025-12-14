@@ -4,373 +4,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.home.HomeActivity">
 
-    <!-- Main Content with CoordinatorLayout for AppBar scrolling -->
+    <!-- Main Content -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinator_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_light">
+        android:background="#F8F9FA">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar_layout"
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="false"
             android:background="@android:color/transparent"
             android:elevation="0dp">
 
-            <LinearLayout
-                android:id="@+id/top_app_bar"
+            <com.hcmus.forumus_client.ui.common.TopAppBar
+                android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:layout_height="wrap_content"
                 android:background="@color/white"
-                app:layout_scrollFlags="scroll|enterAlways">
+                app:layout_scrollFlags="scroll|enterAlways" />
 
-                <ImageButton
-                    android:id="@+id/btn_menu"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/menu"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_hamburger_button" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:contentDescription="@string/app_name"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_logo_dark" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:fontFamily="@font/nanum_myeongjo_regular"
-                        android:text="@string/app_name"
-                        android:textColor="@color/text_primary"
-                        android:textSize="20sp" />
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/btn_search"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/search"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_search" />
-
-                <ImageButton
-                    android:id="@+id/btn_profile"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/profile"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_default_profile" />
-            </LinearLayout>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_posts"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="60dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:listitem="@layout/item_post_card" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
-            android:id="@+id/bottom_nav_container"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_gravity="bottom"
-            android:background="@color/white"
-            android:elevation="5dp"
-            android:clipChildren="false"
-            android:clipToPadding="false">
-
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/postRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:clipChildren="false"
-                android:clipToPadding="false">
+                android:clipToPadding="false"
+                android:paddingBottom="80dp"/>
 
-                <LinearLayout
-                    android:id="@+id/nav_home"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:contentDescription="@string/home"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_home"
-                        app:tint="#666666" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/montserrat_regular"
-                        android:text="@string/home"
-                        android:textColor="#666666"
-                        android:textSize="12sp" />
-                </LinearLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-                <LinearLayout
-                    android:id="@+id/nav_explore"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:contentDescription="@string/explore"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_explore"
-                        app:tint="#666666" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/montserrat_regular"
-                        android:text="@string/explore"
-                        android:textColor="#666666"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <FrameLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:clipChildren="false">
-                    <FrameLayout
-                        android:layout_width="55dp"
-                        android:layout_height="55dp"
-                        android:layout_gravity="center|top"
-                        android:background="@drawable/button_create_background"
-                        android:elevation="10dp">
-                        <ImageView
-                            android:id="@+id/btn_create_post"
-                            android:layout_width="55dp"
-                            android:layout_height="55dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="Create"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_create_post" />
-                    </FrameLayout>
-                </FrameLayout>
-
-                <LinearLayout
-                    android:id="@+id/nav_alerts"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:contentDescription="Alerts"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_notification"
-                        app:tint="#666666" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/montserrat_regular"
-                        android:text="Alerts"
-                        android:textColor="#666666"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/nav_chat"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:contentDescription="Chat"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_chat"
-                        android:translationY="1dp"
-                        app:tint="#666666" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:translationY="-3dp"
-                        android:fontFamily="@font/montserrat_regular"
-                        android:text="Chat"
-                        android:textColor="#666666"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </LinearLayout>
-        </FrameLayout>
-        <LinearLayout
-            android:id="@+id/user_menu_container"
-            android:layout_width="224dp"
+        <com.hcmus.forumus_client.ui.common.BottomNavigationBar
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/popup_profile_background"
-            android:elevation="4dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:visibility="gone">
+            android:layout_gravity="bottom"
+            android:background="@color/white"
+            android:elevation="8dp" />
 
-            <!-- View Profile -->
-            <LinearLayout
-                android:id="@+id/menu_view_profile"
-                android:layout_width="match_parent"
-                android:layout_height="41dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:background="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:contentDescription="View profile"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_user_profile" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:text="View profile"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Edit Profile -->
-            <LinearLayout
-                android:id="@+id/menu_edit_profile"
-                android:layout_width="match_parent"
-                android:layout_height="41dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:background="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:contentDescription="Edit profile"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_user_profile" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:text="Edit profile"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginVertical="8dp"
-                android:background="#E0E0E0" />
-
-            <!-- Dark Mode -->
-            <LinearLayout
-                android:id="@+id/menu_dark_mode"
-                android:layout_width="match_parent"
-                android:layout_height="41dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:background="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:contentDescription="Dark mode"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_theme" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:text="Dark mode"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Settings -->
-            <LinearLayout
-                android:id="@+id/menu_settings"
-                android:layout_width="match_parent"
-                android:layout_height="41dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:background="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:contentDescription="Settings"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_settings" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:text="Settings"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-        </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!-- Navigation Drawer -->
@@ -379,11 +62,13 @@
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        android:background="@color/background_light"
-        app:itemIconTint="@color/text_secondary">
+        android:background="#FFFFFF"
+        android:fitsSystemWindows="false">
 
-        <include layout="@layout/drawer_menu"/>
+        <include
+            android:id="@+id/drawer_content"
+            layout="@layout/drawer_filter_menu"/>
+
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

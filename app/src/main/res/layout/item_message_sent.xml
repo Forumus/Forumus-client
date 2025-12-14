@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="8dp">
+
+    <!-- Message container aligned to right -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:orientation="vertical"
+        android:layout_marginStart="64dp">
+
+        <!-- Message bubble -->
+        <LinearLayout
+            android:id="@+id/ll_message_bubble"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/message_sent_background"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="0dp"
+            android:minWidth="50dp"
+            android:layout_gravity="end">
+
+            <TextView
+                android:id="@+id/tv_message_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="I'm doing great! Thanks for asking"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/montserrat_regular"
+                android:lineSpacingExtra="6dp"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_message_images"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp"
+            android:paddingTop="12dp"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:scrollbars="none"
+            android:layout_gravity="end"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Timestamp -->
+        <TextView
+            android:id="@+id/tv_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10:32 AM"
+            android:textSize="12sp"
+            android:textColor="@color/chat_time_gray"
+            android:fontFamily="@font/montserrat_regular"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_gravity="end" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
+</layout>

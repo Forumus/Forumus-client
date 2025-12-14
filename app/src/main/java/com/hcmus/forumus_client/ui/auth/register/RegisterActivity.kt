@@ -215,7 +215,7 @@ class RegisterActivity : AppCompatActivity() {
 
         val linkColor = ContextCompat.getColor(this, R.color.link_color)
 
-        val loginStart = fullText.indexOf(getString(R.string.already_member))
+        val loginStart = fullText.indexOf(getString(R.string.login_now))
         val loginEnd = loginStart + getString(R.string.login_now).length
 
         spannableString.setSpan(object : ClickableSpan() {

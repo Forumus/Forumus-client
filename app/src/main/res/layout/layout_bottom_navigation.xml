@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
+        android:id="@+id/bottomNavContainer"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bottom_nav_shadow_background"
+        android:paddingTop="8dp"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <LinearLayout
+                android:id="@+id/navHome"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/iconHome"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_home"
+                    app:tint="#666666" />
+                <TextView
+                    android:id="@+id/textHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="Home"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/navExplore"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/iconExplore"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_explore"
+                    app:tint="#666666" />
+                <TextView
+                    android:id="@+id/textExplore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="Explore"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:clipChildren="false">
+                <FrameLayout
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/button_create_background">
+                    <ImageView
+                        android:id="@+id/btnCreatePost"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:layout_gravity="center"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_create_post" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/navAlerts"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/iconAlerts"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_notification"
+                    app:tint="#666666" />
+                <TextView
+                    android:id="@+id/textAlerts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="Alerts"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/navChat"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/iconChat"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="Chat"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_chat"
+                    android:translationY="1dp"
+                    app:tint="#666666" />
+                <TextView
+                    android:id="@+id/textChat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:translationY="-3dp"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="Chat"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+</layout>

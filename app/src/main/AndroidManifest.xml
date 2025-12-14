@@ -72,7 +72,26 @@
             android:name=".ui.auth.resetPassword.ResetPasswordActivity"
             android:exported="false" />
 
-
+        <activity
+            android:name=".ui.chats.ChatsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.post.detail.PostDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.conversation.ConversationActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
+            android:name=".ui.image.FullscreenImageActivity"
+            android:theme="@style/Theme.Forumus.Fullscreen"
+            android:exported="false" />
 
         <activity
             android:name=".ui.onboarding.slide.SlideActivity"

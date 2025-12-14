@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:background="@color/white"
+        android:elevation="2dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Left Part: Menu Button & Logo -->
+        <LinearLayout
+            android:id="@+id/leftPartHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Menu Button -->
+            <ImageButton
+                android:id="@+id/menuButton"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_hamburger_button"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="12dp"
+                tools:ignore="TouchTargetSizeCheck"/>
+
+            <!-- Logo -->
+            <ImageView
+                android:id="@+id/logoIcon"
+                android:layout_width="44dp"
+                android:layout_height="38dp"
+                android:contentDescription="@string/app_name"
+                android:layout_marginEnd="12dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_logo_dark" />
+
+            <!-- Forumus Text -->
+            <TextView
+                android:id="@+id/logoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nanum_myeongjo_regular"
+                android:text="Forumus"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <!-- Search Button -->
+        <ImageButton
+            android:id="@+id/btn_search"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerInside"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_search" />
+
+        <!-- Profile Button -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/profileImage"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:padding="2dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/default_avatar"
+            app:shapeAppearanceOverlay="@style/CircleImage"
+            app:strokeWidth="2dp"
+            app:strokeColor="#3f78e0"/>
+    </LinearLayout>
+</layout>

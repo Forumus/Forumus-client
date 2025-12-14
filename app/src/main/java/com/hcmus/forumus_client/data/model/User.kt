@@ -7,11 +7,21 @@ data class User (
     val role: UserRole = UserRole.STUDENT,
     val profilePictureUrl: String? = null,
     val createdAt: Long = System.currentTimeMillis(),
-    val emailVerified: Boolean = false
+    val emailVerified: Boolean = false,
+    val followedPostIds: List<String> = emptyList(),
+    val reportCount: Int = 0,
+    val status: UserStatus = UserStatus.NORMAL
 )
 
 enum class UserRole {
     STUDENT,
     TEACHER,
     ADMIN
+}
+
+enum class UserStatus {
+    NORMAL,
+    REMINDED,
+    WARNED,
+    BANNED
 }
