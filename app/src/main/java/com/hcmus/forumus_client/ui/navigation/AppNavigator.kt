@@ -12,6 +12,7 @@ import com.hcmus.forumus_client.ui.profile.ProfileMode
 import com.hcmus.forumus_client.ui.post.detail.PostDetailActivity
 import com.hcmus.forumus_client.ui.post.detail.PostDetailActivity.Companion.EXTRA_POST_ID
 import com.hcmus.forumus_client.ui.post.create.CreatePostActivity
+import com.hcmus.forumus_client.ui.search.SearchActivity
 import com.hcmus.forumus_client.ui.settings.SettingsActivity
 
 class AppNavigator(private val activity: Activity) {
@@ -91,7 +92,9 @@ class AppNavigator(private val activity: Activity) {
     }
 
     fun openSearch(clearStack: Boolean = false) {
-        // TODO: Implement search navigation
+        val intent = Intent(activity, SearchActivity::class.java)
+        applyFlags(intent, clearStack)
+        activity.startActivity(intent)
     }
 
     fun openCreatePost(clearStack: Boolean = false) {
