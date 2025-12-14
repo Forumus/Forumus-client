@@ -114,8 +114,16 @@ class CreatePostViewModel : ViewModel() {
                 batch.set(newPostRef, post)
 
                 for (topicName in selectedTopics) {
-                    val topicRef = firestore.collection("topics").document(topicName)
-                    batch.update(topicRef, "postCount", FieldValue.increment(1))
+                    // Chuyển tên topic thành ID (viết thường, không dấu cách) để làm Document ID
+                    val topicId = topicName.lowercase().replace(" ", "_")
+                    val topicRef = firestore.collection("topics").document(topicId)
+
+                    // Dùng set với merge để an toàn: Tự tạo nếu chưa có
+                    val topicData = hashMapOf(
+                        "name" to topicName,
+                        "postCount" to FieldValue.increment(1)
+                    )
+                    batch.set(topicRef, topicData, com.google.firebase.firestore.SetOptions.merge())
                 }
 
                 batch.commit().await()
