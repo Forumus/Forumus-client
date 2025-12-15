@@ -227,7 +227,7 @@ class ChatsFragment : Fragment (){
             setActiveTab(BottomNavigationBar.Tab.CHAT)
             onHomeClick = { navController.navigate(R.id.homeFragment) }
             onExploreClick = { Toast.makeText(requireContext(), "Explore", Toast.LENGTH_SHORT).show() }
-            onCreatePostClick = {  }
+            onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
             onAlertsClick = { }
             onChatClick = { navController.navigate(R.id.chatsFragment) }
         }

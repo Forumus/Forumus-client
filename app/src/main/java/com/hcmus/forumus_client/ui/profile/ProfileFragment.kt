@@ -104,10 +104,7 @@ class ProfileFragment : Fragment() {
                     }
 
                     ProfileMenuAction.SETTINGS -> {
-                        val navAction = NavGraphDirections
-                            .actionGlobalSettingsFragment()
-
-                        navController.navigate(navAction)
+                        navController.navigate(R.id.createPostFragment)
                     }
                 }
             }
@@ -133,7 +130,7 @@ class ProfileFragment : Fragment() {
             setActiveTab(BottomNavigationBar.Tab.NONE)
             onHomeClick = { navController.navigate(R.id.homeFragment) }
             onExploreClick = { Toast.makeText(requireContext(), "Explore", Toast.LENGTH_SHORT).show() }
-            onCreatePostClick = {  }
+            onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
             onAlertsClick = { }
             onChatClick = { navController.navigate(R.id.chatsFragment) }
         }

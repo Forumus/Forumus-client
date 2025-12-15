@@ -17,23 +17,6 @@
         app:enterAnim="@android:anim/fade_in"
         app:exitAnim="@android:anim/fade_out" />
 
-    <action
-        android:id="@+id/action_global_homeFragment"
-        app:destination="@id/homeFragment"
-        app:popUpTo="@id/homeFragment"
-        app:popUpToInclusive="false" />
-
-    <action
-        android:id="@+id/action_global_chatsFragment"
-        app:destination="@id/chatsFragment"
-        app:enterAnim="@android:anim/fade_in"
-        app:exitAnim="@android:anim/fade_out" />
-
-    <action
-        android:id="@+id/action_global_settingsFragment"
-        app:destination="@id/settingsFragment"
-        app:enterAnim="@android:anim/fade_in"
-        app:exitAnim="@android:anim/fade_out" />
 
     <!-- Home Fragment -->
     <fragment
@@ -68,6 +51,13 @@
         android:id="@+id/settingsFragment"
         android:name="com.hcmus.forumus_client.ui.settings.SettingsFragment"
         android:label="Settings">
+    </fragment>
+
+    <!-- Create Post Fragment -->
+    <fragment
+        android:id="@+id/createPostFragment"
+        android:name="com.hcmus.forumus_client.ui.post.create.CreatePostFragment"
+        android:label="CreatePost">
     </fragment>
 
     <!-- Chats Fragment -->

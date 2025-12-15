@@ -1,188 +1,107 @@
 package com.hcmus.forumus_client.ui.post.create
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.MutableLiveData
+import android.app.Application
+import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.hcmus.forumus_client.data.model.Post
-import com.hcmus.forumus_client.data.model.User
 import com.hcmus.forumus_client.data.repository.PostRepository
-import com.hcmus.forumus_client.data.repository.UserRepository
-import com.google.firebase.Timestamp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import android.content.Context
 
-/**
- * ViewModel for managing post creation functionality.
- * Handles user loading, media management, and post submission.
- */
-class CreatePostViewModel(
-    private val userRepository: UserRepository = UserRepository(),
-    private val postRepository: PostRepository = PostRepository()
-) : ViewModel() {
+sealed class PostState {
+    object Loading : PostState()
+    object Success : PostState()
+    data class Error(val msg: String) : PostState()
+}
 
-    // Current authenticated user
-    private val _currentUser = MutableLiveData<User?>()
-    val currentUser: LiveData<User?> = _currentUser
+// Chuyển thành AndroidViewModel để lấy Context check loại file (Ảnh hay Video)
+class CreatePostViewModel(application: Application) : AndroidViewModel(application) {
 
-    // Post title
-    private val _postTitle = MutableLiveData<String>("")
-    val postTitle: LiveData<String> = _postTitle
+    private val _selectedImages = MutableLiveData<MutableList<Uri>>(mutableListOf())
+    val selectedImages: LiveData<MutableList<Uri>> get() = _selectedImages
 
-    // Post content
-    private val _postContent = MutableLiveData<String>("")
-    val postContent: LiveData<String> = _postContent
+    private val _postState = MutableLiveData<PostState>()
+    val postState: LiveData<PostState> get() = _postState
 
-    // List of selected image URIs (local paths)
-    private val _selectedImageUris = MutableLiveData<MutableList<String>>(mutableListOf())
-    val selectedImageUris: LiveData<MutableList<String>> = _selectedImageUris
+    // Giữ LiveData cũ
+    private val _generatedTitle = MutableLiveData<String>()
+    val generatedTitle: LiveData<String> = _generatedTitle
+    private val _isLoadingAi = MutableLiveData<Boolean>()
+    val isLoadingAi: LiveData<Boolean> = _isLoadingAi
+    val errorAi = MutableLiveData<String>()
 
-    // List of selected video URIs (local paths)
-    private val _selectedVideoUris = MutableLiveData<MutableList<String>>(mutableListOf())
-    val selectedVideoUris: LiveData<MutableList<String>> = _selectedVideoUris
+    private val auth = FirebaseAuth.getInstance()
+    private val repository = PostRepository()
+    private val context = application.applicationContext
 
-    // Loading state indicator
-    private val _isLoading = MutableLiveData<Boolean>(false)
-    val isLoading: LiveData<Boolean> = _isLoading
+    fun addImages(uris: List<Uri>) {
+        val currentList = _selectedImages.value ?: mutableListOf()
+        currentList.addAll(uris)
+        _selectedImages.value = currentList
+    }
 
-    // Success message
-    private val _successMessage = MutableLiveData<String?>(null)
-    val successMessage: LiveData<String?> = _successMessage
+    fun removeImage(uri: Uri) {
+        val currentList = _selectedImages.value ?: return
+        currentList.remove(uri)
+        _selectedImages.value = currentList
+    }
 
-    // Error message for UI display
-    private val _error = MutableLiveData<String?>(null)
-    val error: LiveData<String?> = _error
+    fun generateTitleFromContent(content: String) { /* No-op */ }
 
-    /**
-     * Loads the currently authenticated user from the repository.
-     */
-    fun loadUser(userId: String) {
-        viewModelScope.launch {
+    fun createPost(title: String, content: String, selectedTopics: List<String>, context: Context) {
+        _postState.value = PostState.Loading
+
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                val user = userRepository.getUserById(userId)
-                _currentUser.value = user
-            } catch (e: Exception) {
-                _error.value = "Failed to load user: ${e.message}"
-                _currentUser.value = null
-            }
-        }
-    }
+                val user = auth.currentUser
+                if (user == null) {
+                    withContext(Dispatchers.Main) { _postState.value = PostState.Error("You must be logged in!") }
+                    return@launch
+                }
 
-    /**
-     * Updates post title.
-     *
-     * @param title The new title text
-     */
-    fun setPostTitle(title: String) {
-        _postTitle.value = title
-    }
+                val localImageUrls = mutableListOf<String>()
+                val localVideoUrls = mutableListOf<String>()
+                val allUris = _selectedImages.value ?: emptyList()
 
-    /**
-     * Updates post content.
-     *
-     * @param content The new content text
-     */
-    fun setPostContent(content: String) {
-        _postContent.value = content
-    }
+                for (uri in allUris) {
+                    val mimeType = context.contentResolver.getType(uri)
+                    if (mimeType != null && mimeType.startsWith("video")) {
+                        localVideoUrls.add(uri.toString())
+                    } else {
+                        // Mặc định coi là ảnh nếu không phải video
+                        localImageUrls.add(uri.toString())
+                    }
+                }
 
-    /**
-     * Adds an image URI to the selected images list.
-     *
-     * @param imageUri The URI of the image to add
-     */
-    fun addImageUri(imageUri: String) {
-        val currentList = _selectedImageUris.value ?: mutableListOf()
-        currentList.add(imageUri)
-        _selectedImageUris.value = currentList
-    }
-
-    /**
-     * Removes an image URI from the selected images list.
-     *
-     * @param imageUri The URI to remove
-     */
-    fun removeImageUri(imageUri: String) {
-        val currentList = _selectedImageUris.value ?: mutableListOf()
-        currentList.remove(imageUri)
-        _selectedImageUris.value = currentList
-    }
-
-    /**
-     * Adds a video URI to the selected videos list.
-     *
-     * @param videoUri The URI of the video to add
-     */
-    fun addVideoUri(videoUri: String) {
-        val currentList = _selectedVideoUris.value ?: mutableListOf()
-        currentList.add(videoUri)
-        _selectedVideoUris.value = currentList
-    }
-
-    /**
-     * Removes a video URI from the selected videos list.
-     *
-     * @param videoUri The URI to remove
-     */
-    fun removeVideoUri(videoUri: String) {
-        val currentList = _selectedVideoUris.value ?: mutableListOf()
-        currentList.remove(videoUri)
-        _selectedVideoUris.value = currentList
-    }
-
-    /**
-     * Clears all selected media (images and videos).
-     */
-    fun clearAllMedia() {
-        _selectedImageUris.value = mutableListOf()
-        _selectedVideoUris.value = mutableListOf()
-    }
-
-    /**
-     * Submits the post to the repository for saving.
-     * Validates content, creates Post object, and calls PostRepository.savePost().
-     */
-    fun submitPost(context: Context) {
-        // Validate input
-        val content = _postContent.value?.trim() ?: ""
-        if (content.isEmpty()) {
-            _error.value = "Post content cannot be empty"
-            return
-        }
-
-        val user = _currentUser.value
-        if (user == null) {
-            _error.value = "User not loaded, cannot create post"
-            return
-        }
-
-        _isLoading.value = true
-
-        viewModelScope.launch {
-            try {
-                // Create post object
                 val post = Post(
-                    title = _postTitle.value ?: "",
+                    title = title,
                     content = content,
-                    imageUrls = _selectedImageUris.value ?: mutableListOf(),
-                    videoUrls = _selectedVideoUris.value ?: mutableListOf(),
+                    imageUrls = localImageUrls,
+                    videoUrls = localVideoUrls,
+                    topicIds = selectedTopics,
                 )
 
-                // Call repository to save post
-                postRepository.savePost(context, post)
+                //  Gọi Repository để xử lý upload và lưu
+                val result = repository.savePost( context, post)
 
-                // Clear form and show success
-                _postTitle.value = ""
-                _postContent.value = ""
-                _selectedImageUris.value = mutableListOf()
-                _selectedVideoUris.value = mutableListOf()
-                _successMessage.value = "Post created successfully!"
-                _error.value = null
+                withContext(Dispatchers.Main) {
+                    if (result.isSuccess) {
+                        _postState.value = PostState.Success
+                    } else {
+                        _postState.value = PostState.Error("Failed: ${result.exceptionOrNull()?.message}")
+                    }
+                }
 
             } catch (e: Exception) {
-                _error.value = "Failed to create post: ${e.message}"
-            } finally {
-                _isLoading.value = false
+                withContext(Dispatchers.Main) {
+                    _postState.value = PostState.Error("Error: ${e.message}")
+                }
             }
         }
     }

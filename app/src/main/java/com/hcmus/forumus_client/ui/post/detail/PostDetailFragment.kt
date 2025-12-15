@@ -97,10 +97,7 @@ class PostDetailFragment : Fragment() {
                     }
 
                     ProfileMenuAction.SETTINGS -> {
-                        val navAction = NavGraphDirections
-                            .actionGlobalSettingsFragment()
-
-                        navController.navigate(navAction)
+                        navController.navigate(R.id.createPostFragment)
                     }
                 }
             }

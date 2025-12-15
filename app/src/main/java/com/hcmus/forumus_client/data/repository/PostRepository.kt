@@ -73,74 +73,79 @@ class PostRepository(
         return "POST" + "_" + "$formattedDate" + "_" + "$randomPart"
     }
 
-    suspend fun savePost(context: Context, post: Post) {
-        val storage = FirebaseStorage.getInstance().reference
-        val imageUrls = mutableListOf<String>()
-        val videoUrls = mutableListOf<String>()
-        val videoThumbnailUrls = mutableListOf<String?>()
+    suspend fun savePost(context: Context, post: Post): Result<Boolean> {
+        return try {
+            val storage = FirebaseStorage.getInstance().reference
+            val imageUrls = mutableListOf<String>()
+            val videoUrls = mutableListOf<String>()
+            val videoThumbnailUrls = mutableListOf<String?>()
 
-        // 1. Upload ảnh
-        post.imageUrls.forEach { imageUri ->
-            val imageRef = storage.child("post_images/${UUID.randomUUID()}.jpg")
-            val imageData = Uri.parse(imageUri)
+            // 1. Upload ảnh
+            post.imageUrls.forEach { imageUri ->
+                val imageRef = storage.child("post_images/${UUID.randomUUID()}.jpg")
+                val imageData = Uri.parse(imageUri)
 
-            try {
-                // Upload ảnh
-                val imageUrl = uploadFile(imageRef, imageData)
-                imageUrls.add(imageUrl)
-            } catch (e: Exception) {
-                Log.e("savePost", "Error uploading image: ${e.message}")
-            }
-        }
-
-        // 2. Upload video
-        post.videoUrls.forEach { videoUri ->
-            val videoRef = storage.child("post_videos/${UUID.randomUUID()}.mp4")
-            val videoData = Uri.parse(videoUri)
-
-            try {
-                // Upload video
-                val videoUrl = uploadFile(videoRef, videoData)
-                videoUrls.add(videoUrl)
-
-                // 3. Tạo thumbnail cho video
-                val videoThumbnailUri = getVideoThumbnailUri(context, videoUri)
-                if (videoThumbnailUri != null) {
-                    val thumbRef = storage.child("post_thumbnails/${UUID.randomUUID()}.jpg")
-                    val thumbUrl = uploadFile(thumbRef, videoThumbnailUri)
-                    videoThumbnailUrls.add(thumbUrl)
-                } else {
-                    videoThumbnailUrls.add(null)
+                try {
+                    // Upload ảnh
+                    val imageUrl = uploadFile(imageRef, imageData)
+                    imageUrls.add(imageUrl)
+                } catch (e: Exception) {
+                    Log.e("savePost", "Error uploading image: ${e.message}")
                 }
-            } catch (e: Exception) {
-                Log.e("savePost", "Error uploading video: ${e.message}")
             }
+
+            // 2. Upload video
+            post.videoUrls.forEach { videoUri ->
+                val videoRef = storage.child("post_videos/${UUID.randomUUID()}.mp4")
+                val videoData = Uri.parse(videoUri)
+
+                try {
+                    // Upload video
+                    val videoUrl = uploadFile(videoRef, videoData)
+                    videoUrls.add(videoUrl)
+
+                    // 3. Tạo thumbnail cho video
+                    val videoThumbnailUri = getVideoThumbnailUri(context, videoUri)
+                    if (videoThumbnailUri != null) {
+                        val thumbRef = storage.child("post_thumbnails/${UUID.randomUUID()}.jpg")
+                        val thumbUrl = uploadFile(thumbRef, videoThumbnailUri)
+                        videoThumbnailUrls.add(thumbUrl)
+                    } else {
+                        videoThumbnailUrls.add(null)
+                    }
+                } catch (e: Exception) {
+                    Log.e("savePost", "Error uploading video: ${e.message}")
+                }
+            }
+
+            val userId = auth.currentUser!!.uid
+            val user = userRepository.getUserById(userId)
+
+            val generatedId = generatePostId()
+
+            val postRef = FirebaseFirestore
+                .getInstance()
+                .collection("posts")
+                .document(generatedId)
+
+            val now = Timestamp.now()
+
+            val updatedPost = post.copy(
+                id = generatedId,
+                authorId = user.uid,
+                authorName = user.fullName,
+                authorAvatarUrl = user.profilePictureUrl,
+                createdAt = now,
+                imageUrls = imageUrls,
+                videoUrls = videoUrls,
+                videoThumbnailUrls = videoThumbnailUrls
+            )
+
+            postRef.set(updatedPost).await()
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-
-        val userId = auth.currentUser!!.uid
-        val user = userRepository.getUserById(userId)
-
-        val generatedId = generatePostId()
-
-        val postRef = FirebaseFirestore
-            .getInstance()
-            .collection("posts")
-            .document(generatedId)
-
-        val now = Timestamp.now()
-
-        val updatedPost = post.copy(
-            id = generatedId,
-            authorId = user.uid,
-            authorName = user.fullName,
-            authorAvatarUrl = user.profilePictureUrl,
-            createdAt = now,
-            imageUrls = imageUrls,
-            videoUrls = videoUrls,
-            videoThumbnailUrls = videoThumbnailUrls
-        )
-
-        postRef.set(updatedPost).await()
     }
 
     private suspend fun uploadFile(ref: StorageReference, uri: Uri): String {
