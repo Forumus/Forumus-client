@@ -15,6 +15,7 @@ import com.hcmus.forumus_client.data.model.createdAtMillis
 import com.hcmus.forumus_client.data.repository.CommentRepository
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
+import android.util.Log
 import kotlinx.coroutines.launch
 
 /**
@@ -86,10 +87,6 @@ class ProfileViewModel(
     private val _upvotesCount = MutableLiveData<Int>(0)
     val upvotesCount: LiveData<Int> = _upvotesCount
 
-    // Current logged-in user (for top app bar and permission checks)
-    private val _currentUser = MutableLiveData<User?>()
-    val currentUser: LiveData<User?> = _currentUser
-
     init {
         // Set up MediatorLiveData sources to automatically recompute visible items
         // when any of these LiveData values change
@@ -108,71 +105,16 @@ class ProfileViewModel(
      * @param userId The ID of the user whose profile to display
      * @param initialMode The initial display mode (GENERAL, POSTS, or REPLIES)
      */
-    fun init(userId: String, initialMode: ProfileMode) {
+    fun loadUserInfo(userId: String) {
         this.userId = userId
-        _mode.value = initialMode
+        _mode.value = ProfileMode.GENERAL
 
-        loadUserInfo()
-        loadUserContent()
-    }
-
-    /**
-     * Changes the current display mode for filtering content.
-     *
-     * The visibleItems list will automatically update through MediatorLiveData
-     * without requiring additional repository calls.
-     *
-     * @param mode The new ProfileMode to display
-     */
-    fun setMode(mode: ProfileMode) {
-        if (_mode.value == mode) return
-        _mode.value = mode
-    }
-
-    /**
-     * Loads the user's profile information from the repository.
-     *
-     * Executed in viewModelScope to ensure coroutine cancellation on view model clear.
-     * Updates user LiveData on success, or error LiveData on failure.
-     */
-    private fun loadUserInfo() {
-        viewModelScope.launch {
-            try {
-                val userData = userRepository.getUserById(userId)
-                _user.value = userData
-            } catch (e: Exception) {
-                _error.value = e.message
-            }
-        }
-    }
-
-    /**
-     * Loads the current logged-in user's information for UI display.
-     *
-     * Used to populate the top app bar with the current user's avatar.
-     */
-    fun loadCurrentUser() {
-        viewModelScope.launch {
-            val user = userRepository.getCurrentUser()
-            _currentUser.value = user
-        }
-    }
-
-    /**
-     * Loads all user content (posts and comments) from repositories.
-     *
-     * Fetches:
-     * - All posts created by the user
-     * - All comments created by the user
-     * - Combines both into a mixed chronologically-sorted list
-     *
-     * Updates statistics (post count, comment count, upvote count).
-     * Clears error state on success.
-     */
-    private fun loadUserContent() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                val userData = userRepository.getUserById(userId)
+                _user.value = userData
+
                 // Fetch all posts for the user, sorted newest first
                 val allPosts = postRepository.getPostsByUser(userId)
                     .sortedByDescending { it.createdAt?.toDate()?.time ?: 0L }
@@ -196,11 +138,25 @@ class ProfileViewModel(
 
                 _error.value = null
             } catch (e: Exception) {
+                Log.d("ProfileViewModel", "Error loading user info", e)
                 _error.value = e.message
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+
+    /**
+     * Changes the current display mode for filtering content.
+     *
+     * The visibleItems list will automatically update through MediatorLiveData
+     * without requiring additional repository calls.
+     *
+     * @param mode The new ProfileMode to display
+     */
+    fun setMode(mode: ProfileMode) {
+        if (_mode.value == mode) return
+        _mode.value = mode
     }
 
     /**

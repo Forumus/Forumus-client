@@ -19,7 +19,7 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ActivityVerificationBinding
 import com.hcmus.forumus_client.ui.auth.success.SuccessActivity
 import com.hcmus.forumus_client.ui.auth.resetPassword.ResetPasswordActivity
-import com.hcmus.forumus_client.ui.home.HomeActivity
+import com.hcmus.forumus_client.ui.main.MainActivity
 
 class VerificationActivity : AppCompatActivity() {
     
@@ -168,7 +168,7 @@ class VerificationActivity : AppCompatActivity() {
                         finish()
                     }
                     "login_verification" -> {
-                        val intent = Intent(this, HomeActivity::class.java)
+                        val intent = Intent(this, MainActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                         finish()

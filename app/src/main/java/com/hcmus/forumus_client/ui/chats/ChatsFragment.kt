@@ -1,62 +1,65 @@
 package com.hcmus.forumus_client.ui.chats
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.ChatType
-import com.hcmus.forumus_client.databinding.ActivityChatsBinding
-import com.hcmus.forumus_client.ui.conversation.ConversationActivity
-import androidx.activity.viewModels
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.hcmus.forumus_client.databinding.FragmentChatsBinding
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
-import com.hcmus.forumus_client.ui.navigation.AppNavigator
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlin.getValue
 
-class ChatsActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityChatsBinding
-
+class ChatsFragment : Fragment (){
+    private lateinit var binding: FragmentChatsBinding
+    private val viewModel: ChatsViewModel by viewModels()
+    private val navController by lazy { findNavController() }
     private lateinit var chatsAdapter: ChatsAdapter
     private lateinit var userSearchAdapter: UserSearchAdapter
-    private val viewModel: ChatsViewModel by viewModels()
-
-    private val navigator by lazy { AppNavigator(this) }
-
     private val searchHandler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
+    private var chatType: Enum<ChatType> = ChatType.DEFAULT_CHATS
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityChatsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentChatsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        setupWindowInsetsHandling()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupSwipeRefresh()
         setupRecyclerView()
-        setupBottomNavigationBar()
+        setupBottomNavigation()
         setupSearchView()
         setupObservers()
         setupClickListeners()
-        setupLoadChats(ChatType.DEFAULT_CHATS)
+        setupLoadChats(chatType)
     }
 
     private fun setupLoadChats(chatType: Enum<ChatType>) {
@@ -64,39 +67,26 @@ class ChatsActivity : AppCompatActivity() {
         viewModel.loadChats(chatType)
     }
 
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            setupLoadChats(chatType)
+        }
+    }
+
     private fun setupRecyclerView() {
         chatsAdapter = ChatsAdapter({ chatItem ->
             // Handle chat item click - navigate to individual chat
-            navigateToChatActivity(chatItem)
+            val action = ChatsFragmentDirections.actionChatsFragmentToConversationFragment(chatItem.id,
+                chatItem.contactName, chatItem.email, chatItem.profilePictureUrl)
+            navController.navigate(action)
         }, { chatItem ->
             // Handle chat item delete
             deleteChat(chatItem)
         })
 
         binding.recyclerChats.apply {
-            layoutManager = LinearLayoutManager(this@ChatsActivity)
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = chatsAdapter
-        }
-    }
-
-    private fun setupWindowInsetsHandling() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(
-                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
-            )
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-    }
-
-    private fun setupBottomNavigationBar() {
-        binding.bottomBar.apply {
-            onHomeClick = { navigator.openHome() }
-            onExploreClick = { navigator.openSearch() }
-            onCreatePostClick = { navigator.openCreatePost() }
-            onAlertsClick = { navigator.openAlerts() }
-            onChatClick = { navigator.openChat() }
-            setActiveTab(BottomNavigationBar.Tab.CHAT)
         }
     }
 
@@ -119,20 +109,20 @@ class ChatsActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.isLoading.observe(this, Observer { isLoading ->
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             // Show/hide loading indicator
-            binding.loadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.swipeRefresh.isRefreshing = isLoading
         })
 
-        viewModel.error.observe(this, Observer { errorMessage ->
+        viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
             if (errorMessage != null) {
-                Toast.makeText(this@ChatsActivity, errorMessage, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
                 viewModel.clearError()
             }
         })
 
         // Search observers
-        viewModel.isSearchVisible.observe(this, Observer { isVisible ->
+        viewModel.isSearchVisible.observe(viewLifecycleOwner, Observer { isVisible ->
             binding.searchContainer.visibility = if (isVisible) View.VISIBLE else View.GONE
             if (isVisible) {
                 binding.editSearch.requestFocus()
@@ -142,21 +132,23 @@ class ChatsActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.searchResults.observe(this, Observer { users ->
+        viewModel.searchResults.observe(viewLifecycleOwner, Observer { users ->
             userSearchAdapter.submitList(users)
             binding.textEmptySearch.visibility =
                 if (users.isEmpty() && binding.editSearch.text.toString().isNotBlank())
                     View.VISIBLE else View.GONE
         })
 
-        viewModel.isSearching.observe(this, Observer { isSearching ->
+        viewModel.isSearching.observe(viewLifecycleOwner, Observer { isSearching ->
             binding.progressSearch.visibility = if (isSearching) View.VISIBLE else View.GONE
         })
 
-        viewModel.chatResult.observe(this, Observer { chatItem ->
+        viewModel.chatResult.observe(viewLifecycleOwner, Observer { chatItem ->
             Log.d("ChatsFragment", "Chat started with user, navigating to chat $chatItem")
             chatItem?.let {
-                navigateToChatActivity(it)
+                val action = ChatsFragmentDirections.actionChatsFragmentToConversationFragment(it.id,
+                    it.contactName, it.email, it.profilePictureUrl)
+                navController.navigate(action)
             }
         })
     }
@@ -167,7 +159,7 @@ class ChatsActivity : AppCompatActivity() {
         }
 
         binding.recyclerSearchResults.apply {
-            layoutManager = LinearLayoutManager(this@ChatsActivity)
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = userSearchAdapter
         }
 
@@ -208,46 +200,47 @@ class ChatsActivity : AppCompatActivity() {
 
         binding.btnAllChats.setOnClickListener {
             binding.btnAllChats.background = AppCompatResources.getDrawable(
-                this@ChatsActivity,
+                requireContext(),
                 R.drawable.chat_filter_button_selected_background
             )
             binding.btnUnreadChats.background = null
             setupLoadChats(ChatType.DEFAULT_CHATS)
+            chatType = ChatType.DEFAULT_CHATS
         }
 
         binding.btnUnreadChats.setOnClickListener {
             binding.btnUnreadChats.background = AppCompatResources.getDrawable(
-                this@ChatsActivity,
+                requireContext(),
                 R.drawable.chat_filter_button_selected_background
             )
             binding.btnAllChats.background = null
             setupLoadChats(ChatType.UNREAD_CHATS)
+            chatType = ChatType.UNREAD_CHATS
+        }
+    }
+
+    /**
+     * Setup bottom navigation bar for fragment switching.
+     */
+    private fun setupBottomNavigation() {
+        binding.bottomBar.apply {
+            setActiveTab(BottomNavigationBar.Tab.CHAT)
+            onHomeClick = { navController.navigate(R.id.homeFragment) }
+            onExploreClick = { navController.navigate(R.id.searchFragment) }
+            onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
+            onAlertsClick = { }
+            onChatClick = { navController.navigate(R.id.chatsFragment) }
         }
     }
 
     private fun showKeyboard() {
-        val imm = ContextCompat.getSystemService(this@ChatsActivity, InputMethodManager::class.java)
+        val imm = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
         imm?.showSoftInput(binding.editSearch, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun hideKeyboard() {
-        val imm = ContextCompat.getSystemService(this@ChatsActivity, InputMethodManager::class.java)
+        val imm = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
         imm?.hideSoftInputFromWindow(binding.editSearch.windowToken, 0)
-    }
-
-    private fun navigateToChatActivity(chatItem: ChatItem) {
-        try {
-            Log.d("ChatsFragment", "Navigating to chat with: ${chatItem.contactName}")
-            val intent = Intent(this@ChatsActivity, ConversationActivity::class.java).apply {
-                putExtra(ConversationActivity.Companion.EXTRA_CHAT_ID, chatItem.id)
-                putExtra(ConversationActivity.Companion.EXTRA_USER_NAME, chatItem.contactName)
-                putExtra(ConversationActivity.Companion.EXTRA_USER_EMAIL, chatItem.email)
-                putExtra(ConversationActivity.Companion.EXTRA_USER_PICTURE_URL, chatItem.profilePictureUrl)
-            }
-            startActivity(intent)
-        } catch (e: Exception) {
-            Log.e("ChatsFragment", "Error navigating to chat", e)
-        }
     }
 
     private fun deleteChat(chatItem: ChatItem) {
@@ -257,7 +250,7 @@ class ChatsActivity : AppCompatActivity() {
 
     private fun showDeleteChatConfirmationDialog(chatItem: ChatItem) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_delete_chat, null)
-        val dialog = AlertDialog.Builder(this@ChatsActivity)
+        val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setCancelable(true)
             .create()
@@ -272,7 +265,7 @@ class ChatsActivity : AppCompatActivity() {
         dialogView.findViewById<Button>(R.id.btn_delete).setOnClickListener {
             dialog.dismiss()
             viewModel.deleteChat(chatItem.id)
-            Toast.makeText(this@ChatsActivity, "Chat deleted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Chat deleted", Toast.LENGTH_SHORT).show()
         }
 
         dialog.show()

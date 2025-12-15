@@ -12,6 +12,7 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.ui.common.PostViewHolder
 import com.hcmus.forumus_client.ui.common.CommentViewHolder
 import android.view.View
+import com.hcmus.forumus_client.data.model.Topic
 
 /**
  * RecyclerView adapter that displays a mixed list of posts and comments in a user's profile.
@@ -37,6 +38,19 @@ class ProfileAdapter(
         // View type constants for determining which ViewHolder to use
         private const val TYPE_POST = 1
         private const val TYPE_COMMENT = 2
+    }
+
+    // Map of topic id to Topic object
+    private var topicMap: Map<String, Topic> = emptyMap()
+
+    /**
+     * Updates the adapter with the list of topics.
+     *
+     * @param topics The list of topics to map
+     */
+    fun setTopics(topics: List<Topic>) {
+        this.topicMap = topics.associateBy { it.id }
+        notifyDataSetChanged()
     }
 
     /**
@@ -103,7 +117,7 @@ class ProfileAdapter(
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is FeedItem.PostItem -> (holder as PostViewHolder).bind(item.post)
+            is FeedItem.PostItem -> (holder as PostViewHolder).bind(item.post, topicMap)
             is FeedItem.CommentItem -> (holder as CommentViewHolder).bind(item.comment, false)
         }
     }

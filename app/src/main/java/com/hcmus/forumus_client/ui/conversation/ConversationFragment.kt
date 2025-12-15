@@ -7,17 +7,16 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.appcompat.app.AlertDialog
@@ -25,17 +24,22 @@ import com.bumptech.glide.Glide
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.Message
 import com.hcmus.forumus_client.data.model.MessageType
-import com.hcmus.forumus_client.databinding.ActivityConversationBinding
+import com.hcmus.forumus_client.databinding.FragmentConversationBinding
 import com.hcmus.forumus_client.ui.image.FullscreenImageActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
+import androidx.fragment.app.Fragment
+import kotlin.getValue
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.hcmus.forumus_client.data.model.ChatType
 
-class ConversationActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityConversationBinding
+class ConversationFragment : Fragment() {
+    private lateinit var binding: FragmentConversationBinding
     private lateinit var messageAdapter: ConversationAdapter
     private lateinit var imagePreviewAdapter: ImagePreviewAdapter
     private val viewModel: ConversationViewModel by viewModels()
@@ -43,13 +47,39 @@ class ConversationActivity : AppCompatActivity() {
     private var selectedImageUris: MutableList<Uri> = mutableListOf()
     private var currentPhotoPath: String? = null
     private var photoUri: Uri = Uri.EMPTY
-    
+    private val args: ConversationFragmentArgs by navArgs()
+
     companion object {
-        const val EXTRA_CHAT_ID = "extra_chat_id"
-        const val EXTRA_USER_NAME = "extra_user_name"
-        const val EXTRA_USER_EMAIL = "extra_user_email"
-        const val EXTRA_USER_PICTURE_URL = "extra_user_picture_url"
         private const val MAX_IMAGES = 5
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentConversationBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        chatId = args.id
+
+        if (chatId == "" || chatId == null) {
+            Toast.makeText(requireContext(), "Invalid chat", Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+            return
+        }
+
+        setupUI()
+        setupRecyclerView()
+        setupObservers()
+        setupClickListeners()
+
+        // Load messages
+        chatId?.let { viewModel.loadMessages(it) }
     }
 
     private val pickImageLauncher = registerForActivityResult(
@@ -58,7 +88,7 @@ class ConversationActivity : AppCompatActivity() {
         if (uris.isNotEmpty()) {
             if (uris.size + selectedImageUris.size > MAX_IMAGES) {
                 Toast.makeText(
-                    this,
+                    requireContext(),
                     "Maximum $MAX_IMAGES images allowed",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -80,7 +110,7 @@ class ConversationActivity : AppCompatActivity() {
                 updateImagePreview()
             } else {
                 Toast.makeText(
-                    this,
+                    requireContext(),
                     "Maximum $MAX_IMAGES images allowed",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -99,7 +129,7 @@ class ConversationActivity : AppCompatActivity() {
         if (isGranted) {
             openImagePicker()
         } else {
-            Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Storage permission denied", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -109,43 +139,16 @@ class ConversationActivity : AppCompatActivity() {
         if (isGranted) {
             openCamera()
         } else {
-            Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityConversationBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        chatId = intent.getStringExtra(EXTRA_CHAT_ID)
-        if (chatId == null) {
-            Toast.makeText(this, "Invalid chat", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
-        setupUI()
-        setupRecyclerView()
-        setupObservers()
-        setupClickListeners()
-        
-        // Load messages
-        chatId?.let { viewModel.loadMessages(it) }
     }
 
     private fun setupUI() {
         // Get user info from intent
-        val userName = intent.getStringExtra(EXTRA_USER_NAME) ?: "Chat"
-        val userEmail = intent.getStringExtra(EXTRA_USER_EMAIL) ?: ""
-        val userPictureUrl = intent.getStringExtra(EXTRA_USER_PICTURE_URL) ?: ""
-        
+        val userName = args.contactName
+        val userEmail = args.email
+        val userPictureUrl = args.profilePictureUrl
+
         binding.tvUserName.text = userName
         binding.tvUserEmail.text = userEmail
 
@@ -174,10 +177,10 @@ class ConversationActivity : AppCompatActivity() {
             adapter = messageAdapter
             // Optimization: Cache more view holders offscreen to prevent re-binding on small scrolls
             setItemViewCacheSize(20)
-            layoutManager = LinearLayoutManager(this@ConversationActivity).apply {
+            layoutManager = LinearLayoutManager(requireContext()).apply {
                 stackFromEnd = true // Keeps view at bottom
             }
-            
+
             // Add scroll listener to detect when user scrolls to top
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -201,7 +204,7 @@ class ConversationActivity : AppCompatActivity() {
         }
         binding.rvImagePreview.apply {
             adapter = imagePreviewAdapter
-            layoutManager = LinearLayoutManager(this@ConversationActivity, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
     }
 
@@ -232,11 +235,9 @@ class ConversationActivity : AppCompatActivity() {
                     viewModel.sendMessageResult.collectLatest { success ->
                         if (success) {
                             // Clear inputs on main thread - this is lightweight
-                            runOnUiThread {
-                                binding.etMessage.text.clear()
-                                binding.btnSend.isEnabled = true
-                                clearSelectedImages()
-                            }
+                            binding.etMessage.text.clear()
+                            binding.btnSend.isEnabled = true
+                            clearSelectedImages()
                         }
                         viewModel.clearSendResult()
                     }
@@ -268,16 +269,16 @@ class ConversationActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.isLoadingMore.observe(this, Observer { isLoadingMore ->
+        viewModel.isLoadingMore.observe(viewLifecycleOwner, Observer { isLoadingMore ->
             // Show/hide loading indicator when fetching previous messages
             if (isLoadingMore) {
                 Log.d("ConversationActivity", "Loading more messages...")
             }
         })
 
-        viewModel.error.observe(this, Observer { errorMessage ->
+        viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
             if (errorMessage != null) {
-                Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
                 viewModel.clearError()
             }
         })
@@ -285,25 +286,25 @@ class ConversationActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         binding.btnBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-        
+
         binding.btnSend.setOnClickListener {
             sendMessage()
         }
-        
+
         binding.btnMenu.setOnClickListener {
             // Handle menu action
         }
-        
+
         binding.btnAttachment.setOnClickListener {
             showImageSelectionDialog()
         }
-        
+
         binding.btnVoice.setOnClickListener {
             // Handle voice recording
         }
-        
+
         // Handle Enter key press in EditText
         binding.etMessage.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEND) {
@@ -323,7 +324,7 @@ class ConversationActivity : AppCompatActivity() {
         }
 
         when {
-            ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED -> {
                 openImagePicker()
             }
             else -> {
@@ -334,7 +335,7 @@ class ConversationActivity : AppCompatActivity() {
 
     private fun checkPermissionAndOpenCamera() {
         when {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
                 openCamera()
             }
             else -> {
@@ -352,15 +353,15 @@ class ConversationActivity : AppCompatActivity() {
             // Create image file
             val imageFile = createImageFile()
             photoUri = FileProvider.getUriForFile(
-                this,
-                "${packageName}.fileprovider",
+                requireContext(),
+                "${requireContext().packageName}.fileprovider",
                 imageFile
             )
-            
+
             // Launch camera
             takePictureLauncher.launch(photoUri)
         } catch (ex: Exception) {
-            Toast.makeText(this, "Error opening camera: ${ex.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Error opening camera: ${ex.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -368,12 +369,12 @@ class ConversationActivity : AppCompatActivity() {
     private fun createImageFile(): File {
         // Create an image file name
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        
+        val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
         if (storageDir != null && !storageDir.exists()) {
             storageDir.mkdirs()
         }
-        
+
         return File.createTempFile(
             "JPEG_${timeStamp}_",
             ".jpg",
@@ -386,7 +387,7 @@ class ConversationActivity : AppCompatActivity() {
 
     private fun updateImagePreview() {
         imagePreviewAdapter.setImages(selectedImageUris)
-        
+
         if (selectedImageUris.isNotEmpty()) {
             binding.imagePreviewContainer.visibility = android.view.View.VISIBLE
         } else {
@@ -398,27 +399,27 @@ class ConversationActivity : AppCompatActivity() {
         val messageText = binding.etMessage.text.toString().trim()
         val hasImages = selectedImageUris.isNotEmpty()
         val hasText = messageText.isNotEmpty()
-        
+
         if (!hasText && !hasImages) {
-            Toast.makeText(this, "Please enter a message or select images", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Please enter a message or select images", Toast.LENGTH_SHORT).show()
             return
         }
 
         // Disable send button immediately to prevent multiple sends
         binding.btnSend.isEnabled = false
-        
+
         // Convert URIs to strings on main thread (lightweight operation)
         val imageUriStrings = selectedImageUris.map { it.toString() }.toMutableList()
-        
+
         // Send message (heavy operations will be done in background)
         viewModel.sendMessage(messageText, imageUriStrings)
     }
 
     private fun openFullscreenImageView(imageUrls: List<String>, initialPosition: Int) {
-        val intent = FullscreenImageActivity.createIntent(this, imageUrls, initialPosition)
+        val intent = FullscreenImageActivity.createIntent(requireContext(), imageUrls, initialPosition)
         startActivity(intent)
     }
-    
+
     private fun clearSelectedImages() {
         selectedImageUris.clear()
         currentPhotoPath = null
@@ -428,7 +429,7 @@ class ConversationActivity : AppCompatActivity() {
 
     private fun showImageSelectionDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_image_selection, null)
-        val dialog = AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setCancelable(true)
             .create()
@@ -448,22 +449,22 @@ class ConversationActivity : AppCompatActivity() {
 
         dialog.show()
     }
-    
+
     private fun showDeleteMessageDialog(message: Message) {
         // Only allow deletion of own messages that are not already deleted
         if (message.type == MessageType.DELETED) {
-            Toast.makeText(this, "This message has already been deleted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "This message has already been deleted", Toast.LENGTH_SHORT).show()
             return
         }
-        
+
         val currentUserId = viewModel.getCurrentUserId()
         if (message.senderId != currentUserId) {
-            Toast.makeText(this, "You can only delete your own messages", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "You can only delete your own messages", Toast.LENGTH_SHORT).show()
             return
         }
-        
+
         val dialogView = layoutInflater.inflate(R.layout.dialog_delete_message, null)
-        val dialog = AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setCancelable(true)
             .create()
@@ -478,7 +479,7 @@ class ConversationActivity : AppCompatActivity() {
         dialogView.findViewById<android.widget.Button>(R.id.btn_delete).setOnClickListener {
             dialog.dismiss()
             viewModel.deleteMessage(message.id)
-            Toast.makeText(this, "Message deleted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Message deleted", Toast.LENGTH_SHORT).show()
         }
 
         dialog.show()

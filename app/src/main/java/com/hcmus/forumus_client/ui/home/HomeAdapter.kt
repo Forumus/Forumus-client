@@ -8,6 +8,7 @@ import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.ui.common.PostViewHolder
 import android.view.View
+import com.hcmus.forumus_client.data.model.Topic
 
 /**
  * RecyclerView adapter for displaying posts in the home feed.
@@ -20,6 +21,9 @@ class HomeAdapter(
     private var items: List<Post>,
     private val onActionClick: (Post, PostAction, View) -> Unit
 ) : RecyclerView.Adapter<PostViewHolder>() {
+
+    // Map of topic id to Topic object
+    private var topicMap: Map<String, Topic> = emptyMap()
 
     /**
      * Creates a new PostViewHolder instance for each post item.
@@ -41,7 +45,7 @@ class HomeAdapter(
      * @param position The position of the post in the list
      */
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], topicMap)
     }
 
     /**
@@ -59,6 +63,16 @@ class HomeAdapter(
      */
     fun submitList(newItems: List<Post>) {
         items = newItems
+        notifyDataSetChanged()
+    }
+
+    /**
+     * Updates the adapter with the list of topics.
+     *
+     * @param topics The list of topics to map
+     */
+    fun setTopics(topics: List<Topic>) {
+        topicMap = topics.associateBy { it.id }
         notifyDataSetChanged()
     }
 }

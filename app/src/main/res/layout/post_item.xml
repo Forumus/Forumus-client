@@ -104,10 +104,31 @@
             android:fontFamily="@font/montserrat_regular"
             android:text="Excited to announce that registration for our annual Tech Fest is now open! Early bird discount available for the first 100 students."
             android:textColor="#666666"
-            android:layout_marginBottom="10dp"
             android:textSize="13sp" />
 
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPostImages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- Topic Tags Container -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="10dp">
+
+        <LinearLayout
+            android:id="@+id/topicContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <!-- Action Bar Section -->
     <LinearLayout

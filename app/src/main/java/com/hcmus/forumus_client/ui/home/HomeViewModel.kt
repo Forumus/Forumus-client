@@ -4,14 +4,16 @@ import android.widget.Toast
 import androidx.lifecycle.*
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
+import com.hcmus.forumus_client.data.repository.ReportRepository
 import com.hcmus.forumus_client.data.model.Post
-import com.hcmus.forumus_client.data.model.User
+import com.hcmus.forumus_client.data.model.PostStatus
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.data.model.Report
 import com.hcmus.forumus_client.data.model.Violation
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
 
 /**
@@ -20,12 +22,9 @@ import okhttp3.internal.platform.PlatformRegistry.applicationContext
  */
 class HomeViewModel(
     private val userRepository: UserRepository = UserRepository(),
-    private val postRepository: PostRepository = PostRepository()
+    private val postRepository: PostRepository = PostRepository(),
+    private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
-
-    // Current user profile
-    private val _currentUser = MutableLiveData<User?>()
-    val currentUser: LiveData<User?> = _currentUser
 
     // List of posts for the home feed
     private val _posts = MutableLiveData<List<Post>>(emptyList())
@@ -39,13 +38,38 @@ class HomeViewModel(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
+    // List of topics for the drawer
+    private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
+    val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
+
+    enum class SortOption {
+        NONE, NEW, TRENDING
+    }
+
+    // Sorting state
+    private val _sortOption = MutableLiveData(SortOption.NONE)
+    val sortOption: LiveData<SortOption> = _sortOption
+
+    // Selected topics for filtering
+    private val _selectedTopics = MutableLiveData<Set<String>>(emptySet())
+    val selectedTopics: LiveData<Set<String>> = _selectedTopics
+
+    // Keep track of the original list to support un-sorting
+    private var originalPosts: List<Post> = emptyList()
+
     /**
-     * Loads the currently authenticated user from the repository.
+     * Fetches topics from Firestore.
      */
-    fun loadCurrentUser() {
+    fun loadTopics() {
         viewModelScope.launch {
-            val user = userRepository.getCurrentUser()
-            _currentUser.value = user
+            try {
+                val snapshot = FirebaseFirestore.getInstance().collection("topics").get().await()
+                val topicList = snapshot.toObjects(com.hcmus.forumus_client.data.model.Topic::class.java)
+                _topics.value = topicList
+            } catch (e: Exception) {
+                // Handle error or use default topics if needed
+                e.printStackTrace()
+            }
         }
     }
 
@@ -57,13 +81,104 @@ class HomeViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val result = postRepository.getPosts()
-                _posts.value = result
+                val result = postRepository.getPosts(100)
+                originalPosts = result // Save original order
+
+                applyFilters()
+
                 _error.value = null
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Applie filtering logic.
+     */
+    private fun applyFilters() {
+        val selected = _selectedTopics.value ?: emptySet()
+        var filteredList = if (selected.isEmpty()) {
+            originalPosts
+        } else {
+            originalPosts.filter { post ->
+                // Post must have at least one topic in the selected set
+                // Note: post.topicIds is List<String>, selected is Set<String>
+                post.topicIds.any { it in selected }
+            }
+        }
+
+        val sort = _sortOption.value ?: SortOption.NONE
+        filteredList = when (sort) {
+            SortOption.NEW -> filteredList.sortedByDescending { it.createdAt }
+            SortOption.TRENDING -> filteredList.sortedByDescending {
+                // Trending score = Total interactions (upvotes + downvotes + comments)
+                it.upvoteCount + it.downvoteCount + it.commentCount
+            }
+            SortOption.NONE -> filteredList
+        }
+
+        _posts.value = filteredList
+    }
+
+    /**
+     * Toggles the sort option.
+     * If the same option is clicked, it toggles off to NONE.
+     *
+     * @param option The sort option to toggle
+     */
+    fun toggleSort(option: SortOption) {
+        val current = _sortOption.value ?: SortOption.NONE
+        if (current == option) {
+            _sortOption.value = SortOption.NONE
+        } else {
+            _sortOption.value = option
+        }
+        applyFilters()
+    }
+
+    /**
+     * Toggles the selection of a topic for filtering.
+     * Enforces a maximum of 5 selected topics.
+     *
+     * @param topicId The ID of the topic to toggle
+     */
+    fun toggleTopicSelection(topicId: String) {
+        val currentSelection = _selectedTopics.value?.toMutableSet() ?: mutableSetOf()
+
+        if (currentSelection.contains(topicId)) {
+            currentSelection.remove(topicId)
+        } else {
+            if (currentSelection.size < 5) {
+                currentSelection.add(topicId)
+            } else {
+                // Determine what to do if limit reached?
+                // For now, simple logic: Do nothing or replace oldest?
+                // User requirement: "up to 5", usually implies adding more is blocked.
+                // We will just return to block adding the 6th.
+                return
+            }
+        }
+
+        _selectedTopics.value = currentSelection
+        applyFilters()
+    }
+
+    fun addFieldForPosts() {
+        viewModelScope.launch {
+            try {
+                // Lấy trực tiếp danh sách post từ Firestore
+                val posts = postRepository.getPosts(1000) // tăng limit nếu cần
+
+                posts.forEach { post ->
+                    val updated = post.copy(status = PostStatus.APPROVED)
+                    postRepository.updatePost(updated)
+                }
+
+            } catch (e: Exception) {
+                _error.value = "Failed to migrate post status: ${e.message}"
             }
         }
     }
@@ -133,7 +248,6 @@ class HomeViewModel(
 
                 // Create report object
                 val report = Report(
-                    id = FirebaseFirestore.getInstance().collection("reports").document().id,
                     postId = post.id,
                     authorId = userId,
                     nameViolation = violation.name,
@@ -141,10 +255,7 @@ class HomeViewModel(
                 )
 
                 // Save report to Firebase
-                FirebaseFirestore.getInstance()
-                    .collection("reports")
-                    .document(report.id)
-                    .set(report)
+                reportRepository.saveReport(report)
 
                 Toast.makeText(applicationContext, "Post reported", Toast.LENGTH_SHORT).show()
 
@@ -169,16 +280,5 @@ class HomeViewModel(
                 _error.value = "Failed to report post: ${e.message}"
             }
         }
-    }
-
-    /**
-     * Saves a post to user's bookmarks.
-     * (To be implemented with actual bookmark functionality)
-     *
-     * @param post The post to bookmark
-     */
-    fun savePostToBookmarks(post: Post) {
-        // TODO: Implement bookmark functionality
-        // This would typically save the post ID to user's bookmarks in Firebase
     }
 }

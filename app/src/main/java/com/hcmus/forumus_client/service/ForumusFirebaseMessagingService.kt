@@ -13,7 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.hcmus.forumus_client.R
-import com.hcmus.forumus_client.ui.conversation.ConversationActivity
+import com.hcmus.forumus_client.ui.main.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -104,11 +104,12 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
         senderEmail: String,
         senderPictureUrl: String
     ) {
-        val intent = Intent(this, ConversationActivity::class.java).apply {
-            putExtra(ConversationActivity.EXTRA_CHAT_ID, chatId)
-            putExtra(ConversationActivity.EXTRA_USER_NAME, title)
-            putExtra(ConversationActivity.EXTRA_USER_EMAIL, senderEmail)
-            putExtra(ConversationActivity.EXTRA_USER_PICTURE_URL, senderPictureUrl)
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("chatId", chatId)
+            putExtra("senderName", title)
+            putExtra("senderEmail", senderEmail)
+            putExtra("senderPictureUrl", senderPictureUrl)
         }
 
         val pendingIntent = PendingIntent.getActivity(

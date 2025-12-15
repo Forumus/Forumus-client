@@ -13,9 +13,10 @@ import com.hcmus.forumus_client.databinding.ActivitySplashBinding
 import com.hcmus.forumus_client.data.local.TokenManager
 import com.hcmus.forumus_client.data.local.PreferencesManager
 import com.hcmus.forumus_client.ui.auth.login.LoginActivity
-import com.hcmus.forumus_client.ui.home.HomeActivity
+import com.hcmus.forumus_client.ui.main.MainActivity
 import com.hcmus.forumus_client.ui.onboarding.welcome.WelcomeActivity
 
+@SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
     private lateinit var preferenceManager: PreferencesManager
@@ -47,8 +48,8 @@ class SplashActivity : AppCompatActivity() {
             tokenManager.hasValidSession() -> {
                 val remainingTime = tokenManager.getRemainingSessionTime()
                 val daysRemaining = remainingTime / (24 * 60 * 60 * 1000)
-                Log.d("SplashActivity", "Valid session found - remember me enabled, ${daysRemaining} days remaining")
-                HomeActivity::class.java
+                Log.d("SplashActivity", "Valid session found - remember me enabled, $daysRemaining days remaining")
+                MainActivity::class.java
             }
             else -> {
                 Log.d("SplashActivity", "No valid session, remember me disabled, or auto-login disabled - showing login")
@@ -58,7 +59,7 @@ class SplashActivity : AppCompatActivity() {
         
         val intent = Intent(this, nextActivity)
         // Clear task stack when navigating to home from valid session
-        if (nextActivity == HomeActivity::class.java) {
+        if (nextActivity == MainActivity::class.java) {
             intent.putExtras(getIntent())
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }

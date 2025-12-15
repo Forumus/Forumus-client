@@ -1,45 +1,39 @@
 package com.hcmus.forumus_client.ui.settings
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import coil.load
-import com.hcmus.forumus_client.databinding.ActivitySettingsBinding
-import com.hcmus.forumus_client.ui.navigation.AppNavigator
+import com.hcmus.forumus_client.databinding.FragmentSettingsBinding
+import com.hcmus.forumus_client.ui.home.HomeFragmentDirections
+import kotlin.getValue
 
-/**
- * Activity for managing application settings and user preferences.
- *
- * Responsibilities:
- * - Display user profile information in header section
- * - Handle preference toggles (dark mode, push notifications, email notifications)
- * - Persist user settings using PreferencesManager
- * - Navigate to profile screen when view profile is clicked
- * - Show mock toast messages for other menu items
- * - Load and restore saved preferences on activity creation
- *
- * The activity uses SettingsViewModel to manage state and preferences,
- * with all preference changes automatically persisted to SharedPreferences.
- */
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment() {
 
-    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var binding: FragmentSettingsBinding
     private val viewModel: SettingsViewModel by viewModels() {
-        SettingsViewModelFactory(application)
+        SettingsViewModelFactory(requireActivity().application)
     }
-    
-    private val navigator by lazy { AppNavigator(this) }
+    private val navController by lazy { findNavController() }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         // Setup UI components and observe view model
-        setupWindowInsetsHandling()
         setupHeaderActions()
         setupProfileSection()
         setupToggleSwitches()
@@ -52,25 +46,11 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Handle system window insets by applying padding to avoid overlap with status bar,
-     * navigation bar and keyboard (IME).
-     */
-    private fun setupWindowInsetsHandling() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(
-                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
-            )
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-    }
-
-    /**
      * Setup back button and header interactions
      */
     private fun setupHeaderActions() {
         binding.ibBack.setOnClickListener {
-            finish()
+            navController.popBackStack()
         }
     }
 
@@ -110,38 +90,40 @@ class SettingsActivity : AppCompatActivity() {
         // View profile - navigate to profile screen
         binding.llViewProfile.setOnClickListener {
             viewModel.user.value?.let { user ->
-                navigator.openProfile(user.uid)
+                val action = HomeFragmentDirections
+                    .actionGlobalProfileFragment(user.uid)
+                navController.navigate(action)
             }
         }
 
         // Edit profile - mock toast
         binding.llEditProfile.setOnClickListener {
-            Toast.makeText(this, "Edit Profile - Coming Soon", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Edit Profile - Coming Soon", Toast.LENGTH_SHORT).show()
         }
 
         // Saved posts - mock toast
         binding.llSavedPosts.setOnClickListener {
-            Toast.makeText(this, "Saved Posts - Coming Soon", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Saved Posts - Coming Soon", Toast.LENGTH_SHORT).show()
         }
 
         // Help center - mock toast
         binding.llHelpCenter.setOnClickListener {
-            Toast.makeText(this, "Help Center - Coming Soon", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Help Center - Coming Soon", Toast.LENGTH_SHORT).show()
         }
 
         // Community guidelines - mock toast
         binding.llCommunityGuidelines.setOnClickListener {
-            Toast.makeText(this, "Community Guidelines - Coming Soon", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Community Guidelines - Coming Soon", Toast.LENGTH_SHORT).show()
         }
 
         // About forumus - mock toast
         binding.llAboutForumus.setOnClickListener {
-            Toast.makeText(this, "About Forumus - Coming Soon", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "About Forumus - Coming Soon", Toast.LENGTH_SHORT).show()
         }
 
         // Logout - mock toast
         binding.llLogout.setOnClickListener {
-            Toast.makeText(this, "Logout - Coming Soon", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Logout - Coming Soon", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -150,7 +132,7 @@ class SettingsActivity : AppCompatActivity() {
      */
     private fun observeViewModel() {
         // Observe current user for profile display
-        viewModel.user.observe(this) { user ->
+        viewModel.user.observe(viewLifecycleOwner) { user ->
             binding.ivUserAvatar.load(user.profilePictureUrl) {
                 crossfade(true)
             }
@@ -160,17 +142,17 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // Observe dark mode preference
-        viewModel.isDarkModeEnabled.observe(this) { isDarkMode ->
+        viewModel.isDarkModeEnabled.observe(viewLifecycleOwner) { isDarkMode ->
             binding.swDarkMode.isChecked = isDarkMode
         }
 
         // Observe push notifications preference
-        viewModel.isPushNotificationsEnabled.observe(this) { isEnabled ->
+        viewModel.isPushNotificationsEnabled.observe(viewLifecycleOwner) { isEnabled ->
             binding.swPushNotifications.isChecked = isEnabled
         }
 
         // Observe email notifications preference
-        viewModel.isEmailNotificationsEnabled.observe(this) { isEnabled ->
+        viewModel.isEmailNotificationsEnabled.observe(viewLifecycleOwner) { isEnabled ->
             binding.swEmailNotifications.isChecked = isEnabled
         }
     }

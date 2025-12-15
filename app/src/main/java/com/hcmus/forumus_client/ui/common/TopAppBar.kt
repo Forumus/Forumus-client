@@ -12,6 +12,7 @@ import com.hcmus.forumus_client.databinding.PopupProfileMenuBinding
 import android.graphics.Color
 import coil.load
 import androidx.core.graphics.drawable.toDrawable
+import android.view.View
 
 /**
  * A custom top app bar component with menu, logo, search, and profile functionalities.
@@ -29,11 +30,8 @@ class TopAppBar @JvmOverloads constructor(
 
     // Unified callback for all profile menu actions
     var onProfileMenuAction: ((ProfileMenuAction) -> Unit)? = null
-
-    // Individual callbacks for navigation actions
-    var onMenuClick: (() -> Unit)? = null         // Triggered when hamburger menu is tapped
+    var onFuncClick: (() -> Unit)? = null         // Triggered when hamburger menu is tapped
     var onHomeClick: (() -> Unit)? = null         // Triggered when logo is tapped
-    var onSearchClick: (() -> Unit)? = null       // Triggered when search icon is tapped
 
     init {
         // Set horizontal layout orientation for menu, logo, search, and profile elements
@@ -41,12 +39,11 @@ class TopAppBar @JvmOverloads constructor(
 
         with(binding) {
             // Menu button triggers navigation drawer or menu
-            menuButton.setOnClickListener { onMenuClick?.invoke() }
+            funcButton.setOnClickListener { onFuncClick?.invoke() }
             // Logo icon and text both navigate to home screen
             logoIcon.setOnClickListener { onHomeClick?.invoke() }
+
             logoText.setOnClickListener { onHomeClick?.invoke() }
-            // Search button opens search functionality
-            btnSearch.setOnClickListener { onSearchClick?.invoke() }
             // Profile image shows the profile popup menu
             profileImage.setOnClickListener {
                 showProfilePopup()
@@ -66,6 +63,10 @@ class TopAppBar @JvmOverloads constructor(
             placeholder(R.drawable.default_avatar)       // Show while loading
             error(R.drawable.default_avatar)             // Show if loading fails
         }
+    }
+
+    fun setIconFuncButton(icon: Int) {
+        binding.funcButton.setImageResource(icon)
     }
 
     /**
