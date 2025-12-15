@@ -1,6 +1,12 @@
 package com.hcmus.forumus_client.ui.main
 
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +18,13 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ActivityMainBinding
 import com.hcmus.forumus_client.ui.navigation.AppNavigator
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
+import androidx.core.view.GravityCompat
+import coil.load
+import com.hcmus.forumus_client.data.model.Topic
+import com.hcmus.forumus_client.ui.home.HomeViewModel
+import kotlin.text.ifEmpty
+import kotlin.text.lowercase
+import kotlin.text.startsWith
 
 /**
  * Main Activity that serves as the container for all Fragments.
@@ -34,8 +47,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupWindowInsetsHandling()
-        //setupTopAppBar()
-        setupBottomNavigation()
         setupNavigation()
         loadInitialData()
     }
@@ -55,20 +66,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Setup bottom navigation bar for fragment switching.
-     */
-    private fun setupBottomNavigation() {
-        binding.bottomBar.apply {
-            setActiveTab(BottomNavigationBar.Tab.HOME)
-            onHomeClick = { navController.navigate(R.id.homeFragment) }
-            onExploreClick = { Toast.makeText(this@MainActivity, "Explore", Toast.LENGTH_SHORT).show() }
-            onCreatePostClick = { navigator.openCreatePost() }
-            onAlertsClick = { navigator.openAlerts() }
-            onChatClick = { navController.navigate(R.id.chatsFragment) }
-        }
-    }
-
-    /**
      * Initialize the Navigation Component with NavHostFragment and set up destination changed listener.
      * Hides BottomNavigationBar when navigating to PostDetailFragment.
      */
@@ -78,26 +75,6 @@ class MainActivity : AppCompatActivity() {
 
         navController = navHostFragment?.navController
             ?: throw IllegalStateException("NavHostFragment not found")
-
-        // Listen to destination changes to control BottomNavigationBar visibility
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            binding.bottomBar.visibility = android.view.View.VISIBLE
-            //binding.topAppBar.visibility = android.view.View.VISIBLE
-
-            when (destination.id) {
-                R.id.postDetailFragment -> {
-                    // Hide BottomNavigationBar for Post Detail view
-                    binding.bottomBar.visibility = android.view.View.GONE
-                }
-                R.id.chatsFragment -> {
-                    //binding.topAppBar.visibility = android.view.View.GONE
-                }
-                R.id.conversationFragment, R.id.settingsFragment ->{
-                    //binding.topAppBar.visibility = android.view.View.GONE
-                    binding.bottomBar.visibility = android.view.View.GONE
-                }
-            }
-        }
     }
 
     /**

@@ -19,6 +19,7 @@ import com.hcmus.forumus_client.databinding.FragmentProfileBinding
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 import android.util.Log
 import com.hcmus.forumus_client.NavGraphDirections
+import com.hcmus.forumus_client.ui.common.BottomNavigationBar
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 
 /**
@@ -62,6 +63,7 @@ class ProfileFragment : Fragment() {
         setupSwipeRefresh()
         setupFilterButtons()
         setupRecyclerView()
+        setupBottomNavigation()
         observeViewModel()
 
         // Initialize view model with user ID and mode
@@ -121,6 +123,19 @@ class ProfileFragment : Fragment() {
             if (userId.isNotEmpty()) {
                 viewModel.loadUserInfo(userId)
             }
+        }
+    }
+    /**
+     * Setup bottom navigation bar for fragment switching.
+     */
+    private fun setupBottomNavigation() {
+        binding.bottomBar.apply {
+            setActiveTab(BottomNavigationBar.Tab.NONE)
+            onHomeClick = { navController.navigate(R.id.homeFragment) }
+            onExploreClick = { Toast.makeText(requireContext(), "Explore", Toast.LENGTH_SHORT).show() }
+            onCreatePostClick = {  }
+            onAlertsClick = { }
+            onChatClick = { navController.navigate(R.id.chatsFragment) }
         }
     }
 

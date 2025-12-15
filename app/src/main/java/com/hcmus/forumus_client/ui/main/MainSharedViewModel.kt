@@ -4,9 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FirebaseFirestore
 import com.hcmus.forumus_client.data.model.User
 import com.hcmus.forumus_client.data.repository.UserRepository
+import com.hcmus.forumus_client.ui.home.HomeViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import com.hcmus.forumus_client.data.model.Topic
 
 /**
  * Shared ViewModel across MainActivity and its Fragments.

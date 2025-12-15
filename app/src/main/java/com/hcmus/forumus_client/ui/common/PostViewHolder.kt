@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import com.hcmus.forumus_client.R
 import kotlin.math.min
+import com.hcmus.forumus_client.data.model.Topic
 
 class PostViewHolder(
     itemView: View,
@@ -49,6 +50,8 @@ class PostViewHolder(
 
     // RecyclerView for displaying post media (ảnh + video)
     private val rvPostImages: RecyclerView = itemView.findViewById(R.id.rvPostImages)
+
+    val topicContainer: LinearLayout = itemView.findViewById(R.id.topicContainer)
     val imagesAdapter = PostMediaAdapter { clickedIndex ->
         // TODO: mở full-screen gallery, truyền list + index
     }
@@ -59,7 +62,7 @@ class PostViewHolder(
         rvPostImages.adapter = imagesAdapter
     }
 
-    fun bind(post: Post) {
+    fun bind(post: Post, topicMap: Map<String, Topic>? = null) {
         // Bind author information
         authorName.text = post.authorName.ifBlank { "Anonymous" }
         timestamp.text = formatTimestamp(post.createdAt)
@@ -85,6 +88,74 @@ class PostViewHolder(
 
         // Set up media (ảnh + video)
         setupMedia(post)
+
+        // Bind topic tags
+        topicContainer.removeAllViews()
+        if (topicMap != null && post.topicIds.isNotEmpty()) {
+            val density = itemView.resources.displayMetrics.density
+            val marginEnd = (8 * density).toInt()
+            val paddingH = (12 * density).toInt()
+            val paddingV = (6 * density).toInt()
+
+            post.topicIds.take(5).forEach { topicId ->
+                val topic = topicMap[topicId]
+                val topicName = topic?.name ?: topicId
+
+                // Colors
+                val defaultColor = android.graphics.Color.parseColor("#4285F4") // Default Blue
+                var mainColor = defaultColor
+                var alpha = 0.1
+
+                if (topic != null) {
+                    try {
+                        if (topic.fillColor.isNotEmpty()) {
+                            mainColor = android.graphics.Color.parseColor(topic.fillColor)
+                        }
+                        alpha = topic.fillAlpha
+                        // Clamp alpha
+                        if (alpha < 0.0) alpha = 0.0
+                        if (alpha > 1.0) alpha = 1.0
+
+                        android.util.Log.d(
+                            "PostViewHolder",
+                            "Topic: ${topic.name}, Color: ${topic.fillColor}, Alpha: ${topic.fillAlpha}"
+                        )
+                    } catch (e: Exception) {
+                        android.util.Log.e(
+                            "PostViewHolder",
+                            "Color parsing error for topic ${topic.name}",
+                            e
+                        )
+                    }
+                }
+
+                // Calculate background color with alpha
+                val alphaInt = (alpha * 255).toInt()
+                val backgroundColor = (alphaInt shl 24) or (mainColor and 0x00FFFFFF)
+
+                val backgroundDrawable = android.graphics.drawable.GradientDrawable().apply {
+                    shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    cornerRadius = 16 * density
+                    setColor(backgroundColor)
+                    // No stroke for this new design
+                }
+
+                val textView = TextView(itemView.context).apply {
+                    text = topicName
+                    textSize = 12f
+                    setTextColor(mainColor) // Text takes the main (solid) color
+                    background = backgroundDrawable
+                    setPadding(paddingH, paddingV, paddingH, paddingV)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        setMargins(0, 0, marginEnd, 0)
+                    }
+                }
+                topicContainer.addView(textView)
+            }
+        }
 
         // Set up click listeners for all interactive elements
         rootLayout.setOnClickListener { onActionClick(post, PostAction.OPEN, it) }

@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.ChatType
 import com.hcmus.forumus_client.databinding.FragmentChatsBinding
+import com.hcmus.forumus_client.ui.common.BottomNavigationBar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.getValue
@@ -54,6 +55,7 @@ class ChatsFragment : Fragment (){
 
         setupSwipeRefresh()
         setupRecyclerView()
+        setupBottomNavigation()
         setupSearchView()
         setupObservers()
         setupClickListeners()
@@ -214,6 +216,20 @@ class ChatsFragment : Fragment (){
             binding.btnAllChats.background = null
             setupLoadChats(ChatType.UNREAD_CHATS)
             chatType = ChatType.UNREAD_CHATS
+        }
+    }
+
+    /**
+     * Setup bottom navigation bar for fragment switching.
+     */
+    private fun setupBottomNavigation() {
+        binding.bottomBar.apply {
+            setActiveTab(BottomNavigationBar.Tab.CHAT)
+            onHomeClick = { navController.navigate(R.id.homeFragment) }
+            onExploreClick = { Toast.makeText(requireContext(), "Explore", Toast.LENGTH_SHORT).show() }
+            onCreatePostClick = {  }
+            onAlertsClick = { }
+            onChatClick = { navController.navigate(R.id.chatsFragment) }
         }
     }
 
