@@ -161,7 +161,7 @@ class HomeFragment : Fragment() {
         binding.bottomBar.apply {
             setActiveTab(BottomNavigationBar.Tab.HOME)
             onHomeClick = { navController.navigate(R.id.homeFragment) }
-            onExploreClick = { Toast.makeText(requireContext(), "Explore", Toast.LENGTH_SHORT).show() }
+            onExploreClick = { navController.navigate(R.id.searchFragment) }
             onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
             onAlertsClick = { }
             onChatClick = { navController.navigate(R.id.chatsFragment) }

@@ -97,4 +97,11 @@
             app:nullable="true"/>
     </fragment>
 
+    <!-- Search Fragment -->
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.hcmus.forumus_client.ui.search.SearchFragment"
+        android:label="Search">
+    </fragment>
+
 </navigation>
