@@ -18,6 +18,8 @@ import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.databinding.FragmentProfileBinding
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 import android.util.Log
+import com.hcmus.forumus_client.NavGraphDirections
+import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 
 /**
  * Profile Fragment displaying a user's profile information and content (posts and comments).
@@ -56,6 +58,7 @@ class ProfileFragment : Fragment() {
             return
         }
 
+        setupTopAppBar()
         setupSwipeRefresh()
         setupFilterButtons()
         setupRecyclerView()
@@ -64,6 +67,51 @@ class ProfileFragment : Fragment() {
         // Initialize view model with user ID and mode
         viewModel.loadUserInfo(userId)
         mainSharedViewModel.loadCurrentUser()
+    }
+
+    /**
+     * Setup top app bar callbacks for menu, search, and profile actions.
+     * Observes MainSharedViewModel for current user data.
+     */
+    private fun setupTopAppBar() {
+        binding.topAppBar.apply {
+            onFuncClick = {
+                navController.popBackStack()
+            }
+            onHomeClick = {
+                navController.navigate(R.id.homeFragment)
+            }
+            onProfileMenuAction = onProfileMenuAction@{ action ->
+                when (action) {
+                    ProfileMenuAction.VIEW_PROFILE -> {
+                        val currentUser =
+                            mainSharedViewModel.currentUser.value ?: return@onProfileMenuAction
+
+                        val navAction = NavGraphDirections
+                            .actionGlobalProfileFragment(currentUser.uid)
+
+                        navController.navigate(navAction)
+                    }
+
+                    ProfileMenuAction.EDIT_PROFILE -> {
+                        // TODO: Implement edit profile navigation
+                    }
+
+                    ProfileMenuAction.TOGGLE_DARK_MODE -> {
+                        // TODO: Implement theme toggle
+                    }
+
+                    ProfileMenuAction.SETTINGS -> {
+                        val navAction = NavGraphDirections
+                            .actionGlobalSettingsFragment()
+
+                        navController.navigate(navAction)
+                    }
+                }
+            }
+
+            setIconFuncButton(R.drawable.ic_back)
+        }
     }
 
     private fun setupSwipeRefresh() {
@@ -161,6 +209,7 @@ class ProfileFragment : Fragment() {
                 placeholder(R.drawable.default_avatar)
                 error(R.drawable.default_avatar)
             }
+            binding.topAppBar.setProfileImage(user.profilePictureUrl)
         }
 
         // Update statistics display

@@ -10,6 +10,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Top App Bar -->
+        <com.hcmus.forumus_client.ui.common.TopAppBar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <!-- Profile Header (Now scrolls with content) -->
         <LinearLayout
             android:id="@+id/profileHeader"

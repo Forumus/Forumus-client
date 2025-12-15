@@ -6,13 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.hcmus.forumus_client.NavGraphDirections
+import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.databinding.FragmentHomeBinding
 import com.hcmus.forumus_client.ui.common.PopupPostMenu
+import com.hcmus.forumus_client.ui.common.ProfileMenuAction
+import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 
 /**
  * Home Fragment displaying a feed of posts with voting and interaction features.
@@ -24,6 +29,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var homeAdapter: HomeAdapter
     private val viewModel: HomeViewModel by viewModels()
+    private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
     private val navController by lazy { findNavController() }
 
     override fun onCreateView(
@@ -38,12 +44,58 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupTopAppBar()
         setupSwipeRefresh()
         setupRecyclerView()
         observeViewModel()
 
         viewModel.loadPosts()
         //viewModel.addFieldForPosts()
+    }
+
+    /**
+     * Setup top app bar callbacks for menu, search, and profile actions.
+     * Observes MainSharedViewModel for current user data.
+     */
+    private fun setupTopAppBar() {
+        binding.topAppBar.apply {
+            onFuncClick = {
+                Toast.makeText(requireContext(), "Menu clicked", Toast.LENGTH_SHORT).show()
+            }
+            onHomeClick = {
+                navController.navigate(R.id.homeFragment)
+            }
+            onProfileMenuAction = onProfileMenuAction@{ action ->
+                when (action) {
+                    ProfileMenuAction.VIEW_PROFILE -> {
+                        val currentUser =
+                            mainSharedViewModel.currentUser.value ?: return@onProfileMenuAction
+
+                        val navAction = NavGraphDirections
+                            .actionGlobalProfileFragment(currentUser.uid)
+
+                        navController.navigate(navAction)
+                    }
+
+                    ProfileMenuAction.EDIT_PROFILE -> {
+                        // TODO: Implement edit profile navigation
+                    }
+
+                    ProfileMenuAction.TOGGLE_DARK_MODE -> {
+                        // TODO: Implement theme toggle
+                    }
+
+                    ProfileMenuAction.SETTINGS -> {
+                        val navAction = NavGraphDirections
+                            .actionGlobalSettingsFragment()
+
+                        navController.navigate(navAction)
+                    }
+                }
+            }
+
+            setIconFuncButton(R.drawable.ic_hamburger_button)
+        }
     }
 
     /**
@@ -104,6 +156,10 @@ class HomeFragment : Fragment() {
             if (!error.isNullOrBlank()) {
                 Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
             }
+        }
+
+        mainSharedViewModel.currentUser.observe(viewLifecycleOwner){ user ->
+            binding.topAppBar.setProfileImage(user?.profilePictureUrl)
         }
     }
 

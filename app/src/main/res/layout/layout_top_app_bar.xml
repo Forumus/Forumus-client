@@ -30,11 +30,10 @@
 
             <!-- Menu Button -->
             <ImageButton
-                android:id="@+id/menuButton"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
+                android:id="@+id/funcButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
                 android:contentDescription="@string/app_name"
                 android:src="@drawable/ic_hamburger_button"
                 android:scaleType="fitCenter"
@@ -61,16 +60,6 @@
                 android:textColor="@color/text_primary"
                 android:textSize="20sp" />
         </LinearLayout>
-
-        <!-- Search Button -->
-        <ImageButton
-            android:id="@+id/btn_search"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:scaleType="centerInside"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_search" />
 
         <!-- Profile Button -->
         <com.google.android.material.imageview.ShapeableImageView

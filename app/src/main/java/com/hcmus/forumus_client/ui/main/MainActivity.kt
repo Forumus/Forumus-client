@@ -10,9 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ActivityMainBinding
-import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.navigation.AppNavigator
-import com.hcmus.forumus_client.NavGraphDirections
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
 
 /**
@@ -35,15 +33,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Handle system window insets
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
         setupWindowInsetsHandling()
-        setupTopAppBar()
+        //setupTopAppBar()
         setupBottomNavigation()
         setupNavigation()
         loadInitialData()
@@ -60,56 +51,6 @@ class MainActivity : AppCompatActivity() {
             )
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
-        }
-    }
-
-    /**
-     * Setup top app bar callbacks for menu, search, and profile actions.
-     * Observes MainSharedViewModel for current user data.
-     */
-    private fun setupTopAppBar() {
-        binding.topAppBar.apply {
-            onMenuClick = {
-                Toast.makeText(this@MainActivity, "Menu clicked", Toast.LENGTH_SHORT).show()
-            }
-            onHomeClick = {
-                navController.navigate(R.id.homeFragment)
-            }
-            onSearchClick = {
-                navigator.openSearch()
-            }
-            onProfileMenuAction = onProfileMenuAction@{ action ->
-                when (action) {
-                    ProfileMenuAction.VIEW_PROFILE -> {
-                        val currentUser =
-                            mainSharedViewModel.currentUser.value ?: return@onProfileMenuAction
-
-                        val navAction = NavGraphDirections
-                            .actionGlobalProfileFragment(currentUser.uid)
-
-                        navController.navigate(navAction)
-                    }
-                    ProfileMenuAction.EDIT_PROFILE -> {
-                        // TODO: Implement edit profile navigation
-                    }
-                    ProfileMenuAction.TOGGLE_DARK_MODE -> {
-                        // TODO: Implement theme toggle
-                    }
-                    ProfileMenuAction.SETTINGS -> {
-                        val navAction = NavGraphDirections
-                            .actionGlobalSettingsFragment()
-
-                        navController.navigate(navAction)
-                    }
-                }
-            }
-        }
-
-        // Observe current user and update TopAppBar avatar
-        mainSharedViewModel.currentUser.observe(this) { user ->
-            if (user != null) {
-                binding.topAppBar.setProfileImage(user.profilePictureUrl)
-            }
         }
     }
 
@@ -141,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         // Listen to destination changes to control BottomNavigationBar visibility
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.bottomBar.visibility = android.view.View.VISIBLE
-            binding.topAppBar.visibility = android.view.View.VISIBLE
+            //binding.topAppBar.visibility = android.view.View.VISIBLE
 
             when (destination.id) {
                 R.id.postDetailFragment -> {
@@ -149,10 +90,10 @@ class MainActivity : AppCompatActivity() {
                     binding.bottomBar.visibility = android.view.View.GONE
                 }
                 R.id.chatsFragment -> {
-                    binding.topAppBar.visibility = android.view.View.GONE
+                    //binding.topAppBar.visibility = android.view.View.GONE
                 }
                 R.id.conversationFragment, R.id.settingsFragment ->{
-                    binding.topAppBar.visibility = android.view.View.GONE
+                    //binding.topAppBar.visibility = android.view.View.GONE
                     binding.bottomBar.visibility = android.view.View.GONE
                 }
             }

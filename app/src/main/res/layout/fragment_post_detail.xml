@@ -8,6 +8,12 @@
         android:background="@color/white"
         android:orientation="vertical">
 
+        <!-- Top App Bar -->
+        <com.hcmus.forumus_client.ui.common.TopAppBar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <!-- Posts and Replies Frame -->
         <FrameLayout
             android:layout_width="match_parent"

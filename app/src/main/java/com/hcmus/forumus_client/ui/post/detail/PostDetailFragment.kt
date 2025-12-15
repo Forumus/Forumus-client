@@ -11,9 +11,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.hcmus.forumus_client.NavGraphDirections
+import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.CommentAction
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.databinding.FragmentPostDetailBinding
+import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 import com.hcmus.forumus_client.ui.navigation.AppNavigator
 
@@ -26,6 +29,7 @@ class PostDetailFragment : Fragment() {
 
     private lateinit var binding: FragmentPostDetailBinding
     private val viewModel: PostDetailViewModel by viewModels()
+    private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
     private val navController by lazy { findNavController() }
     private lateinit var detailAdapter: PostDetailAdapter
 
@@ -51,12 +55,58 @@ class PostDetailFragment : Fragment() {
             return
         }
 
+        setupTopAppBar()
         setupSwipeRefresh()
         setupBottomInputBar()
         setupRecyclerView()
         observeViewModel()
 
         viewModel.loadPostDetail(postId)
+    }
+
+    /**
+     * Setup top app bar callbacks for menu, search, and profile actions.
+     * Observes MainSharedViewModel for current user data.
+     */
+    private fun setupTopAppBar() {
+        binding.topAppBar.apply {
+            onFuncClick = {
+                navController.popBackStack()
+            }
+            onHomeClick = {
+                navController.navigate(R.id.homeFragment)
+            }
+            onProfileMenuAction = onProfileMenuAction@{ action ->
+                when (action) {
+                    ProfileMenuAction.VIEW_PROFILE -> {
+                        val currentUser =
+                            mainSharedViewModel.currentUser.value ?: return@onProfileMenuAction
+
+                        val navAction = NavGraphDirections
+                            .actionGlobalProfileFragment(currentUser.uid)
+
+                        navController.navigate(navAction)
+                    }
+
+                    ProfileMenuAction.EDIT_PROFILE -> {
+                        // TODO: Implement edit profile navigation
+                    }
+
+                    ProfileMenuAction.TOGGLE_DARK_MODE -> {
+                        // TODO: Implement theme toggle
+                    }
+
+                    ProfileMenuAction.SETTINGS -> {
+                        val navAction = NavGraphDirections
+                            .actionGlobalSettingsFragment()
+
+                        navController.navigate(navAction)
+                    }
+                }
+            }
+
+            setIconFuncButton(R.drawable.ic_back)
+        }
     }
 
     /**
@@ -150,6 +200,10 @@ class PostDetailFragment : Fragment() {
      * Observe all ViewModel LiveData streams and update UI accordingly.
      */
     private fun observeViewModel() {
+        mainSharedViewModel.currentUser.observe(viewLifecycleOwner) { user ->
+            binding.topAppBar.setProfileImage(user?.profilePictureUrl)
+        }
+
         viewModel.items.observe(viewLifecycleOwner) { items ->
             detailAdapter.submitList(items)
         }
