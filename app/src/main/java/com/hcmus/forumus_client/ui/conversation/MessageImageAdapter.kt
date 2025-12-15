@@ -1,6 +1,5 @@
 package com.hcmus.forumus_client.ui.conversation
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,7 +54,7 @@ class MessageImageAdapter(
     }
 
     override fun onBindViewHolder(holder: MessageImageViewHolder, position: Int) {
-        holder.bind(images[position], position, images)
+        holder.bind(images[position], position)
     }
 
     override fun getItemCount(): Int = images.size
@@ -65,7 +64,7 @@ class MessageImageAdapter(
         private val onImageClick: ((String, Int) -> Unit)?
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(imageUrl: String, position: Int, allImages: List<String>) {
+        fun bind(imageUrl: String, position: Int) {
             // Show loading indicator
             binding.pbLoading.visibility = View.VISIBLE
             

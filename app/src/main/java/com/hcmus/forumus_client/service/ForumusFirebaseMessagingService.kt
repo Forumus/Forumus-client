@@ -80,9 +80,12 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
             val senderId = remoteMessage.data["senderId"] ?: ""
             val senderEmail = remoteMessage.data["senderEmail"] ?: ""
             val senderPictureUrl = remoteMessage.data["senderPictureUrl"] ?: ""
-            
+
             // Show notification
             showNotification(senderName, messageContent, chatId, senderId, senderEmail, senderPictureUrl)
+
+            // Return here so we don't process the notification block below
+            return
         }
 
         // Handle notification payload (if sent from Firebase Console)
@@ -106,7 +109,6 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
             putExtra(ConversationActivity.EXTRA_USER_NAME, title)
             putExtra(ConversationActivity.EXTRA_USER_EMAIL, senderEmail)
             putExtra(ConversationActivity.EXTRA_USER_PICTURE_URL, senderPictureUrl)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -125,7 +127,7 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(chatId.hashCode(), notificationBuilder.build())
     }
 

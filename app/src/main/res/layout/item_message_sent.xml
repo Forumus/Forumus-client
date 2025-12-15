@@ -41,17 +41,13 @@
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_message_images"
-            android:layout_width="300dp"
+        <com.hcmus.forumus_client.ui.conversation.MessageImagesView
+            android:id="@+id/message_images_view"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="8dp"
             android:paddingTop="12dp"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:scrollbars="none"
-            android:layout_gravity="end"
-            android:layout_marginEnd="8dp" />
+            android:layout_gravity="end"/>
 
         <!-- Timestamp -->
         <TextView

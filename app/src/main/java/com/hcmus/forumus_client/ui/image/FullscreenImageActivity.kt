@@ -115,9 +115,9 @@ class FullscreenImageActivity : AppCompatActivity() {
 
     private fun toggleOverlays() {
         overlaysVisible = !overlaysVisible
-        val visibility = if (overlaysVisible) View.VISIBLE else View.GONE
+//        val visibility = if (overlaysVisible) View.VISIBLE else View.GONE
         
-        binding.topOverlay.visibility = visibility
+//        binding.topOverlay.visibility = visibility
         
         if (overlaysVisible) {
             showSystemUI()
@@ -154,10 +154,5 @@ class FullscreenImageActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(this, "Failed to share image", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
     }
 }

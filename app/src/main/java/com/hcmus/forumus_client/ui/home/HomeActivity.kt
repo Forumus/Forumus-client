@@ -18,10 +18,12 @@ import androidx.core.view.WindowInsetsCompat
 import android.view.View
 import com.google.firebase.messaging.FirebaseMessaging
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.hcmus.forumus_client.ui.conversation.ConversationActivity
 
 /**
  * Home activity displaying a feed of posts with voting and interaction features.
@@ -74,6 +76,9 @@ class HomeActivity : AppCompatActivity() {
         
         // Initialize FCM and get token
         initializeFCM()
+
+        // Check if the app is opened from a notification
+        handleNotificationIntent(intent)
     }
 
     override fun onResume() {
@@ -93,6 +98,25 @@ class HomeActivity : AppCompatActivity() {
             )
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+    }
+
+    private fun handleNotificationIntent(intent: Intent?) {
+        val chatId = intent?.getStringExtra("chatId")
+        Log.d("MainActivity", "Notification intent chatId: $chatId")
+
+        if (!chatId.isNullOrEmpty()) {
+            // We found a chat ID! The user clicked a notification.
+            Log.d("MainActivity", "Navigating to chat: $chatId")
+
+            val targetIntent = Intent(this, ConversationActivity::class.java).apply {
+                putExtra(ConversationActivity.EXTRA_CHAT_ID, chatId)
+                putExtra(ConversationActivity.EXTRA_USER_NAME, intent.getStringExtra("senderName"))
+                putExtra(ConversationActivity.EXTRA_USER_EMAIL, intent.getStringExtra("senderEmail"))
+                putExtra(ConversationActivity.EXTRA_USER_PICTURE_URL, intent.getStringExtra("senderPictureUrl"))
+            }
+
+            startActivity(targetIntent)
         }
     }
 

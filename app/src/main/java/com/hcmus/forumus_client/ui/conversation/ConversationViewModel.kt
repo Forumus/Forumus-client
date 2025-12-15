@@ -43,7 +43,7 @@ class ConversationViewModel : ViewModel() {
     private var lastErrorTime = 0L // Prevent error spam
     
     companion object {
-        private const val TAG = "ChatViewModel"
+        private const val TAG = "ConversationViewModel"
         private const val ERROR_DEBOUNCE_TIME = 3000L // 3 seconds between errors
         private const val MESSAGES_PER_PAGE = 50
     }
@@ -55,6 +55,8 @@ class ConversationViewModel : ViewModel() {
     fun loadMessages(chatId: String) {
         currentChatId = chatId
         _isLoading.value = true
+
+        Log.d(TAG, "Loading messages for chatId: $chatId")
 
         // CRITICAL: Stop previous listener to prevent memory leaks
         messagesListener?.remove()

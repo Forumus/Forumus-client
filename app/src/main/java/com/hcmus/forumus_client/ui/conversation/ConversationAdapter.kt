@@ -97,23 +97,9 @@ class ConversationAdapter(
         private val onMessageLongClick: ((Message) -> Unit)?
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        // 1. Create the adapter ONLY ONCE
-        private val messageImageAdapter = MessageImageAdapter()
         private var currentMessage: Message? = null
 
         init {
-            // 2. Setup RecyclerView ONLY ONCE
-            binding.rvMessageImages.apply {
-                setRecycledViewPool(viewPool) // SHARE VIEWS
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
-                    stackFromEnd = true
-                }
-                adapter = messageImageAdapter // Attach adapter immediately
-                setHasFixedSize(true) // Optimization
-                isNestedScrollingEnabled = false // Optimization for smooth scrolling
-                itemAnimator = null // Remove animations to reduce flicker on scroll
-            }
-            
             // Setup long-click listener on the message container
             binding.root.setOnLongClickListener {
                 currentMessage?.let { message ->
@@ -135,21 +121,10 @@ class ConversationAdapter(
 
             binding.tvTimestamp.text = formatTimestamp(message.timestamp)
 
-            if (message.imageUrls.isNotEmpty()) {
-                binding.rvMessageImages.visibility = View.VISIBLE
-
-                // 3. IMPORTANT: Update the EXISTING adapter. Do NOT create a new one.
-                // We also update the click listener callback with the current message's images
-                messageImageAdapter.apply {
-                    setImageUrls(message.imageUrls)
-                    setOnImageClickListener { _, position ->
-                        onImageClick?.invoke(message.imageUrls, position)
-                    }
-                }
-            } else {
-                binding.rvMessageImages.visibility = View.GONE
-                // Clear memory in the adapter if hidden
-                messageImageAdapter.setImageUrls(emptyList())
+            // Update images view
+            binding.messageImagesView.setImageUrls(message.imageUrls)
+            binding.messageImagesView.setOnImageClickListener { urls, position ->
+                onImageClick?.invoke(urls, position)
             }
 
             if (message.type == MessageType.DELETED) {
@@ -167,21 +142,6 @@ class ConversationAdapter(
         private val onImageClick: ((List<String>, Int) -> Unit)?
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        private val messageImageAdapter = MessageImageAdapter()
-
-        init {
-            binding.rvMessageImages.apply {
-                setRecycledViewPool(viewPool)
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
-                    stackFromEnd = true
-                }
-                adapter = messageImageAdapter
-                setHasFixedSize(true)
-                isNestedScrollingEnabled = false
-                itemAnimator = null
-            }
-        }
-
         fun bind(message: Message) {
             if (message.content.trim().isNotEmpty()) {
                 binding.tvMessageText.text = message.content
@@ -192,19 +152,10 @@ class ConversationAdapter(
 
             binding.tvTimestamp.text = formatTimestamp(message.timestamp)
 
-            if (message.imageUrls.isNotEmpty()) {
-                binding.rvMessageImages.visibility = View.VISIBLE
-
-                // Update EXISTING adapter
-                messageImageAdapter.apply {
-                    setImageUrls(message.imageUrls)
-                    setOnImageClickListener { _, position ->
-                        onImageClick?.invoke(message.imageUrls, position)
-                    }
-                }
-            } else {
-                binding.rvMessageImages.visibility = View.GONE
-                messageImageAdapter.setImageUrls(emptyList())
+            // Update images view
+            binding.messageImagesView.setImageUrls(message.imageUrls)
+            binding.messageImagesView.setOnImageClickListener { urls, position ->
+                onImageClick?.invoke(urls, position)
             }
         }
     }

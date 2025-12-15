@@ -13,6 +13,7 @@ import kotlinx.coroutines.tasks.await
 import java.util.*
 import com.google.firebase.storage.FirebaseStorage
 import androidx.core.net.toUri
+import com.google.firebase.firestore.FieldValue
 import com.hcmus.forumus_client.data.model.ChatType
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -268,7 +269,9 @@ class ChatRepository {
                     .update(
                         mapOf(
                             "lastMessage" to content,
-                            "lastUpdate" to timestamp
+                            "lastUpdate" to timestamp,
+                            "unreadCount" to FieldValue.increment(1),
+                            "isUnread" to true
                         )
                     )
                     .await()

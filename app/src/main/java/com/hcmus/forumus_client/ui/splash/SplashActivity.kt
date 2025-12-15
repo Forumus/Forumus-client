@@ -59,6 +59,7 @@ class SplashActivity : AppCompatActivity() {
         val intent = Intent(this, nextActivity)
         // Clear task stack when navigating to home from valid session
         if (nextActivity == HomeActivity::class.java) {
+            intent.putExtras(getIntent())
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         startActivity(intent)
