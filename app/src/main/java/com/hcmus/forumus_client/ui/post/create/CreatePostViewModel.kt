@@ -84,7 +84,8 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                     content = content,
                     imageUrls = localImageUrls,
                     videoUrls = localVideoUrls,
-                    topicIds = selectedTopics,
+
+                    topicIds = selectedTopics.map { it.trim().lowercase().replace(" ", "_") },
                 )
 
                 //  Gọi Repository để xử lý upload và lưu

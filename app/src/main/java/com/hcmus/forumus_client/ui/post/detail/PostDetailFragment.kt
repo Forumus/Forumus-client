@@ -205,6 +205,10 @@ class PostDetailFragment : Fragment() {
             detailAdapter.submitList(items)
         }
 
+        viewModel.topics.observe(viewLifecycleOwner) { topics ->
+            detailAdapter.setTopics(topics)
+        }
+
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.swipeRefresh.isRefreshing = isLoading
         }
