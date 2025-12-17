@@ -12,6 +12,7 @@ import com.hcmus.forumus_client.data.repository.CommentRepository
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 /**
  * ViewModel for managing post detail view with nested comment threading.
@@ -68,6 +69,25 @@ class PostDetailViewModel(
     // Error message for UI display
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
+
+    private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
+    val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
+
+    init {
+        loadTopics()
+    }
+
+    private fun loadTopics() {
+        viewModelScope.launch {
+            try {
+                val snapshot = com.google.firebase.firestore.FirebaseFirestore.getInstance().collection("topics").get().await()
+                val topicList = snapshot.toObjects(com.hcmus.forumus_client.data.model.Topic::class.java)
+                _topics.value = topicList
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     /**
      * Loads the post detail and all associated comments from repositories.
