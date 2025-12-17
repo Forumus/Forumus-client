@@ -35,7 +35,6 @@ class TopicAdapter(
     inner class TopicViewHolder(private val binding: ItemTopicGridBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: TopicItem) {
             binding.tvTopicName.text = item.name
-            binding.tvTopicIcon.text = item.icon
 
             // Xử lý UI khi được chọn hoặc không
             updateSelectionState(binding.cardTopic, item.isSelected)

@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.hcmus.forumus_client.data.local.TokenManager
 import com.hcmus.forumus_client.data.local.PreferencesManager
-import com.hcmus.forumus_client.data.model.ResetPasswordRequest
+import com.hcmus.forumus_client.data.dto.ResetPasswordRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hcmus.forumus_client.data.model.User

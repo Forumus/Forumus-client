@@ -20,6 +20,9 @@ import java.util.*
 import android.content.Context
 import androidx.core.net.toUri
 import com.google.firebase.Timestamp
+import com.hcmus.forumus_client.data.dto.GetSuggestedTopicsRequest
+import com.hcmus.forumus_client.data.model.Topic
+import com.hcmus.forumus_client.data.remote.NetworkService
 
 /**
  * Repository for managing post data operations with Firestore.
@@ -371,5 +374,44 @@ class PostRepository(
         updatePost(post)
 
         return post.copy()
+    }
+
+    suspend fun getAllTopics(): List<Topic> {
+        return try {
+            val topicsSnapshot = firestore.collection("topics")
+                .get()
+                .await()
+
+            topicsSnapshot.toObjects(Topic::class.java)
+        } catch (e: Exception) {
+            Log.e("PostRepository", "Error fetching topics: ${e.message}")
+            emptyList()
+        }
+    }
+
+    suspend fun getSuggestedTopics(title: String, content: String): List<Topic> {
+        return try {
+            val request = GetSuggestedTopicsRequest(
+                title = title,
+                content = content
+            )
+
+            val response = NetworkService.apiService.getSuggestedTopics(request)
+
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null && responseBody.success) {
+                    responseBody.topics
+                } else {
+                    emptyList()
+                }
+            } else {
+                Log.e("PostRepository", "Failed to fetch suggested topics: ${response.code()} ${response.message()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("PostRepository", "Error fetching suggested topics: ${e.message}")
+            emptyList()
+        }
     }
 }
