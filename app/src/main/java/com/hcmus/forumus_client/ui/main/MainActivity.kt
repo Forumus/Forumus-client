@@ -40,6 +40,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupWindowInsetsHandling()
+        
+        // Force light status bar (dark icons)
+        androidx.core.view.WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
+        
         setupNavigation()
         loadInitialData()
         handleNotificationIntent(intent)
