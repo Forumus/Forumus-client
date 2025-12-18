@@ -124,6 +124,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Activity Result Launcher to request notification permission on Android 13+.
+     */
     private val requestNotificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->

@@ -1,5 +1,6 @@
 package com.hcmus.forumus_client.ui.home
 
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.hcmus.forumus_client.data.repository.PostRepository
@@ -88,6 +89,7 @@ class HomeViewModel(
 
                 _error.value = null
             } catch (e: Exception) {
+                Log.d("HomeViewModel", "loadPosts: Exception ${e.message}")
                 _error.value = e.message
             } finally {
                 _isLoading.value = false

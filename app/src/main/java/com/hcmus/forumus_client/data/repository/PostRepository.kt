@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.core.net.toUri
 import com.google.firebase.Timestamp
 import com.hcmus.forumus_client.data.dto.GetSuggestedTopicsRequest
+import com.hcmus.forumus_client.data.model.PostStatus
 import com.hcmus.forumus_client.data.model.Topic
 import com.hcmus.forumus_client.data.remote.NetworkService
 
@@ -221,6 +222,7 @@ class PostRepository(
         val userId = auth.currentUser?.uid
         return firestore.collection("posts")
             .orderBy("createdAt", Query.Direction.DESCENDING)
+//            .whereEqualTo("status", PostStatus.APPROVED) // Only fetch approved posts (we used it when the backend is ready)
             .limit(limit)
             .get()
             .await()

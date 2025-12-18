@@ -5,6 +5,8 @@ object ApiConstants {
     const val SECRET_KEY = "Sdxb44tssZ0qAgrSE2EBO9geqxwLNaUA"
     
     // API Endpoints
-    const val RESET_PASSWORD = "api/resetPassword"
+    const val RESET_PASSWORD = "api/auth/resetPassword"
     const val GET_SUGGESTED_TOPICS = "api/posts/getSuggestedTopics"
+    const val SEND_OTP_EMAIL = "api/email/send-otp"
+    const val SEND_WELCOME_EMAIL = "api/email/send-welcome"
 }

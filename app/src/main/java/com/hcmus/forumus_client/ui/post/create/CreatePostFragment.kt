@@ -22,6 +22,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -107,6 +109,7 @@ class CreatePostFragment : Fragment() {
 
         viewModel.getAllTopics()
     }
+
 
     private fun setupListeners() {
         binding.btnClose.setOnClickListener { handleExit() }
