@@ -1,6 +1,5 @@
 package com.hcmus.forumus_client.ui.home
 
-import android.Manifest
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -17,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.hcmus.forumus_client.NavGraphDirections
 import com.hcmus.forumus_client.R
@@ -31,18 +31,10 @@ import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 import kotlin.text.ifEmpty
 import kotlin.text.lowercase
 import kotlin.text.startsWith
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
-import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import com.google.firebase.messaging.FirebaseMessaging
 
 /**
- * Home Fragment displaying a feed of posts with voting and interaction features.
- * Uses NavController for navigation and Safe Args for passing data.
- * Shares MainSharedViewModel for current user data.
+ * Home Fragment displaying a feed of posts with voting and interaction features. Uses NavController
+ * for navigation and Safe Args for passing data. Shares MainSharedViewModel for current user data.
  */
 class HomeFragment : Fragment() {
 
@@ -53,9 +45,9 @@ class HomeFragment : Fragment() {
     private val navController by lazy { findNavController() }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
@@ -73,110 +65,139 @@ class HomeFragment : Fragment() {
 
         viewModel.loadPosts()
         viewModel.loadTopics()
-        //viewModel.addFieldForPosts()
+        // viewModel.addFieldForPosts()
     }
 
     /**
-     * Setup top app bar callbacks for menu, search, and profile actions.
-     * Observes MainSharedViewModel for current user data.
+     * Setup top app bar callbacks for menu, search, and profile actions. Observes
+     * MainSharedViewModel for current user data.
      */
     private fun setupTopAppBar() {
         binding.topAppBar.apply {
-            onFuncClick = {
-                binding.drawerLayout.openDrawer(GravityCompat.START)
-            }
-            onHomeClick = {
-                navController.navigate(R.id.homeFragment)
-            }
-            onProfileMenuAction = onProfileMenuAction@{ action ->
-                when (action) {
-                    ProfileMenuAction.VIEW_PROFILE -> {
-                        val currentUser =
-                            mainSharedViewModel.currentUser.value ?: return@onProfileMenuAction
+            onFuncClick = { binding.drawerLayout.openDrawer(GravityCompat.START) }
+            onHomeClick = { navController.navigate(R.id.homeFragment) }
+            onProfileMenuAction =
+                    onProfileMenuAction@{ action ->
+                        when (action) {
+                            ProfileMenuAction.VIEW_PROFILE -> {
+                                val currentUser =
+                                        mainSharedViewModel.currentUser.value
+                                                ?: return@onProfileMenuAction
 
-                        val navAction = NavGraphDirections
-                            .actionGlobalProfileFragment(currentUser.uid)
+                                val navAction =
+                                        NavGraphDirections.actionGlobalProfileFragment(
+                                                currentUser.uid
+                                        )
 
-                        navController.navigate(navAction)
+                                navController.navigate(navAction)
+                            }
+                            ProfileMenuAction.EDIT_PROFILE -> {
+                                // TODO: Implement edit profile navigation
+                            }
+                            ProfileMenuAction.TOGGLE_DARK_MODE -> {
+                                // TODO: Implement theme toggle
+                            }
+                            ProfileMenuAction.SETTINGS -> {
+                                navController.navigate(R.id.settingsFragment)
+                            }
+                        }
                     }
-
-                    ProfileMenuAction.EDIT_PROFILE -> {
-                        // TODO: Implement edit profile navigation
-                    }
-
-                    ProfileMenuAction.TOGGLE_DARK_MODE -> {
-                        // TODO: Implement theme toggle
-                    }
-
-                    ProfileMenuAction.SETTINGS -> {
-                        navController.navigate(R.id.settingsFragment)
-                    }
-                }
-            }
 
             setIconFuncButton(R.drawable.ic_hamburger_button)
         }
     }
 
     /**
-     * Sets up the RecyclerView with HomeAdapter to display posts.
-     * Configures post action callbacks for upvote, downvote, and navigation.
+     * Sets up the RecyclerView with HomeAdapter to display posts. Configures post action callbacks
+     * for upvote, downvote, and navigation. Adds scroll listener for infinite scrolling.
      */
     private fun setupRecyclerView() {
-        homeAdapter = HomeAdapter(emptyList()) { post, action, view ->
-            when (action) {
-                PostAction.OPEN -> {
-                    // Navigate to PostDetailFragment using Safe Args
-                    val action = HomeFragmentDirections.actionGlobalPostDetailFragment(post.id)
-                    navController.navigate(action)
+        homeAdapter =
+                HomeAdapter(emptyList()) { post, action, view ->
+                    when (action) {
+                        PostAction.OPEN -> {
+                            // Navigate to PostDetailFragment using Safe Args
+                            val action =
+                                    HomeFragmentDirections.actionGlobalPostDetailFragment(post.id)
+                            navController.navigate(action)
+                        }
+                        PostAction.UPVOTE -> viewModel.onPostAction(post, PostAction.UPVOTE)
+                        PostAction.DOWNVOTE -> viewModel.onPostAction(post, PostAction.DOWNVOTE)
+                        PostAction.REPLY -> {
+                            // Navigate to PostDetailFragment using Safe Args
+                            val action =
+                                    HomeFragmentDirections.actionGlobalPostDetailFragment(post.id)
+                            navController.navigate(action)
+                        }
+                        PostAction.SHARE ->
+                                Toast.makeText(
+                                                requireContext(),
+                                                "Share feature coming soon",
+                                                Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                        PostAction.AUTHOR_PROFILE -> {
+                            // Navigate to ProfileFragment using Safe Args
+                            val action =
+                                    HomeFragmentDirections.actionGlobalProfileFragment(
+                                            post.authorId
+                                    )
+                            navController.navigate(action)
+                        }
+                        PostAction.MENU -> showPostMenu(post, view)
+                    }
                 }
-                PostAction.UPVOTE -> viewModel.onPostAction(post, PostAction.UPVOTE)
-                PostAction.DOWNVOTE -> viewModel.onPostAction(post, PostAction.DOWNVOTE)
-                PostAction.REPLY -> {
-                    // Navigate to PostDetailFragment using Safe Args
-                    val action = HomeFragmentDirections.actionGlobalPostDetailFragment(post.id)
-                    navController.navigate(action)
-                }
-                PostAction.SHARE -> Toast.makeText(requireContext(), "Share feature coming soon", Toast.LENGTH_SHORT).show()
-                PostAction.AUTHOR_PROFILE -> {
-                    // Navigate to ProfileFragment using Safe Args
-                    val action = HomeFragmentDirections
-                        .actionGlobalProfileFragment(post.authorId)
-                    navController.navigate(action)
-                }
-                PostAction.MENU -> showPostMenu(post, view)
-            }
-        }
+
+        val layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         binding.postRecyclerView.apply {
             adapter = homeAdapter
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            this.layoutManager = layoutManager
+
+            // Add scroll listener for infinite scrolling
+            addOnScrollListener(
+                    object : RecyclerView.OnScrollListener() {
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+
+                            // Check if user scrolled down
+                            if (dy > 0) {
+                                val visibleItemCount = layoutManager.childCount
+                                val totalItemCount = layoutManager.itemCount
+                                val firstVisibleItemPosition =
+                                        layoutManager.findFirstVisibleItemPosition()
+
+                                // Load more when reaching the last 3 items
+                                if ((visibleItemCount + firstVisibleItemPosition) >=
+                                                totalItemCount - 3
+                                ) {
+                                    viewModel.loadMorePosts()
+                                }
+                            }
+                        }
+                    }
+            )
         }
     }
 
     private fun setupSwipeRefresh() {
-        binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadPosts()
-        }
+        binding.swipeRefresh.setOnRefreshListener { viewModel.loadPosts() }
     }
 
-    /**
-     * Setup bottom navigation bar for fragment switching.
-     */
+    /** Setup bottom navigation bar for fragment switching. */
     private fun setupBottomNavigation() {
         binding.bottomBar.apply {
             setActiveTab(BottomNavigationBar.Tab.HOME)
             onHomeClick = { navController.navigate(R.id.homeFragment) }
             onExploreClick = { navController.navigate(R.id.searchFragment) }
             onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
-            onAlertsClick = { }
+            onAlertsClick = {}
             onChatClick = { navController.navigate(R.id.chatsFragment) }
         }
     }
 
-    /**
-     * Initializes the navigation drawer callbacks.
-     */
+    /** Initializes the navigation drawer callbacks. */
     private fun setupDrawer() {
 
         val newItem = binding.navView.findViewById<LinearLayout>(R.id.item_new)
@@ -192,9 +213,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /**
-     * Populates the topics linear layout with dynamic views.
-     */
+    /** Populates the topics linear layout with dynamic views. */
     private fun populateTopics(topics: List<Topic>) {
         val container = binding.navView.findViewById<LinearLayout>(R.id.topics_container) ?: return
         container.removeAllViews()
@@ -203,89 +222,121 @@ class HomeFragment : Fragment() {
 
         // Resolve selectableItemBackground
         val typedValue = TypedValue()
-        requireActivity().theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+        requireActivity()
+                .theme
+                .resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
         val selectableBackground = typedValue.resourceId
 
         for (topic in topics) {
-            val itemView = LinearLayout(requireContext()).apply {
-                orientation = LinearLayout.HORIZONTAL
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    (48 * density).toInt()
-                ).apply {
-                    bottomMargin = (12 * density).toInt()
-                }
-                gravity = Gravity.CENTER_VERTICAL
-                if (selectableBackground != 0) {
-                    setBackgroundResource(selectableBackground)
-                }
-                isClickable = true
-                isFocusable = true
-                tag = topic.id // Set tag for identification
-            }
-
-            val iconView = ImageView(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    (24 * density).toInt(),
-                    (24 * density).toInt()
-                )
-
-                // improved icon lookup logic
-                val iconName = topic.icon.ifEmpty { topic.name }
-                val normalizedName = iconName.lowercase().replace(" ", "_").replace("&", "").replace("__", "_")
-
-                // Try multiple patterns
-                // 1. Exact match (e.g. "ic_biology")
-                var resId = resources.getIdentifier(iconName, "drawable", requireContext().packageName)
-
-                // 2. Try adding ic_ prefix if not present (e.g. "biology" -> "ic_biology")
-                if (resId == 0) {
-                    if (!iconName.startsWith("ic_")) {
-                        resId = resources.getIdentifier("ic_$iconName", "drawable", requireContext().packageName)
-                    }
-                }
-
-                // 3. Try normalized name with ic_ prefix (e.g. "Computer Science" -> "ic_computer_science")
-                if (resId == 0) {
-                    resId = resources.getIdentifier("ic_$normalizedName", "drawable", requireContext().packageName)
-                }
-
-                // 4. Try just normalized name (e.g. "computer_science")
-                if (resId == 0) {
-                    resId = resources.getIdentifier(normalizedName, "drawable", requireContext().packageName)
-                }
-
-                if (resId != 0) {
-                    setImageResource(resId)
-                } else {
-                    // Fallback to URL or default
-                    if (topic.icon.isNotEmpty() && (topic.icon.startsWith("http") || topic.icon.startsWith("content"))) {
-                        this.load(topic.icon) {
-                            placeholder(R.drawable.ic_study_groups)
-                            error(R.drawable.ic_study_groups)
+            val itemView =
+                    LinearLayout(requireContext()).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                        layoutParams =
+                                LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                                (48 * density).toInt()
+                                        )
+                                        .apply { bottomMargin = (12 * density).toInt() }
+                        gravity = Gravity.CENTER_VERTICAL
+                        if (selectableBackground != 0) {
+                            setBackgroundResource(selectableBackground)
                         }
-                    } else {
-                        setImageResource(R.drawable.ic_study_groups)
+                        isClickable = true
+                        isFocusable = true
+                        tag = topic.id // Set tag for identification
                     }
-                }
-                contentDescription = topic.name
-            }
 
-            val textView = TextView(requireContext()).apply {
-                text = topic.name
-                textSize = 14f
-                setTextColor(android.graphics.Color.parseColor("#333333"))
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    marginStart = (16 * density).toInt()
-                }
-            }
+            val iconView =
+                    ImageView(requireContext()).apply {
+                        layoutParams =
+                                LinearLayout.LayoutParams(
+                                        (24 * density).toInt(),
+                                        (24 * density).toInt()
+                                )
 
-            itemView.setOnClickListener {
-                viewModel.toggleTopicSelection(topic.id)
-            }
+                        // improved icon lookup logic
+                        val iconName = topic.icon.ifEmpty { topic.name }
+                        val normalizedName =
+                                iconName.lowercase()
+                                        .replace(" ", "_")
+                                        .replace("&", "")
+                                        .replace("__", "_")
+
+                        // Try multiple patterns
+                        // 1. Exact match (e.g. "ic_biology")
+                        var resId =
+                                resources.getIdentifier(
+                                        iconName,
+                                        "drawable",
+                                        requireContext().packageName
+                                )
+
+                        // 2. Try adding ic_ prefix if not present (e.g. "biology" -> "ic_biology")
+                        if (resId == 0) {
+                            if (!iconName.startsWith("ic_")) {
+                                resId =
+                                        resources.getIdentifier(
+                                                "ic_$iconName",
+                                                "drawable",
+                                                requireContext().packageName
+                                        )
+                            }
+                        }
+
+                        // 3. Try normalized name with ic_ prefix (e.g. "Computer Science" ->
+                        // "ic_computer_science")
+                        if (resId == 0) {
+                            resId =
+                                    resources.getIdentifier(
+                                            "ic_$normalizedName",
+                                            "drawable",
+                                            requireContext().packageName
+                                    )
+                        }
+
+                        // 4. Try just normalized name (e.g. "computer_science")
+                        if (resId == 0) {
+                            resId =
+                                    resources.getIdentifier(
+                                            normalizedName,
+                                            "drawable",
+                                            requireContext().packageName
+                                    )
+                        }
+
+                        if (resId != 0) {
+                            setImageResource(resId)
+                        } else {
+                            // Fallback to URL or default
+                            if (topic.icon.isNotEmpty() &&
+                                            (topic.icon.startsWith("http") ||
+                                                    topic.icon.startsWith("content"))
+                            ) {
+                                this.load(topic.icon) {
+                                    placeholder(R.drawable.ic_study_groups)
+                                    error(R.drawable.ic_study_groups)
+                                }
+                            } else {
+                                setImageResource(R.drawable.ic_study_groups)
+                            }
+                        }
+                        contentDescription = topic.name
+                    }
+
+            val textView =
+                    TextView(requireContext()).apply {
+                        text = topic.name
+                        textSize = 14f
+                        setTextColor(android.graphics.Color.parseColor("#333333"))
+                        layoutParams =
+                                LinearLayout.LayoutParams(
+                                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                                                ViewGroup.LayoutParams.WRAP_CONTENT
+                                        )
+                                        .apply { marginStart = (16 * density).toInt() }
+                    }
+
+            itemView.setOnClickListener { viewModel.toggleTopicSelection(topic.id) }
 
             itemView.addView(iconView)
             itemView.addView(textView)
@@ -295,7 +346,8 @@ class HomeFragment : Fragment() {
 
     // Updates the visual state of topic items in the drawer based on selection
     private fun updateTopicSelectionUI(selectedTopics: Set<String>) {
-        val topicListContainer = binding.navView.findViewById<LinearLayout>(R.id.topics_container) ?: return
+        val topicListContainer =
+                binding.navView.findViewById<LinearLayout>(R.id.topics_container) ?: return
 
         // Iterate through all child views (topic items)
         for (i in 0 until topicListContainer.childCount) {
@@ -309,7 +361,9 @@ class HomeFragment : Fragment() {
                 itemView.setBackgroundColor(android.graphics.Color.parseColor("#E1E1E1"))
             } else {
                 val typedValue = TypedValue()
-                requireActivity().theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+                requireActivity()
+                        .theme
+                        .resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
                 if (typedValue.resourceId != 0) {
                     itemView.setBackgroundResource(typedValue.resourceId)
                 } else {
@@ -319,13 +373,9 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /**
-     * Observe all ViewModel LiveData streams and update UI accordingly.
-     */
+    /** Observe all ViewModel LiveData streams and update UI accordingly. */
     private fun observeViewModel() {
-        viewModel.posts.observe(viewLifecycleOwner) { posts ->
-            homeAdapter.submitList(posts)
-        }
+        viewModel.posts.observe(viewLifecycleOwner) { posts -> homeAdapter.submitList(posts) }
 
         viewModel.topics.observe(viewLifecycleOwner) { topics ->
             populateTopics(topics)
@@ -336,13 +386,17 @@ class HomeFragment : Fragment() {
             binding.swipeRefresh.isRefreshing = loading
         }
 
+        viewModel.isLoadingMore.observe(viewLifecycleOwner) { isLoadingMore ->
+            homeAdapter.setLoadingMore(isLoadingMore)
+        }
+
         viewModel.error.observe(viewLifecycleOwner) { error ->
             if (!error.isNullOrBlank()) {
                 Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
             }
         }
 
-        mainSharedViewModel.currentUser.observe(viewLifecycleOwner){ user ->
+        mainSharedViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             binding.topAppBar.setProfileImage(user?.profilePictureUrl)
         }
 
@@ -356,7 +410,9 @@ class HomeFragment : Fragment() {
 
             // Resolve selectableItemBackground once
             val typedValue = TypedValue()
-            requireActivity().theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+            requireActivity()
+                    .theme
+                    .resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
             val selectableBackground = if (typedValue.resourceId != 0) typedValue.resourceId else 0
 
             // Update New item
@@ -376,8 +432,8 @@ class HomeFragment : Fragment() {
     }
 
     /**
-     * Display the post action menu popup when user taps the menu icon on a post.
-     * Allows users to save or report the post.
+     * Display the post action menu popup when user taps the menu icon on a post. Allows users to
+     * save or report the post.
      */
     private fun showPostMenu(post: Post, menuButton: View) {
         val popupMenu = PopupPostMenu(requireActivity() as androidx.appcompat.app.AppCompatActivity)
@@ -388,9 +444,7 @@ class HomeFragment : Fragment() {
         }
 
         // Handle violation selection from report menu
-        popupMenu.onReportClick = { violation ->
-            viewModel.saveReport(post, violation)
-        }
+        popupMenu.onReportClick = { violation -> viewModel.saveReport(post, violation) }
 
         // Show popup at menu button
         popupMenu.show(menuButton)

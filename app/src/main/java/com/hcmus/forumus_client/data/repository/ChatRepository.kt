@@ -67,7 +67,6 @@ class ChatRepository {
                 }
 
                 if (snapshot != null) {
-                    // 3. Process data asynchronously on IO thread
                     // We use 'launch' from the ProducerScope to keep the flow active
                     launch(Dispatchers.IO) {
                         val deferredChats = snapshot.documents.map { doc ->
@@ -128,7 +127,7 @@ class ChatRepository {
     }
 
     // Listen to messages in a specific chat with pagination
-    fun getChatMessagesFlow(chatId: String, limit: Int = 50): Flow<List<Message>> = callbackFlow {
+    fun getChatMessagesFlow(chatId: String, limit: Int = 25): Flow<List<Message>> = callbackFlow {
         val listener = chatsCollection
             .document(chatId)
             .collection(MESSAGES_SUBCOLLECTION)

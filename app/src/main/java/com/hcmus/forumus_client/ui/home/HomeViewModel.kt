@@ -2,28 +2,25 @@ package com.hcmus.forumus_client.ui.home
 
 import android.widget.Toast
 import androidx.lifecycle.*
-import com.hcmus.forumus_client.data.repository.PostRepository
-import com.hcmus.forumus_client.data.repository.UserRepository
-import com.hcmus.forumus_client.data.repository.ReportRepository
-import com.hcmus.forumus_client.data.model.Post
-import com.hcmus.forumus_client.data.model.PostStatus
-import com.hcmus.forumus_client.data.model.PostAction
-import com.hcmus.forumus_client.data.model.Report
-import com.hcmus.forumus_client.data.model.Violation
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.hcmus.forumus_client.data.model.Post
+import com.hcmus.forumus_client.data.model.PostAction
+import com.hcmus.forumus_client.data.model.PostStatus
+import com.hcmus.forumus_client.data.model.Report
+import com.hcmus.forumus_client.data.model.Violation
+import com.hcmus.forumus_client.data.repository.PostRepository
+import com.hcmus.forumus_client.data.repository.ReportRepository
+import com.hcmus.forumus_client.data.repository.UserRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
 
-/**
- * ViewModel for the Home screen.
- * Manages loading posts and users, handling voting interactions.
- */
+/** ViewModel for the Home screen. Manages loading posts and users, handling voting interactions. */
 class HomeViewModel(
-    private val userRepository: UserRepository = UserRepository(),
-    private val postRepository: PostRepository = PostRepository(),
-    private val reportRepository: ReportRepository = ReportRepository()
+        private val userRepository: UserRepository = UserRepository(),
+        private val postRepository: PostRepository = PostRepository(),
+        private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
 
     // List of posts for the home feed
@@ -34,16 +31,28 @@ class HomeViewModel(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    // Loading more indicator for pagination
+    private val _isLoadingMore = MutableLiveData<Boolean>(false)
+    val isLoadingMore: LiveData<Boolean> = _isLoadingMore
+
     // Error message for UI display
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
+    // Pagination state
+    private var lastDocument: com.google.firebase.firestore.DocumentSnapshot? = null
+    private var hasMorePosts = true
+    private val pageSize = 10L
+
     // List of topics for the drawer
-    private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
+    private val _topics =
+            MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
     val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
 
     enum class SortOption {
-        NONE, NEW, TRENDING
+        NONE,
+        NEW,
+        TRENDING
     }
 
     // Sorting state
@@ -57,14 +66,13 @@ class HomeViewModel(
     // Keep track of the original list to support un-sorting
     private var originalPosts: List<Post> = emptyList()
 
-    /**
-     * Fetches topics from Firestore.
-     */
+    /** Fetches topics from Firestore. */
     fun loadTopics() {
         viewModelScope.launch {
             try {
                 val snapshot = FirebaseFirestore.getInstance().collection("topics").get().await()
-                val topicList = snapshot.toObjects(com.hcmus.forumus_client.data.model.Topic::class.java)
+                val topicList =
+                        snapshot.toObjects(com.hcmus.forumus_client.data.model.Topic::class.java)
                 _topics.value = topicList
             } catch (e: Exception) {
                 // Handle error or use default topics if needed
@@ -74,16 +82,22 @@ class HomeViewModel(
     }
 
     /**
-     * Fetches posts from the repository and updates the posts LiveData.
-     * Manages loading state and error handling.
+     * Fetches initial posts from the repository using pagination. Manages loading state and error
+     * handling.
      */
     fun loadPosts() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val result = postRepository.getPosts(100)
-                originalPosts = result // Save original order
+                // Reset pagination state
+                lastDocument = null
+                hasMorePosts = true
 
+                val (posts, lastDoc) = postRepository.getPostsPaginated(pageSize, null)
+                lastDocument = lastDoc
+                hasMorePosts = posts.size >= pageSize
+
+                originalPosts = posts // Save original order
                 applyFilters()
 
                 _error.value = null
@@ -96,36 +110,67 @@ class HomeViewModel(
     }
 
     /**
-     * Applie filtering logic.
+     * Loads more posts for infinite scroll. Only loads if not already loading and there are more
+     * posts available.
      */
-    private fun applyFilters() {
-        val selected = _selectedTopics.value ?: emptySet()
-        var filteredList = if (selected.isEmpty()) {
-            originalPosts
-        } else {
-            originalPosts.filter { post ->
-                // Post must have at least one topic in the selected set
-                // Note: post.topicIds is List<String>, selected is Set<String>
-                post.topicIds.any { it in selected }
-            }
+    fun loadMorePosts() {
+        // Don't load if already loading or no more posts
+        if (_isLoadingMore.value == true || !hasMorePosts || _isLoading.value == true) {
+            return
         }
 
-        val sort = _sortOption.value ?: SortOption.NONE
-        filteredList = when (sort) {
-            SortOption.NEW -> filteredList.sortedByDescending { it.createdAt }
-            SortOption.TRENDING -> filteredList.sortedByDescending {
-                // Trending score = Total interactions (upvotes + downvotes + comments)
-                it.upvoteCount + it.downvoteCount + it.commentCount
+        viewModelScope.launch {
+            _isLoadingMore.value = true
+            try {
+                val (newPosts, lastDoc) = postRepository.getPostsPaginated(pageSize, lastDocument)
+                lastDocument = lastDoc
+                hasMorePosts = newPosts.size >= pageSize
+
+                // Append new posts to original list
+                originalPosts = originalPosts + newPosts
+                applyFilters()
+
+                _error.value = null
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
+                _isLoadingMore.value = false
             }
-            SortOption.NONE -> filteredList
         }
+    }
+
+    /** Applie filtering logic. */
+    private fun applyFilters() {
+        val selected = _selectedTopics.value ?: emptySet()
+        var filteredList =
+                if (selected.isEmpty()) {
+                    originalPosts
+                } else {
+                    originalPosts.filter { post ->
+                        // Post must have at least one topic in the selected set
+                        // Note: post.topicIds is List<String>, selected is Set<String>
+                        post.topicIds.any { it in selected }
+                    }
+                }
+
+        val sort = _sortOption.value ?: SortOption.NONE
+        filteredList =
+                when (sort) {
+                    SortOption.NEW -> filteredList.sortedByDescending { it.createdAt }
+                    SortOption.TRENDING ->
+                            filteredList.sortedByDescending {
+                                // Trending score = Total interactions (upvotes + downvotes +
+                                // comments)
+                                it.upvoteCount + it.downvoteCount + it.commentCount
+                            }
+                    SortOption.NONE -> filteredList
+                }
 
         _posts.value = filteredList
     }
 
     /**
-     * Toggles the sort option.
-     * If the same option is clicked, it toggles off to NONE.
+     * Toggles the sort option. If the same option is clicked, it toggles off to NONE.
      *
      * @param option The sort option to toggle
      */
@@ -140,8 +185,7 @@ class HomeViewModel(
     }
 
     /**
-     * Toggles the selection of a topic for filtering.
-     * Enforces a maximum of 5 selected topics.
+     * Toggles the selection of a topic for filtering. Enforces a maximum of 5 selected topics.
      *
      * @param topicId The ID of the topic to toggle
      */
@@ -176,7 +220,6 @@ class HomeViewModel(
                     val updated = post.copy(status = PostStatus.APPROVED)
                     postRepository.updatePost(updated)
                 }
-
             } catch (e: Exception) {
                 _error.value = "Failed to migrate post status: ${e.message}"
             }
@@ -198,8 +241,8 @@ class HomeViewModel(
     }
 
     /**
-     * Processes voting logic for a post.
-     * Updates the post via repository and refreshes the posts list.
+     * Processes voting logic for a post. Updates the post via repository and refreshes the posts
+     * list.
      *
      * @param post The post to vote on
      * @param isUpvote True for upvote, false for downvote
@@ -208,18 +251,16 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 // Perform vote action on repository
-                val updatedPost = if (isUpvote) {
-                    postRepository.toggleUpvote(post)
-                } else {
-                    postRepository.toggleDownvote(post)
-                }
+                val updatedPost =
+                        if (isUpvote) {
+                            postRepository.toggleUpvote(post)
+                        } else {
+                            postRepository.toggleDownvote(post)
+                        }
 
                 // Update posts list with the updated post
                 val currentList = _posts.value ?: emptyList()
-                _posts.value = currentList.map { p ->
-                    if (p.id == post.id) updatedPost else p
-                }
-
+                _posts.value = currentList.map { p -> if (p.id == post.id) updatedPost else p }
             } catch (e: Exception) {
                 _error.value = e.message
             }
@@ -227,9 +268,8 @@ class HomeViewModel(
     }
 
     /**
-     * Saves a report for a post when user selects a violation.
-     * Creates a Report object, saves it to Firebase, increments reportCount,
-     * and adds userId to reportedUsers list in the post.
+     * Saves a report for a post when user selects a violation. Creates a Report object, saves it to
+     * Firebase, increments reportCount, and adds userId to reportedUsers list in the post.
      *
      * @param post The post being reported
      * @param violation The violation category selected by the user
@@ -238,21 +278,29 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 val currentUser = userRepository.getCurrentUser()
-                val userId = currentUser?.uid ?: FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                val userId =
+                        currentUser?.uid
+                                ?: FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
 
                 // Check if user has already reported this post
                 if (post.reportedUsers.contains(userId)) {
-                    Toast.makeText(applicationContext, "You have already reported this post", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                                    applicationContext,
+                                    "You have already reported this post",
+                                    Toast.LENGTH_SHORT
+                            )
+                            .show()
                     return@launch
                 }
 
                 // Create report object
-                val report = Report(
-                    postId = post.id,
-                    authorId = userId,
-                    nameViolation = violation.name,
-                    descriptionViolation = violation
-                )
+                val report =
+                        Report(
+                                postId = post.id,
+                                authorId = userId,
+                                nameViolation = violation.name,
+                                descriptionViolation = violation
+                        )
 
                 // Save report to Firebase
                 reportRepository.saveReport(report)
@@ -260,22 +308,21 @@ class HomeViewModel(
                 Toast.makeText(applicationContext, "Post reported", Toast.LENGTH_SHORT).show()
 
                 // Update post: increment reportCount and add userId to reportedUsers
-                val updatedPost = post.copy(
-                    reportCount = post.reportCount + 1,
-                    reportedUsers = post.reportedUsers.toMutableList().apply { add(userId) }
-                )
+                val updatedPost =
+                        post.copy(
+                                reportCount = post.reportCount + 1,
+                                reportedUsers =
+                                        post.reportedUsers.toMutableList().apply { add(userId) }
+                        )
 
                 // Update post in Firebase via repository
                 postRepository.updatePost(updatedPost)
 
                 // Update posts list with the updated post
                 val currentList = _posts.value ?: emptyList()
-                _posts.value = currentList.map { p ->
-                    if (p.id == post.id) updatedPost else p
-                }
+                _posts.value = currentList.map { p -> if (p.id == post.id) updatedPost else p }
 
                 _error.value = null
-
             } catch (e: Exception) {
                 _error.value = "Failed to report post: ${e.message}"
             }
