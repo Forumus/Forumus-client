@@ -30,19 +30,58 @@ class NotificationViewModel : ViewModel() {
     val unreadCount: LiveData<Int> = _unreadCount
     
     private var isEarlierExpanded = false
+    
+    init {
+        startListening()
+    }
 
-    fun loadNotifications() {
+    private fun startListening() {
         viewModelScope.launch {
             _isLoading.value = true
+            repository.getNotificationsFlow()
+                .collect { list ->
+                    _isLoading.value = false
+                    // Sort descending by date just to be safe, though query does it
+                    val sortedList = list.sortedByDescending { it.createdAt?.toDate() }
+                    
+                    _notifications.value = sortedList
+                    updateUnreadCount(sortedList)
+                    processDisplayList(sortedList)
+                }
+        }
+    }
+
+    fun loadNotifications() {
+        // No-op or restart listening if needed. 
+        // For now, we trust the flow. If pull-to-refresh is needed, 
+        // we could just restart the flow, but snapshot listener handles updates automatically.
+    }
+    
+    fun expandEarlierSection() {
+        isEarlierExpanded = true
+        _notifications.value?.let { processDisplayList(it) }
+    }
+
+    fun markAsRead(notification: Notification) {
+        if (notification.isRead) return
+        
+        // Optimistic Update (Visual only, to feel instant)
+        val currentList = _notifications.value?.toMutableList() ?: return
+        val index = currentList.indexOfFirst { it.id == notification.id }
+        if (index != -1) {
+            val updatedNoti = currentList[index].copy(isRead = true)
+            currentList[index] = updatedNoti
+            _notifications.value = ArrayList(currentList)
+            updateUnreadCount(currentList)
+            processDisplayList(currentList)
+        }
+
+        viewModelScope.launch {
             try {
-                val list = repository.getNotifications().sortedByDescending { it.createdAt?.toDate() }
-                _notifications.value = list
-                updateUnreadCount(list)
-                processDisplayList(list)
+                repository.markAsRead(notification.id)
+                // Flow will update automatically on success
             } catch (e: Exception) {
-                // Handle error
-            } finally {
-                _isLoading.value = false
+                // Revert or log error
             }
         }
     }
@@ -91,42 +130,7 @@ class NotificationViewModel : ViewModel() {
         
         _displayItems.value = displayList
     }
-    
-    fun expandEarlierSection() {
-        isEarlierExpanded = true
-        _notifications.value?.let { processDisplayList(it) }
-    }
 
-    fun markAsRead(notification: Notification) {
-        if (notification.isRead) return
-        
-        // OPTIMISTIC UPDATE: Update UI immediately
-        val currentList = _notifications.value?.toMutableList() ?: return
-        val index = currentList.indexOfFirst { it.id == notification.id }
-        
-        if (index != -1) {
-            val updatedNoti = currentList[index].copy(isRead = true)
-            currentList[index] = updatedNoti
-            
-            // Emit new list instance
-            _notifications.value = ArrayList(currentList)
-            updateUnreadCount(currentList)
-            processDisplayList(currentList)
-            
-            android.util.Log.d("NotificationVM", "Optimistic update: ID=${notification.id} isRead=true. New Unread Count=${_unreadCount.value}")
-        }
-
-        viewModelScope.launch {
-            try {
-                repository.markAsRead(notification.id)
-                android.util.Log.d("NotificationVM", "Firestore update success: ID=${notification.id}")
-            } catch (e: Exception) {
-                android.util.Log.e("NotificationVM", "Firestore update failed: ${e.message}")
-                // Optionally revert optimistic update here if critical
-            }
-        }
-    }
-    
     private fun getStartOfDay(date: Date): Date {
         val calendar = Calendar.getInstance()
         calendar.time = date

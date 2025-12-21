@@ -35,8 +35,9 @@ class NotificationFragment : Fragment() {
 
         setupUI()
         observeViewModel()
-        viewModel.loadNotifications()
-        
+        if (viewModel.displayItems.value.isNullOrEmpty()) {
+            viewModel.loadNotifications()
+        }
     }
 
     private fun setupUI() {

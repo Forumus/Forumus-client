@@ -1,6 +1,7 @@
 package com.hcmus.forumus_client.data.model
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.PropertyName
 
 data class Notification(
     var id: String = "",
@@ -10,5 +11,5 @@ data class Notification(
     var targetId: String = "", // Post/Comment ID
     var previewText: String = "",
     var createdAt: Timestamp? = null,
-    var isRead: Boolean = false
+    @get:PropertyName("isRead") @set:PropertyName("isRead") var isRead: Boolean = false
 )
