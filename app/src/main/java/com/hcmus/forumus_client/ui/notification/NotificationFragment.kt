@@ -11,14 +11,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.NavGraphDirections
 import com.hcmus.forumus_client.databinding.FragmentNotificationBinding
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
-import com.hcmus.forumus_client.ui.common.TopAppBar
 import com.hcmus.forumus_client.R
+
+import androidx.fragment.app.activityViewModels
 
 class NotificationFragment : Fragment() {
 
     private var _binding: FragmentNotificationBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: NotificationViewModel by viewModels()
+    private val viewModel: NotificationViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,19 +36,10 @@ class NotificationFragment : Fragment() {
         setupUI()
         observeViewModel()
         viewModel.loadNotifications()
+        
     }
 
     private fun setupUI() {
-        // Setup TopAppBar
-        // binding.topAppBar.setTitle("Notifications") // Not supported by custom view
-        // binding.topAppBar.setNavigationOnClickListener { } // Not supported by custom view
-        binding.topAppBar.setIconFuncButton(R.drawable.ic_hamburger_button)
-        binding.topAppBar.onFuncClick = {
-            // Open drawer or do nothing? NotificationFragment is not inside drawer layout usually?
-            // If main activity has a drawer, we might need access to it.
-            // For now, let's just leave it empty or log.
-        }
-
         // Setup BottomNavigationBar
         binding.bottomBar.setActiveTab(BottomNavigationBar.Tab.ALERTS)
         
@@ -64,14 +56,19 @@ class NotificationFragment : Fragment() {
         }
         
         // Setup RecyclerView
-        val adapter = NotificationAdapter { notification ->
-            viewModel.markAsRead(notification)
-            // Navigate to Post Detail
-            if (notification.targetId.isNotEmpty()) {
-                val action = NavGraphDirections.actionGlobalPostDetailFragment(notification.targetId)
-                findNavController().navigate(action)
+        val adapter = NotificationAdapter(
+            onNotificationClick = { notification ->
+                viewModel.markAsRead(notification)
+                // Navigate to Post Detail
+                if (notification.targetId.isNotEmpty()) {
+                    val action = NavGraphDirections.actionGlobalPostDetailFragment(notification.targetId)
+                    findNavController().navigate(action)
+                }
+            },
+            onShowMoreClick = {
+                viewModel.expandEarlierSection()
             }
-        }
+        )
         binding.rvNotifications.apply {
             layoutManager = LinearLayoutManager(context)
             this.adapter = adapter
@@ -84,13 +81,25 @@ class NotificationFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.notifications.observe(viewLifecycleOwner) { notifications ->
-            (binding.rvNotifications.adapter as NotificationAdapter).submitList(notifications)
+        viewModel.displayItems.observe(viewLifecycleOwner) { items ->
+            (binding.rvNotifications.adapter as NotificationAdapter).submitList(items)
             binding.swipeRefreshLayout.isRefreshing = false
+            
+            if (items.isEmpty()) {
+                binding.tvEmptyState.visibility = View.VISIBLE
+                binding.rvNotifications.visibility = View.GONE
+            } else {
+                binding.tvEmptyState.visibility = View.GONE
+                binding.rvNotifications.visibility = View.VISIBLE
+            }
+        }
+        
+        viewModel.unreadCount.observe(viewLifecycleOwner) { count ->
+             binding.bottomBar.setNotificationBadge(count)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading && viewModel.notifications.value.isNullOrEmpty()) {
+            if (isLoading && viewModel.displayItems.value.isNullOrEmpty()) {
                 binding.swipeRefreshLayout.isRefreshing = true
             }
         }
