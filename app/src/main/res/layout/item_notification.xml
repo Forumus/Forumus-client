@@ -4,8 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:background="@color/white"
+    android:foreground="?attr/selectableItemBackground"
+    android:elevation="2dp"
+    android:layout_marginBottom="2dp"
     android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:src="@drawable/noti_vote" />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -16,8 +30,9 @@
         android:textColor="@android:color/black"
         android:textSize="16sp"
         android:layout_marginEnd="8dp"
+        android:layout_marginStart="20dp"
         app:layout_constraintEnd_toStartOf="@+id/tvTime"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivIcon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="User Name commented on your post" />
 
@@ -28,10 +43,10 @@
         android:layout_marginTop="4dp"
         android:ellipsize="end"
         android:maxLines="2"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="#3f78e0"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/tvTitle"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tvTitle"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle"
         tools:text="Great post! I really learned a lot from this..." />
 

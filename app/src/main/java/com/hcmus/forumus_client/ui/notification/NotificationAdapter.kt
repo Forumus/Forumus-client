@@ -34,10 +34,23 @@ class NotificationAdapter(
         fun bind(notification: Notification) {
             val actor = notification.actorName
             val typeText = when (notification.type) {
-                "UPVOTE" -> "upvoted your post"
-                "COMMENT" -> "commented on your post"
-                "REPLY" -> "replied to your comment"
-                else -> "interacted with you"
+                "UPVOTE" -> {
+                    binding.ivIcon.setImageResource(com.hcmus.forumus_client.R.drawable.noti_vote)
+                    "upvoted your post"
+                }
+                "COMMENT" -> {
+                    binding.ivIcon.setImageResource(com.hcmus.forumus_client.R.drawable.noti_comment)
+                    "commented on your post"
+                }
+                "REPLY" -> {
+                    binding.ivIcon.setImageResource(com.hcmus.forumus_client.R.drawable.noti_comment)
+                    "replied to your comment"
+                }
+                else -> {
+                    // Default fallback if needed
+                    binding.ivIcon.setImageResource(com.hcmus.forumus_client.R.drawable.noti_comment)
+                    "interacted with you"
+                }
             }
             binding.tvTitle.text = "$actor $typeText"
             binding.tvContent.text = notification.previewText
