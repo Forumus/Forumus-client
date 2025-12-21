@@ -1,18 +1,24 @@
 package com.hcmus.forumus_client.ui.post.detail
 
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.hcmus.forumus_client.data.model.Comment
 import com.hcmus.forumus_client.data.model.FeedItem
 import com.hcmus.forumus_client.data.model.Post
+import com.hcmus.forumus_client.data.model.Report
 import com.hcmus.forumus_client.data.model.User
+import com.hcmus.forumus_client.data.model.Violation
 import com.hcmus.forumus_client.data.repository.CommentRepository
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
+import com.hcmus.forumus_client.data.repository.ReportRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import okhttp3.internal.platform.PlatformRegistry.applicationContext
 
 /**
  * ViewModel for managing post detail view with nested comment threading.
@@ -39,7 +45,8 @@ import kotlinx.coroutines.tasks.await
 class PostDetailViewModel(
     private val userRepository: UserRepository = UserRepository(),
     private val postRepository: PostRepository = PostRepository(),
-    private val commentRepository: CommentRepository = CommentRepository()
+    private val commentRepository: CommentRepository = CommentRepository(),
+    private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
     // List of FeedItems (posts and comments) to display in RecyclerView
     private val _items = MutableLiveData<List<FeedItem>>(emptyList())
@@ -351,6 +358,67 @@ class PostDetailViewModel(
                 _replyTargetComment.value = null
             } catch (e: Exception) {
                 // Error handled silently - could show toast if needed
+            }
+        }
+    }
+
+    /**
+     * Saves a report for a post when user selects a violation. Creates a Report object, saves it to
+     * Firebase, increments reportCount, and adds userId to reportedUsers list in the post.
+     *
+     * @param post The post being reported
+     * @param violation The violation category selected by the user
+     */
+    fun saveReport(post: Post, violation: Violation) {
+        viewModelScope.launch {
+            try {
+                val currentUser = userRepository.getCurrentUser()
+                val userId =
+                    currentUser?.uid
+                        ?: FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+
+                // Check if user has already reported this post
+                if (post.reportedUsers.contains(userId)) {
+                    Toast.makeText(
+                        applicationContext,
+                        "You have already reported this post",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                    return@launch
+                }
+
+                // Create report object
+                val report =
+                    Report(
+                        postId = post.id,
+                        authorId = userId,
+                        nameViolation = violation.name,
+                        descriptionViolation = violation
+                    )
+
+                // Save report to Firebase
+                reportRepository.saveReport(report)
+
+                Toast.makeText(applicationContext, "Post reported", Toast.LENGTH_SHORT).show()
+
+                // Update post: increment reportCount and add userId to reportedUsers
+                val updatedPost =
+                    post.copy(
+                        reportCount = post.reportCount + 1,
+                        reportedUsers =
+                            post.reportedUsers.toMutableList().apply { add(userId) }
+                    )
+
+                // Update post in Firebase via repository
+                postRepository.updatePost(updatedPost)
+
+                // Update post with the updated post
+                loadPostDetail(currentPost!!.id)
+
+                _error.value = null
+            } catch (e: Exception) {
+                _error.value = "Failed to report post: ${e.message}"
             }
         }
     }

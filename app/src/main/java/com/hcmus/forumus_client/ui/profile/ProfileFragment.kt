@@ -19,8 +19,11 @@ import com.hcmus.forumus_client.databinding.FragmentProfileBinding
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 import android.util.Log
 import com.hcmus.forumus_client.NavGraphDirections
+import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
+import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
+import com.hcmus.forumus_client.ui.common.SharePostDialog
 
 /**
  * Profile Fragment displaying a user's profile information and content (posts and comments).
@@ -168,13 +171,14 @@ class ProfileFragment : Fragment() {
                         navController.navigate(navAction)
                     }
                     PostAction.SHARE -> {
-                        Toast.makeText(requireContext(), "Share post from profile", Toast.LENGTH_SHORT).show()
+                        val shareDialog = SharePostDialog.newInstance(post.id)
+                        shareDialog.show(childFragmentManager, "SharePostDialog")
                     }
                     PostAction.AUTHOR_PROFILE -> {
                         // Already on profile, ignore
                     }
                     PostAction.MENU -> {
-                        // TODO: Implement post menu functionality
+                        showPostMenu(post, view)
                     }
                 }
             },
@@ -290,5 +294,24 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
+    }
+
+    /**
+     * Display the post action menu popup when user taps the menu icon on a post. Allows users to
+     * save or report the post.
+     */
+    private fun showPostMenu(post: Post, menuButton: View) {
+        val popupMenu = PopupPostMenu(requireActivity() as androidx.appcompat.app.AppCompatActivity)
+
+        // Handle save button click
+        popupMenu.onSaveClick = {
+            Toast.makeText(requireContext(), "Post saved", Toast.LENGTH_SHORT).show()
+        }
+
+        // Handle violation selection from report menu
+        popupMenu.onReportClick = { violation -> viewModel.saveReport(post, violation) }
+
+        // Show popup at menu button
+        popupMenu.show(menuButton)
     }
 }

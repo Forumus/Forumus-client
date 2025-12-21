@@ -15,8 +15,14 @@ import com.hcmus.forumus_client.data.model.createdAtMillis
 import com.hcmus.forumus_client.data.repository.CommentRepository
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
+import com.hcmus.forumus_client.data.repository.ReportRepository
 import android.util.Log
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.hcmus.forumus_client.data.model.Report
+import com.hcmus.forumus_client.data.model.Violation
 import kotlinx.coroutines.launch
+import okhttp3.internal.platform.PlatformRegistry.applicationContext
 
 /**
  * ViewModel for managing user profile data and interactions.
@@ -40,7 +46,8 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val postRepository: PostRepository = PostRepository(),
     private val commentRepository: CommentRepository = CommentRepository(),
-    private val userRepository: UserRepository = UserRepository()
+    private val userRepository: UserRepository = UserRepository(),
+    private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
 
     private lateinit var userId: String
@@ -327,5 +334,70 @@ class ProfileViewModel(
             ProfileMode.REPLIES -> commentsList.map { FeedItem.CommentItem(it) }
         }
         _visibleItems.value = result
+    }
+
+    /**
+     * Saves a report for a post when user selects a violation. Creates a Report object, saves it to
+     * Firebase, increments reportCount, and adds userId to reportedUsers list in the post.
+     *
+     * @param post The post being reported
+     * @param violation The violation category selected by the user
+     */
+    fun saveReport(post: Post, violation: Violation) {
+        viewModelScope.launch {
+            try {
+                val currentUser = userRepository.getCurrentUser()
+                val userId =
+                    currentUser?.uid
+                        ?: FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+
+                // Check if user has already reported this post
+                if (post.reportedUsers.contains(userId)) {
+                    Toast.makeText(
+                        applicationContext,
+                        "You have already reported this post",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                    return@launch
+                }
+
+                // Create report object
+                val report =
+                    Report(
+                        postId = post.id,
+                        authorId = userId,
+                        nameViolation = violation.name,
+                        descriptionViolation = violation
+                    )
+
+                // Save report to Firebase
+                reportRepository.saveReport(report)
+
+                Toast.makeText(applicationContext, "Post reported", Toast.LENGTH_SHORT).show()
+
+                // Update post: increment reportCount and add userId to reportedUsers
+                val updatedPost =
+                    post.copy(
+                        reportCount = post.reportCount + 1,
+                        reportedUsers =
+                            post.reportedUsers.toMutableList().apply { add(userId) }
+                    )
+
+                // Update post in Firebase via repository
+                postRepository.updatePost(updatedPost)
+
+                // Update posts list with the updated post
+                val currentList = _posts.value ?: emptyList()
+                _posts.value = currentList.map { p -> if (p.id == post.id) updatedPost else p }
+
+                // Rebuild mixed items list
+                recomputeMixedItems()
+
+                _error.value = null
+            } catch (e: Exception) {
+                _error.value = "Failed to report post: ${e.message}"
+            }
+        }
     }
 }
