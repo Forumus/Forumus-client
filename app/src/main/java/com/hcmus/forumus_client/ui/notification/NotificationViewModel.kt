@@ -31,12 +31,15 @@ class NotificationViewModel : ViewModel() {
     
     private var isEarlierExpanded = false
     
+    private var listeningJob: kotlinx.coroutines.Job? = null
+    
     init {
         startListening()
     }
 
     private fun startListening() {
-        viewModelScope.launch {
+        listeningJob?.cancel()
+        listeningJob = viewModelScope.launch {
             _isLoading.value = true
             repository.getNotificationsFlow()
                 .collect { list ->
@@ -52,9 +55,7 @@ class NotificationViewModel : ViewModel() {
     }
 
     fun loadNotifications() {
-        // No-op or restart listening if needed. 
-        // For now, we trust the flow. If pull-to-refresh is needed, 
-        // we could just restart the flow, but snapshot listener handles updates automatically.
+        startListening()
     }
     
     fun expandEarlierSection() {
