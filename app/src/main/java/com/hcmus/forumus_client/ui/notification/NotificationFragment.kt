@@ -47,6 +47,10 @@ class NotificationFragment : Fragment() {
         binding.bottomBar.onHomeClick = {
             findNavController().navigate(R.id.homeFragment)
         }
+
+        binding.bottomBar.onExploreClick = {
+            findNavController().navigate(R.id.searchFragment)
+        }
         
         binding.bottomBar.onCreatePostClick = {
              findNavController().navigate(R.id.createPostFragment)
