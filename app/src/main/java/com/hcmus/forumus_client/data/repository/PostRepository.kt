@@ -356,6 +356,50 @@ class PostRepository(
         // Persist changes to Firestore
         updatePost(post)
 
+        // Trigger notification if upvoted and not self-vote
+        if (post.userVote == VoteState.UPVOTE && post.authorId != userId) {
+            try {
+                val user = userRepository.getUserById(userId)
+                
+                // Client-side notification trigger (Temporary for testing)
+                val notificationId = UUID.randomUUID().toString()
+                val notificationData = hashMapOf(
+                    "id" to notificationId,
+                    "type" to "UPVOTE",
+                    "actorId" to userId,
+                    "actorName" to user.fullName,
+                    "targetId" to post.id,
+                    "previewText" to post.title,
+                    "createdAt" to Timestamp.now(),
+                    "isRead" to false
+                )
+
+                firestore.collection("users")
+                    .document(post.authorId)
+                    .collection("notifications")
+                    .document(notificationId)
+                    .set(notificationData)
+
+                // Backend notification trigger
+                try {
+                    val request = com.hcmus.forumus_client.data.remote.dto.NotificationTriggerRequest(
+                        type = "UPVOTE",
+                        actorId = userId,
+                        actorName = user.fullName,
+                        targetId = post.id,
+                        targetUserId = post.authorId,
+                        previewText = post.title
+                    )
+                    com.hcmus.forumus_client.data.remote.NetworkService.apiService.triggerNotification(request)
+                } catch (e: Exception) {
+                    Log.e("PostRepository", "Backend notification trigger failed", e)
+                }
+            } catch (e: Exception) {
+                // Log error
+                Log.e("PostRepository", "Error triggering notification", e)
+            }
+        }
+
         return post.copy()
     }
 
