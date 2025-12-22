@@ -6,4 +6,5 @@ object ApiConstants {
     
     // API Endpoints
     const val RESET_PASSWORD = "api/resetPassword"
+    const val NOTIFICATIONS_TRIGGER = "api/notifications"
 }
