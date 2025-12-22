@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -73,7 +74,17 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
         // Handle data payload
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(TAG, "Message data: ${remoteMessage.data}")
+            val type = remoteMessage.data["type"]
             
+            if (type == "general_notification") {
+                val targetId = remoteMessage.data["targetId"] ?: ""
+                val title = remoteMessage.notification?.title ?: "New Notification"
+                val body = remoteMessage.notification?.body ?: "You have a new update"
+                
+                showGeneralNotification(title, body, targetId)
+                return
+            }
+
             val senderName = remoteMessage.data["senderName"] ?: "New Message"
             val messageContent = remoteMessage.data["messageContent"] ?: ""
             val chatId = remoteMessage.data["chatId"] ?: ""
@@ -81,10 +92,11 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
             val senderEmail = remoteMessage.data["senderEmail"] ?: ""
             val senderPictureUrl = remoteMessage.data["senderPictureUrl"] ?: ""
 
-            // Show notification
-            showNotification(senderName, messageContent, chatId, senderId, senderEmail, senderPictureUrl)
+            // Don't show notification if we are currently chatting in this chat
+            // This would require checking the current activity/fragment state
+            // For now, we'll just show it
 
-            // Return here so we don't process the notification block below
+            showNotification(senderName, messageContent, chatId, senderId, senderEmail, senderPictureUrl)
             return
         }
 
@@ -147,5 +159,41 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
+    }
+
+    private fun showGeneralNotification(title: String, messageBody: String, postId: String) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            putExtra("postId", postId)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0 /* Request code */, intent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val channelId = getString(R.string.default_notification_channel_id)
+        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(title)
+            .setContentText(messageBody)
+            .setAutoCancel(true)
+            .setSound(defaultSoundUri)
+            .setContentIntent(pendingIntent)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // Since android Oreo notification channel is needed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "General Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
     }
 }

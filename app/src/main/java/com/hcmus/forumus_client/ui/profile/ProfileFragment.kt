@@ -131,7 +131,7 @@ class ProfileFragment : Fragment() {
             onHomeClick = { navController.navigate(R.id.homeFragment) }
             onExploreClick = { navController.navigate(R.id.searchFragment) }
             onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
-            onAlertsClick = { }
+            onAlertsClick = { navController.navigate(NavGraphDirections.actionGlobalNotificationFragment()) }
             onChatClick = { navController.navigate(R.id.chatsFragment) }
         }
     }

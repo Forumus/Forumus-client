@@ -126,6 +126,12 @@ class MainActivity : AppCompatActivity() {
             )
             navController.navigate(action)
         }
+
+        val postId = intent?.getStringExtra("postId")
+        if (!postId.isNullOrEmpty()) {
+             val action = NavGraphDirections.actionGlobalPostDetailFragment(postId)
+             navController.navigate(action)
+        }
     }
 
     private val requestNotificationPermission = registerForActivityResult(
