@@ -14,11 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.NavGraphDirections
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.CommentAction
+import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.databinding.FragmentPostDetailBinding
+import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
+import com.hcmus.forumus_client.ui.common.SharePostDialog
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
-import com.hcmus.forumus_client.ui.navigation.AppNavigator
 
 /**
  * Post Detail Fragment displaying a single post and all its comments.
@@ -145,14 +147,15 @@ class PostDetailFragment : Fragment() {
                         viewModel.handleReply(post)
                     }
                     PostAction.SHARE -> {
-                        // TODO: Implement post sharing functionality
+                        val shareDialog = SharePostDialog.newInstance(post.id)
+                        shareDialog.show(childFragmentManager, "SharePostDialog")
                     }
                     PostAction.AUTHOR_PROFILE -> {
                         val action = PostDetailFragmentDirections.actionGlobalProfileFragment(post.authorId)
                         navController.navigate(action)
                     }
                     PostAction.MENU -> {
-                        // TODO: Implement post menu functionality
+                        showPostMenu(post, view)
                     }
                 }
             },
@@ -234,5 +237,24 @@ class PostDetailFragment : Fragment() {
             }
             binding.bottomInputBar.setHint(hint)
         }
+    }
+
+    /**
+     * Display the post action menu popup when user taps the menu icon on a post. Allows users to
+     * save or report the post.
+     */
+    private fun showPostMenu(post: Post, menuButton: View) {
+        val popupMenu = PopupPostMenu(requireActivity() as androidx.appcompat.app.AppCompatActivity)
+
+        // Handle save button click
+        popupMenu.onSaveClick = {
+            Toast.makeText(requireContext(), "Post saved", Toast.LENGTH_SHORT).show()
+        }
+
+        // Handle violation selection from report menu
+        popupMenu.onReportClick = { violation -> viewModel.saveReport(post, violation) }
+
+        // Show popup at menu button
+        popupMenu.show(menuButton)
     }
 }

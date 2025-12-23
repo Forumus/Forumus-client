@@ -37,6 +37,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.hcmus.forumus_client.data.model.ChatType
+import com.hcmus.forumus_client.utils.SharePostUtil
 
 class ConversationFragment : Fragment() {
     private lateinit var binding: FragmentConversationBinding
@@ -166,12 +167,21 @@ class ConversationFragment : Fragment() {
         val currentUserId = viewModel.getCurrentUserId() ?: ""
 
         // PASS THE POOL HERE
-        messageAdapter = ConversationAdapter(currentUserId, viewPool, { imageUrls, initialPosition ->
-            openFullscreenImageView(imageUrls, initialPosition)
-        }, { message ->
-            // Handle message long-click for deletion
-            showDeleteMessageDialog(message)
-        })
+        messageAdapter = ConversationAdapter(
+            currentUserId,
+            viewPool,
+            { imageUrls, initialPosition ->
+                openFullscreenImageView(imageUrls, initialPosition)
+            },
+            { message ->
+                // Handle message long-click for deletion
+                showDeleteMessageDialog(message)
+            },
+            { url ->
+                // Handle link click
+                handleShareLinkClick(url)
+            }
+        )
 
         binding.rvMessages.apply {
             adapter = messageAdapter
@@ -484,6 +494,35 @@ class ConversationFragment : Fragment() {
 
         dialog.show()
     }
+
+    /**
+     * Handles the click event when a user taps on a share link in a message.
+     * Extracts the post ID from the share URL and navigates to the PostDetail screen.
+     *
+     * @param url The share URL that was clicked
+     */
+    private fun handleShareLinkClick(url: String) {
+        // Validate the share URL: check format AND Firebase post existence
+        lifecycleScope.launch {
+            val result = SharePostUtil.validateShareUrl(url)
+            
+            if (result.isSuccess) {
+                val postId = result.getOrNull()
+                if (postId != null) {
+                    // Navigate to PostDetail with the valid postId
+                    val action = ConversationFragmentDirections.actionGlobalPostDetailFragment(postId)
+                    findNavController().navigate(action)
+                } else {
+                    Toast.makeText(requireContext(), "Post no longer exists", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                val error = result.exceptionOrNull()
+                Log.d("ConversationFragment", "Invalid share link: ${error?.message}")
+                Toast.makeText(requireContext(), "Invalid or deleted post link", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
     override fun onDestroy() {
         // MEMORY FIX: Clean up all resources to prevent leaks

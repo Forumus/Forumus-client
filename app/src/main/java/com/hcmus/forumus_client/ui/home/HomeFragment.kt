@@ -28,6 +28,7 @@ import com.hcmus.forumus_client.ui.common.BottomNavigationBar
 import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
+import com.hcmus.forumus_client.ui.common.SharePostDialog
 import kotlin.text.ifEmpty
 import kotlin.text.lowercase
 import kotlin.text.startsWith
@@ -65,7 +66,6 @@ class HomeFragment : Fragment() {
 
         viewModel.loadPosts()
         viewModel.loadTopics()
-        // viewModel.addFieldForPosts()
     }
 
     /**
@@ -129,13 +129,10 @@ class HomeFragment : Fragment() {
                                     HomeFragmentDirections.actionGlobalPostDetailFragment(post.id)
                             navController.navigate(action)
                         }
-                        PostAction.SHARE ->
-                                Toast.makeText(
-                                                requireContext(),
-                                                "Share feature coming soon",
-                                                Toast.LENGTH_SHORT
-                                        )
-                                        .show()
+                        PostAction.SHARE -> {
+                            val shareDialog = SharePostDialog.newInstance(post.id)
+                            shareDialog.show(childFragmentManager, "SharePostDialog")
+                        }
                         PostAction.AUTHOR_PROFILE -> {
                             // Navigate to ProfileFragment using Safe Args
                             val action =

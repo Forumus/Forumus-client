@@ -13,6 +13,7 @@ import com.hcmus.forumus_client.data.model.Message
 import com.hcmus.forumus_client.data.model.MessageType
 import com.hcmus.forumus_client.databinding.ItemMessageReceivedBinding
 import com.hcmus.forumus_client.databinding.ItemMessageSentBinding
+import com.hcmus.forumus_client.utils.SharePostUtil
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -20,7 +21,8 @@ class ConversationAdapter(
     private val currentUserId: String,
     private val viewPool: RecyclerView.RecycledViewPool, // OPTIMIZATION: Shared Pool
     private val onImageClick: ((List<String>, Int) -> Unit)? = null,
-    private val onMessageLongClick: ((Message) -> Unit)? = null
+    private val onMessageLongClick: ((Message) -> Unit)? = null,
+    private val onLinkClick: ((String) -> Unit)? = null
 ) : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
     companion object {
@@ -56,7 +58,7 @@ class ConversationAdapter(
                     parent,
                     false
                 )
-                SentMessageViewHolder(binding, viewPool, onImageClick, onMessageLongClick)
+                SentMessageViewHolder(binding, viewPool, onImageClick, onMessageLongClick, onLinkClick)
             }
             VIEW_TYPE_RECEIVED -> {
                 val binding = ItemMessageReceivedBinding.inflate(
@@ -64,7 +66,7 @@ class ConversationAdapter(
                     parent,
                     false
                 )
-                ReceivedMessageViewHolder(binding, viewPool, onImageClick)
+                ReceivedMessageViewHolder(binding, viewPool, onImageClick, onLinkClick)
             }
             else -> throw IllegalArgumentException("Invalid view type")
         }
@@ -94,7 +96,8 @@ class ConversationAdapter(
         private val binding: ItemMessageSentBinding,
         viewPool: RecyclerView.RecycledViewPool,
         private val onImageClick: ((List<String>, Int) -> Unit)?,
-        private val onMessageLongClick: ((Message) -> Unit)?
+        private val onMessageLongClick: ((Message) -> Unit)?,
+        private val onLinkClick: ((String) -> Unit)?
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private var currentMessage: Message? = null
@@ -113,8 +116,15 @@ class ConversationAdapter(
             currentMessage = message
             
             if (message.content.trim().isNotEmpty()) {
-                binding.tvMessageText.text = message.content
-                binding.tvMessageText.visibility = View.VISIBLE
+                // Check if content is a share URL
+                if (SharePostUtil.isShareUrl(message.content)) {
+                    // Render as blue, underlined, clickable link
+                    renderAsLink(message.content)
+                } else {
+                    // Regular text
+                    binding.tvMessageText.text = message.content
+                    binding.tvMessageText.visibility = View.VISIBLE
+                }
             } else {
                 binding.tvMessageText.visibility = View.GONE
             }
@@ -134,18 +144,58 @@ class ConversationAdapter(
                 )
             }
         }
+        
+        private fun renderAsLink(url: String) {
+            val spannableString = android.text.SpannableString(url)
+            
+            // Add underline
+            spannableString.setSpan(
+                android.text.style.UnderlineSpan(),
+                0,
+                url.length,
+                android.text.SpannableString.SPAN_INCLUSIVE_INCLUSIVE
+            )
+            
+            // Add custom click span
+            val clickableSpan = object : android.text.style.ClickableSpan() {
+                override fun onClick(widget: View) {
+                    onLinkClick?.invoke(url)
+                }
+            }
+            
+            spannableString.setSpan(
+                clickableSpan,
+                0,
+                url.length,
+                android.text.SpannableString.SPAN_INCLUSIVE_INCLUSIVE
+            )
+            
+            // Set text and make it blue
+            binding.tvMessageText.text = spannableString
+            binding.tvMessageText.setTextColor(android.graphics.Color.BLUE)
+            binding.tvMessageText.movementMethod = android.text.method.LinkMovementMethod.getInstance()
+            binding.tvMessageText.visibility = View.VISIBLE
+        }
     }
 
     class ReceivedMessageViewHolder(
         private val binding: ItemMessageReceivedBinding,
         viewPool: RecyclerView.RecycledViewPool,
-        private val onImageClick: ((List<String>, Int) -> Unit)?
+        private val onImageClick: ((List<String>, Int) -> Unit)?,
+        private val onLinkClick: ((String) -> Unit)?
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(message: Message) {
             if (message.content.trim().isNotEmpty()) {
-                binding.tvMessageText.text = message.content
-                binding.tvMessageText.visibility = View.VISIBLE
+                // Check if content is a share URL
+                if (SharePostUtil.isShareUrl(message.content)) {
+                    // Render as blue, underlined, clickable link
+                    renderAsLink(message.content)
+                } else {
+                    // Regular text
+                    binding.tvMessageText.text = message.content
+                    binding.tvMessageText.visibility = View.VISIBLE
+                }
             } else {
                 binding.tvMessageText.visibility = View.GONE
             }
@@ -157,6 +207,38 @@ class ConversationAdapter(
             binding.messageImagesView.setOnImageClickListener { urls, position ->
                 onImageClick?.invoke(urls, position)
             }
+        }
+        
+        private fun renderAsLink(url: String) {
+            val spannableString = android.text.SpannableString(url)
+            
+            // Add underline
+            spannableString.setSpan(
+                android.text.style.UnderlineSpan(),
+                0,
+                url.length,
+                android.text.SpannableString.SPAN_INCLUSIVE_INCLUSIVE
+            )
+            
+            // Add custom click span
+            val clickableSpan = object : android.text.style.ClickableSpan() {
+                override fun onClick(widget: View) {
+                    onLinkClick?.invoke(url)
+                }
+            }
+            
+            spannableString.setSpan(
+                clickableSpan,
+                0,
+                url.length,
+                android.text.SpannableString.SPAN_INCLUSIVE_INCLUSIVE
+            )
+            
+            // Set text and make it blue
+            binding.tvMessageText.text = spannableString
+            binding.tvMessageText.setTextColor(android.graphics.Color.BLUE)
+            binding.tvMessageText.movementMethod = android.text.method.LinkMovementMethod.getInstance()
+            binding.tvMessageText.visibility = View.VISIBLE
         }
     }
 }
