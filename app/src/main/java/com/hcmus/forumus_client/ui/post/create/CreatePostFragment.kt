@@ -22,23 +22,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.fragment.app.viewModels
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide // Đừng quên import Glide
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
 import com.hcmus.forumus_client.R
-import com.hcmus.forumus_client.databinding.FragmentCreatePostBinding
 import com.hcmus.forumus_client.data.model.TopicItem
-import com.hcmus.forumus_client.data.model.User // Import class User
+import com.hcmus.forumus_client.databinding.FragmentCreatePostBinding
 import java.io.File
-import kotlin.compareTo
-import kotlin.getValue
 import kotlin.math.abs
 
 class CreatePostFragment : Fragment() {
@@ -50,7 +47,6 @@ class CreatePostFragment : Fragment() {
     private val MAX_TOPIC_LIMIT = 5
     private var tempImageUri: Uri? = null
 
-    // --- DANH SÁCH CHỦ ĐỀ ---
     private val fullTopicData = listOf(
         TopicItem("Analytical Chemistry", "🧪"),
         TopicItem("Artificial Intelligence", "🤖"),
@@ -79,32 +75,27 @@ class CreatePostFragment : Fragment() {
 
     private val selectedTopicsList = ArrayList<String>()
 
-    // --- LAUNCHERS ---
+    // --- LAUNCHERS (Giữ nguyên) ---
     private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) tempImageUri?.let { viewModel.addImages(listOf(it)); setBottomSheetState(false) }
     }
-
     private val takeVideoLauncher = registerForActivityResult(ActivityResultContracts.CaptureVideo()) { success ->
         if (success) tempImageUri?.let { viewModel.addImages(listOf(it)); setBottomSheetState(false) }
     }
-
     private val requestVideoPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         val cameraGranted = permissions[Manifest.permission.CAMERA] ?: false
         val audioGranted = permissions[Manifest.permission.RECORD_AUDIO] ?: false
         if (cameraGranted && audioGranted) launchCamera(isVideo = true)
         else Toast.makeText(requireContext(), "Camera and Audio permissions are required to record video", Toast.LENGTH_SHORT).show()
     }
-
     private val requestCameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) launchCamera(isVideo = false)
         else Toast.makeText(requireContext(), "Camera permission is required to take photos", Toast.LENGTH_SHORT).show()
     }
-
     private val requestStoragePermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         if (permissions.entries.any { it.value }) launchPhotoPicker()
         else Toast.makeText(requireContext(), "Photo access permission is required", Toast.LENGTH_SHORT).show()
     }
-
     private val pickMedia = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(10)) { uris ->
         if (uris.isNotEmpty()) {
             viewModel.addImages(uris)
@@ -112,46 +103,36 @@ class CreatePostFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentCreatePostBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupBottomSheet()
         setupRecyclerView()
         setupListeners()
-        setupObservers() // <--- Đây là nơi code mới hoạt động
-
+        setupObservers()
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { handleExit() }
         validatePostButton()
     }
 
     private fun setupListeners() {
         binding.btnClose.setOnClickListener { handleExit() }
-
         val onCameraClick = View.OnClickListener { showCameraModeSelection() }
         val onPhotoClick = View.OnClickListener { checkPermissionAndPickImage() }
         val onTopicClick = View.OnClickListener { showTopicSelectionDialog() }
 
         binding.btnCamera.setOnClickListener(onCameraClick)
         binding.btnAttachImage.setOnClickListener(onPhotoClick)
-
         val layoutFullActions = binding.layoutFullActions
         if (layoutFullActions.childCount > 3) {
             layoutFullActions.getChildAt(3).setOnClickListener(onTopicClick)
         }
-
         binding.btnQuickPhoto.setOnClickListener(onPhotoClick)
         binding.btnQuickCamera.setOnClickListener(onCameraClick)
         binding.btnQuickTopic.setOnClickListener(onTopicClick)
-
         binding.btnMoreOptions.setOnClickListener { setBottomSheetState(true) }
 
         val textWatcher = object : android.text.TextWatcher {
@@ -187,7 +168,6 @@ class CreatePostFragment : Fragment() {
                 }
             }
         }
-
         viewModel.selectedImages.observe(viewLifecycleOwner) { images ->
             if (images.isNullOrEmpty()) {
                 binding.rvSelectedImages.visibility = View.GONE
@@ -199,47 +179,92 @@ class CreatePostFragment : Fragment() {
             }
             validatePostButton()
         }
-
-        // --- MỚI: Quan sát và hiển thị thông tin User ---
         viewModel.currentUser.observe(viewLifecycleOwner) { user ->
             if (user != null) {
-                // Hiển thị Tên
                 binding.tvAuthorName.text = user.fullName.ifEmpty { "User Name" }
-
-                // Hiển thị Email
                 binding.tvAuthorEmail.text = user.email
-
-                // Xử lý Avatar: Nếu có link -> Load, không -> Tạo ảnh chữ cái
-                val avatarToLoad = if (!user.profilePictureUrl.isNullOrEmpty()) {
-                    user.profilePictureUrl
-                } else {
-                    // Tạo avatar chữ cái nền xanh dương (2196F3) chữ trắng
-                    "https://ui-avatars.com/api/?name=${user.fullName}&background=2196F3&color=fff&size=128"
-                }
-
-                // Load ảnh bằng Glide
-                Glide.with(requireContext())
-                    .load(avatarToLoad)
-                    .placeholder(R.drawable.default_avatar)
-                    .error(R.drawable.default_avatar)
-                    .circleCrop()
-                    .into(binding.ivAuthorAvatar)
+                val avatarToLoad = if (!user.profilePictureUrl.isNullOrEmpty()) user.profilePictureUrl
+                else "https://ui-avatars.com/api/?name=${user.fullName}&background=2196F3&color=fff&size=128"
+                Glide.with(requireContext()).load(avatarToLoad).placeholder(R.drawable.default_avatar).error(R.drawable.default_avatar).circleCrop().into(binding.ivAuthorAvatar)
             }
+        }
+        // Cập nhật chip khi màu đã tải về
+        viewModel.topicColors.observe(viewLifecycleOwner) {
+            if (selectedTopicsList.isNotEmpty()) updateTopicChips()
         }
     }
 
-    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
+    // --- CẬP NHẬT CHIP VỚI ALPHA ---
+    private fun updateTopicChips() {
+        binding.chipGroupTopics.removeAllViews()
+        val colorMap = viewModel.topicColors.value ?: emptyMap()
+
+        selectedTopicsList.forEach { topicName ->
+            val chip = Chip(requireContext())
+
+            // 1. Chỉ hiện tên, bỏ icon
+            chip.text = topicName
+            chip.isCheckable = false
+            chip.isCloseIconVisible = true
+            chip.setOnCloseIconClickListener {
+                selectedTopicsList.remove(topicName)
+                updateTopicChips()
+            }
+
+            // 2. Xử lý màu sắc với Alpha
+            val appearance = colorMap[topicName]
+            if (appearance != null) {
+                try {
+                    val baseColor = Color.parseColor(appearance.colorHex)
+
+                    // Tính toán màu nền với Alpha (VD: 0.125 * 255 = ~32)
+                    val alphaInt = (appearance.alpha * 255).toInt().coerceIn(0, 255)
+                    val backgroundColor = Color.argb(
+                        alphaInt,
+                        Color.red(baseColor),
+                        Color.green(baseColor),
+                        Color.blue(baseColor)
+                    )
+
+                    // Set Background nhạt
+                    chip.chipBackgroundColor = ColorStateList.valueOf(backgroundColor)
+
+                    // Set Text và Icon màu đậm (100% opacity)
+                    chip.setTextColor(baseColor)
+                    chip.closeIconTint = ColorStateList.valueOf(baseColor)
+                } catch (e: Exception) {
+                    setRandomPastelColor(chip, topicName)
+                }
+            } else {
+                setRandomPastelColor(chip, topicName)
+            }
+            binding.chipGroupTopics.addView(chip)
+        }
+    }
+
+    private fun setRandomPastelColor(chip: Chip, topicName: String) {
+        val color = getColorForTopic(topicName)
+        chip.chipBackgroundColor = ColorStateList.valueOf(color)
+        chip.setTextColor(Color.BLACK)
+        chip.closeIconTint = ColorStateList.valueOf(Color.BLACK)
+    }
+
+    private fun getColorForTopic(topic: String): Int {
+        val hash = abs(topic.hashCode())
+        val colors = listOf(0xFFE3F2FD.toInt(), 0xFFE8F5E9.toInt(), 0xFFFFF3E0.toInt(), 0xFFFFEBEE.toInt(), 0xFFF3E5F5.toInt(), 0xFFE0F7FA.toInt(), 0xFFFFF8E1.toInt(), 0xFFF1F8E9.toInt())
+        return colors[hash % colors.size]
+    }
+
+    // --- CÁC HÀM UI KHÁC GIỮ NGUYÊN ---
     private fun showTopicSelectionDialog() {
         val dialog = BottomSheetDialog(requireContext())
         val dialogView = layoutInflater.inflate(R.layout.layout_dialog_topic_selection, null)
         dialog.setContentView(dialogView)
-
         val rvTopics = dialogView.findViewById<RecyclerView>(R.id.rv_topics)
         val btnDone = dialogView.findViewById<Button>(R.id.btn_done_selection)
         val btnClose = dialogView.findViewById<ImageView>(R.id.btn_close_dialog)
 
         val currentItems = fullTopicData.map { it.copy(isSelected = selectedTopicsList.contains(it.name)) }
-
         val topicAdapter = TopicAdapter(currentItems, MAX_TOPIC_LIMIT)
         rvTopics.adapter = topicAdapter
         rvTopics.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -252,28 +277,9 @@ class CreatePostFragment : Fragment() {
             validatePostButton()
             dialog.dismiss()
         }
-
         btnClose.setOnClickListener { dialog.dismiss() }
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         dialog.show()
-    }
-
-    private fun updateTopicChips() {
-        binding.chipGroupTopics.removeAllViews()
-        selectedTopicsList.forEach { topicName ->
-            val chip = Chip(requireContext())
-            val icon = fullTopicData.find { it.name == topicName }?.icon ?: ""
-            chip.text = "$icon $topicName"
-            chip.isCheckable = false
-            chip.isCloseIconVisible = true
-            chip.chipBackgroundColor = ColorStateList.valueOf(getColorForTopic(topicName))
-            chip.setTextColor(Color.BLACK)
-            chip.setOnCloseIconClickListener {
-                selectedTopicsList.remove(topicName)
-                updateTopicChips()
-            }
-            binding.chipGroupTopics.addView(chip)
-        }
     }
 
     private fun showCameraModeSelection() {
@@ -282,17 +288,8 @@ class CreatePostFragment : Fragment() {
             .setTitle("Choose Action")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> {
-                        val hasCameraPermission = hasPermission(Manifest.permission.CAMERA)
-                        if (hasCameraPermission) launchCamera(isVideo = false)
-                        else requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                    }
-                    1 -> {
-                        val hasCameraPermission = hasPermission(Manifest.permission.CAMERA)
-                        val hasAudioPermission = hasPermission(Manifest.permission.RECORD_AUDIO)
-                        if (hasCameraPermission && hasAudioPermission) launchCamera(isVideo = true)
-                        else requestVideoPermissionLauncher.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
-                    }
+                    0 -> { if (hasPermission(Manifest.permission.CAMERA)) launchCamera(isVideo = false) else requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA) }
+                    1 -> { if (hasPermission(Manifest.permission.CAMERA) && hasPermission(Manifest.permission.RECORD_AUDIO)) launchCamera(isVideo = true) else requestVideoPermissionLauncher.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)) }
                 }
             }
             .show()
@@ -304,11 +301,8 @@ class CreatePostFragment : Fragment() {
             val suffix = if (isVideo) ".mp4" else ".jpg"
             val file = File.createTempFile(fileName, suffix, requireContext().cacheDir)
             tempImageUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.fileprovider", file)
-            if (isVideo) takeVideoLauncher.launch(tempImageUri!!)
-            else takePhotoLauncher.launch(tempImageUri!!)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            if (isVideo) takeVideoLauncher.launch(tempImageUri!!) else takePhotoLauncher.launch(tempImageUri!!)
+        } catch (e: Exception) { e.printStackTrace() }
     }
 
     private fun previewMedia(uri: Uri) {
@@ -316,7 +310,7 @@ class CreatePostFragment : Fragment() {
         val mimeType = requireContext().contentResolver.getType(uri) ?: "video/mp4"
         intent.setDataAndType(uri, mimeType)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        try { startActivity(intent) } catch (e: Exception) { Toast.makeText(requireContext(), "No app found to open this file", Toast.LENGTH_SHORT).show() }
+        try { startActivity(intent) } catch (e: Exception) { Toast.makeText(requireContext(), "No app found", Toast.LENGTH_SHORT).show() }
     }
 
     private fun hasPermission(permission: String) = ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED
@@ -330,12 +324,6 @@ class CreatePostFragment : Fragment() {
     }
 
     private fun launchPhotoPicker() = pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-
-    private fun getColorForTopic(topic: String): Int {
-        val hash = abs(topic.hashCode())
-        val colors = listOf(0xFFE3F2FD.toInt(), 0xFFE8F5E9.toInt(), 0xFFFFF3E0.toInt(), 0xFFFFEBEE.toInt(), 0xFFF3E5F5.toInt(), 0xFFE0F7FA.toInt(), 0xFFFFF8E1.toInt(), 0xFFF1F8E9.toInt())
-        return colors[hash % colors.size]
-    }
 
     private fun setupBottomSheet() {
         val bottomSheet = binding.bottomSheetLayout

@@ -23,6 +23,9 @@ sealed class PostState {
     data class Error(val msg: String) : PostState()
 }
 
+// Data class nhỏ để lưu thông tin màu
+data class TopicAppearance(val colorHex: String, val alpha: Float)
+
 class CreatePostViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _selectedImages = MutableLiveData<MutableList<Uri>>(mutableListOf())
@@ -31,11 +34,14 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
     private val _postState = MutableLiveData<PostState>()
     val postState: LiveData<PostState> get() = _postState
 
-    // --- MỚI: LiveData chứa thông tin User hiện tại ---
     private val _currentUser = MutableLiveData<User?>()
     val currentUser: LiveData<User?> get() = _currentUser
 
-    // Các biến cũ
+    // --- SỬA: Map lưu Tên Topic -> TopicAppearance (Màu + Alpha) ---
+    private val _topicColors = MutableLiveData<Map<String, TopicAppearance>>()
+    val topicColors: LiveData<Map<String, TopicAppearance>> get() = _topicColors
+
+    // Các biến cũ giữ nguyên
     private val _generatedTitle = MutableLiveData<String>()
     val generatedTitle: LiveData<String> = _generatedTitle
     private val _isLoadingAi = MutableLiveData<Boolean>()
@@ -43,14 +49,14 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
     val errorAi = MutableLiveData<String>()
 
     private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance() // Thêm Firestore instance
+    private val firestore = FirebaseFirestore.getInstance()
     private val repository = PostRepository()
 
     init {
-        fetchCurrentUser() // Gọi hàm lấy user ngay khi khởi tạo
+        fetchCurrentUser()
+        fetchTopicColors()
     }
 
-    // --- MỚI: Hàm lấy thông tin User từ Firestore ---
     private fun fetchCurrentUser() {
         val uid = auth.currentUser?.uid
         if (uid != null) {
@@ -59,7 +65,6 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         try {
-                            // Parse document thành object User
                             val user = document.toObject(User::class.java)
                             _currentUser.value = user
                         } catch (e: Exception) {
@@ -67,10 +72,30 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                         }
                     }
                 }
-                .addOnFailureListener { e ->
-                    Log.e("CreatePostVM", "Error fetching user", e)
-                }
         }
+    }
+
+    // --- SỬA: Lấy cả fillColor và fillAlpha ---
+    private fun fetchTopicColors() {
+        firestore.collection("topics")
+            .get()
+            .addOnSuccessListener { result ->
+                val colorMap = mutableMapOf<String, TopicAppearance>()
+                for (document in result) {
+                    val name = document.getString("name")
+                    val color = document.getString("fillColor")
+                    // Lấy alpha, nếu không có thì mặc định là 1.0 (đậm đặc)
+                    val alpha = document.getDouble("fillAlpha")?.toFloat() ?: 1.0f
+
+                    if (name != null && color != null) {
+                        colorMap[name] = TopicAppearance(color, alpha)
+                    }
+                }
+                _topicColors.value = colorMap
+            }
+            .addOnFailureListener { e ->
+                Log.e("CreatePostVM", "Error fetching topic colors", e)
+            }
     }
 
     fun addImages(uris: List<Uri>) {
@@ -111,7 +136,6 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
 
-                // Có thể thêm authorId vào Post nếu Model Post của bạn hỗ trợ
                 val post = Post(
                     title = title,
                     content = content,
