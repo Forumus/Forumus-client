@@ -1,4 +1,4 @@
-package com.hcmus.forumus_client.data.model
+package com.hcmus.forumus_client.data.dto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

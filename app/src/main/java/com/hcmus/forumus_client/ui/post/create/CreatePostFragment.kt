@@ -22,6 +22,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -32,6 +34,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
 import com.hcmus.forumus_client.R
+import com.hcmus.forumus_client.data.model.Topic
 import com.hcmus.forumus_client.databinding.FragmentCreatePostBinding
 import com.hcmus.forumus_client.data.model.TopicItem
 import java.io.File
@@ -47,33 +50,6 @@ class CreatePostFragment : Fragment() {
 
     private val MAX_TOPIC_LIMIT = 5
     private var tempImageUri: Uri? = null
-
-    // --- DANH SÁCH 23 CHỦ ĐỀ KÈM ICON ---
-    private val fullTopicData = listOf(
-        TopicItem("Analytical Chemistry", "🧪"),
-        TopicItem("Artificial Intelligence", "🤖"),
-        TopicItem("Astrobiology", "🔭"),
-        TopicItem("Astronomy", "🌟"),
-        TopicItem("Biology", "🧬"),
-        TopicItem("Biophysics", "⚡"),
-        TopicItem("Biotechnology", "🧫"),
-        TopicItem("Chemistry", "⚗️"),
-        TopicItem("Computational Science", "💻"),
-        TopicItem("Computer Science", "💾"),
-        TopicItem("Earth & Atmospheric Science", "🌍"),
-        TopicItem("Environmental Science", "🌿"),
-        TopicItem("Genetics", "🧬"),
-        TopicItem("Geology", "🪨"),
-        TopicItem("Materials Science", "⚗️"),
-        TopicItem("Mathematics", "📐"),
-        TopicItem("Nanotechnology", "🔬"),
-        TopicItem("Physics", "⚛️"),
-        TopicItem("Quantum Computing", "💻"),
-        TopicItem("Robotics", "🤖"),
-        TopicItem("Statistics & Data Science", "📊"),
-        TopicItem("Theoretical Physics", "🌌"),
-        TopicItem("XAI", "🧠")
-    )
 
     // List String để lưu tên topic đã chọn gửi lên Firebase
     private val selectedTopicsList = ArrayList<String>()
@@ -130,7 +106,10 @@ class CreatePostFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { handleExit() }
         validatePostButton()
+
+        viewModel.getAllTopics()
     }
+
 
     private fun setupListeners() {
         binding.btnClose.setOnClickListener { handleExit() }
@@ -217,16 +196,78 @@ class CreatePostFragment : Fragment() {
         val rvTopics = dialogView.findViewById<RecyclerView>(R.id.rv_topics)
         val btnDone = dialogView.findViewById<Button>(R.id.btn_done_selection)
         val btnClose = dialogView.findViewById<ImageView>(R.id.btn_close_dialog)
-        val tvSubtitle = dialogView.findViewById<TextView>(R.id.tv_subtitle)
+        val btnAiSuggestion = dialogView.findViewById<androidx.cardview.widget.CardView>(R.id.btn_ai_suggestion)
+        val progressAi = dialogView.findViewById<android.widget.ProgressBar>(R.id.progress_ai)
+        val tvAiEmoji = dialogView.findViewById<TextView>(R.id.tv_ai_emoji)
+        val tvAiText = dialogView.findViewById<TextView>(R.id.tv_ai_text)
 
         // Chuẩn bị dữ liệu: Clone list gốc và đánh dấu những item đang được chọn
-        val currentItems = fullTopicData.map { it.copy(isSelected = selectedTopicsList.contains(it.name)) }
+        val currentItems = ArrayList<TopicItem>()
+        val fullTopicData = viewModel.allTopics.value ?: emptyList()
+        fullTopicData.forEach { topic ->
+            val isSelected = selectedTopicsList.contains(topic.name)
+            currentItems.add(TopicItem(topic.name, isSelected))
+        }
 
         // Setup Adapter (TopicAdapter)
         val topicAdapter = TopicAdapter(currentItems, MAX_TOPIC_LIMIT)
         rvTopics.adapter = topicAdapter
         // Setup Layout Manager: Grid 2 cột
         rvTopics.layoutManager = GridLayoutManager(requireContext(), 2)
+
+        // Xử lý nút AI Suggestion
+        btnAiSuggestion.setOnClickListener {
+            val title = binding.edtTitle.text.toString().trim()
+            val content = binding.edtContent.text.toString().trim()
+            
+            if (title.isEmpty() && content.isEmpty()) {
+                Toast.makeText(requireContext(), "Please enter title or content first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            // Show loading state
+            progressAi.visibility = View.VISIBLE
+            tvAiEmoji.visibility = View.GONE
+            tvAiText.text = "Loading..."
+            btnAiSuggestion.isClickable = false
+            
+            // Call ViewModel to get AI suggestions
+            viewModel.getSuggestedTopics(title, content)
+        }
+
+        // Observe AI suggested topics
+        viewModel.suggestedTopics.observe(viewLifecycleOwner) { suggestedTopics ->
+            // Hide loading state
+            progressAi.visibility = View.GONE
+            tvAiEmoji.visibility = View.VISIBLE
+            tvAiText.text = "AI Topic Suggestion"
+            btnAiSuggestion.isClickable = true
+            
+            if (suggestedTopics.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), "No suggestions found", Toast.LENGTH_SHORT).show()
+                return@observe
+            }
+            
+            // Deselect all current selections
+            currentItems.forEach { it.isSelected = false }
+            
+            // Select suggested topics (up to MAX_TOPIC_LIMIT)
+            var selectedCount = 0
+            suggestedTopics.forEach { suggestedTopic ->
+                if (selectedCount >= MAX_TOPIC_LIMIT) return@forEach
+                
+                val matchingItem = currentItems.find { it.name == suggestedTopic.name }
+                if (matchingItem != null) {
+                    matchingItem.isSelected = true
+                    selectedCount++
+                }
+            }
+            
+            // Notify adapter to refresh UI
+            topicAdapter.notifyDataSetChanged()
+            
+            Toast.makeText(requireContext(), "Selected $selectedCount suggested topics", Toast.LENGTH_SHORT).show()
+        }
 
         // Xử lý nút Done
         btnDone.setOnClickListener {
@@ -251,8 +292,7 @@ class CreatePostFragment : Fragment() {
         selectedTopicsList.forEach { topicName ->
             val chip = Chip(requireContext())
             // Tìm icon tương ứng để hiển thị trên chip (nếu muốn)
-            val icon = fullTopicData.find { it.name == topicName }?.icon ?: ""
-            chip.text = "$icon $topicName"
+            chip.text = topicName
 
             chip.isCheckable = false
             chip.isCloseIconVisible = true

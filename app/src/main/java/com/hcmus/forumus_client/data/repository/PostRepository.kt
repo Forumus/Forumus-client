@@ -1,34 +1,38 @@
 package com.hcmus.forumus_client.data.repository
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.media.MediaMetadataRetriever
-import android.net.Uri
-import android.util.Log
-import androidx.core.net.toUri
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.VoteState
+import kotlinx.coroutines.tasks.await
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import android.media.MediaMetadataRetriever
+import java.util.UUID
+import android.net.Uri
+import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
+import android.graphics.Bitmap
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.UUID
-import kotlinx.coroutines.tasks.await
+import android.content.Context
+import androidx.core.net.toUri
+import com.google.firebase.Timestamp
+import com.hcmus.forumus_client.data.dto.GetSuggestedTopicsRequest
+import com.hcmus.forumus_client.data.model.PostStatus
+import com.hcmus.forumus_client.data.model.Topic
+import com.hcmus.forumus_client.data.remote.NetworkService
 
 /**
- * Repository for managing post data operations with Firestore. Handles CRUD operations, voting, and
- * post enrichment with user-specific data.
+ * Repository for managing post data operations with Firestore.
+ * Handles CRUD operations, voting, and post enrichment with user-specific data.
  */
 class PostRepository(
-        private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-        private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-        private val userRepository: UserRepository = UserRepository()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val userRepository: UserRepository = UserRepository()
 ) {
 
     /**
@@ -47,8 +51,11 @@ class PostRepository(
         this.downvoteCount = votes.count { it == VoteState.DOWNVOTE }
 
         // Fetch and count comments for this post
-        val commentsSnapshot =
-                firestore.collection("posts").document(this.id).collection("comments").get().await()
+        val commentsSnapshot = firestore.collection("posts")
+            .document(this.id)
+            .collection("comments")
+            .get()
+            .await()
 
         this.commentCount = commentsSnapshot.size()
 
@@ -120,21 +127,23 @@ class PostRepository(
 
             val generatedId = generatePostId()
 
-            val postRef = FirebaseFirestore.getInstance().collection("posts").document(generatedId)
+            val postRef = FirebaseFirestore
+                .getInstance()
+                .collection("posts")
+                .document(generatedId)
 
             val now = Timestamp.now()
 
-            val updatedPost =
-                    post.copy(
-                            id = generatedId,
-                            authorId = user.uid,
-                            authorName = user.fullName,
-                            authorAvatarUrl = user.profilePictureUrl,
-                            createdAt = now,
-                            imageUrls = imageUrls,
-                            videoUrls = videoUrls,
-                            videoThumbnailUrls = videoThumbnailUrls
-                    )
+            val updatedPost = post.copy(
+                id = generatedId,
+                authorId = user.uid,
+                authorName = user.fullName,
+                authorAvatarUrl = user.profilePictureUrl,
+                createdAt = now,
+                imageUrls = imageUrls,
+                videoUrls = videoUrls,
+                videoThumbnailUrls = videoThumbnailUrls
+            )
 
             postRef.set(updatedPost).await()
             Result.success(true)
@@ -146,15 +155,12 @@ class PostRepository(
     private suspend fun uploadFile(ref: StorageReference, uri: Uri): String {
         return try {
             val uploadTask = ref.putFile(uri)
-            val downloadUrlTask =
-                    uploadTask
-                            .continueWithTask { task ->
-                                if (!task.isSuccessful) {
-                                    task.exception?.let { throw it }
-                                }
-                                ref.downloadUrl
-                            }
-                            .await()
+            val downloadUrlTask = uploadTask.continueWithTask { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let { throw it }
+                }
+                ref.downloadUrl
+            }.await()
 
             downloadUrlTask.toString()
         } catch (e: Exception) {
@@ -168,9 +174,10 @@ class PostRepository(
             val uri = videoUri.toUri()
             retriever.setDataSource(context, uri)
 
-            val thumbnailBitmap =
-                    retriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST)
-                            ?: return null
+            val thumbnailBitmap = retriever.getFrameAtTime(
+                0,
+                MediaMetadataRetriever.OPTION_CLOSEST
+            ) ?: return null
 
             // Tạo file tạm trong cache của app
             val tempFile = File.createTempFile("video_thumb_", ".jpg", context.cacheDir)
@@ -213,14 +220,14 @@ class PostRepository(
      */
     suspend fun getPosts(limit: Long = 50): List<Post> {
         val userId = auth.currentUser?.uid
-        return firestore
-                .collection("posts")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(limit)
-                .get()
-                .await()
-                .toObjects(Post::class.java)
-                .map { it.enrichForUser(userId) }
+        return firestore.collection("posts")
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .whereEqualTo("status", PostStatus.APPROVED) // Only fetch approved posts (we used it when the backend is ready)
+            .limit(limit)
+            .get()
+            .await()
+            .toObjects(Post::class.java)
+            .map { it.enrichForUser(userId) }
     }
 
     /**
@@ -231,16 +238,16 @@ class PostRepository(
      * @return Pair of enriched posts list and the last document snapshot for next page
      */
     suspend fun getPostsPaginated(
-            limit: Long = 10,
-            lastDocument: com.google.firebase.firestore.DocumentSnapshot? = null
+        limit: Long = 10,
+        lastDocument: com.google.firebase.firestore.DocumentSnapshot? = null
     ): Pair<List<Post>, com.google.firebase.firestore.DocumentSnapshot?> {
         val userId = auth.currentUser?.uid
 
         var query =
-                firestore
-                        .collection("posts")
-                        .orderBy("createdAt", Query.Direction.DESCENDING)
-                        .limit(limit)
+            firestore
+                .collection("posts")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(limit)
 
         // If we have a last document, start after it for pagination
         if (lastDocument != null) {
@@ -252,11 +259,11 @@ class PostRepository(
 
         // Get the last document for next pagination
         val lastDoc =
-                if (snapshot.documents.isNotEmpty()) {
-                    snapshot.documents.last()
-                } else {
-                    null
-                }
+            if (snapshot.documents.isNotEmpty()) {
+                snapshot.documents.last()
+            } else {
+                null
+            }
 
         return Pair(posts, lastDoc)
     }
@@ -268,13 +275,12 @@ class PostRepository(
      */
     suspend fun getAllPosts(): List<Post> {
         val userId = auth.currentUser?.uid
-        return firestore
-                .collection("posts")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .await()
-                .toObjects(Post::class.java)
-                .map { it.enrichForUser(userId) }
+        return firestore.collection("posts")
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .get()
+            .await()
+            .toObjects(Post::class.java)
+            .map { it.enrichForUser(userId) }
     }
 
     /**
@@ -284,18 +290,20 @@ class PostRepository(
      * @param limit Maximum number of posts to retrieve
      * @return List of enriched posts with user-specific data
      */
-    suspend fun getPostsByUser(userId: String, limit: Long = 100): List<Post> {
+    suspend fun getPostsByUser(
+        userId: String,
+        limit: Long = 100
+    ): List<Post> {
         val currentUser = auth.currentUser?.uid
 
-        return firestore
-                .collection("posts")
-                .whereEqualTo("authorId", userId)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(limit)
-                .get()
-                .await()
-                .toObjects(Post::class.java)
-                .map { it.enrichForUser(currentUser) }
+        return firestore.collection("posts")
+            .whereEqualTo("authorId", userId)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .limit(limit)
+            .get()
+            .await()
+            .toObjects(Post::class.java)
+            .map { it.enrichForUser(currentUser) }
     }
 
     /**
@@ -306,25 +314,27 @@ class PostRepository(
      */
     suspend fun getPostById(postId: String): Post? {
         val userId = auth.currentUser?.uid
-        return firestore
-                .collection("posts")
-                .document(postId)
-                .get()
-                .await()
-                .toObject(Post::class.java)
-                ?.enrichForUser(userId)
+        return firestore.collection("posts")
+            .document(postId)
+            .get()
+            .await()
+            .toObject(Post::class.java)
+            ?.enrichForUser(userId)
     }
 
     /**
-     * Toggles upvote for a post by the current user. If already upvoted, removes the vote. If
-     * downvoted, changes to upvote. If no vote, creates new upvote.
+     * Toggles upvote for a post by the current user.
+     * If already upvoted, removes the vote.
+     * If downvoted, changes to upvote.
+     * If no vote, creates new upvote.
      *
      * @param post The post to upvote
      * @return Updated post with new vote state
      * @throws IllegalStateException if user is not logged in
      */
     suspend fun toggleUpvote(post: Post): Post {
-        val userId = auth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
+        val userId = auth.currentUser?.uid
+            ?: throw IllegalStateException("User not logged in")
 
         val currentVote = post.votedUsers[userId]
         var upvoteChange = 0
@@ -360,15 +370,18 @@ class PostRepository(
     }
 
     /**
-     * Toggles downvote for a post by the current user. If already downvoted, removes the vote. If
-     * upvoted, changes to downvote. If no vote, creates new downvote.
+     * Toggles downvote for a post by the current user.
+     * If already downvoted, removes the vote.
+     * If upvoted, changes to downvote.
+     * If no vote, creates new downvote.
      *
      * @param post The post to downvote
      * @return Updated post with new vote state
      * @throws IllegalStateException if user is not logged in
      */
     suspend fun toggleDownvote(post: Post): Post {
-        val userId = auth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
+        val userId = auth.currentUser?.uid
+            ?: throw IllegalStateException("User not logged in")
 
         val currentVote = post.votedUsers[userId]
         var upvoteChange = 0
@@ -401,5 +414,44 @@ class PostRepository(
         updatePost(post)
 
         return post.copy()
+    }
+
+    suspend fun getAllTopics(): List<Topic> {
+        return try {
+            val topicsSnapshot = firestore.collection("topics")
+                .get()
+                .await()
+
+            topicsSnapshot.toObjects(Topic::class.java)
+        } catch (e: Exception) {
+            Log.e("PostRepository", "Error fetching topics: ${e.message}")
+            emptyList()
+        }
+    }
+
+    suspend fun getSuggestedTopics(title: String, content: String): List<Topic> {
+        return try {
+            val request = GetSuggestedTopicsRequest(
+                title = title,
+                content = content
+            )
+
+            val response = NetworkService.apiService.getSuggestedTopics(request)
+
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null && responseBody.success) {
+                    responseBody.topics
+                } else {
+                    emptyList()
+                }
+            } else {
+                Log.e("PostRepository", "Failed to fetch suggested topics: ${response.code()} ${response.message()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("PostRepository", "Error fetching suggested topics: ${e.message}")
+            emptyList()
+        }
     }
 }

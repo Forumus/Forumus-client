@@ -4,13 +4,14 @@ import android.content.Context
 import android.util.Log
 import com.hcmus.forumus_client.data.local.TokenManager
 import com.hcmus.forumus_client.data.local.PreferencesManager
-import com.hcmus.forumus_client.data.model.ResetPasswordRequest
+import com.hcmus.forumus_client.data.dto.ResetPasswordRequest
+import com.hcmus.forumus_client.data.dto.SendOTPRequest
+import com.hcmus.forumus_client.data.dto.SendWelcomeEmailRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hcmus.forumus_client.data.model.User
 import com.hcmus.forumus_client.data.model.UserRole
 import com.hcmus.forumus_client.data.remote.NetworkService
-import com.hcmus.forumus_client.service.EmailService
 import com.hcmus.forumus_client.service.OTPService
 import com.hcmus.forumus_client.utils.Resource
 import com.hcmus.forumus_client.utils.ApiConstants
@@ -20,7 +21,6 @@ class AuthRepository (
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val otpService: OTPService = OTPService(firestore),
-    private val emailService: EmailService = EmailService(),
     private val context: Context? = null
 ) {
     
@@ -125,17 +125,19 @@ class AuthRepository (
             // Generate OTP
             when (val otpResult = otpService.generateOTP(email)) {
                 is Resource.Success -> {
-                    // Send OTP via email
-                    when (val emailResult = emailService.sendOTPEmail(email, otpResult.data!!)) {
-                        is Resource.Success -> {
-                            // Log the request for rate limiting
-                            otpService.logOTPRequest(email)
-                            Resource.Success(true)
-                        }
-                        is Resource.Error -> {
-                            Resource.Error("Failed to send OTP email: ${emailResult.message}")
-                        }
-                        is Resource.Loading -> Resource.Loading()
+                    // Send OTP via backend email service
+                    val request = SendOTPRequest(
+                        recipientEmail = email,
+                        otpCode = otpResult.data!!
+                    )
+                    val response = NetworkService.apiService.sendOTPEmail(request)
+                    
+                    if (response.isSuccessful && response.body()?.success == true) {
+                        // Log the request for rate limiting
+                        otpService.logOTPRequest(email)
+                        Resource.Success(true)
+                    } else {
+                        Resource.Error("Failed to send OTP email: ${response.body()?.message ?: "Unknown error"}")
                     }
                 }
                 is Resource.Error -> {
@@ -193,7 +195,20 @@ class AuthRepository (
                 // NEVER send welcome email for login verification, only for email verification of new users
                 if (!wasAlreadyVerified && user != null) {
                     Log.d("AuthRepository", "Sending welcome email to: $email")
-                    emailService.sendWelcomeEmail(email, user.fullName)
+                    try {
+                        val request = SendWelcomeEmailRequest(
+                            recipientEmail = email,
+                            username = user.fullName
+                        )
+                        val response = NetworkService.apiService.sendWelcomeEmail(request)
+                        if (response.isSuccessful && response.body()?.success == true) {
+                            Log.d("AuthRepository", "Welcome email sent successfully")
+                        } else {
+                            Log.e("AuthRepository", "Failed to send welcome email: ${response.body()?.message}")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("AuthRepository", "Error sending welcome email: ${e.message}")
+                    }
                 } else {
                     Log.d("AuthRepository", "NOT sending welcome email, wasAlreadyVerified: $wasAlreadyVerified")
                 }
