@@ -1,18 +1,21 @@
 package com.hcmus.forumus_client.ui.post.create
 
 import android.app.Application
+import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.hcmus.forumus_client.data.model.Post
+import com.hcmus.forumus_client.data.model.User
 import com.hcmus.forumus_client.data.repository.PostRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.content.Context
 
 sealed class PostState {
     object Loading : PostState()
@@ -20,7 +23,6 @@ sealed class PostState {
     data class Error(val msg: String) : PostState()
 }
 
-// Chuyển thành AndroidViewModel để lấy Context check loại file (Ảnh hay Video)
 class CreatePostViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _selectedImages = MutableLiveData<MutableList<Uri>>(mutableListOf())
@@ -29,7 +31,11 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
     private val _postState = MutableLiveData<PostState>()
     val postState: LiveData<PostState> get() = _postState
 
-    // Giữ LiveData cũ
+    // --- MỚI: LiveData chứa thông tin User hiện tại ---
+    private val _currentUser = MutableLiveData<User?>()
+    val currentUser: LiveData<User?> get() = _currentUser
+
+    // Các biến cũ
     private val _generatedTitle = MutableLiveData<String>()
     val generatedTitle: LiveData<String> = _generatedTitle
     private val _isLoadingAi = MutableLiveData<Boolean>()
@@ -37,8 +43,35 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
     val errorAi = MutableLiveData<String>()
 
     private val auth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance() // Thêm Firestore instance
     private val repository = PostRepository()
-    private val context = application.applicationContext
+
+    init {
+        fetchCurrentUser() // Gọi hàm lấy user ngay khi khởi tạo
+    }
+
+    // --- MỚI: Hàm lấy thông tin User từ Firestore ---
+    private fun fetchCurrentUser() {
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            firestore.collection("users").document(uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        try {
+                            // Parse document thành object User
+                            val user = document.toObject(User::class.java)
+                            _currentUser.value = user
+                        } catch (e: Exception) {
+                            Log.e("CreatePostVM", "Error parsing user", e)
+                        }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("CreatePostVM", "Error fetching user", e)
+                }
+        }
+    }
 
     fun addImages(uris: List<Uri>) {
         val currentList = _selectedImages.value ?: mutableListOf()
@@ -74,22 +107,20 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                     if (mimeType != null && mimeType.startsWith("video")) {
                         localVideoUrls.add(uri.toString())
                     } else {
-                        // Mặc định coi là ảnh nếu không phải video
                         localImageUrls.add(uri.toString())
                     }
                 }
 
+                // Có thể thêm authorId vào Post nếu Model Post của bạn hỗ trợ
                 val post = Post(
                     title = title,
                     content = content,
                     imageUrls = localImageUrls,
                     videoUrls = localVideoUrls,
-
                     topicIds = selectedTopics.map { it.trim().lowercase().replace(" ", "_") },
                 )
 
-                //  Gọi Repository để xử lý upload và lưu
-                val result = repository.savePost( context, post)
+                val result = repository.savePost(context, post)
 
                 withContext(Dispatchers.Main) {
                     if (result.isSuccess) {

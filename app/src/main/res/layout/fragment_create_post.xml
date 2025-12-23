@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF">
@@ -24,17 +24,21 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/ic_back" />
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_back"
+                    app:tint="#1A1A1A" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="24dp"
+                    android:layout_marginStart="16dp"
                     android:layout_toEndOf="@id/btnClose"
                     android:text="Create post"
                     android:textColor="#1A1A1A"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnSubmitPost"
@@ -72,38 +76,44 @@
                         android:layout_marginBottom="12dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
+
                         <androidx.cardview.widget.CardView
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            app:cardBackgroundColor="#2196F3"
+                            app:cardBackgroundColor="#E0E0E0"
                             app:cardCornerRadius="24dp"
                             app:cardElevation="0dp">
-                            <TextView
+
+                            <ImageView
+                                android:id="@+id/ivAuthorAvatar"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:text="T"
-                                android:textColor="#FFFFFF"
-                                android:textSize="20sp"
-                                android:textStyle="bold" />
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/default_avatar"
+                                tools:ignore="ContentDescription" />
                         </androidx.cardview.widget.CardView>
+
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:orientation="vertical">
+
                             <TextView
+                                android:id="@+id/tvAuthorName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Nguyễn Viết Toàn"
+                                android:text="Loading Name..."
                                 android:textColor="#000000"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
+
                             <TextView
+                                android:id="@+id/tvAuthorEmail"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="23120096@student.hcmus.edu.vn"
+                                android:text="loading@email.com"
                                 android:textColor="#757575"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -124,7 +134,7 @@
                         android:inputType="textCapSentences"
                         android:paddingTop="16dp"
                         android:paddingBottom="8dp"
-                        android:paddingHorizontal="16dp"
+                        android:paddingHorizontal="4dp"
                         android:textColor="#000000"
                         android:textColorHint="#9E9E9E"
                         android:textSize="22sp"
@@ -147,11 +157,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="30dp"
-                        android:orientation="horizontal"
                         android:clipToPadding="false"
+                        android:orientation="horizontal"
                         android:paddingHorizontal="16dp"
                         android:visibility="gone"
-                        tools:listitem="@layout/item_selected_image"/>
+                        tools:listitem="@layout/item_selected_image" />
 
                     <View
                         android:layout_width="match_parent"
@@ -172,46 +182,51 @@
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
             android:visibility="gone">
+
             <ImageView
                 android:id="@+id/btnQuickPhoto"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="1dp"
-                android:src="@drawable/ic_photo"/>
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
+                android:src="@drawable/ic_photo" />
 
             <ImageView
                 android:id="@+id/btnQuickCamera"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="1dp"
-                android:src="@drawable/ic_camera"/>
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
+                android:src="@drawable/ic_camera" />
 
             <ImageView
                 android:id="@+id/btnQuickTopic"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="1dp"
-                android:src="@drawable/ic_hashtag"/>
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
+                android:src="@drawable/ic_hashtag" />
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="1dp"
-                android:src="@drawable/ic_location"/>
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
+                android:src="@drawable/ic_location" />
 
             <ImageView
                 android:id="@+id/btnMoreOptions"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="1dp"
-                android:src="@drawable/ic_more_horiz"/>
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
+                android:src="@drawable/ic_more_horiz" />
         </LinearLayout>
-
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/bottomSheetLayout"
@@ -219,16 +234,15 @@
             android:layout_height="match_parent"
             android:background="#FFFFFF"
             android:clickable="true"
-            android:focusable="true"
-            android:fillViewport="true"
             android:elevation="16dp"
+            android:fillViewport="true"
+            android:focusable="true"
+            app:behavior_expandedOffset="520dp"
+            app:behavior_fitToContents="false"
             app:behavior_hideable="true"
             app:behavior_peekHeight="0dp"
-            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-            app:behavior_fitToContents="false"
-            app:behavior_expandedOffset="610dp"
-            app:behavior_skipCollapsed="true">
-
+            app:behavior_skipCollapsed="true"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
             <LinearLayout
                 android:id="@+id/layoutFullActions"
                 android:layout_width="match_parent"
@@ -251,18 +265,21 @@
                     android:clickable="true"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="16dp">
+
                     <androidx.cardview.widget.CardView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         app:cardBackgroundColor="#E8F5E9"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="0dp">
+
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_photo" />
                     </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -307,20 +324,24 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
+                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="16dp">
+
                     <androidx.cardview.widget.CardView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         app:cardBackgroundColor="#FFEBEE"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="0dp">
+
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_hashtag" />
                     </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -333,20 +354,24 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
+                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="16dp">
+
                     <androidx.cardview.widget.CardView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        app:cardBackgroundColor="#FFEBEE"
+                        app:cardBackgroundColor="#E0F7FA"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="0dp">
+
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_location" />
                     </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -356,7 +381,10 @@
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="20dp"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:background="@android:color/transparent" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
