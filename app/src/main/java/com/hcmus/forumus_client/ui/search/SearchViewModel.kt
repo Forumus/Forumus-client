@@ -9,9 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.Topic
@@ -29,21 +26,12 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private val postRepository = PostRepository()
     private val userRepository = UserRepository()
     private val context = application.applicationContext
-
-    // --- CẤU HÌNH GSON ĐỂ XỬ LÝ TIMESTAMP ---
-    // Đây là chìa khóa để fix lỗi Recent Search
-    private val gson: Gson = GsonBuilder()
-        .registerTypeAdapter(Timestamp::class.java, JsonSerializer<Timestamp> { src, _, _ ->
-            JsonPrimitive(src.seconds) // Lưu dưới dạng số giây (Long)
-        })
-        .registerTypeAdapter(Timestamp::class.java, JsonDeserializer { json, _, _ ->
-            Timestamp(json.asLong, 0) // Đọc lại thành Timestamp
-        })
-        .create()
+    private val gson = Gson()
 
     private val PREFS_NAME = "search_history_prefs"
-    private val KEY_RECENT_POSTS = "key_recent_posts"
-    private val KEY_RECENT_USERS = "key_recent_users"
+    // Hai key riêng biệt cho 2 loại tìm kiếm
+    private val KEY_POST_KEYWORDS = "key_post_keywords"
+    private val KEY_PEOPLE_KEYWORDS = "key_people_keywords"
 
     // --- LiveData ---
     private val _postResults = MutableLiveData<List<Post>>()
@@ -55,17 +43,18 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private val _trendingTopics = MutableLiveData<List<Topic>>()
     val trendingTopics: LiveData<List<Topic>> = _trendingTopics
 
-    private val _recentPosts = MutableLiveData<List<Post>>()
-    val recentPosts: LiveData<List<Post>> = _recentPosts
+    // --- TÁCH BIỆT LỊCH SỬ TỪ KHÓA ---
+    private val _recentPostKeywords = MutableLiveData<List<String>>()
+    val recentPostKeywords: LiveData<List<String>> = _recentPostKeywords
 
-    private val _recentUsers = MutableLiveData<List<User>>()
-    val recentUsers: LiveData<List<User>> = _recentUsers
+    private val _recentPeopleKeywords = MutableLiveData<List<String>>()
+    val recentPeopleKeywords: LiveData<List<String>> = _recentPeopleKeywords
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
     init {
-        loadRecentHistory()
+        loadAllHistory()
     }
 
     fun loadTrendingTopics() {
@@ -82,8 +71,13 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         return pattern.matcher(nfdNormalizedString).replaceAll("").lowercase().trim()
     }
 
+    // --- TÌM KIẾM BÀI VIẾT ---
     fun searchPosts(query: String) {
         if (query.isBlank()) { _postResults.value = emptyList(); return }
+
+        // Lưu vào lịch sử POST
+        addPostKeyword(query)
+
         _isLoading.value = true
         val normalizedQuery = removeAccents(query)
 
@@ -101,15 +95,24 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    // --- TÌM KIẾM NGƯỜI DÙNG (NAME/EMAIL) ---
     fun searchUsers(query: String) {
         if (query.isBlank()) { _userResults.value = emptyList(); return }
+
+        // Lưu vào lịch sử PEOPLE
+        addPeopleKeyword(query)
+
         _isLoading.value = true
         val normalizedQuery = removeAccents(query)
+
         viewModelScope.launch(Dispatchers.IO) {
+            // Lấy danh sách candidate và lọc theo tên hoặc email
             val allUsers = userRepository.searchUsersCandidates()
+
             val filtered = allUsers.filter { user ->
                 val nameNorm = removeAccents(user.fullName)
                 val emailNorm = removeAccents(user.email)
+
                 nameNorm.contains(normalizedQuery) || emailNorm.contains(normalizedQuery)
             }
             withContext(Dispatchers.Main) {
@@ -119,51 +122,47 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    // --- RECENT HISTORY ---
-    private fun loadRecentHistory() {
+    // --- QUẢN LÝ LỊCH SỬ ---
+    private fun loadAllHistory() {
         try {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val type = object : TypeToken<List<String>>() {}.type
 
-            val postsJson = prefs.getString(KEY_RECENT_POSTS, "[]")
-            val postType = object : TypeToken<List<Post>>() {}.type
-            // Sử dụng Gson đã cấu hình Timestamp
-            val savedPosts: List<Post> = gson.fromJson(postsJson, postType) ?: emptyList()
-            _recentPosts.value = savedPosts
+            // Load Post Keywords
+            val postJson = prefs.getString(KEY_POST_KEYWORDS, "[]")
+            val postList: List<String> = gson.fromJson(postJson, type) ?: emptyList()
+            _recentPostKeywords.value = postList
 
-            val usersJson = prefs.getString(KEY_RECENT_USERS, "[]")
-            val userType = object : TypeToken<List<User>>() {}.type
-            val savedUsers: List<User> = gson.fromJson(usersJson, userType) ?: emptyList()
-            _recentUsers.value = savedUsers
+            // Load People Keywords
+            val peopleJson = prefs.getString(KEY_PEOPLE_KEYWORDS, "[]")
+            val peopleList: List<String> = gson.fromJson(peopleJson, type) ?: emptyList()
+            _recentPeopleKeywords.value = peopleList
+
         } catch (e: Exception) {
-            // Nếu dữ liệu cũ lỗi, reset về rỗng để tránh crash
-            _recentPosts.value = emptyList()
-            _recentUsers.value = emptyList()
+            _recentPostKeywords.value = emptyList()
+            _recentPeopleKeywords.value = emptyList()
         }
     }
 
-    fun addToRecentPosts(post: Post) {
-        val currentList = _recentPosts.value?.toMutableList() ?: mutableListOf()
-        currentList.removeAll { it.id == post.id }
-        currentList.add(0, post)
-        if (currentList.size > 5) currentList.removeAt(currentList.size - 1)
-
-        _recentPosts.value = currentList
-        saveToPrefs(KEY_RECENT_POSTS, currentList)
+    private fun addPostKeyword(query: String) {
+        val list = _recentPostKeywords.value?.toMutableList() ?: mutableListOf()
+        updateListAndSave(list, query, KEY_POST_KEYWORDS)
+        _recentPostKeywords.value = list
     }
 
-    fun addToRecentUsers(user: User) {
-        val currentList = _recentUsers.value?.toMutableList() ?: mutableListOf()
-        currentList.removeAll { it.uid == user.uid }
-        currentList.add(0, user)
-        if (currentList.size > 5) currentList.removeAt(currentList.size - 1)
-
-        _recentUsers.value = currentList
-        saveToPrefs(KEY_RECENT_USERS, currentList)
+    private fun addPeopleKeyword(query: String) {
+        val list = _recentPeopleKeywords.value?.toMutableList() ?: mutableListOf()
+        updateListAndSave(list, query, KEY_PEOPLE_KEYWORDS)
+        _recentPeopleKeywords.value = list
     }
 
-    private fun saveToPrefs(key: String, list: List<Any>) {
+    private fun updateListAndSave(list: MutableList<String>, query: String, key: String) {
+        val trimmed = query.trim()
+        list.removeAll { it.equals(trimmed, ignoreCase = true) }
+        list.add(0, trimmed)
+        if (list.size > 5) list.removeAt(list.size - 1)
+
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val json = gson.toJson(list)
-        prefs.edit().putString(key, json).apply()
+        prefs.edit().putString(key, gson.toJson(list)).apply()
     }
 }

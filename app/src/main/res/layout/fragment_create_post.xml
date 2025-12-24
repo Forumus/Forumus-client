@@ -189,7 +189,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="12dp"
+                android:padding="1dp"
                 android:src="@drawable/ic_photo" />
 
             <ImageView
@@ -198,7 +198,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="12dp"
+                android:padding="1dp"
                 android:src="@drawable/ic_camera" />
 
             <ImageView
@@ -207,7 +207,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="12dp"
+                android:padding="1dp"
                 android:src="@drawable/ic_hashtag" />
 
             <ImageView
@@ -215,7 +215,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="12dp"
+                android:padding="1dp"
                 android:src="@drawable/ic_location" />
 
             <ImageView
@@ -224,7 +224,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="12dp"
+                android:padding="1dp"
                 android:src="@drawable/ic_more_horiz" />
         </LinearLayout>
 

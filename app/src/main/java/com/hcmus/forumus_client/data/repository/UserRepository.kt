@@ -23,7 +23,11 @@ class UserRepository(
 
     suspend fun searchUsersCandidates(): List<User> {
         return try {
-            usersCollection.limit(100).get().await().toObjects(User::class.java)
+            usersCollection
+                .limit(100)
+                .get()
+                .await()
+                .toObjects(User::class.java)
         } catch (e: Exception) {
             Log.e("UserRepository", "Error searching user candidates", e)
             emptyList()
