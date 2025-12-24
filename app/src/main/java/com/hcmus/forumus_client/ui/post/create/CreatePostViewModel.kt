@@ -1,7 +1,6 @@
 package com.hcmus.forumus_client.ui.post.create
 
 import android.app.Application
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -16,6 +15,8 @@ import com.hcmus.forumus_client.data.repository.PostRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.content.Context
+import com.hcmus.forumus_client.data.model.Topic
 
 sealed class PostState {
     object Loading : PostState()
@@ -34,6 +35,13 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
     private val _postState = MutableLiveData<PostState>()
     val postState: LiveData<PostState> get() = _postState
 
+    private val _allTopics = MutableLiveData<List<Topic>>()
+    val allTopics: LiveData<List<Topic>> get() = _allTopics
+
+    private val _suggestedTopics = MutableLiveData<List<Topic>>()
+    val suggestedTopics: LiveData<List<Topic>> get() = _suggestedTopics
+
+    // Giữ LiveData cũ
     private val _currentUser = MutableLiveData<User?>()
     val currentUser: LiveData<User?> get() = _currentUser
 
@@ -132,6 +140,7 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                     if (mimeType != null && mimeType.startsWith("video")) {
                         localVideoUrls.add(uri.toString())
                     } else {
+                        // Mặc định coi là ảnh nếu không phải video
                         localImageUrls.add(uri.toString())
                     }
                 }
@@ -141,10 +150,12 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                     content = content,
                     imageUrls = localImageUrls,
                     videoUrls = localVideoUrls,
+
                     topicIds = selectedTopics.map { it.trim().lowercase().replace(" ", "_") },
                 )
 
-                val result = repository.savePost(context, post)
+                //  Gọi Repository để xử lý upload và lưu
+                val result = repository.savePost( context, post)
 
                 withContext(Dispatchers.Main) {
                     if (result.isSuccess) {
@@ -157,6 +168,38 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     _postState.value = PostState.Error("Error: ${e.message}")
+                }
+            }
+        }
+    }
+
+    fun getAllTopics() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val topics = repository.getAllTopics()
+
+                withContext(Dispatchers.Main) {
+                    _allTopics.value = topics
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _allTopics.value = emptyList()
+                }
+            }
+        }
+    }
+
+    fun getSuggestedTopics(title: String, content: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val suggestedTopics = repository.getSuggestedTopics(title, content)
+
+                withContext(Dispatchers.Main) {
+                    _suggestedTopics.value = suggestedTopics
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _suggestedTopics.value = emptyList()
                 }
             }
         }
