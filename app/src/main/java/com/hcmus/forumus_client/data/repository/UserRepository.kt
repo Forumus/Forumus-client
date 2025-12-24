@@ -21,6 +21,15 @@ class UserRepository(
 
     private val usersCollection = firestore.collection(USERS_COLLECTION)
 
+    suspend fun searchUsersCandidates(): List<User> {
+        return try {
+            usersCollection.limit(100).get().await().toObjects(User::class.java)
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error searching user candidates", e)
+            emptyList()
+        }
+    }
+
     /**
      * Retrieves a user by their unique ID.
      *
@@ -97,7 +106,7 @@ class UserRepository(
             val currentUserId = auth.currentUser?.uid
 
             Log.i("UserRepository", "Current user ID: $currentUserId")
-            
+
             // Get all users and filter client-side (Firestore doesn't support case-insensitive queries well)
             val querySnapshot = usersCollection
                 .limit(50) // Limit to avoid large data transfer
@@ -110,7 +119,7 @@ class UserRepository(
                 try {
                     Log.i("UserRepository", "Processing document: ${doc.id}")
                     val user = doc.toObject(User::class.java)
-                    
+
                     if (user != null) {
                         Log.i("UserRepository", "User converted successfully")
                         user.copy(uid = doc.id)
@@ -125,7 +134,7 @@ class UserRepository(
             }
 
             Log.i("UserRepository", "All users with UIDs: ${allUsers.size} total")
-            
+
             // Filter out current user and search results
             val filteredUsers = allUsers.filter { user ->
                 user.uid != currentUserId

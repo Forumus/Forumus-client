@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F5F5F5"
+        android:background="#FFFFFF"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#4285F4"
-            android:elevation="0dp"
+            android:elevation="4dp"
             android:orientation="vertical"
-            android:paddingTop="12dp"
-            android:paddingBottom="8dp">
+            android:paddingTop="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -34,6 +32,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_back"
                     app:tint="#FFFFFF" />
+
                 <androidx.appcompat.widget.SearchView
                     android:id="@+id/search_view"
                     android:layout_width="match_parent"
@@ -70,101 +69,129 @@
             </com.google.android.material.tabs.TabLayout>
         </LinearLayout>
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/layout_suggestions"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:visibility="visible">
+            android:layout_height="match_parent">
 
-            <LinearLayout
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/layout_suggestions"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_trending_up"
-                        app:tint="#4285F4"/> <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Trending Topics"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#000000"/>
+                    <LinearLayout
+                        android:id="@+id/section_trending"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_trending_up"
+                                app:tint="#4285F4"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="Trending Topics"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="#000000"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/chip_group_trending"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginBottom="16dp"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Recent Searches"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_recent_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:nestedScrollingEnabled="false"/>
+
+                    <TextView
+                        android:id="@+id/tv_no_recent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="No recent history"
+                        android:textColor="#9E9E9E"
+                        android:visibility="gone"/>
+
                 </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chip_group_trending"
+            <FrameLayout
+                android:id="@+id/layout_results"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_posts_results"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp" />
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:padding="16dp" />
 
-                <TextView
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_users_results"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:padding="16dp"/>
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Recent Searches"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#000000"/>
+                    android:layout_gravity="center"
+                    android:indeterminateTint="#4285F4"
+                    android:visibility="gone"/>
 
                 <TextView
-                    android:id="@+id/tv_no_recent"
-                    android:layout_width="match_parent"
+                    android:id="@+id/tv_no_results"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="No recent searches"
-                    android:textColor="#9E9E9E"/>
+                    android:layout_gravity="center"
+                    android:text="No results found"
+                    android:visibility="gone"/>
+            </FrameLayout>
 
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
-
-        <FrameLayout
-            android:id="@+id/layout_results"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_posts_results"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:padding="16dp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_users_results"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                android:padding="16dp"/>
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:indeterminateTint="#4285F4"
-                android:visibility="gone"/>
-
-            <TextView
-                android:id="@+id/tv_no_results"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="No results found"
-                android:visibility="gone"/>
         </FrameLayout>
-
     </LinearLayout>
 </layout>
