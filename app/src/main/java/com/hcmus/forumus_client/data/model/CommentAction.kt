@@ -5,6 +5,7 @@ enum class CommentAction {
     UPVOTE,
     DOWNVOTE,
     REPLY,
+    VIEW_REPLIES,
     AUTHOR_PROFILE,
     REPLIED_USER_PROFILE
 }

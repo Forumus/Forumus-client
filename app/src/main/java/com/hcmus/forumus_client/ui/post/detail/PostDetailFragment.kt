@@ -186,6 +186,11 @@ class PostDetailFragment : Fragment() {
                             navController.navigate(action)
                         }
                     }
+
+                    CommentAction.VIEW_REPLIES -> {
+                        // Toggle expand/collapse for comment's nested replies
+                        viewModel.toggleReplies(comment)
+                    }
                 }
             }
         )
