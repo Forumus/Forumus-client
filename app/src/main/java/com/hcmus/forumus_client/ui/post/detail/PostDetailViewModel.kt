@@ -299,6 +299,16 @@ class PostDetailViewModel(
     }
 
     /**
+     * Toggles the visibility of replies for a comment.
+     * Alias for handleOpen to provide semantic clarity when triggered by VIEW_REPLIES button.
+     *
+     * @param comment The comment whose replies should be shown/hidden
+     */
+    fun toggleReplies(comment: Comment) {
+        handleOpen(comment)
+    }
+
+    /**
      * Sends a new comment or reply to the post.
      *
      * Creates a new Comment object with:

@@ -204,6 +204,8 @@ class ProfileFragment : Fragment() {
                             navController.navigate(navAction)
                         }
                     }
+
+                    CommentAction.VIEW_REPLIES -> TODO()
                 }
             }
         )
