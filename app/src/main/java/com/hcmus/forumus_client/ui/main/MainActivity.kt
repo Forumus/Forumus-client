@@ -13,12 +13,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.firebase.messaging.FirebaseMessaging
 import com.hcmus.forumus_client.NavGraphDirections
 import com.hcmus.forumus_client.R
+import com.hcmus.forumus_client.data.model.UserStatus
+import com.hcmus.forumus_client.data.repository.UserRepository
 import com.hcmus.forumus_client.databinding.ActivityMainBinding
+import com.hcmus.forumus_client.ui.auth.banned.BannedActivity
+import kotlinx.coroutines.launch
 
 /**
  * Main Activity that serves as the container for all Fragments.
@@ -40,6 +45,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupWindowInsetsHandling()
+        
+        // Check if user is banned
+        checkBanStatus()
         
         // Force light status bar (dark icons)
         androidx.core.view.WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
@@ -192,5 +200,44 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Log.e("HomeActivity", "Failed to save FCM token to Firestore", e)
             }
+    }
+    
+    /**
+     * Check if the current user is banned and redirect to BannedActivity if necessary.
+     */
+    private fun checkBanStatus() {
+        lifecycleScope.launch {
+            try {
+                val userRepository = UserRepository()
+                val currentUser = userRepository.getCurrentUser()
+                
+                if (currentUser == null) {
+                    Log.w("MainActivity", "No current user found")
+                    return@launch
+                }
+                
+                // Check if user is banned
+                if (currentUser.status == UserStatus.BANNED && 
+                    currentUser.blacklistedUntil != null && 
+                    currentUser.blacklistedUntil > System.currentTimeMillis()) {
+                    
+                    Log.d("MainActivity", "User is banned, navigating to BannedActivity")
+                    navigateToBannedActivity(currentUser.blacklistedUntil)
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error checking ban status", e)
+            }
+        }
+    }
+    
+    /**
+     * Navigate to BannedActivity with ban expiration timestamp.
+     */
+    private fun navigateToBannedActivity(blacklistedUntil: Long) {
+        val intent = Intent(this, BannedActivity::class.java)
+        intent.putExtra(BannedActivity.EXTRA_BLACKLISTED_UNTIL, blacklistedUntil)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }

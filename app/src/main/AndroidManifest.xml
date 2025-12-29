@@ -79,6 +79,12 @@
             android:name=".ui.auth.success.SuccessActivity"
             android:exported="false" />
 
+        <!-- Banned Activity -->
+        <activity
+            android:name=".ui.auth.banned.BannedActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
+
         <!-- Register Activity -->
         <activity
             android:name=".ui.auth.register.RegisterActivity"
