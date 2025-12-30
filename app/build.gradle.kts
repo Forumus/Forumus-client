@@ -103,5 +103,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
 
     implementation(libs.androidx.swiperefreshlayout)
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.gson)
+
+    // WorkManager for background tasks
+    implementation(libs.androidx.work.runtime.ktx)
 }

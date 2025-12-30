@@ -8,6 +8,7 @@ firebaseFirestoreKtx = "25.1.4"
 firebaseStorageKtx = "21.0.2"
 glide = "5.0.5"
 circleImageView = "3.1.0"
+gson = "2.13.2"
 kotlin = "2.2.0"
 coreKtx = "1.17.0"
 junit = "4.13.2"
@@ -31,6 +32,7 @@ playServicesMaps = "19.2.0"
 retrofit = "3.0.0"
 firebaseMessaging = "25.0.1"
 swiperefreshlayout = "1.2.0"
+workRuntime = "2.9.0"
 
 [libraries]
 android-activation = { module = "com.sun.mail:android-activation", version.ref = "androidMail" }
@@ -51,6 +53,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 firebase-storage-ktx = { module = "com.google.firebase:firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -70,6 +73,7 @@ moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "mosh
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

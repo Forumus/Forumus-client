@@ -68,11 +68,14 @@ class MessageImageAdapter(
             // Show loading indicator
             binding.pbLoading.visibility = View.VISIBLE
             
+            val cornerRadius = (16 * binding.root.context.resources.displayMetrics.density).toInt()
+            
             val requestOptions = RequestOptions()
                 .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .override(200, 200) // Limit size to prevent OOM
                 .timeout(10000) // 10 second timeout
+                .transform(com.bumptech.glide.load.resource.bitmap.RoundedCorners(cornerRadius))
             
             Glide.with(binding.root.context)
                 .load(imageUrl)

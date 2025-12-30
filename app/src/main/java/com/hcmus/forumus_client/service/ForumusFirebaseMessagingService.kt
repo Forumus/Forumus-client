@@ -74,15 +74,19 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(TAG, "Message data: ${remoteMessage.data}")
             
-            val senderName = remoteMessage.data["senderName"] ?: "New Message"
-            val messageContent = remoteMessage.data["messageContent"] ?: ""
-            val chatId = remoteMessage.data["chatId"] ?: ""
-            val senderId = remoteMessage.data["senderId"] ?: ""
-            val senderEmail = remoteMessage.data["senderEmail"] ?: ""
-            val senderPictureUrl = remoteMessage.data["senderPictureUrl"] ?: ""
+            if (remoteMessage.data["type"] == "chat") {
+                val senderName = remoteMessage.data["senderName"] ?: "New Message"
+                val messageContent = remoteMessage.data["messageContent"] ?: ""
+                val chatId = remoteMessage.data["chatId"] ?: ""
+                val senderId = remoteMessage.data["senderId"] ?: ""
+                val senderEmail = remoteMessage.data["senderEmail"] ?: ""
+                val senderPictureUrl = remoteMessage.data["senderPictureUrl"] ?: ""
 
-            // Show notification
-            showNotification(senderName, messageContent, chatId, senderId, senderEmail, senderPictureUrl)
+                // Show notification
+                showChatNotification(senderName, messageContent, chatId, senderId, senderEmail, senderPictureUrl)
+            } else if (remoteMessage.data["type"] == "post_approved")  {
+
+            }
 
             // Return here so we don't process the notification block below
             return
@@ -92,11 +96,11 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
         remoteMessage.notification?.let {
             Log.d(TAG, "Notification title: ${it.title}")
             Log.d(TAG, "Notification body: ${it.body}")
-            showNotification(it.title ?: "New Message", it.body ?: "", "", "", "", "")
+            showChatNotification(it.title ?: "New Message", it.body ?: "", "", "", "", "")
         }
     }
 
-    private fun showNotification(
+    private fun showChatNotification(
         title: String,
         message: String,
         chatId: String,
