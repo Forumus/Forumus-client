@@ -148,9 +148,17 @@ class EditProfileFragment : Fragment() {
 
     private fun applyRoleChipStyle(role: UserRole) {
         val (textColorRes, bgColorRes) = when (role) {
-            UserRole.ADMIN -> R.color.status_inactive to R.color.status_inactive_tonal
-            UserRole.TEACHER -> R.color.role to R.color.role_tonal
-            else -> R.color.text_primary to R.color.neutral_tonal
+            UserRole.STUDENT ->
+                R.color.role_student to R.color.role_student_tonal   // xanh dương
+
+            UserRole.TEACHER ->
+                R.color.role_teacher to R.color.role_teacher_tonal   // tím
+
+            UserRole.ADMIN ->
+                R.color.role_admin to R.color.role_admin_tonal       // vàng
+
+            else ->
+                R.color.text_primary to R.color.neutral_tonal
         }
 
         val textColor = ContextCompat.getColor(requireContext(), textColorRes)
@@ -165,12 +173,17 @@ class EditProfileFragment : Fragment() {
 
     private fun applyStatusChipStyle(status: UserStatus) {
         val (textColorRes, bgColorRes) = when (status) {
-            UserStatus.BANNED, UserStatus.WARNED ->
-                R.color.status_inactive to R.color.status_inactive_tonal
+            UserStatus.BANNED ->
+                R.color.status_banned to R.color.status_banned_tonal      // đỏ
+
+            UserStatus.WARNED ->
+                R.color.status_warned to R.color.status_warned_tonal      // vàng
+
             UserStatus.REMINDED ->
-                R.color.text_primary to R.color.neutral_tonal
+                R.color.status_reminded to R.color.status_reminded_tonal  // xanh dương
+
             else ->
-                R.color.status_active to R.color.status_active_tonal
+                R.color.status_normal to R.color.status_normal_tonal      // xanh lá (normal/active)
         }
 
         val textColor = ContextCompat.getColor(requireContext(), textColorRes)

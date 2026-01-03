@@ -43,6 +43,36 @@
     <color name="chat_border">#E5E7EB</color>
     <color name="chat_filter_unselected">#4A5565</color>
 
+
+    <!-- Edit Profile -->
+    <!-- Active/Normal (xanh lá) -->
+    <color name="status_normal">#10B981</color>
+    <color name="status_normal_tonal">#D1FAE5</color>
+
+    <!-- Banned (đỏ) -->
+    <color name="status_banned">#EF4444</color>
+    <color name="status_banned_tonal">#FEE2E2</color>
+
+    <!-- Warned (vàng) -->
+    <color name="status_warned">#F59E0B</color>
+    <color name="status_warned_tonal">#FEF3C7</color>
+
+    <!-- Reminded (xanh dương) -->
+    <color name="status_reminded">#3B82F6</color>
+    <color name="status_reminded_tonal">#DBEAFE</color>
+
+    <!-- Student (xanh dương) -->
+    <color name="role_student">#3B82F6</color>
+    <color name="role_student_tonal">#DBEAFE</color>
+
+    <!-- Teacher (tím) -->
+    <color name="role_teacher">#8B5CF6</color>
+    <color name="role_teacher_tonal">#EDE9FE</color>
+
+    <!-- Admin (vàng) -->
+    <color name="role_admin">#F59E0B</color>
+    <color name="role_admin_tonal">#FEF3C7</color>
+
     <color name="bg_app">#F5F6FA</color>
     <color name="surface">#FFFFFF</color>
     <color name="stroke">#E6E8F0</color>
@@ -56,9 +86,6 @@
     <color name="neutral_tonal">#EEF2FF</color> <!-- hoặc xám nhạt #F3F4F6 -->
     <color name="role">#6366F1</color>
     <color name="role_tonal">#EEF2FF</color>
-
-    <color name="status_active">#10B981</color>
-    <color name="status_active_tonal">#D1FAE5</color>
 
     <color name="status_inactive">#EF4444</color>
     <color name="status_inactive_tonal">#FEE2E2</color>
