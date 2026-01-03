@@ -74,14 +74,16 @@ class PostViewHolder(
             com.hcmus.forumus_client.data.model.UserRole.ADMIN -> "Admin"
             else -> "Student"
         }
-        val display = "$name · $roleLabel"
+        val display = "$name  ·  $roleLabel"
         val spannable = SpannableString(display)
         val roleStart = display.indexOf('·').takeIf { it >= 0 }?.plus(2) ?: name.length
-        val roleColor = when (post.authorRole) {
+        val roleColorRes = when (post.authorRole) {
             com.hcmus.forumus_client.data.model.UserRole.TEACHER -> R.color.role_teacher
             com.hcmus.forumus_client.data.model.UserRole.ADMIN -> R.color.role_admin
             else -> R.color.role_student
         }
+
+        val roleColor = androidx.core.content.ContextCompat.getColor(itemView.context, roleColorRes)
         spannable.setSpan(ForegroundColorSpan(roleColor), roleStart, display.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         authorName.text = spannable
         timestamp.text = formatTimestamp(post.createdAt)

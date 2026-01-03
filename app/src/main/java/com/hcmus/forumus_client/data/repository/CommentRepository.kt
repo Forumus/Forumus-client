@@ -262,6 +262,7 @@ class CommentRepository(
             id = generatedId,
             authorId = user.uid,
             authorName = user.fullName,
+            authorRole = user.role,
             authorAvatarUrl = user.profilePictureUrl ?: "",
             createdAt = now,
         )
