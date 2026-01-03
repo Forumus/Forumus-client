@@ -99,7 +99,7 @@ class ProfileFragment : Fragment() {
                     }
 
                     ProfileMenuAction.EDIT_PROFILE -> {
-                        // TODO: Implement edit profile navigation
+                        navController.navigate(R.id.editProfileFragment)
                     }
 
                     ProfileMenuAction.TOGGLE_DARK_MODE -> {
@@ -107,7 +107,7 @@ class ProfileFragment : Fragment() {
                     }
 
                     ProfileMenuAction.SETTINGS -> {
-                        navController.navigate(R.id.createPostFragment)
+                        navController.navigate(R.id.settingsFragment)
                     }
                 }
             }
