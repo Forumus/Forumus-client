@@ -20,6 +20,76 @@ class CommentRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val userRepository: UserRepository = UserRepository()
 ) {
+    companion object {
+        private const val BATCH_LIMIT = 450
+    }
+
+    suspend fun updateAuthorInfoInComments(
+        userId: String,
+        newName: String,
+        newAvatarUrl: String?
+    ) {
+        var lastDoc: com.google.firebase.firestore.DocumentSnapshot? = null
+
+        while (true) {
+            var query = firestore.collectionGroup("comments")
+                .whereEqualTo("authorId", userId)
+                .orderBy("createdAt")
+                .limit(BATCH_LIMIT.toLong())
+
+            if (lastDoc != null) query = query.startAfter(lastDoc)
+
+            val snap = query.get().await()
+            if (snap.isEmpty) break
+
+            val batch = firestore.batch()
+            for (doc in snap.documents) {
+                batch.update(
+                    doc.reference,
+                    mapOf(
+                        "authorName" to newName,
+                        "authorAvatarUrl" to (newAvatarUrl ?: "")
+                    )
+                )
+            }
+            batch.commit().await()
+
+            lastDoc = snap.documents.last()
+            if (snap.size() < BATCH_LIMIT) break
+        }
+    }
+
+    /**
+     * Cập nhật luôn tên ở "replyToUserName"
+     * cho những comment reply tới user này.
+     */
+    suspend fun updateReplyToUserName(
+        userId: String,
+        newName: String
+    ) {
+        var lastDoc: com.google.firebase.firestore.DocumentSnapshot? = null
+
+        while (true) {
+            var query = firestore.collectionGroup("comments")
+                .whereEqualTo("replyToUserId", userId)
+                .orderBy("createdAt")
+                .limit(BATCH_LIMIT.toLong())
+
+            if (lastDoc != null) query = query.startAfter(lastDoc)
+
+            val snap = query.get().await()
+            if (snap.isEmpty) break
+
+            val batch = firestore.batch()
+            for (doc in snap.documents) {
+                batch.update(doc.reference, "replyToUserName", newName)
+            }
+            batch.commit().await()
+
+            lastDoc = snap.documents.last()
+            if (snap.size() < BATCH_LIMIT) break
+        }
+    }
 
     /**
      * Enriches a comment with the current user's vote state and vote counts.

@@ -35,6 +35,44 @@ class PostRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val userRepository: UserRepository = UserRepository()
 ) {
+    companion object {
+        private const val BATCH_LIMIT = 450 // chừa buffer, Firestore limit 500 ops/batch
+    }
+
+    suspend fun updateAuthorInfoInPosts(
+        userId: String,
+        newName: String,
+        newAvatarUrl: String?
+    ) {
+        var lastDoc: com.google.firebase.firestore.DocumentSnapshot? = null
+
+        while (true) {
+            var query = firestore.collection("posts")
+                .whereEqualTo("authorId", userId)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(BATCH_LIMIT.toLong())
+
+            if (lastDoc != null) query = query.startAfter(lastDoc)
+
+            val snap = query.get().await()
+            if (snap.isEmpty) break
+
+            val batch = firestore.batch()
+            for (doc in snap.documents) {
+                batch.update(
+                    doc.reference,
+                    mapOf(
+                        "authorName" to newName,
+                        "authorAvatarUrl" to (newAvatarUrl ?: "")
+                    )
+                )
+            }
+            batch.commit().await()
+
+            lastDoc = snap.documents.last()
+            if (snap.size() < BATCH_LIMIT) break
+        }
+    }
 
     suspend fun getTrendingTopics(): List<Topic> {
         return try {
