@@ -58,6 +58,13 @@
         android:label="Settings">
     </fragment>
 
+    <!-- Edit Profile Fragment -->
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.hcmus.forumus_client.ui.profile.EditProfileFragment"
+        android:label="Settings">
+    </fragment>
+
     <!-- Create Post Fragment -->
     <fragment
         android:id="@+id/createPostFragment"

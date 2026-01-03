@@ -3,9 +3,11 @@ package com.hcmus.forumus_client.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.firestore.SetOptions
 import com.hcmus.forumus_client.data.model.User
 import kotlinx.coroutines.tasks.await
+import android.net.Uri
 
 /**
  * Repository for managing user data operations with Firestore.
@@ -13,10 +15,12 @@ import kotlinx.coroutines.tasks.await
  */
 class UserRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 ) {
     companion object {
         private const val USERS_COLLECTION = "users"
+        private const val AVATAR_FOLDER = "avatars"
     }
 
     private val usersCollection = firestore.collection(USERS_COLLECTION)
@@ -203,6 +207,28 @@ class UserRepository(
             }
         } catch (e: Exception) {
             Log.e("UserRepository", "Error updating profile for user: $uid", e)
+            throw e
+        }
+    }
+
+    /**
+     * Upload avatar lên Firebase Storage, trả về downloadUrl (String).
+     * Lưu theo path: avatars/{uid}.jpg  (ghi đè ảnh cũ)
+     */
+    suspend fun uploadAvatar(uid: String, uri: Uri): String {
+        return try {
+            val ref = storage.reference.child("$AVATAR_FOLDER/$uid.jpg")
+
+            // Upload file
+            ref.putFile(uri).await()
+
+            // Get download url
+            val downloadUrl = ref.downloadUrl.await().toString()
+
+            Log.i("UserRepository", "Avatar uploaded: $downloadUrl")
+            downloadUrl
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error uploading avatar for user: $uid", e)
             throw e
         }
     }

@@ -92,7 +92,7 @@ class HomeFragment : Fragment() {
                                 navController.navigate(navAction)
                             }
                             ProfileMenuAction.EDIT_PROFILE -> {
-                                // TODO: Implement edit profile navigation
+                                navController.navigate(R.id.editProfileFragment)
                             }
                             ProfileMenuAction.TOGGLE_DARK_MODE -> {
                                 // TODO: Implement theme toggle
