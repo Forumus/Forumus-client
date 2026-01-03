@@ -3,6 +3,9 @@ package com.hcmus.forumus_client.ui.common
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -92,8 +95,23 @@ class CommentViewHolder(
             indentationSpace.layoutParams = layoutParams
         }
 
-        // Bind author information
-        authorName.text = comment.authorName.ifBlank { "Anonymous" }
+        // Bind author information (show role next to name with color)
+        val name = comment.authorName.ifBlank { "Anonymous" }
+        val roleLabel = when (comment.authorRole) {
+            com.hcmus.forumus_client.data.model.UserRole.TEACHER -> "Teacher"
+            com.hcmus.forumus_client.data.model.UserRole.ADMIN -> "Admin"
+            else -> "Student"
+        }
+        val display = "$name · $roleLabel"
+        val spannable = SpannableString(display)
+        val roleStart = display.indexOf('·').takeIf { it >= 0 }?.plus(2) ?: name.length
+        val roleColor = when (comment.authorRole) {
+            com.hcmus.forumus_client.data.model.UserRole.TEACHER -> R.color.role_teacher
+            com.hcmus.forumus_client.data.model.UserRole.ADMIN -> R.color.role_admin
+            else -> R.color.role_student
+        }
+        spannable.setSpan(ForegroundColorSpan(roleColor), roleStart, display.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        authorName.text = spannable
         timestamp.text = formatTimestamp(comment.createdAt)
         contentText.text = comment.content
 

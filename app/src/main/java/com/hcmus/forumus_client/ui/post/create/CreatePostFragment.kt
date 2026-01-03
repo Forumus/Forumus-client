@@ -112,7 +112,6 @@ class CreatePostFragment : Fragment() {
         viewModel.getAllTopics()
     }
 
-
     private fun setupListeners() {
         binding.btnClose.setOnClickListener { handleExit() }
 
