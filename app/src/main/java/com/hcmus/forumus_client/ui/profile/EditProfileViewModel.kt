@@ -16,9 +16,8 @@ import android.util.Log
 
 data class EditProfileUiState(
     val user: User? = null,
-    val isLoading: Boolean = false,
     val isSaving: Boolean = false,
-    val avatarPreviewUri: Uri? = null,      // ảnh mới chọn (chưa upload)
+    val avatarPreviewUri: Uri? = null,
     val error: String? = null
 )
 
@@ -28,19 +27,12 @@ class EditProfileViewModel(
     private val commentRepository: CommentRepository = CommentRepository()
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(EditProfileUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(EditProfileUiState())
     val uiState: StateFlow<EditProfileUiState> = _uiState.asStateFlow()
 
-    fun loadCurrentUser() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                val user = userRepository.getCurrentUser()
-                _uiState.update { it.copy(user = user, isLoading = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, error = "Unable to load user") }
-            }
-        }
+    /** Gọi khi Fragment nhận user từ MainSharedViewModel */
+    fun setUser(user: User?) {
+        _uiState.update { it.copy(user = user) }
     }
 
     fun onPickAvatar(uri: Uri) {
@@ -48,11 +40,9 @@ class EditProfileViewModel(
     }
 
     /**
-     * Save sẽ xử lý cả fullName và avatar (nếu có chọn ảnh).
-     * - Nếu có avatarPreviewUri: upload -> lấy url -> updateProfile(profilePictureUrl)
-     * - Sau đó updateProfile(fullName)
+     * Save và trả về updatedUser để Fragment cập nhật MainSharedViewModel
      */
-    fun saveProfile(newFullName: String, onSuccess: () -> Unit) {
+    fun saveProfile(newFullName: String, onSuccess: (updatedUser: User) -> Unit) {
         val user = _uiState.value.user ?: run {
             _uiState.update { it.copy(error = "No user to save") }
             return
@@ -63,57 +53,43 @@ class EditProfileViewModel(
 
             try {
                 val pickedUri = _uiState.value.avatarPreviewUri
-
-                // avatarUrl cuối cùng sẽ dùng để sync vào posts/comments
                 var finalAvatarUrl: String? = user.profilePictureUrl
 
-                // 1) Nếu có ảnh mới -> upload -> update profilePictureUrl
+                // 1) Upload avatar nếu có
                 if (pickedUri != null) {
                     val downloadUrl = userRepository.uploadAvatar(user.uid, pickedUri)
-
-                    // cache-bust để client (Coil) không dính ảnh cũ
                     val urlForUi = "$downloadUrl?ts=${System.currentTimeMillis()}"
 
                     userRepository.updateProfile(user.uid, profilePictureUrl = urlForUi)
                     finalAvatarUrl = urlForUi
 
-                    // update state user để UI phản ánh ngay
                     _uiState.update { st ->
                         st.copy(
-                            user = st.user?.copy(profilePictureUrl = urlForUi),
-                            avatarPreviewUri = null
+                            avatarPreviewUri = null,
+                            user = st.user?.copy(profilePictureUrl = urlForUi)
                         )
                     }
                 }
 
-                // 2) Update full name trong users
+                // 2) Update full name
                 userRepository.updateProfile(user.uid, fullName = newFullName)
+                _uiState.update { st -> st.copy(user = st.user?.copy(fullName = newFullName)) }
 
-                // update state user (để UI hiện tên mới ngay)
-                _uiState.update { st ->
-                    st.copy(user = st.user?.copy(fullName = newFullName))
-                }
+                // 3) Sync posts/comments (có thể cần index)
+                postRepository.updateAuthorInfoInPosts(user.uid, newFullName, finalAvatarUrl)
+                commentRepository.updateAuthorInfoInComments(user.uid, newFullName, finalAvatarUrl)
 
-                // 3) Sync toàn bộ posts/comments (denormalized fields)
-                // Post: posts where authorId == uid
-                postRepository.updateAuthorInfoInPosts(
-                    userId = user.uid,
-                    newName = newFullName,
-                    newAvatarUrl = finalAvatarUrl
+                // optional
+                // commentRepository.updateReplyToUserName(user.uid, newFullName)
+
+                val updated = _uiState.value.user ?: user.copy(
+                    fullName = newFullName,
+                    profilePictureUrl = finalAvatarUrl
                 )
-
-                // Comment: collectionGroup("comments") where authorId == uid
-                commentRepository.updateAuthorInfoInComments(
-                    userId = user.uid,
-                    newName = newFullName,
-                    newAvatarUrl = finalAvatarUrl
-                )
-
-                commentRepository.updateReplyToUserName(user.uid, newFullName)
 
                 _uiState.update { it.copy(isSaving = false) }
-                onSuccess()
-            }  catch (e: Exception) {
+                onSuccess(updated)
+            } catch (e: Exception) {
                 Log.e("EditProfileVM", "saveProfile failed", e)
                 _uiState.update { it.copy(isSaving = false, error = e.message ?: "Failed to save profile") }
             }
