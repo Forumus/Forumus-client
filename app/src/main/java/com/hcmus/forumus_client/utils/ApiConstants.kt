@@ -5,10 +5,10 @@ object ApiConstants {
     // Use port 8081 for Docker container
 
     // Local backend server
-//    const val BASE_URL = "http://10.0.2.2:8081/"
+    const val BASE_URL = "http://10.0.2.2:3000/"
 
     // AWS EC2 backend server
-    const val BASE_URL = "http://3.105.149.245:8081/"
+//    const val BASE_URL = "http://3.105.149.245:8081/"
     const val SECRET_KEY = "Sdxb44tssZ0qAgrSE2EBO9geqxwLNaUA"
     
     // API Endpoints

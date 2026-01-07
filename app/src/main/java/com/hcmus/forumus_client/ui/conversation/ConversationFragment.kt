@@ -507,10 +507,10 @@ class ConversationFragment : Fragment() {
             val result = SharePostUtil.validateShareUrl(url)
             
             if (result.isSuccess) {
-                val postId = result.getOrNull()
-                if (postId != null) {
+                val post = result.getOrNull()
+                if (post != null) {
                     // Navigate to PostDetail with the valid postId
-                    val action = ConversationFragmentDirections.actionGlobalPostDetailFragment(postId)
+                    val action = ConversationFragmentDirections.actionGlobalPostDetailFragment(post.id)
                     findNavController().navigate(action)
                 } else {
                     Toast.makeText(requireContext(), "Post no longer exists", Toast.LENGTH_SHORT).show()
