@@ -14,6 +14,7 @@ import java.util.Date
 
 class NotificationViewModel : ViewModel() {
     private val repository = NotificationRepository()
+
     
     // Raw data
     private val _notifications = MutableLiveData<List<Notification>>()
@@ -62,6 +63,8 @@ class NotificationViewModel : ViewModel() {
         isEarlierExpanded = true
         _notifications.value?.let { processDisplayList(it) }
     }
+
+
 
     fun markAsRead(notification: Notification) {
         if (notification.isRead) return

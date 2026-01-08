@@ -1,0 +1,63 @@
+﻿> Task :app:clean
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDebugResValues
+> Task :app:dataBindingMergeDependencyArtifactsDebug
+> Task :app:generateDebugResources
+> Task :app:processDebugGoogleServices
+> Task :app:mergeDebugResources
+> Task :app:packageDebugResources
+> Task :app:processDebugNavigationResources
+> Task :app:dataBindingTriggerDebug
+> Task :app:parseDebugLocalResources
+> Task :app:generateSafeArgsDebug
+> Task :app:dataBindingGenBaseClassesDebug
+> Task :app:mapDebugSourceSetPaths
+> Task :app:checkDebugAarMetadata
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:compileDebugNavigationResources
+> Task :app:extractDeepLinksDebug
+
+> Task :app:processDebugMainManifest
+E:\Coding\Mobile dev\Final project\Forumus-client\app\src\main\AndroidManifest.xml:18:5-76 Warning:
+	Element uses-permission#android.permission.READ_MEDIA_IMAGES at AndroidManifest.xml:18:5-76 duplicated with element declared at AndroidManifest.xml:11:5-76
+E:\Coding\Mobile dev\Final project\Forumus-client\app\src\main\AndroidManifest.xml:19:5-75 Warning:
+	Element uses-permission#android.permission.READ_MEDIA_VIDEO at AndroidManifest.xml:19:5-75 duplicated with element declared at AndroidManifest.xml:12:5-75
+E:\Coding\Mobile dev\Final project\Forumus-client\app\src\main\AndroidManifest.xml:21:5-85 Warning:
+	Element uses-feature#android.hardware.camera at AndroidManifest.xml:21:5-85 duplicated with element declared at AndroidManifest.xml:14:5-85
+E:\Coding\Mobile dev\Final project\Forumus-client\app\src\main\AndroidManifest.xml:22:5-65 Warning:
+	Element uses-permission#android.permission.CAMERA at AndroidManifest.xml:22:5-65 duplicated with element declared at AndroidManifest.xml:15:5-65
+E:\Coding\Mobile dev\Final project\Forumus-client\app\src\main\AndroidManifest.xml:23:5-70 Warning:
+	Element uses-permission#android.permission.RECORD_AUDIO at AndroidManifest.xml:23:5-70 duplicated with element declared at AndroidManifest.xml:16:5-70
+E:\Coding\Mobile dev\Final project\Forumus-client\app\src\main\AndroidManifest.xml:55:9-61:19 Warning:
+	Element service#com.hcmus.forumus_client.service.ForumusFirebaseMessagingService at AndroidManifest.xml:55:9-61:19 duplicated with element declared at AndroidManifest.xml:47:9-53:19
+
+> Task :app:processDebugManifest
+> Task :app:javaPreCompileDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:processDebugManifestForPackage
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:desugarDebugFileDependencies
+> Task :app:mergeDebugJniLibFolders
+> Task :app:mergeDebugNativeLibs
+> Task :app:checkDebugDuplicateClasses
+> Task :app:validateSigningDebug
+> Task :app:mergeLibDexDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+
+> Task :app:stripDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libdatastore_shared_counter.so. Run with --info option to learn more.
+
+> Task :app:processDebugResources
+> Task :app:mergeExtDexDebug
+> Task :app:kaptGenerateStubsDebugKotlin
+> Task :app:kaptDebugKotlin
+
+> Task :app:compileDebugKotlin FAILED
+38 actionable tasks: 38 executed

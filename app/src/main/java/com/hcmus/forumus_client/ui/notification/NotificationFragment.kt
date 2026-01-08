@@ -14,6 +14,7 @@ import com.hcmus.forumus_client.ui.common.BottomNavigationBar
 import com.hcmus.forumus_client.R
 
 import androidx.fragment.app.activityViewModels
+import android.app.AlertDialog
 
 class NotificationFragment : Fragment() {
 
@@ -64,8 +65,43 @@ class NotificationFragment : Fragment() {
         val adapter = NotificationAdapter(
             onNotificationClick = { notification ->
                 viewModel.markAsRead(notification)
-                // Navigate to Post Detail
-                if (notification.targetId.isNotEmpty()) {
+                
+                if (notification.type == "STATUS_CHANGED") {
+                     // Show Custom Status Detail Modal
+                     val dialogView = LayoutInflater.from(requireContext()).inflate(com.hcmus.forumus_client.R.layout.dialog_notification_status, null)
+                     val dialog = android.app.AlertDialog.Builder(requireContext())
+                        .setView(dialogView)
+                        .setCancelable(true)
+                        .create()
+
+                     // Bind Views
+                     val tvMessage = dialogView.findViewById<android.widget.TextView>(com.hcmus.forumus_client.R.id.tvMessage)
+                     val tvCurrentStatus = dialogView.findViewById<android.widget.TextView>(com.hcmus.forumus_client.R.id.tvCurrentStatus)
+                     val btnOk = dialogView.findViewById<android.view.View>(com.hcmus.forumus_client.R.id.btnOk)
+
+                     tvMessage.text = notification.previewText
+                     
+                     // Determine status from notification text
+                     val statusText = notification.previewText.lowercase()
+                     val status = when {
+                         statusText.contains("normal") -> "NORMAL"
+                         statusText.contains("reminder") -> "REMINDED"
+                         statusText.contains("warning") -> "WARNED"
+                         statusText.contains("suspended") || statusText.contains("banned") -> "BANNED"
+                         else -> "UPDATED"
+                     }
+                     
+                     tvCurrentStatus.text = status
+
+                     btnOk.setOnClickListener {
+                         dialog.dismiss()
+                     }
+                     
+                     // Make background transparent for rounded corners if possible, or just show
+                     dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+                     dialog.show()
+                } else if (notification.targetId.isNotEmpty()) {
+                    // Navigate to Post Detail
                     val action = NavGraphDirections.actionGlobalPostDetailFragment(notification.targetId)
                     findNavController().navigate(action)
                 }

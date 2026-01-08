@@ -61,25 +61,49 @@ class NotificationAdapter(
 
         fun bind(notification: Notification) {
             val actor = notification.actorName
-            val typeText = when (notification.type) {
+            var typeText = ""
+            var iconRes = com.hcmus.forumus_client.R.drawable.noti_comment
+            var customTitle: String? = null
+
+            when (notification.type) {
                 "UPVOTE" -> {
-                    binding.ivIcon.setImageResource(com.hcmus.forumus_client.R.drawable.noti_vote)
-                    "upvoted your post"
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_vote
+                    typeText = "upvoted your post"
                 }
                 "COMMENT" -> {
-                    binding.ivIcon.setImageResource(com.hcmus.forumus_client.R.drawable.noti_comment)
-                    "commented on your post"
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_comment
+                    typeText = "commented on your post"
                 }
                 "REPLY" -> {
-                    binding.ivIcon.setImageResource(com.hcmus.forumus_client.R.drawable.noti_comment)
-                    "replied to your comment"
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_comment
+                    typeText = "replied to your comment"
+                }
+                "POST_DELETED" -> {
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_remove_post
+                    typeText = "removed your post"
+                }
+                "POST_REJECTED" -> {
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_remove_post
+                    typeText = "rejected your post"
+                }
+                "STATUS_CHANGED" -> {
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_status
+                    customTitle = "Admin has modified your status"
                 }
                 else -> {
-                    binding.ivIcon.setImageResource(com.hcmus.forumus_client.R.drawable.noti_comment)
-                    "interacted with you"
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_comment
+                    typeText = "interacted with you"
                 }
             }
-            binding.tvTitle.text = "$actor $typeText"
+            
+            binding.ivIcon.setImageResource(iconRes)
+            
+            if (customTitle != null) {
+                 binding.tvTitle.text = customTitle
+            } else {
+                 binding.tvTitle.text = "$actor $typeText"
+            }
+            
             binding.tvContent.text = notification.previewText
 
             val timeAgo = notification.createdAt?.toDate()?.time?.let {
