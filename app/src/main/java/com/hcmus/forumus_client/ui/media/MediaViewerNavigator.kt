@@ -42,9 +42,10 @@ object MediaViewerNavigator {
         val vm = ViewModelProvider(activity, factory).get(MediaViewerViewModel::class.java)
         vm.setMediaList(mediaList, startIndex)
 
-        // Navigate using view's NavController
+        // Navigate using view's NavController like HomeFragment does.
         try {
-            view.findNavController().navigate(R.id.mediaViewerFragment)
+            val navController = view.findNavController()
+            navController.navigate(R.id.mediaViewerFragment)
         } catch (_: Exception) {
             // ignore navigation errors
         }

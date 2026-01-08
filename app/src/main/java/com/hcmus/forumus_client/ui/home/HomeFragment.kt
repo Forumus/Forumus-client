@@ -64,7 +64,6 @@ class HomeFragment : Fragment() {
         setupDrawer()
         observeViewModel()
 
-        //viewModel.migrateAddAuthorRole()
         viewModel.loadPosts()
         viewModel.loadTopics()
     }

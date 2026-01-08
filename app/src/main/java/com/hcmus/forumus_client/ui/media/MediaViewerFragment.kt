@@ -8,18 +8,19 @@ import android.view.ViewGroup
 import android.widget.MediaController
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.FragmentMediaViewerBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import android.util.Log
+import kotlin.math.min
+import android.widget.ImageView
+import androidx.navigation.fragment.findNavController
 
 class MediaViewerFragment : Fragment() {
 
     private var _binding: FragmentMediaViewerBinding? = null
     private val binding get() = _binding!!
+    private val navController by lazy { findNavController() }
 
     private val viewModel: MediaViewerViewModel by activityViewModels()
 
@@ -37,7 +38,9 @@ class MediaViewerFragment : Fragment() {
 
         binding.btnPrev.setOnClickListener { viewModel.prev() }
         binding.btnNext.setOnClickListener { viewModel.next() }
-        binding.btnClose.setOnClickListener { parentFragmentManager.popBackStack() }
+        binding.btnClose.setOnClickListener {
+                navController.popBackStack()
+        }
 
         viewModel.mediaItems.observe(viewLifecycleOwner) { /* no-op; handled by index observer */ }
 
@@ -53,14 +56,24 @@ class MediaViewerFragment : Fragment() {
         val item = items[index]
 
         binding.tvCounter.text = "${index + 1}/${items.size}"
-        binding.btnPrev.isEnabled = index > 0
-        binding.btnNext.isEnabled = index < items.size - 1
+        if (items.size <= 1) {
+            binding.btnPrev.visibility = View.GONE
+            binding.btnNext.visibility = View.GONE
+        } else {
+            binding.btnPrev.visibility = if (index > 0) View.VISIBLE else View.GONE
+            binding.btnNext.visibility = if (index < items.size - 1) View.VISIBLE else View.GONE
+        }
 
         try {
             if (item.type == MediaViewerItem.Type.IMAGE) {
                 binding.vvMedia.visibility = View.GONE
                 binding.vvMedia.stopPlayback()
                 binding.ivMedia.visibility = View.VISIBLE
+
+                // Use 'contain' / fit mode: preserve aspect ratio, do not crop or stretch
+                binding.ivMedia.adjustViewBounds = true
+                binding.ivMedia.scaleType = ImageView.ScaleType.FIT_CENTER
+
                 binding.ivMedia.load(item.imageUrl) {
                     crossfade(true)
                     error(R.drawable.error_image)
@@ -68,16 +81,45 @@ class MediaViewerFragment : Fragment() {
             } else {
                 binding.ivMedia.visibility = View.GONE
                 binding.vvMedia.visibility = View.VISIBLE
-                try {
-                    binding.vvMedia.setVideoURI(Uri.parse(item.videoUrl))
-                    val mc = MediaController(requireContext())
-                    mc.setAnchorView(binding.vvMedia)
-                    binding.vvMedia.setMediaController(mc)
-                    binding.vvMedia.requestFocus()
-                    binding.vvMedia.start()
-                } catch (e: Exception) {
-                    Log.e("MediaViewerFragment", "Error playing video", e)
-                }
+                    try {
+                        binding.vvMedia.setVideoURI(Uri.parse(item.videoUrl))
+
+                        // Adjust VideoView size to preserve aspect ratio (contain behavior)
+                        binding.vvMedia.setOnPreparedListener { mp ->
+                            try {
+                                val videoWidth = mp.videoWidth
+                                val videoHeight = mp.videoHeight
+
+                                binding.vvMedia.post {
+                                    val containerW = binding.root.width
+                                    val containerH = binding.root.height
+
+                                    if (videoWidth > 0 && videoHeight > 0 && containerW > 0 && containerH > 0) {
+                                        val scale = min(containerW.toFloat() / videoWidth, containerH.toFloat() / videoHeight)
+                                        val newW = (videoWidth * scale).toInt()
+                                        val newH = (videoHeight * scale).toInt()
+
+                                        val lp = binding.vvMedia.layoutParams
+                                        lp.width = newW
+                                        lp.height = newH
+                                        binding.vvMedia.layoutParams = lp
+                                    }
+
+                                    binding.vvMedia.start()
+                                }
+                            } catch (e: Exception) {
+                                Log.e("MediaViewerFragment", "Error sizing video", e)
+                                binding.vvMedia.start()
+                            }
+                        }
+
+                        val mc = MediaController(requireContext())
+                        mc.setAnchorView(binding.vvMedia)
+                        binding.vvMedia.setMediaController(mc)
+                        binding.vvMedia.requestFocus()
+                    } catch (e: Exception) {
+                        Log.e("MediaViewerFragment", "Error playing video", e)
+                    }
             }
         } catch (e: Exception) {
             Log.e("MediaViewerFragment", "Error showing media", e)
