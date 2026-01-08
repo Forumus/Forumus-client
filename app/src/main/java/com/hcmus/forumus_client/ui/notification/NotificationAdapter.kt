@@ -86,6 +86,10 @@ class NotificationAdapter(
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_post_reject
                     typeText = "rejected your post"
                 }
+                "POST_APPROVED" -> {
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_post_approve
+                    typeText = "approved your post"
+                }
                 "STATUS_CHANGED" -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_status
                     customTitle = "Admin has modified your status"
