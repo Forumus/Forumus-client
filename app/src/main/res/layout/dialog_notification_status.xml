@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="24dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@android:color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <ImageView
+            android:id="@+id/ivStatusIcon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/noti_status"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Account Status Update"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toBottomOf="@id/ivStatusIcon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/layoutStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/shape_circle_blue" 
+            android:backgroundTint="#E3F2FD"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status: "
+                android:textColor="#1976D2"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvCurrentStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="NORMAL"
+                android:textStyle="bold"
+                android:textColor="#1976D2"
+                android:textSize="14sp" />
+        </LinearLayout>
+        <!-- Note: Using shape_circle_blue as background might be round, simplified to just a color or standard shape if exists, assuming shape_circle_blue is available from context or I can use a standard material shape style but for now using existing drawable ref from earlier context or just a simple color/shape -->
+        
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            tools:text="Your account status has been restored to normal. You can now access all features."
+            android:gravity="center"
+            android:textColor="#424242"
+            android:textSize="16sp"
+            android:lineSpacingMultiplier="1.2"
+            app:layout_constraintTop_toBottomOf="@id/layoutStatus"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="OK"
+            app:backgroundTint="#2196F3"
+            app:cornerRadius="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tvMessage"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

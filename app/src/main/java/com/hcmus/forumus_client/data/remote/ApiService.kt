@@ -32,4 +32,9 @@ interface ApiService {
     suspend fun sendWelcomeEmail(
         @Body request: SendWelcomeEmailRequest
     ): Response<EmailResponse>
+
+    @POST(ApiConstants.NOTIFICATIONS_TRIGGER)
+    suspend fun triggerNotification(
+        @Body request: com.hcmus.forumus_client.data.remote.dto.NotificationTriggerRequest
+    ): Response<Unit>
 }
