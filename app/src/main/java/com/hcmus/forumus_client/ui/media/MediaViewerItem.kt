@@ -1,4 +1,4 @@
-package com.hcmus.forumus_client.ui.common
+package com.hcmus.forumus_client.ui.media
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

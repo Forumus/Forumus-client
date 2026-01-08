@@ -14,8 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
 import android.content.Intent
-import com.hcmus.forumus_client.ui.common.MediaViewerActivity
-import com.hcmus.forumus_client.ui.common.MediaViewerItem
 import com.google.firebase.Timestamp
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.data.model.Post
@@ -280,37 +278,7 @@ class PostViewHolder(
 
         // Open Media Viewer when any media item is clicked. Convert to parcelable MediaViewerItem.
         imagesAdapter.setOnMediaClickListener { clickedIndex ->
-            try {
-                val all = imagesAdapter.getAllItems()
-                val mediaList = ArrayList<MediaViewerItem>()
-                all.forEach { m ->
-                    when (m) {
-                        is PostMediaItem.Image -> mediaList.add(
-                            MediaViewerItem(
-                                type = MediaViewerItem.Type.IMAGE,
-                                imageUrl = m.imageUrl,
-                                videoUrl = null,
-                                thumbnailUrl = null
-                            )
-                        )
-                        is PostMediaItem.Video -> mediaList.add(
-                            MediaViewerItem(
-                                type = MediaViewerItem.Type.VIDEO,
-                                imageUrl = m.thumbnailUrl,
-                                videoUrl = m.videoUrl,
-                                thumbnailUrl = m.thumbnailUrl
-                            )
-                        )
-                    }
-                }
-
-                val intent = Intent(itemView.context, MediaViewerActivity::class.java)
-                intent.putParcelableArrayListExtra("media_items", mediaList)
-                intent.putExtra("start_index", clickedIndex)
-                itemView.context.startActivity(intent)
-            } catch (e: Exception) {
-                Log.e("PostViewHolder", "Failed to open media viewer", e)
-            }
+            com.hcmus.forumus_client.ui.media.MediaViewerNavigator.open(itemView, post, clickedIndex)
         }
     }
 

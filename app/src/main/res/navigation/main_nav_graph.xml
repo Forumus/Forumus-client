@@ -116,4 +116,10 @@
         android:label="Search">
     </fragment>
 
+    <!-- Media Viewer Fragment -->
+    <fragment
+        android:id="@+id/mediaViewerFragment"
+        android:name="com.hcmus.forumus_client.ui.media.MediaViewerFragment"
+        android:label="Media Viewer"/>
+
 </navigation>

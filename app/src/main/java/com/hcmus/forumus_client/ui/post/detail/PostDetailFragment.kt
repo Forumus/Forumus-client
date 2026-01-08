@@ -150,10 +150,10 @@ class PostDetailFragment : Fragment() {
                         val shareDialog = SharePostDialog.newInstance(post.id)
                         shareDialog.show(childFragmentManager, "SharePostDialog")
                     }
-                    PostAction.AUTHOR_PROFILE -> {
-                        val action = PostDetailFragmentDirections.actionGlobalProfileFragment(post.authorId)
-                        navController.navigate(action)
-                    }
+                        PostAction.AUTHOR_PROFILE -> {
+                            val action = PostDetailFragmentDirections.actionGlobalProfileFragment(post.authorId)
+                            navController.navigate(action)
+                        }
                     PostAction.MENU -> {
                         showPostMenu(post, view)
                     }

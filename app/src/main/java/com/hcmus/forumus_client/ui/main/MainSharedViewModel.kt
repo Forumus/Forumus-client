@@ -81,4 +81,6 @@ class MainSharedViewModel(
     fun setCurrentUser(user: User?) {
         _currentUser.value = user
     }
+
+    // Note: media preview is now handled by MediaViewerViewModel in ui.media
 }

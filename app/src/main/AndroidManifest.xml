@@ -100,12 +100,6 @@
             android:theme="@style/Theme.Forumus.Fullscreen"
             android:exported="false" />
 
-        <!-- Media Viewer Activity (images & videos) -->
-        <activity
-            android:name=".ui.common.MediaViewerActivity"
-            android:theme="@style/Theme.Forumus.Fullscreen"
-            android:exported="false" />
-
         <!-- Slide Activity -->
         <activity
             android:name=".ui.onboarding.slide.SlideActivity"
