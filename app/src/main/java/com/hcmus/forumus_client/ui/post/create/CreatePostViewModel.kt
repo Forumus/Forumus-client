@@ -161,33 +161,10 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                 if (saveResult.isSuccess) {
                     val postId = saveResult.getOrNull()
                     if (postId != null) {
-                        // Call AI Validation
-                        val validationResult = repository.validatePost(postId)
-                        
+                        // Post saved as PENDING. 
+                        // Backend PostListener will handle validation asynchronously.
                         withContext(Dispatchers.Main) {
-                            if (validationResult.isSuccess) {
-                                val response = validationResult.getOrNull()
-                                if (response != null && response.isValid) {
-                                    _postState.value = PostState.Success
-                                } else {
-                                    // Validated but Rejected
-                                    val reason = response?.message ?: "Unknown reason"
-                                    _postState.value = PostState.Error("Post rejected by AI: $reason")
-                                }
-                            } else {
-                                // Validation failed (network error etc), but post is saved as PENDING.
-                                // We can decide to either show success (and let pending sit) or show warning.
-                                // For now, let's show Success but maybe a toast?
-                                // Or safer: Show Success, as the notification system will handle rejection later?
-                                // User rule says: "When a post is rejected initially (by AI)..." 
-                                // The requirement implies immediate feedback is good, but notification is key.
-                                // If validatePost call fails (network), the post is PENDING.
-                                // Let's treat network failure on validation as "Success" (pending review) to not block user, 
-                                // OR block usage. 
-                                // Given it's "AI Post Validation", if it fails to reach AI, maybe allow PENDING.
-                                // But if AI explicitly REJECTS, we show Error.
-                                _postState.value = PostState.Success
-                            }
+                             _postState.value = PostState.Success
                         }
                     } else {
                         withContext(Dispatchers.Main) {
