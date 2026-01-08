@@ -127,4 +127,18 @@ class BottomNavigationBar @JvmOverloads constructor(
     enum class Tab {
         HOME, EXPLORE, ALERTS, CHAT, NONE
     }
+
+    /**
+     * Sets the notification badge count.
+     * @param count number of unread notifications. 0 or less hides the badge.
+     */
+    fun setNotificationBadge(count: Int) {
+        android.util.Log.d("BottomNavigationBar", "Setting badge: $count")
+        if (count > 0) {
+            binding.badgeAlerts.visibility = VISIBLE
+            binding.badgeAlerts.text = if (count > 99) "99+" else count.toString()
+        } else {
+            binding.badgeAlerts.visibility = GONE
+        }
+    }
 }

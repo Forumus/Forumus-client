@@ -27,13 +27,17 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.ChatType
 import com.hcmus.forumus_client.databinding.FragmentChatsBinding
 import com.hcmus.forumus_client.ui.common.BottomNavigationBar
+import com.hcmus.forumus_client.NavGraphDirections
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.getValue
 
+import androidx.fragment.app.activityViewModels
+
 class ChatsFragment : Fragment (){
     private lateinit var binding: FragmentChatsBinding
     private val viewModel: ChatsViewModel by viewModels()
+    private val notificationViewModel: com.hcmus.forumus_client.ui.notification.NotificationViewModel by activityViewModels()
     private val navController by lazy { findNavController() }
     private lateinit var chatsAdapter: ChatsAdapter
     private lateinit var userSearchAdapter: UserSearchAdapter
@@ -107,6 +111,11 @@ class ChatsFragment : Fragment (){
                     }
                 }
             }
+        }
+
+        notificationViewModel.unreadCount.observe(viewLifecycleOwner) { count ->
+             android.util.Log.d("ChatsFragment", "Badge update: $count")
+             binding.bottomBar.setNotificationBadge(count)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
@@ -228,7 +237,7 @@ class ChatsFragment : Fragment (){
             onHomeClick = { navController.navigate(R.id.homeFragment) }
             onExploreClick = { navController.navigate(R.id.searchFragment) }
             onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
-            onAlertsClick = { }
+            onAlertsClick = { navController.navigate(NavGraphDirections.actionGlobalNotificationFragment()) }
             onChatClick = { navController.navigate(R.id.chatsFragment) }
         }
     }

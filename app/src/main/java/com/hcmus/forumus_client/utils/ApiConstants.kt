@@ -16,4 +16,5 @@ object ApiConstants {
     const val GET_SUGGESTED_TOPICS = "api/posts/getSuggestedTopics"
     const val SEND_OTP_EMAIL = "api/email/send-otp"
     const val SEND_WELCOME_EMAIL = "api/email/send-welcome"
+    const val NOTIFICATIONS_TRIGGER = "api/notifications"
 }

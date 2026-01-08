@@ -43,6 +43,7 @@ class HomeFragment : Fragment() {
     private lateinit var homeAdapter: HomeAdapter
     private val viewModel: HomeViewModel by viewModels()
     private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
+    private val notificationViewModel: com.hcmus.forumus_client.ui.notification.NotificationViewModel by activityViewModels()
     private val navController by lazy { findNavController() }
 
     override fun onCreateView(
@@ -67,6 +68,7 @@ class HomeFragment : Fragment() {
         //viewModel.migrateAddAuthorRole()
         viewModel.loadPosts()
         viewModel.loadTopics()
+
     }
 
     /**
@@ -190,7 +192,7 @@ class HomeFragment : Fragment() {
             onHomeClick = { navController.navigate(R.id.homeFragment) }
             onExploreClick = { navController.navigate(R.id.searchFragment) }
             onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
-            onAlertsClick = {}
+            onAlertsClick = { navController.navigate(NavGraphDirections.actionGlobalNotificationFragment()) }
             onChatClick = { navController.navigate(R.id.chatsFragment) }
         }
     }
@@ -378,6 +380,11 @@ class HomeFragment : Fragment() {
         viewModel.topics.observe(viewLifecycleOwner) { topics ->
             populateTopics(topics)
             homeAdapter.setTopics(topics)
+        }
+
+        notificationViewModel.unreadCount.observe(viewLifecycleOwner) { count ->
+             android.util.Log.d("HomeFragment", "Badge update: $count")
+             binding.bottomBar.setNotificationBadge(count)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
