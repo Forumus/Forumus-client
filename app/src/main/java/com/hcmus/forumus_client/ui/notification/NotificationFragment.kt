@@ -109,11 +109,19 @@ class NotificationFragment : Fragment() {
 
                     // Bind Views
                     val tvNotificationMessage = dialogView.findViewById<android.widget.TextView>(com.hcmus.forumus_client.R.id.tvNotificationMessage)
+                    val tvRejectionReason = dialogView.findViewById<android.widget.TextView>(com.hcmus.forumus_client.R.id.tvRejectionReason)
                     val tvOriginalTitle = dialogView.findViewById<android.widget.TextView>(com.hcmus.forumus_client.R.id.tvOriginalTitle)
                     val tvOriginalContent = dialogView.findViewById<android.widget.TextView>(com.hcmus.forumus_client.R.id.tvOriginalContent)
                     val btnDismiss = dialogView.findViewById<android.view.View>(com.hcmus.forumus_client.R.id.btnDismiss)
 
                     tvNotificationMessage.text = notification.previewText
+                    
+                    if (!notification.rejectionReason.isNullOrEmpty()) {
+                        tvRejectionReason.text = "Reason: ${notification.rejectionReason}"
+                        tvRejectionReason.visibility = View.VISIBLE
+                    } else {
+                        tvRejectionReason.visibility = View.GONE
+                    }
                     tvOriginalTitle.text = notification.originalPostTitle ?: "Original Post"
                     tvOriginalContent.text = notification.originalPostContent ?: "Content not available"
 

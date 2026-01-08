@@ -17,4 +17,5 @@ object ApiConstants {
     const val SEND_OTP_EMAIL = "api/email/send-otp"
     const val SEND_WELCOME_EMAIL = "api/email/send-welcome"
     const val NOTIFICATIONS_TRIGGER = "api/notifications"
+    const val VALIDATE_POST = "api/posts/validatePost"
 }

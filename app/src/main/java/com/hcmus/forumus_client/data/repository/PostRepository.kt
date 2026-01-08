@@ -144,7 +144,7 @@ class PostRepository(
         return "POST" + "_" + "$formattedDate" + "_" + "$randomPart"
     }
 
-    suspend fun savePost(context: Context, post: Post): Result<Boolean> {
+    suspend fun savePost(context: Context, post: Post): Result<String> {
         return try {
             val storage = FirebaseStorage.getInstance().reference
             val imageUrls = mutableListOf<String>()
@@ -214,7 +214,7 @@ class PostRepository(
             )
 
             postRef.set(updatedPost).await()
-            Result.success(true)
+            Result.success(generatedId)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -314,6 +314,7 @@ class PostRepository(
         var query =
             firestore
                 .collection("posts")
+                .whereEqualTo("status", PostStatus.APPROVED)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(limit)
 
@@ -344,6 +345,7 @@ class PostRepository(
     suspend fun getAllPosts(): List<Post> {
         val userId = auth.currentUser?.uid
         return firestore.collection("posts")
+            .whereEqualTo("status", PostStatus.APPROVED)
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .get()
             .await()
@@ -366,6 +368,7 @@ class PostRepository(
 
         return firestore.collection("posts")
             .whereEqualTo("authorId", userId)
+            .whereEqualTo("status", PostStatus.APPROVED)
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .limit(limit)
             .get()
@@ -564,6 +567,21 @@ class PostRepository(
         } catch (e: Exception) {
             Log.e("PostRepository", "Error fetching suggested topics: ${e.message}")
             emptyList()
+        }
+    }
+
+    suspend fun validatePost(postId: String): Result<com.hcmus.forumus_client.data.dto.PostValidationResponse> {
+        return try {
+            val request = com.hcmus.forumus_client.data.dto.PostIdRequest(postId)
+            val response = NetworkService.apiService.validatePost(request)
+            
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Validation request failed: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }
