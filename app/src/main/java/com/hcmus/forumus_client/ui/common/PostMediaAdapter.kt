@@ -11,10 +11,13 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 
 class PostMediaAdapter(
-    private val onMediaClick: (position: Int) -> Unit
+    private var onMediaClick: (position: Int) -> Unit = {}
 ) : RecyclerView.Adapter<PostMediaAdapter.ImageViewHolder>() {
 
-    private var mediaItems: List<PostMediaItem> = emptyList()
+    // Full list of media items (images + videos) in original order
+    private var allItems: List<PostMediaItem> = emptyList()
+    // Subset displayed by the adapter (max 3)
+    private var displayedItems: List<PostMediaItem> = emptyList()
     private var totalCount: Int = 0
 
     /**
@@ -23,9 +26,16 @@ class PostMediaAdapter(
      */
     fun submitMedia(items: List<PostMediaItem>) {
         totalCount = items.size
-        mediaItems = if (items.size <= 3) items else items.take(3)
+        allItems = items
+        displayedItems = if (items.size <= 3) items else items.take(3)
         notifyDataSetChanged()
     }
+
+    fun setOnMediaClickListener(listener: (position: Int) -> Unit) {
+        onMediaClick = listener
+    }
+
+    fun getAllItems(): List<PostMediaItem> = allItems
 
     inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val ivPostImage: ImageView = itemView.findViewById(R.id.ivPostImage)
@@ -90,9 +100,9 @@ class PostMediaAdapter(
         return ImageViewHolder(view)
     }
 
-    override fun getItemCount(): Int = mediaItems.size
+    override fun getItemCount(): Int = displayedItems.size
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        holder.bind(mediaItems[position], position)
+        holder.bind(displayedItems[position], position)
     }
 }
