@@ -8,8 +8,10 @@ data class Notification(
     var type: String = "", // UPVOTE, COMMENT, REPLY
     var actorId: String = "",
     var actorName: String = "",
-    var targetId: String = "", // Post/Comment ID
-    var previewText: String = "",
-    var createdAt: Timestamp? = null,
+    val targetId: String = "", // Post/Comment ID
+    val previewText: String = "",
+    val originalPostTitle: String? = null,
+    val originalPostContent: String? = null,
+    val createdAt: Timestamp? = null,
     @get:PropertyName("isRead") @set:PropertyName("isRead") var isRead: Boolean = false
 )

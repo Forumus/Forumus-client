@@ -100,6 +100,29 @@ class NotificationFragment : Fragment() {
                      // Make background transparent for rounded corners if possible, or just show
                      dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
                      dialog.show()
+                } else if (notification.type == "POST_DELETED" || notification.type == "POST_REJECTED") {
+                    // Show Post Removal Dialog
+                    val dialogView = LayoutInflater.from(requireContext()).inflate(com.hcmus.forumus_client.R.layout.dialog_notification_post_removed, null)
+                    val dialog = android.app.AlertDialog.Builder(requireContext())
+                        .setView(dialogView)
+                        .create()
+
+                    // Bind Views
+                    val tvNotificationMessage = dialogView.findViewById<android.widget.TextView>(com.hcmus.forumus_client.R.id.tvNotificationMessage)
+                    val tvOriginalTitle = dialogView.findViewById<android.widget.TextView>(com.hcmus.forumus_client.R.id.tvOriginalTitle)
+                    val tvOriginalContent = dialogView.findViewById<android.widget.TextView>(com.hcmus.forumus_client.R.id.tvOriginalContent)
+                    val btnDismiss = dialogView.findViewById<android.view.View>(com.hcmus.forumus_client.R.id.btnDismiss)
+
+                    tvNotificationMessage.text = notification.previewText
+                    tvOriginalTitle.text = notification.originalPostTitle ?: "Original Post"
+                    tvOriginalContent.text = notification.originalPostContent ?: "Content not available"
+
+                    btnDismiss.setOnClickListener {
+                        dialog.dismiss()
+                    }
+                    
+                    dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+                    dialog.show()
                 } else if (notification.targetId.isNotEmpty()) {
                     // Navigate to Post Detail
                     val action = NavGraphDirections.actionGlobalPostDetailFragment(notification.targetId)
