@@ -159,7 +159,7 @@ class SavedPostsFragment : Fragment() {
 
     /**
      * Display the post action menu popup when user taps the menu icon on a post.
-     * Allows users to unsave the post.
+     * Allows users to unsave the post and report violations.
      *
      * @param post The post to show menu for
      * @param menuButton The menu button view
@@ -167,15 +167,19 @@ class SavedPostsFragment : Fragment() {
     private fun showPostMenu(post: Post, menuButton: View) {
         val popupMenu = PopupPostMenu(requireActivity() as androidx.appcompat.app.AppCompatActivity)
 
+        // Set button text to "Unsave" since posts are already saved on this screen
+        popupMenu.saveButtonText = "Unsave"
+
         // Handle unsave button click
         popupMenu.onSaveClick = {
             viewModel.unsavePost(post)
             Toast.makeText(requireContext(), "Post removed from saved", Toast.LENGTH_SHORT).show()
         }
 
-        // Handle report click (optional, can be disabled for saved posts)
+        // Handle report click
         popupMenu.onReportClick = { violation ->
-            Toast.makeText(requireContext(), "Report coming soon", Toast.LENGTH_SHORT).show()
+            viewModel.saveReport(post, violation)
+            Toast.makeText(requireContext(), "Post reported", Toast.LENGTH_SHORT).show()
         }
 
         // Show popup at menu button

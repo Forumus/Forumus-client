@@ -7,8 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.User
+import com.hcmus.forumus_client.data.model.Report
+import com.hcmus.forumus_client.data.model.Violation
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
+import com.hcmus.forumus_client.data.repository.ReportRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 /**
@@ -17,7 +21,8 @@ import kotlinx.coroutines.launch
  */
 class SavedPostsViewModel(
     private val userRepository: UserRepository = UserRepository(),
-    private val postRepository: PostRepository = PostRepository()
+    private val postRepository: PostRepository = PostRepository(),
+    private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
 
     // List of saved posts
@@ -100,6 +105,55 @@ class SavedPostsViewModel(
             } catch (e: Exception) {
                 Log.e("SavedPostsViewModel", "Error unsaving post", e)
                 _error.value = "Failed to unsave post: ${e.message}"
+            }
+        }
+    }
+
+    /**
+     * Saves a report for a post when user selects a violation.
+     *
+     * @param post The post being reported
+     * @param violation The violation category selected by the user
+     */
+    fun saveReport(post: Post, violation: Violation) {
+        viewModelScope.launch {
+            try {
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+
+                // Check if user has already reported this post
+                if (post.reportedUsers.contains(userId)) {
+                    _error.value = "You have already reported this post"
+                    return@launch
+                }
+
+                // Create report object
+                val report = Report(
+                    postId = post.id,
+                    authorId = userId,
+                    nameViolation = violation.name,
+                    descriptionViolation = violation
+                )
+
+                // Save report to Firebase
+                reportRepository.saveReport(report)
+
+                // Update post: increment reportCount and add userId to reportedUsers
+                val updatedPost = post.copy(
+                    reportCount = post.reportCount + 1,
+                    reportedUsers = post.reportedUsers.toMutableList().apply { add(userId) }
+                )
+
+                // Update post in Firebase
+                postRepository.updatePost(updatedPost)
+
+                // Update local saved posts list
+                val currentPosts = _savedPosts.value ?: emptyList()
+                _savedPosts.value = currentPosts.map { p -> if (p.id == post.id) updatedPost else p }
+
+                Log.i("SavedPostsViewModel", "Post reported successfully")
+            } catch (e: Exception) {
+                Log.e("SavedPostsViewModel", "Error reporting post", e)
+                _error.value = "Failed to report post: ${e.message}"
             }
         }
     }
