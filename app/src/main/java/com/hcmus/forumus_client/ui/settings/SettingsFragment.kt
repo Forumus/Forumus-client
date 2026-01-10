@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.load
+import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.FragmentSettingsBinding
+import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.home.HomeFragmentDirections
 import kotlin.getValue
 
@@ -98,12 +100,12 @@ class SettingsFragment : Fragment() {
 
         // Edit profile - mock toast
         binding.llEditProfile.setOnClickListener {
-            Toast.makeText(requireContext(), "Edit Profile - Coming Soon", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.editProfileFragment)
         }
 
         // Saved posts - mock toast
         binding.llSavedPosts.setOnClickListener {
-            Toast.makeText(requireContext(), "Saved Posts - Coming Soon", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.action_settingsFragment_to_savedPostsFragment)
         }
 
         // Help center - mock toast

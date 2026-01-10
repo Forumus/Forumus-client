@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Comment Section Header - Clear visual separation -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <!-- Divider Line -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="#F5F5F5"/>
+
+    <!-- Comment Count Label -->
+    <TextView
+        android:id="@+id/commentCountLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="12 Comments"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:fontFamily="@font/montserrat_medium"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="12dp"/>
+
+    <!-- Subtle Bottom Border -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EEEEEE"/>
+
+</LinearLayout>

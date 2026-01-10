@@ -20,6 +20,76 @@ class CommentRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val userRepository: UserRepository = UserRepository()
 ) {
+    companion object {
+        private const val BATCH_LIMIT = 450
+    }
+
+    suspend fun updateAuthorInfoInComments(
+        userId: String,
+        newName: String,
+        newAvatarUrl: String?
+    ) {
+        var lastDoc: com.google.firebase.firestore.DocumentSnapshot? = null
+
+        while (true) {
+            var query = firestore.collectionGroup("comments")
+                .whereEqualTo("authorId", userId)
+                .orderBy("createdAt")
+                .limit(BATCH_LIMIT.toLong())
+
+            if (lastDoc != null) query = query.startAfter(lastDoc)
+
+            val snap = query.get().await()
+            if (snap.isEmpty) break
+
+            val batch = firestore.batch()
+            for (doc in snap.documents) {
+                batch.update(
+                    doc.reference,
+                    mapOf(
+                        "authorName" to newName,
+                        "authorAvatarUrl" to (newAvatarUrl ?: "")
+                    )
+                )
+            }
+            batch.commit().await()
+
+            lastDoc = snap.documents.last()
+            if (snap.size() < BATCH_LIMIT) break
+        }
+    }
+
+    /**
+     * Cập nhật luôn tên ở "replyToUserName"
+     * cho những comment reply tới user này.
+     */
+    suspend fun updateReplyToUserName(
+        userId: String,
+        newName: String
+    ) {
+        var lastDoc: com.google.firebase.firestore.DocumentSnapshot? = null
+
+        while (true) {
+            var query = firestore.collectionGroup("comments")
+                .whereEqualTo("replyToUserId", userId)
+                .orderBy("createdAt")
+                .limit(BATCH_LIMIT.toLong())
+
+            if (lastDoc != null) query = query.startAfter(lastDoc)
+
+            val snap = query.get().await()
+            if (snap.isEmpty) break
+
+            val batch = firestore.batch()
+            for (doc in snap.documents) {
+                batch.update(doc.reference, "replyToUserName", newName)
+            }
+            batch.commit().await()
+
+            lastDoc = snap.documents.last()
+            if (snap.size() < BATCH_LIMIT) break
+        }
+    }
 
     /**
      * Enriches a comment with the current user's vote state and vote counts.
@@ -192,11 +262,74 @@ class CommentRepository(
             id = generatedId,
             authorId = user.uid,
             authorName = user.fullName,
+            authorRole = user.role,
             authorAvatarUrl = user.profilePictureUrl ?: "",
             createdAt = now,
         )
 
         commentRef.set(updatedComment).await()
+
+        // Trigger Notification
+        try {
+            var targetUserId = ""
+            var type = "COMMENT"
+            
+            if (updatedComment.parentCommentId != null) {
+                type = "REPLY"
+                if (!updatedComment.replyToUserId.isNullOrEmpty()) {
+                    targetUserId = updatedComment.replyToUserId!!
+                } else {
+                    // Try to fetch parent comment to get author if replyToUserId is missing
+                    // For now, skip if no replyToUserId in reply
+                }
+            } else {
+                type = "COMMENT"
+                // Fetch post to get authorId
+                val postSnapshot = firestore.collection("posts").document(updatedComment.postId).get().await()
+                if (postSnapshot.exists()) {
+                     targetUserId = postSnapshot.getString("authorId") ?: ""
+                }
+            }
+            
+            if (targetUserId.isNotEmpty() && targetUserId != userId) {
+                 // Client-side notification trigger (Temporary for testing)
+                 val notificationId = java.util.UUID.randomUUID().toString()
+                 val notificationData = hashMapOf(
+                    "id" to notificationId,
+                    "type" to type,
+                    "actorId" to userId,
+                    "actorName" to user.fullName,
+                    "targetId" to updatedComment.postId, // Link to Post
+                    "previewText" to updatedComment.content,
+                    "createdAt" to Timestamp.now(),
+                    "isRead" to false
+                 )
+
+                 firestore.collection("users")
+                    .document(targetUserId)
+                    .collection("notifications")
+                    .document(notificationId)
+                    .set(notificationData)
+
+                 // Backend notification trigger
+                 try {
+                     val request = com.hcmus.forumus_client.data.remote.dto.NotificationTriggerRequest(
+                        type = type,
+                        actorId = userId,
+                        actorName = user.fullName,
+                        targetId = updatedComment.postId, // Link to Post
+                        targetUserId = targetUserId,
+                        previewText = updatedComment.content
+                    )
+                    com.hcmus.forumus_client.data.remote.NetworkService.apiService.triggerNotification(request)
+                 } catch (e: Exception) {
+                     android.util.Log.e("CommentRepository", "Backend notification trigger failed", e)
+                 }
+            }
+        } catch (e: Exception) {
+            // Log error
+             android.util.Log.e("CommentRepository", "Error triggering notification", e)
+        }
 
         return updatedComment
     }
@@ -244,6 +377,50 @@ class CommentRepository(
 
         // Persist changes to Firestore
         updateComment(comment)
+
+        // Trigger notification if upvoted and not self-vote
+        if (comment.userVote == VoteState.UPVOTE && comment.authorId != userId) {
+            try {
+                val user = userRepository.getUserById(userId)
+                
+                // Client-side notification trigger
+                val notificationId = java.util.UUID.randomUUID().toString()
+                val notificationData = hashMapOf(
+                    "id" to notificationId,
+                    "type" to "UPVOTE",
+                    "actorId" to userId,
+                    "actorName" to user.fullName,
+                    "targetId" to comment.id,
+                    "previewText" to comment.content,
+                    "createdAt" to Timestamp.now(),
+                    "isRead" to false
+                )
+
+                firestore.collection("users")
+                    .document(comment.authorId)
+                    .collection("notifications")
+                    .document(notificationId)
+                    .set(notificationData)
+
+                // Backend notification trigger
+                try {
+                    val request = com.hcmus.forumus_client.data.remote.dto.NotificationTriggerRequest(
+                        type = "UPVOTE",
+                        actorId = userId,
+                        actorName = user.fullName,
+                        targetId = comment.id,
+                        targetUserId = comment.authorId,
+                        previewText = comment.content
+                    )
+                    com.hcmus.forumus_client.data.remote.NetworkService.apiService.triggerNotification(request)
+                } catch (e: Exception) {
+                     android.util.Log.e("CommentRepository", "Backend notification trigger failed", e)
+                }
+            } catch (e: Exception) {
+                // Log error
+                android.util.Log.e("CommentRepository", "Error triggering notification", e)
+            }
+        }
 
         return comment.copy()
     }

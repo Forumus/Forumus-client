@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Post Detail Header - Optimized for reading -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/postDetailHeader"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:paddingHorizontal="20dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="20dp">
+
+    <!-- Author Info Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/authorInfoContainer"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <!-- Author Avatar -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/authorAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/default_avatar"
+            app:shapeAppearanceOverlay="@style/CircleImage"
+            android:layout_marginEnd="12dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Author Name -->
+            <TextView
+                android:id="@+id/authorName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Anonymous"
+                android:textSize="14sp"
+                android:textColor="#1A1A1A"
+                android:fontFamily="@font/montserrat_semibold"/>
+
+            <!-- Time -->
+            <TextView
+                android:id="@+id/timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2h ago"
+                android:textSize="12sp"
+                android:textColor="#999999"
+                android:fontFamily="@font/montserrat_regular"
+                android:layout_marginTop="2dp"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/menuButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_open_actions"
+            android:scaleType="fitCenter"/>
+
+    </LinearLayout>
+
+    <!-- Post Title - Dominant -->
+    <TextView
+        android:id="@+id/postTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_semibold"
+        android:text="Post Title"
+        android:textColor="#1A1A1A"
+        android:layout_marginBottom="14dp"
+        android:textSize="22sp"
+        android:lineSpacingExtra="4dp"/>
+
+    <!-- Post Content - Optimized for reading -->
+    <TextView
+        android:id="@+id/postContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_regular"
+        android:text="Excited to announce that registration for our annual Tech Fest is now open! Early bird discount available for the first 100 students."
+        android:textColor="#333333"
+        android:textSize="15sp"
+        android:lineSpacingExtra="6dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Post Images -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPostImages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Topic Tags Container -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:id="@+id/topicContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Action Bar Section -->
+    <LinearLayout
+        android:id="@+id/actionBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Upvote & Downvote Section -->
+        <LinearLayout
+            android:id="@+id/upvoteDownvoteContainer"
+            android:layout_width="109dp"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/button_background_light"
+            android:paddingHorizontal="8dp">
+
+            <!-- Upvote Icon -->
+            <ImageButton
+                android:id="@+id/upvoteIcon"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_upvote"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="15dp"
+                app:tint="#666666"
+                tools:ignore="TouchTargetSizeCheck"/>
+
+            <!-- Upvote Count -->
+            <TextView
+                android:id="@+id/upvoteCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="13sp"
+                android:textColor="#666666"
+                android:fontFamily="@font/montserrat_regular"
+                android:layout_marginEnd="15dp" />
+
+            <!-- Downvote Icon -->
+            <ImageButton
+                android:id="@+id/downvoteIcon"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_downvote"
+                android:scaleType="fitCenter"
+                app:tint="#666666"
+                tools:ignore="TouchTargetSizeCheck"/>
+        </LinearLayout>
+
+        <!-- Reply & Share Section -->
+        <LinearLayout
+            android:id="@+id/replyShareContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|end">
+
+            <!-- Reply Button -->
+            <LinearLayout
+                android:id="@+id/replyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="37dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/button_background_light"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="8dp">
+
+                <!-- Reply Icon -->
+                <ImageView
+                    android:id="@+id/replyIcon"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:src="@drawable/ic_comment"
+                    app:tint="#666666"
+                    android:scaleType="fitCenter"
+                    android:layout_marginEnd="6dp"/>
+
+                <!-- Reply Count -->
+                <TextView
+                    android:id="@+id/replyCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="13sp"
+                    android:textColor="#666666"
+                    android:gravity="center"
+                    android:fontFamily="@font/montserrat_regular"/>
+            </LinearLayout>
+
+            <!-- Share Button -->
+            <LinearLayout
+                android:id="@+id/shareButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:background="@drawable/button_background_light">
+
+                <!-- Share Icon -->
+                <ImageView
+                    android:id="@+id/shareIcon"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:src="@drawable/ic_share"
+                    app:tint="#666666"
+                    android:scaleType="fitCenter"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

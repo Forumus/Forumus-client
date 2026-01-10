@@ -3,6 +3,9 @@ package com.hcmus.forumus_client.ui.common
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -36,13 +39,17 @@ class CommentViewHolder(
     val authorName: TextView = itemView.findViewById(R.id.authorName)
     val timestamp: TextView = itemView.findViewById(R.id.timestamp)
 
-    // Original poster and reply metadata views
-    val tvOriginalPoster: TextView = itemView.findViewById(R.id.tvOriginalPoster)
-    val tvReplyText: TextView = itemView.findViewById(R.id.tvReplyText)
+    // Original poster badge and reply context
+    val opBadge: TextView = itemView.findViewById(R.id.opBadge)
+    val replyContextContainer: LinearLayout = itemView.findViewById(R.id.replyContextContainer)
     val replyToUser: TextView = itemView.findViewById(R.id.replyToUser)
 
+    // Threading support
+    val indentationSpace: View = itemView.findViewById(R.id.indentationSpace)
+    val threadLine: View = itemView.findViewById(R.id.threadLine)
+
     // Comment content view
-    val contentText: TextView = itemView.findViewById(R.id.postContent)
+    val contentText: TextView = itemView.findViewById(R.id.commentContent)
 
     // Voting views
     val upvoteIcon: ImageButton = itemView.findViewById(R.id.upvoteIcon)
@@ -50,8 +57,13 @@ class CommentViewHolder(
     val downvoteIcon: ImageButton = itemView.findViewById(R.id.downvoteIcon)
 
     // Interaction views
-    val replyButton: LinearLayout = itemView.findViewById(R.id.replyButton)
+    val replyButton: ImageButton = itemView.findViewById(R.id.replyButton)
     val replyCount: TextView = itemView.findViewById(R.id.replyCount)
+
+    // View replies button
+    val viewRepliesButton: LinearLayout = itemView.findViewById(R.id.viewRepliesButton)
+    val viewRepliesText: TextView = itemView.findViewById(R.id.viewRepliesText)
+    val viewRepliesChevron: ImageView = itemView.findViewById(R.id.viewRepliesChevron)
 
     // Root view for click handling and layout adjustments
     val rootLayout: LinearLayout = itemView.findViewById(R.id.commentItem)
@@ -64,26 +76,44 @@ class CommentViewHolder(
      * @param isDetailMode If true, applies indentation for nested replies
      */
     fun bind(comment: Comment, isDetailMode: Boolean) {
-        // Apply indentation for nested comments in detail view
-        if (isDetailMode) {
-            val paddingStartDp = if (comment.parentCommentId != null) 47 else 15
-            val paddingStartPx = (paddingStartDp * rootLayout.context.resources.displayMetrics.density).toInt()
-
-            rootLayout.setPadding(
-                paddingStartPx,
-                rootLayout.paddingTop,
-                rootLayout.paddingRight,
-                rootLayout.paddingBottom
-            )
-
-            // Remove bottom margin for detail view (replies shown directly below)
-            val layoutParams = rootLayout.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.bottomMargin = 0
-            rootLayout.layoutParams = layoutParams
+        // Apply indentation and thread line for nested comments in detail view
+        if (isDetailMode && comment.parentCommentId != null) {
+            // Show thread line for replies
+            threadLine.visibility = View.VISIBLE
+            
+            // Calculate indentation based on nesting level (max 2 levels)
+            val indentationDp = 24 // 24dp per level
+            val indentationPx = (indentationDp * rootLayout.context.resources.displayMetrics.density).toInt()
+            
+            val layoutParams = indentationSpace.layoutParams
+            layoutParams.width = indentationPx
+            indentationSpace.layoutParams = layoutParams
+        } else {
+            threadLine.visibility = View.GONE
+            val layoutParams = indentationSpace.layoutParams
+            layoutParams.width = 0
+            indentationSpace.layoutParams = layoutParams
         }
 
-        // Bind author information
-        authorName.text = comment.authorName.ifBlank { "Anonymous" }
+        // Bind author information (show role next to name with color)
+        val name = comment.authorName.ifBlank { "Anonymous" }
+        val roleLabel = when (comment.authorRole) {
+            com.hcmus.forumus_client.data.model.UserRole.TEACHER -> "Teacher"
+            com.hcmus.forumus_client.data.model.UserRole.ADMIN -> "Admin"
+            else -> "Student"
+        }
+        val display = "$name  ·  $roleLabel"
+        val spannable = SpannableString(display)
+        val roleStart = display.indexOf('·').takeIf { it >= 0 }?.plus(2) ?: name.length
+        val roleColorRes = when (comment.authorRole) {
+            com.hcmus.forumus_client.data.model.UserRole.TEACHER -> R.color.role_teacher
+            com.hcmus.forumus_client.data.model.UserRole.ADMIN -> R.color.role_admin
+            else -> R.color.role_student
+        }
+
+        val roleColor = androidx.core.content.ContextCompat.getColor(itemView.context, roleColorRes)
+        spannable.setSpan(ForegroundColorSpan(roleColor), roleStart, display.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        authorName.text = spannable
         timestamp.text = formatTimestamp(comment.createdAt)
         contentText.text = comment.content
 
@@ -95,17 +125,15 @@ class CommentViewHolder(
             transformations(CircleCropTransformation())
         }
 
-        // Show "Original Poster" badge if comment is from the post author
-        tvOriginalPoster.visibility = if (comment.isOriginalPoster) View.VISIBLE else View.GONE
+        // Show "OP" badge if comment is from the post author
+        opBadge.visibility = if (comment.isOriginalPoster) View.VISIBLE else View.GONE
 
-        // Show reply-to information if this comment is a reply
+        // Show reply context if this comment is a reply
         if (comment.replyToUserName != null) {
-            tvReplyText.visibility = View.VISIBLE
-            replyToUser.visibility = View.VISIBLE
+            replyContextContainer.visibility = View.VISIBLE
             replyToUser.text = comment.replyToUserName
         } else {
-            tvReplyText.visibility = View.GONE
-            replyToUser.visibility = View.GONE
+            replyContextContainer.visibility = View.GONE
         }
 
         // Bind vote counts and apply vote UI
@@ -113,11 +141,23 @@ class CommentViewHolder(
         applyVoteUI(comment)
         replyCount.text = comment.commentCount.toString()
 
+        // Show/hide view replies button based on comment count and comment level
+        // Only show for root-level comments (no parent) that have replies
+        if (comment.commentCount > 0 && comment.parentCommentId == null) {
+            viewRepliesButton.visibility = View.VISIBLE
+            val repliesText = if (comment.commentCount == 1) "View 1 reply" else "View ${comment.commentCount} replies"
+            viewRepliesText.text = repliesText
+        } else {
+            viewRepliesButton.visibility = View.GONE
+        }
+
+
         // Set up click listeners for all interactive elements
         rootLayout.setOnClickListener { onActionClick(comment, CommentAction.OPEN) }
         upvoteIcon.setOnClickListener { onActionClick(comment, CommentAction.UPVOTE) }
         downvoteIcon.setOnClickListener { onActionClick(comment, CommentAction.DOWNVOTE) }
         replyButton.setOnClickListener { onActionClick(comment, CommentAction.REPLY) }
+        viewRepliesButton.setOnClickListener { onActionClick(comment, CommentAction.VIEW_REPLIES) }
         authorAvatar.setOnClickListener { onActionClick(comment, CommentAction.AUTHOR_PROFILE) }
         authorName.setOnClickListener { onActionClick(comment, CommentAction.AUTHOR_PROFILE) }
         replyToUser.setOnClickListener { onActionClick(comment, CommentAction.REPLIED_USER_PROFILE) }

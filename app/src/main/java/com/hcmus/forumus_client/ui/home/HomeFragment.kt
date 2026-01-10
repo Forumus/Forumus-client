@@ -29,6 +29,7 @@ import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 import com.hcmus.forumus_client.ui.common.SharePostDialog
+import com.hcmus.forumus_client.data.repository.SavePostResult
 import kotlin.text.ifEmpty
 import kotlin.text.lowercase
 import kotlin.text.startsWith
@@ -43,6 +44,7 @@ class HomeFragment : Fragment() {
     private lateinit var homeAdapter: HomeAdapter
     private val viewModel: HomeViewModel by viewModels()
     private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
+    private val notificationViewModel: com.hcmus.forumus_client.ui.notification.NotificationViewModel by activityViewModels()
     private val navController by lazy { findNavController() }
 
     override fun onCreateView(
@@ -66,6 +68,7 @@ class HomeFragment : Fragment() {
 
         viewModel.loadPosts()
         viewModel.loadTopics()
+
     }
 
     /**
@@ -92,7 +95,7 @@ class HomeFragment : Fragment() {
                                 navController.navigate(navAction)
                             }
                             ProfileMenuAction.EDIT_PROFILE -> {
-                                // TODO: Implement edit profile navigation
+                                navController.navigate(R.id.editProfileFragment)
                             }
                             ProfileMenuAction.TOGGLE_DARK_MODE -> {
                                 // TODO: Implement theme toggle
@@ -189,7 +192,7 @@ class HomeFragment : Fragment() {
             onHomeClick = { navController.navigate(R.id.homeFragment) }
             onExploreClick = { navController.navigate(R.id.searchFragment) }
             onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
-            onAlertsClick = {}
+            onAlertsClick = { navController.navigate(NavGraphDirections.actionGlobalNotificationFragment()) }
             onChatClick = { navController.navigate(R.id.chatsFragment) }
         }
     }
@@ -379,6 +382,11 @@ class HomeFragment : Fragment() {
             homeAdapter.setTopics(topics)
         }
 
+        notificationViewModel.unreadCount.observe(viewLifecycleOwner) { count ->
+             android.util.Log.d("HomeFragment", "Badge update: $count")
+             binding.bottomBar.setNotificationBadge(count)
+        }
+
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.swipeRefresh.isRefreshing = loading
         }
@@ -390,6 +398,23 @@ class HomeFragment : Fragment() {
         viewModel.error.observe(viewLifecycleOwner) { error ->
             if (!error.isNullOrBlank()) {
                 Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
+            }
+        }
+
+        viewModel.savePostResult.observe(viewLifecycleOwner) { result ->
+            result?.let {
+                when (it) {
+                    is SavePostResult.Success -> {
+                        Toast.makeText(requireContext(), "Post saved successfully", Toast.LENGTH_SHORT).show()
+                    }
+                    is SavePostResult.AlreadySaved -> {
+                        Toast.makeText(requireContext(), "Post is already saved", Toast.LENGTH_SHORT).show()
+                    }
+                    is SavePostResult.Error -> {
+                        Toast.makeText(requireContext(), "Failed to save post: ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                viewModel.clearSavePostResult()
             }
         }
 
@@ -437,7 +462,7 @@ class HomeFragment : Fragment() {
 
         // Handle save button click
         popupMenu.onSaveClick = {
-            Toast.makeText(requireContext(), "Post saved", Toast.LENGTH_SHORT).show()
+            viewModel.savePost(post)
         }
 
         // Handle violation selection from report menu

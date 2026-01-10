@@ -3,9 +3,20 @@ package com.hcmus.forumus_client.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.firestore.SetOptions
 import com.hcmus.forumus_client.data.model.User
 import kotlinx.coroutines.tasks.await
+import android.net.Uri
+
+/**
+ * Result of saving a post operation
+ */
+sealed class SavePostResult {
+    object Success : SavePostResult()
+    object AlreadySaved : SavePostResult()
+    data class Error(val message: String) : SavePostResult()
+}
 
 /**
  * Repository for managing user data operations with Firestore.
@@ -13,10 +24,12 @@ import kotlinx.coroutines.tasks.await
  */
 class UserRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 ) {
     companion object {
         private const val USERS_COLLECTION = "users"
+        private const val AVATAR_FOLDER = "avatars"
     }
 
     private val usersCollection = firestore.collection(USERS_COLLECTION)
@@ -208,6 +221,28 @@ class UserRepository(
     }
 
     /**
+     * Upload avatar lên Firebase Storage, trả về downloadUrl (String).
+     * Lưu theo path: avatars/{uid}.jpg  (ghi đè ảnh cũ)
+     */
+    suspend fun uploadAvatar(uid: String, uri: Uri): String {
+        return try {
+            val ref = storage.reference.child("$AVATAR_FOLDER/$uid.jpg")
+
+            // Upload file
+            ref.putFile(uri).await()
+
+            // Get download url
+            val downloadUrl = ref.downloadUrl.await().toString()
+
+            Log.i("UserRepository", "Avatar uploaded: $downloadUrl")
+            downloadUrl
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error uploading avatar for user: $uid", e)
+            throw e
+        }
+    }
+
+    /**
      * Deletes a user document from Firestore.
      * Note: This only removes the user profile data, not the authentication account.
      *
@@ -221,6 +256,76 @@ class UserRepository(
                 .await()
         } catch (e: Exception) {
             Log.e("UserRepository", "Error deleting user: $uid", e)
+            throw e
+        }
+    }
+
+    /**
+     * Saves a post to the user's saved posts list.
+     *
+     * @param postId The ID of the post to save
+     * @return SavePostResult indicating the result of the operation
+     */
+    suspend fun savePost(postId: String): SavePostResult {
+        return try {
+            val currentUserId = auth.currentUser?.uid
+            if (currentUserId == null) {
+                return SavePostResult.Error("User not authenticated")
+            }
+            
+            val userDoc = usersCollection.document(currentUserId)
+            
+            var wasAlreadySaved = false
+            firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(userDoc)
+                val currentSaved = snapshot.get("followedPostIds") as? List<*> ?: emptyList<String>()
+                val savedList = currentSaved.mapNotNull { it as? String }.toMutableList()
+                
+                if (savedList.contains(postId)) {
+                    wasAlreadySaved = true
+                } else {
+                    savedList.add(postId)
+                    transaction.update(userDoc, "followedPostIds", savedList)
+                }
+            }.await()
+            
+            if (wasAlreadySaved) {
+                Log.i("UserRepository", "Post $postId is already saved")
+                SavePostResult.AlreadySaved
+            } else {
+                Log.i("UserRepository", "Post $postId saved successfully")
+                SavePostResult.Success
+            }
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error saving post: $postId", e)
+            SavePostResult.Error(e.message ?: "Unknown error")
+        }
+    }
+
+    /**
+     * Removes a post from the user's saved posts list.
+     *
+     * @param postId The ID of the post to unsave
+     */
+    suspend fun unsavePost(postId: String) {
+        try {
+            val currentUserId = auth.currentUser?.uid ?: return
+            val userDoc = usersCollection.document(currentUserId)
+            
+            firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(userDoc)
+                val currentSaved = snapshot.get("savedPostIds") as? List<*> ?: emptyList<String>()
+                val savedList = currentSaved.mapNotNull { it as? String }.toMutableList()
+                
+                if (savedList.contains(postId)) {
+                    savedList.remove(postId)
+                    transaction.update(userDoc, "savedPostIds", savedList)
+                }
+            }.await()
+            
+            Log.i("UserRepository", "Post $postId unsaved successfully")
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error unsaving post: $postId", e)
             throw e
         }
     }

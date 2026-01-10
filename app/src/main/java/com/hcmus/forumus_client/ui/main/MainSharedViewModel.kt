@@ -61,4 +61,26 @@ class MainSharedViewModel(
             }
         }
     }
+
+    /** Gọi sau khi edit profile để lấy user mới nhất từ Firestore */
+    fun refreshCurrentUser() {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                _currentUser.value = userRepository.getCurrentUser()
+                _error.value = null
+            } catch (e: Exception) {
+                _error.value = "Failed to refresh user: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /** Nếu đã có object user mới rồi thì set thẳng khỏi gọi Firestore */
+    fun setCurrentUser(user: User?) {
+        _currentUser.value = user
+    }
+
+    // Note: media preview is now handled by MediaViewerViewModel in ui.media
 }

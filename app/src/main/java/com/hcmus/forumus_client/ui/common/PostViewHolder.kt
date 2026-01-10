@@ -2,6 +2,9 @@ package com.hcmus.forumus_client.ui.common
 
 import android.util.Log
 import android.view.View
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -10,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
+import android.content.Intent
 import com.google.firebase.Timestamp
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.data.model.Post
@@ -53,9 +57,7 @@ class PostViewHolder(
     private val rvPostImages: RecyclerView = itemView.findViewById(R.id.rvPostImages)
 
     val topicContainer: LinearLayout = itemView.findViewById(R.id.topicContainer)
-    val imagesAdapter = PostMediaAdapter { clickedIndex ->
-        // TODO: mở full-screen gallery, truyền list + index
-    }
+    val imagesAdapter = PostMediaAdapter()
 
     var imagesLayoutManager: GridLayoutManager? = null
 
@@ -64,8 +66,25 @@ class PostViewHolder(
     }
 
     fun bind(post: Post, topicMap: Map<String, Topic>? = null) {
-        // Bind author information
-        authorName.text = post.authorName.ifBlank { "Anonymous" }
+        // Bind author information (show role next to name with color)
+        val name = post.authorName.ifBlank { "Anonymous" }
+        val roleLabel = when (post.authorRole) {
+            com.hcmus.forumus_client.data.model.UserRole.TEACHER -> "Teacher"
+            com.hcmus.forumus_client.data.model.UserRole.ADMIN -> "Admin"
+            else -> "Student"
+        }
+        val display = "$name  ·  $roleLabel"
+        val spannable = SpannableString(display)
+        val roleStart = display.indexOf('·').takeIf { it >= 0 }?.plus(2) ?: name.length
+        val roleColorRes = when (post.authorRole) {
+            com.hcmus.forumus_client.data.model.UserRole.TEACHER -> R.color.role_teacher
+            com.hcmus.forumus_client.data.model.UserRole.ADMIN -> R.color.role_admin
+            else -> R.color.role_student
+        }
+
+        val roleColor = androidx.core.content.ContextCompat.getColor(itemView.context, roleColorRes)
+        spannable.setSpan(ForegroundColorSpan(roleColor), roleStart, display.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        authorName.text = spannable
         timestamp.text = formatTimestamp(post.createdAt)
 
         // Bind post content
@@ -256,6 +275,11 @@ class PostViewHolder(
         }
 
         imagesAdapter.submitMedia(mediaItems)
+
+        // Open Media Viewer when any media item is clicked. Convert to parcelable MediaViewerItem.
+        imagesAdapter.setOnMediaClickListener { clickedIndex ->
+            com.hcmus.forumus_client.ui.media.MediaViewerNavigator.open(itemView, post, clickedIndex)
+        }
     }
 
     private fun formatTimestamp(timestamp: Timestamp?): String {

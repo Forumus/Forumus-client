@@ -24,6 +24,7 @@ import com.hcmus.forumus_client.ui.common.BottomNavigationBar
 import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.common.SharePostDialog
+import com.hcmus.forumus_client.data.repository.SavePostResult
 
 /**
  * Profile Fragment displaying a user's profile information and content (posts and comments).
@@ -99,7 +100,7 @@ class ProfileFragment : Fragment() {
                     }
 
                     ProfileMenuAction.EDIT_PROFILE -> {
-                        // TODO: Implement edit profile navigation
+                        navController.navigate(R.id.editProfileFragment)
                     }
 
                     ProfileMenuAction.TOGGLE_DARK_MODE -> {
@@ -107,7 +108,7 @@ class ProfileFragment : Fragment() {
                     }
 
                     ProfileMenuAction.SETTINGS -> {
-                        navController.navigate(R.id.createPostFragment)
+                        navController.navigate(R.id.settingsFragment)
                     }
                 }
             }
@@ -134,7 +135,7 @@ class ProfileFragment : Fragment() {
             onHomeClick = { navController.navigate(R.id.homeFragment) }
             onExploreClick = { navController.navigate(R.id.searchFragment) }
             onCreatePostClick = { navController.navigate(R.id.createPostFragment) }
-            onAlertsClick = { }
+            onAlertsClick = { navController.navigate(NavGraphDirections.actionGlobalNotificationFragment()) }
             onChatClick = { navController.navigate(R.id.chatsFragment) }
         }
     }
@@ -204,6 +205,8 @@ class ProfileFragment : Fragment() {
                             navController.navigate(navAction)
                         }
                     }
+
+                    CommentAction.VIEW_REPLIES -> TODO()
                 }
             }
         )
@@ -258,6 +261,23 @@ class ProfileFragment : Fragment() {
             }
         }
 
+        viewModel.savePostResult.observe(viewLifecycleOwner) { result ->
+            result?.let {
+                when (it) {
+                    is SavePostResult.Success -> {
+                        Toast.makeText(requireContext(), "Post saved successfully", Toast.LENGTH_SHORT).show()
+                    }
+                    is SavePostResult.AlreadySaved -> {
+                        Toast.makeText(requireContext(), "Post is already saved", Toast.LENGTH_SHORT).show()
+                    }
+                    is SavePostResult.Error -> {
+                        Toast.makeText(requireContext(), "Failed to save post: ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                viewModel.clearSavePostResult()
+            }
+        }
+
         // Monitor loading state (can show/hide ProgressBar if needed)
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.swipeRefresh.isRefreshing = isLoading
@@ -305,7 +325,7 @@ class ProfileFragment : Fragment() {
 
         // Handle save button click
         popupMenu.onSaveClick = {
-            Toast.makeText(requireContext(), "Post saved", Toast.LENGTH_SHORT).show()
+            viewModel.savePost(post)
         }
 
         // Handle violation selection from report menu

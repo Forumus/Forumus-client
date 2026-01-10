@@ -90,11 +90,11 @@
             android:id="@+id/postTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_regular"
+            android:fontFamily="@font/montserrat_semibold"
             android:text="Post Title"
             android:textColor="#2C2C2C"
             android:layout_marginBottom="10dp"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
         <!-- Post Content -->
         <TextView

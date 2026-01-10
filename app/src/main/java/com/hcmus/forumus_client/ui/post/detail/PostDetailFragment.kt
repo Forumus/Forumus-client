@@ -21,6 +21,7 @@ import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.common.SharePostDialog
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
+import com.hcmus.forumus_client.data.repository.SavePostResult
 
 /**
  * Post Detail Fragment displaying a single post and all its comments.
@@ -150,10 +151,10 @@ class PostDetailFragment : Fragment() {
                         val shareDialog = SharePostDialog.newInstance(post.id)
                         shareDialog.show(childFragmentManager, "SharePostDialog")
                     }
-                    PostAction.AUTHOR_PROFILE -> {
-                        val action = PostDetailFragmentDirections.actionGlobalProfileFragment(post.authorId)
-                        navController.navigate(action)
-                    }
+                        PostAction.AUTHOR_PROFILE -> {
+                            val action = PostDetailFragmentDirections.actionGlobalProfileFragment(post.authorId)
+                            navController.navigate(action)
+                        }
                     PostAction.MENU -> {
                         showPostMenu(post, view)
                     }
@@ -185,6 +186,11 @@ class PostDetailFragment : Fragment() {
                             val action = PostDetailFragmentDirections.actionGlobalProfileFragment(it)
                             navController.navigate(action)
                         }
+                    }
+
+                    CommentAction.VIEW_REPLIES -> {
+                        // Toggle expand/collapse for comment's nested replies
+                        viewModel.toggleReplies(comment)
                     }
                 }
             }
@@ -222,6 +228,23 @@ class PostDetailFragment : Fragment() {
             }
         }
 
+        viewModel.savePostResult.observe(viewLifecycleOwner) { result ->
+            result?.let {
+                when (it) {
+                    is SavePostResult.Success -> {
+                        Toast.makeText(requireContext(), "Post saved successfully", Toast.LENGTH_SHORT).show()
+                    }
+                    is SavePostResult.AlreadySaved -> {
+                        Toast.makeText(requireContext(), "Post is already saved", Toast.LENGTH_SHORT).show()
+                    }
+                    is SavePostResult.Error -> {
+                        Toast.makeText(requireContext(), "Failed to save post: ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                viewModel.clearSavePostResult()
+            }
+        }
+
         // Open keyboard and focus input bar when user replies to post or comment
         viewModel.openReplyInput.observe(viewLifecycleOwner) { open ->
             if (open == true) {
@@ -248,7 +271,7 @@ class PostDetailFragment : Fragment() {
 
         // Handle save button click
         popupMenu.onSaveClick = {
-            Toast.makeText(requireContext(), "Post saved", Toast.LENGTH_SHORT).show()
+            viewModel.savePost(post)
         }
 
         // Handle violation selection from report menu

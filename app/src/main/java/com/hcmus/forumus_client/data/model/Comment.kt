@@ -9,6 +9,7 @@ data class Comment(
 
     var authorId: String = "",
     var authorName: String = "",
+    var authorRole: UserRole = UserRole.STUDENT,
     var authorAvatarUrl: String? = "",
 
     var createdAt: Timestamp? = null,

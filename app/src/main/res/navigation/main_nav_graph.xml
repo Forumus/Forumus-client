@@ -56,6 +56,25 @@
         android:id="@+id/settingsFragment"
         android:name="com.hcmus.forumus_client.ui.settings.SettingsFragment"
         android:label="Settings">
+        <action
+            android:id="@+id/action_settingsFragment_to_savedPostsFragment"
+            app:destination="@id/savedPostsFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <!-- Saved Posts Fragment -->
+    <fragment
+        android:id="@+id/savedPostsFragment"
+        android:name="com.hcmus.forumus_client.ui.settings.savedposts.SavedPostsFragment"
+        android:label="Saved Posts">
+    </fragment>
+
+    <!-- Edit Profile Fragment -->
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.hcmus.forumus_client.ui.profile.EditProfileFragment"
+        android:label="Settings">
     </fragment>
 
     <!-- Create Post Fragment -->
@@ -107,6 +126,26 @@
         android:id="@+id/searchFragment"
         android:name="com.hcmus.forumus_client.ui.search.SearchFragment"
         android:label="Search">
+    </fragment>
+
+    <!-- Media Viewer Fragment -->
+    <fragment
+        android:id="@+id/mediaViewerFragment"
+        android:name="com.hcmus.forumus_client.ui.media.MediaViewerFragment"
+        android:label="Media Viewer"/>
+
+    <!-- Global Action to Notification Fragment -->
+    <action
+        android:id="@+id/action_global_notificationFragment"
+        app:destination="@id/notificationFragment"
+        app:enterAnim="@android:anim/fade_in"
+        app:exitAnim="@android:anim/fade_out" />
+
+    <!-- Notification Fragment -->
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.hcmus.forumus_client.ui.notification.NotificationFragment"
+        android:label="Notifications">
     </fragment>
 
 </navigation>
