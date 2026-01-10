@@ -442,25 +442,6 @@ class PostRepository(
             try {
                 val user = userRepository.getUserById(userId)
                 
-                // Client-side notification trigger (Temporary for testing)
-                val notificationId = UUID.randomUUID().toString()
-                val notificationData = hashMapOf(
-                    "id" to notificationId,
-                    "type" to "UPVOTE",
-                    "actorId" to userId,
-                    "actorName" to user.fullName,
-                    "targetId" to post.id,
-                    "previewText" to post.title,
-                    "createdAt" to Timestamp.now(),
-                    "isRead" to false
-                )
-
-                firestore.collection("users")
-                    .document(post.authorId)
-                    .collection("notifications")
-                    .document(notificationId)
-                    .set(notificationData)
-
                 // Backend notification trigger
                 try {
                     val request = com.hcmus.forumus_client.data.remote.dto.NotificationTriggerRequest(

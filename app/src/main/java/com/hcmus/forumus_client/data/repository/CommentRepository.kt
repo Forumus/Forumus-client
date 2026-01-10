@@ -292,25 +292,6 @@ class CommentRepository(
             }
             
             if (targetUserId.isNotEmpty() && targetUserId != userId) {
-                 // Client-side notification trigger (Temporary for testing)
-                 val notificationId = java.util.UUID.randomUUID().toString()
-                 val notificationData = hashMapOf(
-                    "id" to notificationId,
-                    "type" to type,
-                    "actorId" to userId,
-                    "actorName" to user.fullName,
-                    "targetId" to updatedComment.postId, // Link to Post
-                    "previewText" to updatedComment.content,
-                    "createdAt" to Timestamp.now(),
-                    "isRead" to false
-                 )
-
-                 firestore.collection("users")
-                    .document(targetUserId)
-                    .collection("notifications")
-                    .document(notificationId)
-                    .set(notificationData)
-
                  // Backend notification trigger
                  try {
                      val request = com.hcmus.forumus_client.data.remote.dto.NotificationTriggerRequest(
@@ -383,25 +364,6 @@ class CommentRepository(
             try {
                 val user = userRepository.getUserById(userId)
                 
-                // Client-side notification trigger
-                val notificationId = java.util.UUID.randomUUID().toString()
-                val notificationData = hashMapOf(
-                    "id" to notificationId,
-                    "type" to "UPVOTE",
-                    "actorId" to userId,
-                    "actorName" to user.fullName,
-                    "targetId" to comment.id,
-                    "previewText" to comment.content,
-                    "createdAt" to Timestamp.now(),
-                    "isRead" to false
-                )
-
-                firestore.collection("users")
-                    .document(comment.authorId)
-                    .collection("notifications")
-                    .document(notificationId)
-                    .set(notificationData)
-
                 // Backend notification trigger
                 try {
                     val request = com.hcmus.forumus_client.data.remote.dto.NotificationTriggerRequest(
