@@ -16,6 +16,7 @@ import com.hcmus.forumus_client.data.repository.CommentRepository
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
 import com.hcmus.forumus_client.data.repository.ReportRepository
+import com.hcmus.forumus_client.data.repository.SavePostResult
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
@@ -83,6 +84,10 @@ class ProfileViewModel(
     // Error message (null if no error)
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
+
+    // Save post result for UI feedback
+    private val _savePostResult = MutableLiveData<SavePostResult?>()
+    val savePostResult: LiveData<SavePostResult?> = _savePostResult
 
     // Statistics
     private val _postsCount = MutableLiveData<Int>(0)
@@ -399,5 +404,24 @@ class ProfileViewModel(
                 _error.value = "Failed to report post: ${e.message}"
             }
         }
+    }
+
+    /**
+     * Saves a post for the current user.
+     *
+     * @param post The post to save
+     */
+    fun savePost(post: Post) {
+        viewModelScope.launch {
+            val result = userRepository.savePost(post.id)
+            _savePostResult.value = result
+        }
+    }
+
+    /**
+     * Clears the save post result after it has been handled by the UI
+     */
+    fun clearSavePostResult() {
+        _savePostResult.value = null
     }
 }
