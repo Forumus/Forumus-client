@@ -210,7 +210,10 @@ class PostRepository(
                 createdAt = now,
                 imageUrls = imageUrls,
                 videoUrls = videoUrls,
-                videoThumbnailUrls = videoThumbnailUrls
+                videoThumbnailUrls = videoThumbnailUrls,
+                locationName = post.locationName,
+                latitude = post.latitude,
+                longitude = post.longitude
             )
 
             postRef.set(updatedPost).await()
