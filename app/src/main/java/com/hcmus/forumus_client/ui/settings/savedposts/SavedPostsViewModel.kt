@@ -13,6 +13,7 @@ import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
 import com.hcmus.forumus_client.data.repository.ReportRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.hcmus.forumus_client.data.model.PostAction
 import kotlinx.coroutines.launch
 
 /**
@@ -75,6 +76,47 @@ class SavedPostsViewModel(
                 _savedPosts.value = emptyList()
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Handles post actions such as voting.
+     *
+     * @param post The post being acted upon
+     * @param postAction The action type (UPVOTE, DOWNVOTE, etc.)
+     */
+    fun onPostAction(post: Post, postAction: PostAction) {
+        when (postAction) {
+            PostAction.UPVOTE -> handleVote(post, isUpvote = true)
+            PostAction.DOWNVOTE -> handleVote(post, isUpvote = false)
+            else -> Unit
+        }
+    }
+
+    /**
+     * Processes voting logic for a post. Updates the post via repository and refreshes the posts
+     * list.
+     *
+     * @param post The post to vote on
+     * @param isUpvote True for upvote, false for downvote
+     */
+    private fun handleVote(post: Post, isUpvote: Boolean) {
+        viewModelScope.launch {
+            try {
+                // Perform vote action on repository
+                val updatedPost =
+                    if (isUpvote) {
+                        postRepository.toggleUpvote(post)
+                    } else {
+                        postRepository.toggleDownvote(post)
+                    }
+
+                // Update posts list with the updated post
+                val currentList = _savedPosts.value ?: emptyList()
+                _savedPosts.value = currentList.map { p -> if (p.id == post.id) updatedPost else p }
+            } catch (e: Exception) {
+                _error.value = e.message
             }
         }
     }

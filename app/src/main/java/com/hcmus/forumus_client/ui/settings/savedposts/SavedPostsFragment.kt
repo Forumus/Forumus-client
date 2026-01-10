@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.data.model.Post
@@ -14,6 +15,7 @@ import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.databinding.FragmentSavedPostsBinding
 import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import com.hcmus.forumus_client.ui.home.HomeFragmentDirections
+import kotlinx.coroutines.launch
 
 /**
  * Fragment displaying all posts saved by the user.
@@ -124,12 +126,10 @@ class SavedPostsFragment : Fragment() {
     private fun handlePostAction(post: Post, action: PostAction, view: View) {
         when (action) {
             PostAction.UPVOTE -> {
-                // Voting not implemented in saved posts - could be added later
-                Toast.makeText(requireContext(), "Voting coming soon", Toast.LENGTH_SHORT).show()
+                viewModel.onPostAction(post, PostAction.UPVOTE)
             }
             PostAction.DOWNVOTE -> {
-                // Voting not implemented in saved posts - could be added later
-                Toast.makeText(requireContext(), "Voting coming soon", Toast.LENGTH_SHORT).show()
+                viewModel.onPostAction(post, PostAction.DOWNVOTE)
             }
             PostAction.REPLY -> {
                 // Navigate to post detail
@@ -150,8 +150,11 @@ class SavedPostsFragment : Fragment() {
                 navController.navigate(action)
             }
             PostAction.AUTHOR_PROFILE ->{
-                // Navigate to post detail
-                val action = HomeFragmentDirections.actionGlobalPostDetailFragment(post.id)
+                // Navigate to ProfileFragment using Safe Args
+                val action =
+                    HomeFragmentDirections.actionGlobalProfileFragment(
+                        post.authorId
+                    )
                 navController.navigate(action)
             }
         }
