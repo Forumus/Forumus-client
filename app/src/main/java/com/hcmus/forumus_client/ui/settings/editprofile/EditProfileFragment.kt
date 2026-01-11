@@ -1,4 +1,4 @@
-package com.hcmus.forumus_client.ui.profile
+package com.hcmus.forumus_client.ui.settings.editprofile
 
 import android.content.res.ColorStateList
 import android.net.Uri
@@ -58,7 +58,6 @@ class EditProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupHeaderActions()
         setupActions()
         observeMainShared()
         observeEditState()
@@ -120,11 +119,6 @@ class EditProfileFragment : Fragment() {
             }
         }
     }
-
-    private fun setupHeaderActions() {
-        binding.topAppBar.setNavigationOnClickListener { navController.popBackStack() }
-    }
-
     private fun setupActions() {
         binding.fullnameInputLayout.setEndIconOnClickListener {
             binding.fullnameEditText.isEnabled = true
@@ -153,6 +147,10 @@ class EditProfileFragment : Fragment() {
                 Toast.makeText(requireContext(), "Profile saved", Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
             }
+        }
+
+        binding.ibBack.setOnClickListener {
+            navController.popBackStack()
         }
     }
 
