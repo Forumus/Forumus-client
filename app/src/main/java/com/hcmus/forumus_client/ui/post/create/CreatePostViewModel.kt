@@ -1,6 +1,7 @@
 package com.hcmus.forumus_client.ui.post.create
 
 import android.app.Application
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -10,13 +11,12 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hcmus.forumus_client.data.model.Post
+import com.hcmus.forumus_client.data.model.Topic
 import com.hcmus.forumus_client.data.model.User
 import com.hcmus.forumus_client.data.repository.PostRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.content.Context
-import com.hcmus.forumus_client.data.model.Topic
 
 sealed class PostState {
     object Loading : PostState()
@@ -24,7 +24,6 @@ sealed class PostState {
     data class Error(val msg: String) : PostState()
 }
 
-// Data class nhỏ để lưu thông tin màu
 data class TopicAppearance(val colorHex: String, val alpha: Float)
 
 class CreatePostViewModel(application: Application) : AndroidViewModel(application) {
@@ -41,20 +40,11 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
     private val _suggestedTopics = MutableLiveData<List<Topic>>()
     val suggestedTopics: LiveData<List<Topic>> get() = _suggestedTopics
 
-    // Giữ LiveData cũ
     private val _currentUser = MutableLiveData<User?>()
     val currentUser: LiveData<User?> get() = _currentUser
 
-    // --- SỬA: Map lưu Tên Topic -> TopicAppearance (Màu + Alpha) ---
     private val _topicColors = MutableLiveData<Map<String, TopicAppearance>>()
     val topicColors: LiveData<Map<String, TopicAppearance>> get() = _topicColors
-
-    // Các biến cũ giữ nguyên
-    private val _generatedTitle = MutableLiveData<String>()
-    val generatedTitle: LiveData<String> = _generatedTitle
-    private val _isLoadingAi = MutableLiveData<Boolean>()
-    val isLoadingAi: LiveData<Boolean> = _isLoadingAi
-    val errorAi = MutableLiveData<String>()
 
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
@@ -68,41 +58,31 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
     private fun fetchCurrentUser() {
         val uid = auth.currentUser?.uid
         if (uid != null) {
-            firestore.collection("users").document(uid)
-                .get()
+            firestore.collection("users").document(uid).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         try {
                             val user = document.toObject(User::class.java)
                             _currentUser.value = user
-                        } catch (e: Exception) {
-                            Log.e("CreatePostVM", "Error parsing user", e)
-                        }
+                        } catch (e: Exception) { e.printStackTrace() }
                     }
                 }
         }
     }
 
-    // --- SỬA: Lấy cả fillColor và fillAlpha ---
     private fun fetchTopicColors() {
-        firestore.collection("topics")
-            .get()
+        firestore.collection("topics").get()
             .addOnSuccessListener { result ->
                 val colorMap = mutableMapOf<String, TopicAppearance>()
                 for (document in result) {
                     val name = document.getString("name")
                     val color = document.getString("fillColor")
-                    // Lấy alpha, nếu không có thì mặc định là 1.0 (đậm đặc)
                     val alpha = document.getDouble("fillAlpha")?.toFloat() ?: 1.0f
-
                     if (name != null && color != null) {
                         colorMap[name] = TopicAppearance(color, alpha)
                     }
                 }
                 _topicColors.value = colorMap
-            }
-            .addOnFailureListener { e ->
-                Log.e("CreatePostVM", "Error fetching topic colors", e)
             }
     }
 
@@ -118,9 +98,16 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
         _selectedImages.value = currentList
     }
 
-    fun generateTitleFromContent(content: String) { /* No-op */ }
-
-    fun createPost(title: String, content: String, selectedTopics: List<String>, context: Context) {
+    // --- HÀM NÀY ĐÃ ĐƯỢC CẬP NHẬT ĐỂ NHẬN VỊ TRÍ (Location) ---
+    fun createPost(
+        title: String,
+        content: String,
+        selectedTopics: List<String>,
+        context: Context,
+        locationName: String? = null, // Thêm tham số
+        lat: Double? = null,          // Thêm tham số
+        lng: Double? = null           // Thêm tham số
+    ) {
         _postState.value = PostState.Loading
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -140,7 +127,6 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                     if (mimeType != null && mimeType.startsWith("video")) {
                         localVideoUrls.add(uri.toString())
                     } else {
-                        // Mặc định coi là ảnh nếu không phải video
                         localImageUrls.add(uri.toString())
                     }
                 }
@@ -150,11 +136,14 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                     content = content,
                     imageUrls = localImageUrls,
                     videoUrls = localVideoUrls,
-
                     topicIds = selectedTopics.map { it.trim().lowercase().replace(" ", "_") },
+
+                    // Gán thông tin vị trí vào Post
+                    locationName = locationName,
+                    latitude = lat,
+                    longitude = lng
                 )
 
-                //  Gọi Repository để xử lý upload và lưu
                 //  Gọi Repository để xử lý upload và lưu
                 val saveResult = repository.savePost(context, post)
 
@@ -176,7 +165,6 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                         _postState.value = PostState.Error("Failed to save post: ${saveResult.exceptionOrNull()?.message}")
                     }
                 }
-
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     _postState.value = PostState.Error("Error: ${e.message}")
@@ -189,14 +177,9 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val topics = repository.getAllTopics()
-
-                withContext(Dispatchers.Main) {
-                    _allTopics.value = topics
-                }
+                withContext(Dispatchers.Main) { _allTopics.value = topics }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    _allTopics.value = emptyList()
-                }
+                withContext(Dispatchers.Main) { _allTopics.value = emptyList() }
             }
         }
     }
@@ -205,14 +188,9 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val suggestedTopics = repository.getSuggestedTopics(title, content)
-
-                withContext(Dispatchers.Main) {
-                    _suggestedTopics.value = suggestedTopics
-                }
+                withContext(Dispatchers.Main) { _suggestedTopics.value = suggestedTopics }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    _suggestedTopics.value = emptyList()
-                }
+                withContext(Dispatchers.Main) { _suggestedTopics.value = emptyList() }
             }
         }
     }

@@ -56,12 +56,36 @@
         android:id="@+id/settingsFragment"
         android:name="com.hcmus.forumus_client.ui.settings.SettingsFragment"
         android:label="Settings">
+        <action
+            android:id="@+id/action_settingsFragment_to_savedPostsFragment"
+            app:destination="@id/savedPostsFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_aboutFragment"
+            app:destination="@id/aboutFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <!-- Saved Posts Fragment -->
+    <fragment
+        android:id="@+id/savedPostsFragment"
+        android:name="com.hcmus.forumus_client.ui.settings.savedposts.SavedPostsFragment"
+        android:label="Saved Posts">
+    </fragment>
+
+    <!-- About Fragment -->
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.hcmus.forumus_client.ui.settings.about.AboutFragment"
+        android:label="About Forumus">
     </fragment>
 
     <!-- Edit Profile Fragment -->
     <fragment
         android:id="@+id/editProfileFragment"
-        android:name="com.hcmus.forumus_client.ui.profile.EditProfileFragment"
+        android:name="com.hcmus.forumus_client.ui.settings.editprofile.EditProfileFragment"
         android:label="Settings">
     </fragment>
 

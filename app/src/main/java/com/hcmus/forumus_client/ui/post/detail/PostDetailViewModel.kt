@@ -16,6 +16,7 @@ import com.hcmus.forumus_client.data.repository.CommentRepository
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
 import com.hcmus.forumus_client.data.repository.ReportRepository
+import com.hcmus.forumus_client.data.repository.SavePostResult
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
@@ -76,6 +77,10 @@ class PostDetailViewModel(
     // Error message for UI display
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
+
+    // Save post result for UI feedback
+    private val _savePostResult = MutableLiveData<SavePostResult?>()
+    val savePostResult: LiveData<SavePostResult?> = _savePostResult
 
     private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
     val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
@@ -431,5 +436,24 @@ class PostDetailViewModel(
                 _error.value = "Failed to report post: ${e.message}"
             }
         }
+    }
+
+    /**
+     * Saves a post for the current user.
+     *
+     * @param post The post to save
+     */
+    fun savePost(post: Post) {
+        viewModelScope.launch {
+            val result = userRepository.savePost(post.id)
+            _savePostResult.value = result
+        }
+    }
+
+    /**
+     * Clears the save post result after it has been handled by the UI
+     */
+    fun clearSavePostResult() {
+        _savePostResult.value = null
     }
 }

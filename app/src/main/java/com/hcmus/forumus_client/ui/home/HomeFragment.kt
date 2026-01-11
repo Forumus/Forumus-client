@@ -29,6 +29,7 @@ import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 import com.hcmus.forumus_client.ui.common.SharePostDialog
+import com.hcmus.forumus_client.data.repository.SavePostResult
 import kotlin.text.ifEmpty
 import kotlin.text.lowercase
 import kotlin.text.startsWith
@@ -400,6 +401,23 @@ class HomeFragment : Fragment() {
             }
         }
 
+        viewModel.savePostResult.observe(viewLifecycleOwner) { result ->
+            result?.let {
+                when (it) {
+                    is SavePostResult.Success -> {
+                        Toast.makeText(requireContext(), "Post saved successfully", Toast.LENGTH_SHORT).show()
+                    }
+                    is SavePostResult.AlreadySaved -> {
+                        Toast.makeText(requireContext(), "Post is already saved", Toast.LENGTH_SHORT).show()
+                    }
+                    is SavePostResult.Error -> {
+                        Toast.makeText(requireContext(), "Failed to save post: ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                viewModel.clearSavePostResult()
+            }
+        }
+
         mainSharedViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             binding.topAppBar.setProfileImage(user?.profilePictureUrl)
         }
@@ -444,7 +462,7 @@ class HomeFragment : Fragment() {
 
         // Handle save button click
         popupMenu.onSaveClick = {
-            Toast.makeText(requireContext(), "Post saved", Toast.LENGTH_SHORT).show()
+            viewModel.savePost(post)
         }
 
         // Handle violation selection from report menu

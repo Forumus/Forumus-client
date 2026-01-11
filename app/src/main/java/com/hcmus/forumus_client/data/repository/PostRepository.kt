@@ -118,13 +118,13 @@ class PostRepository(
         this.downvoteCount = votes.count { it == VoteState.DOWNVOTE }
 
         // Fetch and count comments for this post
-        val commentsSnapshot = firestore.collection("posts")
-            .document(this.id)
-            .collection("comments")
-            .get()
-            .await()
-
-        this.commentCount = commentsSnapshot.size()
+//        val commentsSnapshot = firestore.collection("posts")
+//            .document(this.id)
+//            .collection("comments")
+//            .get()
+//            .await()
+//
+//        this.commentCount = commentsSnapshot.size()
 
         return this
     }
@@ -210,7 +210,10 @@ class PostRepository(
                 createdAt = now,
                 imageUrls = imageUrls,
                 videoUrls = videoUrls,
-                videoThumbnailUrls = videoThumbnailUrls
+                videoThumbnailUrls = videoThumbnailUrls,
+                locationName = post.locationName,
+                latitude = post.latitude,
+                longitude = post.longitude
             )
 
             postRef.set(updatedPost).await()
@@ -394,6 +397,41 @@ class PostRepository(
     }
 
     /**
+     * Retrieves multiple posts by their IDs.
+     * Uses Firestore whereIn query which is limited to 10 items per query.
+     * Chunks large ID lists into multiple queries if needed.
+     *
+     * @param postIds List of post IDs to retrieve
+     * @return List of enriched posts found (may be less than input if some posts don't exist)
+     */
+    suspend fun getPostsByIds(postIds: List<String>): List<Post> {
+        if (postIds.isEmpty()) return emptyList()
+
+        return try {
+            val userId = auth.currentUser?.uid
+            // Firestore whereIn supports maximum 10 items per query
+            val chunkedIds = postIds.chunked(10)
+            val result = mutableListOf<Post>()
+
+            for (chunk in chunkedIds) {
+                val posts = firestore.collection("posts")
+                    .whereIn("id", chunk)
+                    .get()
+                    .await()
+                    .toObjects(Post::class.java)
+                    .map { it.enrichForUser(userId) }
+
+                result.addAll(posts)
+            }
+
+            result
+        } catch (e: Exception) {
+            Log.e("PostRepository", "Error fetching posts by IDs", e)
+            emptyList()
+        }
+    }
+
+    /**
      * Toggles upvote for a post by the current user.
      * If already upvoted, removes the vote.
      * If downvoted, changes to upvote.
@@ -442,6 +480,7 @@ class PostRepository(
             try {
                 val user = userRepository.getUserById(userId)
                 
+
                 // Backend notification trigger
                 try {
                     val request = com.hcmus.forumus_client.data.remote.dto.NotificationTriggerRequest(

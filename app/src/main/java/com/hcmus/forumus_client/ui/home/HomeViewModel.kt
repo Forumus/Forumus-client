@@ -13,6 +13,7 @@ import com.hcmus.forumus_client.data.model.Violation
 import com.hcmus.forumus_client.data.repository.PostRepository
 import com.hcmus.forumus_client.data.repository.ReportRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
+import com.hcmus.forumus_client.data.repository.SavePostResult
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
@@ -41,6 +42,10 @@ class HomeViewModel(
     // Error message for UI display
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
+
+    // Save post result for UI feedback
+    private val _savePostResult = MutableLiveData<SavePostResult?>()
+    val savePostResult: LiveData<SavePostResult?> = _savePostResult
 
     // Pagination state
     private var lastDocument: com.google.firebase.firestore.DocumentSnapshot? = null
@@ -230,85 +235,6 @@ class HomeViewModel(
         }
     }
 
-//    /**
-//     * Migration helper: scan all posts and comments and add `authorRole` where missing.
-//     * Runs in `viewModelScope` and uses batched updates to avoid hitting Firestore limits.
-//     * NOTE: Run this only from an admin/dev environment.
-//     */
-//    fun migrateAddAuthorRole() {
-//        viewModelScope.launch {
-//            _isLoading.value = true
-//            try {
-//                val firestore = FirebaseFirestore.getInstance()
-//                val BATCH_LIMIT = 400
-//
-//                // Migrate posts
-//                var lastPostDoc: com.google.firebase.firestore.DocumentSnapshot? = null
-//                while (true) {
-//                    var q = firestore.collection("posts").orderBy("createdAt")
-//                    if (lastPostDoc != null) q = q.startAfter(lastPostDoc)
-//                    q = q.limit(BATCH_LIMIT.toLong())
-//
-//                    val snap = q.get().await()
-//                    if (snap.isEmpty) break
-//
-//                    val batch = firestore.batch()
-//                    var anyUpdate = false
-//                    for (doc in snap.documents) {
-//                        val data = doc.data ?: continue
-//                        if (data.containsKey("authorRole") && data["authorRole"] != null) continue
-//
-//                        val authorId = data["authorId"] as? String ?: continue
-//                        val user = userRepository.getUserById(authorId)
-//                        val roleValue = user.role
-//                        // update only if role present
-//                        batch.update(doc.reference, mapOf("authorRole" to roleValue))
-//                        anyUpdate = true
-//                    }
-//                    if (anyUpdate) batch.commit().await()
-//
-//                    lastPostDoc = snap.documents.last()
-//                    if (snap.size() < BATCH_LIMIT) break
-//                }
-//
-//                // Migrate comments (collectionGroup)
-//                var lastCommentDoc: com.google.firebase.firestore.DocumentSnapshot? = null
-//                while (true) {
-//                    var q = firestore.collectionGroup("comments").orderBy("createdAt")
-//                    if (lastCommentDoc != null) q = q.startAfter(lastCommentDoc)
-//                    q = q.limit(BATCH_LIMIT.toLong())
-//
-//                    val snap = q.get().await()
-//                    if (snap.isEmpty) break
-//
-//                    val batch = firestore.batch()
-//                    var anyUpdate = false
-//                    for (doc in snap.documents) {
-//                        val data = doc.data ?: continue
-//                        if (data.containsKey("authorRole") && data["authorRole"] != null) continue
-//
-//                        val authorId = data["authorId"] as? String ?: continue
-//                        val user = userRepository.getUserById(authorId)
-//                        val roleValue = user.role
-//                        batch.update(doc.reference, mapOf("authorRole" to roleValue))
-//                        anyUpdate = true
-//                    }
-//                    if (anyUpdate) batch.commit().await()
-//
-//                    lastCommentDoc = snap.documents.last()
-//                    if (snap.size() < BATCH_LIMIT) break
-//                }
-//
-//                _error.value = null
-//            } catch (e: Exception) {
-//                Log.e("HomeViewModel", "migrateAddAuthorRole error", e)
-//                _error.value = "Migration failed: ${e.message}"
-//            } finally {
-//                _isLoading.value = false
-//            }
-//        }
-//    }
-
     /**
      * Handles post actions such as voting.
      *
@@ -410,5 +336,24 @@ class HomeViewModel(
                 _error.value = "Failed to report post: ${e.message}"
             }
         }
+    }
+
+    /**
+     * Saves a post for the current user.
+     *
+     * @param post The post to save
+     */
+    fun savePost(post: Post) {
+        viewModelScope.launch {
+            val result = userRepository.savePost(post.id)
+            _savePostResult.value = result
+        }
+    }
+
+    /**
+     * Clears the save post result after it has been handled by the UI
+     */
+    fun clearSavePostResult() {
+        _savePostResult.value = null
     }
 }

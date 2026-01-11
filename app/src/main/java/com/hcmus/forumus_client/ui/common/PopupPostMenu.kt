@@ -21,6 +21,9 @@ class PopupPostMenu(
     // Callback for when user selects a violation from reports menu
     var onReportClick: ((Violation) -> Unit)? = null
 
+    // Text to display on the save button (default is "Save")
+    var saveButtonText: String = "Save"
+
     // Inner popup menu for violations
     private var reportsMenu: PopupReportsMenu? = null
 
@@ -48,7 +51,11 @@ class PopupPostMenu(
         }
 
         // Setup click listener for Save button
-        popupView.findViewById<LinearLayout>(R.id.btnSave).setOnClickListener {
+        val saveButton = popupView.findViewById<LinearLayout>(R.id.btnSave)
+        val saveTextView = saveButton.findViewById<android.widget.TextView>(R.id.tvSaveText)
+        saveTextView?.text = saveButtonText
+        
+        saveButton.setOnClickListener {
             onSaveClick?.invoke()
             popupWindow.dismiss()
         }
