@@ -118,13 +118,13 @@ class PostRepository(
         this.downvoteCount = votes.count { it == VoteState.DOWNVOTE }
 
         // Fetch and count comments for this post
-        val commentsSnapshot = firestore.collection("posts")
-            .document(this.id)
-            .collection("comments")
-            .get()
-            .await()
-
-        this.commentCount = commentsSnapshot.size()
+//        val commentsSnapshot = firestore.collection("posts")
+//            .document(this.id)
+//            .collection("comments")
+//            .get()
+//            .await()
+//
+//        this.commentCount = commentsSnapshot.size()
 
         return this
     }
@@ -210,10 +210,23 @@ class PostRepository(
                 createdAt = now,
                 imageUrls = imageUrls,
                 videoUrls = videoUrls,
-                videoThumbnailUrls = videoThumbnailUrls
+                videoThumbnailUrls = videoThumbnailUrls,
+                locationName = post.locationName,
+                latitude = post.latitude,
+                longitude = post.longitude
             )
 
             postRef.set(updatedPost).await()
+
+            updatedPost.topicIds.forEach { topicId ->
+                try {
+                    firestore.collection("topics").document(topicId)
+                        .update("postCount", FieldValue.increment(1))
+                } catch (e: Exception) {
+                    Log.e("savePost", "Error incrementing topic count", e)
+                }
+            }
+
             Result.success(true)
         } catch (e: Exception) {
             Result.failure(e)
@@ -414,7 +427,7 @@ class PostRepository(
                     .await()
                     .toObjects(Post::class.java)
                     .map { it.enrichForUser(userId) }
-                
+
                 result.addAll(posts)
             }
 
@@ -473,7 +486,7 @@ class PostRepository(
         if (post.userVote == VoteState.UPVOTE && post.authorId != userId) {
             try {
                 val user = userRepository.getUserById(userId)
-                
+
                 // Client-side notification trigger (Temporary for testing)
                 val notificationId = UUID.randomUUID().toString()
                 val notificationData = hashMapOf(
