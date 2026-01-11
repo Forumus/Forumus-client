@@ -114,6 +114,7 @@ class ProfileFragment : Fragment() {
             }
 
             setIconFuncButton(R.drawable.ic_back)
+            setProfileImage(mainSharedViewModel.currentUser.value?.profilePictureUrl)
         }
     }
 
@@ -228,7 +229,6 @@ class ProfileFragment : Fragment() {
                 placeholder(R.drawable.default_avatar)
                 error(R.drawable.default_avatar)
             }
-            binding.topAppBar.setProfileImage(user.profilePictureUrl)
         }
 
         // Update statistics display
