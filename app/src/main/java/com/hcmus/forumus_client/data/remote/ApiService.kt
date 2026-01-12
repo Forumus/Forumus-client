@@ -37,4 +37,9 @@ interface ApiService {
     suspend fun triggerNotification(
         @Body request: com.hcmus.forumus_client.data.remote.dto.NotificationTriggerRequest
     ): Response<Unit>
+
+    @POST(ApiConstants.VALIDATE_POST)
+    suspend fun validatePost(
+        @Body request: com.hcmus.forumus_client.data.dto.PostIdRequest
+    ): Response<com.hcmus.forumus_client.data.dto.PostValidationResponse>
 }

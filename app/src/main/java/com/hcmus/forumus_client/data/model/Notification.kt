@@ -12,6 +12,7 @@ data class Notification(
     val previewText: String = "",
     val originalPostTitle: String? = null,
     val originalPostContent: String? = null,
+    val rejectionReason: String? = null,
     val createdAt: Timestamp? = null,
     @get:PropertyName("isRead") @set:PropertyName("isRead") var isRead: Boolean = false
 )

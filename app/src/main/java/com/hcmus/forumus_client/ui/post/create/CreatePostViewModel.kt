@@ -144,13 +144,26 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                     longitude = lng
                 )
 
-                val result = repository.savePost(context, post)
+                //  Gọi Repository để xử lý upload và lưu
+                //  Gọi Repository để xử lý upload và lưu
+                val saveResult = repository.savePost(context, post)
 
-                withContext(Dispatchers.Main) {
-                    if (result.isSuccess) {
-                        _postState.value = PostState.Success
+                if (saveResult.isSuccess) {
+                    val postId = saveResult.getOrNull()
+                    if (postId != null) {
+                        // Post saved as PENDING. 
+                        // Backend PostListener will handle validation asynchronously.
+                        withContext(Dispatchers.Main) {
+                             _postState.value = PostState.Success
+                        }
                     } else {
-                        _postState.value = PostState.Error("Failed: ${result.exceptionOrNull()?.message}")
+                        withContext(Dispatchers.Main) {
+                            _postState.value = PostState.Error("Failed to retrieve Post ID")
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        _postState.value = PostState.Error("Failed to save post: ${saveResult.exceptionOrNull()?.message}")
                     }
                 }
             } catch (e: Exception) {

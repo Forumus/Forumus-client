@@ -246,8 +246,8 @@ class CreatePostFragment : Fragment() {
                     binding.btnSubmitPost.text = "Posting..."
                 }
                 is PostState.Success -> {
-                    Toast.makeText(requireContext(), "Post created!", Toast.LENGTH_SHORT).show()
-                    findNavController().popBackStack()
+                    Toast.makeText(requireContext(), "Post submitted for review", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack() // Đóng màn hình quay về Home
                 }
                 is PostState.Error -> {
                     binding.btnSubmitPost.isEnabled = true

@@ -83,8 +83,12 @@ class NotificationAdapter(
                     typeText = "removed your post"
                 }
                 "POST_REJECTED" -> {
-                    iconRes = com.hcmus.forumus_client.R.drawable.noti_remove_post
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_post_reject
                     typeText = "rejected your post"
+                }
+                "POST_APPROVED" -> {
+                    iconRes = com.hcmus.forumus_client.R.drawable.noti_post_approve
+                    typeText = "approved your post"
                 }
                 "STATUS_CHANGED" -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_status
