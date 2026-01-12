@@ -105,7 +105,7 @@ class SettingsFragment : Fragment() {
 
         // Saved posts - mock toast
         binding.llSavedPosts.setOnClickListener {
-            Toast.makeText(requireContext(), "Saved Posts - Coming Soon", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.action_settingsFragment_to_savedPostsFragment)
         }
 
         // Help center - mock toast
@@ -120,7 +120,7 @@ class SettingsFragment : Fragment() {
 
         // About forumus - mock toast
         binding.llAboutForumus.setOnClickListener {
-            Toast.makeText(requireContext(), "About Forumus - Coming Soon", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.action_settingsFragment_to_aboutFragment)
         }
 
         // Logout - mock toast

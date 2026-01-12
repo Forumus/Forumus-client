@@ -10,6 +10,15 @@ import kotlinx.coroutines.tasks.await
 import android.net.Uri
 
 /**
+ * Result of saving a post operation
+ */
+sealed class SavePostResult {
+    object Success : SavePostResult()
+    object AlreadySaved : SavePostResult()
+    data class Error(val message: String) : SavePostResult()
+}
+
+/**
  * Repository for managing user data operations with Firestore.
  * Handles CRUD operations for user profiles and authentication-related data.
  */
@@ -247,6 +256,76 @@ class UserRepository(
                 .await()
         } catch (e: Exception) {
             Log.e("UserRepository", "Error deleting user: $uid", e)
+            throw e
+        }
+    }
+
+    /**
+     * Saves a post to the user's saved posts list.
+     *
+     * @param postId The ID of the post to save
+     * @return SavePostResult indicating the result of the operation
+     */
+    suspend fun savePost(postId: String): SavePostResult {
+        return try {
+            val currentUserId = auth.currentUser?.uid
+            if (currentUserId == null) {
+                return SavePostResult.Error("User not authenticated")
+            }
+            
+            val userDoc = usersCollection.document(currentUserId)
+            
+            var wasAlreadySaved = false
+            firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(userDoc)
+                val currentSaved = snapshot.get("followedPostIds") as? List<*> ?: emptyList<String>()
+                val savedList = currentSaved.mapNotNull { it as? String }.toMutableList()
+                
+                if (savedList.contains(postId)) {
+                    wasAlreadySaved = true
+                } else {
+                    savedList.add(postId)
+                    transaction.update(userDoc, "followedPostIds", savedList)
+                }
+            }.await()
+            
+            if (wasAlreadySaved) {
+                Log.i("UserRepository", "Post $postId is already saved")
+                SavePostResult.AlreadySaved
+            } else {
+                Log.i("UserRepository", "Post $postId saved successfully")
+                SavePostResult.Success
+            }
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error saving post: $postId", e)
+            SavePostResult.Error(e.message ?: "Unknown error")
+        }
+    }
+
+    /**
+     * Removes a post from the user's saved posts list.
+     *
+     * @param postId The ID of the post to unsave
+     */
+    suspend fun unsavePost(postId: String) {
+        try {
+            val currentUserId = auth.currentUser?.uid ?: return
+            val userDoc = usersCollection.document(currentUserId)
+            
+            firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(userDoc)
+                val currentSaved = snapshot.get("savedPostIds") as? List<*> ?: emptyList<String>()
+                val savedList = currentSaved.mapNotNull { it as? String }.toMutableList()
+                
+                if (savedList.contains(postId)) {
+                    savedList.remove(postId)
+                    transaction.update(userDoc, "savedPostIds", savedList)
+                }
+            }.await()
+            
+            Log.i("UserRepository", "Post $postId unsaved successfully")
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error unsaving post: $postId", e)
             throw e
         }
     }

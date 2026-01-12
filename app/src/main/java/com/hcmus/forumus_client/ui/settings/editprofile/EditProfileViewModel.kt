@@ -1,4 +1,4 @@
-package com.hcmus.forumus_client.ui.profile
+package com.hcmus.forumus_client.ui.settings.editprofile
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel

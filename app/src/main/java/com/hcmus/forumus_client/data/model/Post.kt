@@ -33,6 +33,10 @@ data class Post(
 	@set:PropertyName("topics")
 	var topicIds: List<String> = emptyList(),
 
+	var locationName: String? = null,
+	var latitude: Double? = null,
+	var longitude: Double? = null,
+
 	@get:Exclude
 	@set:Exclude
 	var userVote: VoteState = VoteState.NONE

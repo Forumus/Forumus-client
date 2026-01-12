@@ -42,7 +42,6 @@ object MediaViewerNavigator {
         val vm = ViewModelProvider(activity, factory).get(MediaViewerViewModel::class.java)
         vm.setMediaList(mediaList, startIndex)
 
-        // Navigate using view's NavController like HomeFragment does.
         try {
             val navController = view.findNavController()
             navController.navigate(R.id.mediaViewerFragment)
