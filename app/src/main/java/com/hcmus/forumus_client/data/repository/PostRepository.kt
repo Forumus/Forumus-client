@@ -227,7 +227,7 @@ class PostRepository(
                 }
             }
 
-            Result.success(true)
+            Result.success(generatePostId())
         } catch (e: Exception) {
             Result.failure(e)
         }
