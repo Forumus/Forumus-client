@@ -157,7 +157,7 @@ class ConversationAdapter(
                     binding.llMessageBubble.visibility = View.VISIBLE
                     binding.tvMessageText.text = message.content
                     binding.tvMessageText.setTextColor(
-                            binding.root.context.getColor(android.R.color.white)
+                            binding.root.context.getColor(com.hcmus.forumus_client.R.color.white)
                     )
                     binding.tvMessageText.movementMethod = null
                     binding.tvMessageText.visibility = View.VISIBLE
@@ -255,7 +255,7 @@ class ConversationAdapter(
 
                         override fun updateDrawState(ds: android.text.TextPaint) {
                             super.updateDrawState(ds)
-                            ds.color = android.graphics.Color.BLUE
+                            ds.color = binding.root.context.getColor(com.hcmus.forumus_client.R.color.primary)
                             ds.isUnderlineText = true
                         }
                     }
@@ -310,7 +310,7 @@ class ConversationAdapter(
                     )?.visibility = View.VISIBLE
                     binding.tvMessageText.text = message.content
                     binding.tvMessageText.setTextColor(
-                            binding.root.context.getColor(android.R.color.black)
+                            binding.root.context.getColor(com.hcmus.forumus_client.R.color.text_primary)
                     )
                     binding.tvMessageText.movementMethod = null
                     binding.tvMessageText.visibility = View.VISIBLE
@@ -405,7 +405,7 @@ class ConversationAdapter(
 
                         override fun updateDrawState(ds: android.text.TextPaint) {
                             super.updateDrawState(ds)
-                            ds.color = android.graphics.Color.BLUE
+                            ds.color = binding.root.context.getColor(com.hcmus.forumus_client.R.color.primary)
                             ds.isUnderlineText = true
                         }
                     }

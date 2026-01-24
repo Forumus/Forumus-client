@@ -4,12 +4,12 @@
 <FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/surface">
 
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/surface"
     android:orientation="vertical">
 
     <!-- Header with title and search icon -->
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:paddingHorizontal="22dp"
         android:paddingTop="14dp"
         android:paddingBottom="20dp"
@@ -29,7 +29,7 @@
             android:layout_weight="1"
             android:text="Chats"
             android:textSize="32sp"
-            android:textColor="@color/black"
+            android:textColor="@color/text_primary"
             android:fontFamily="@font/montserrat_semibold"
             android:textStyle="bold"
             android:lineSpacingExtra="4dp" />
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:text="Unread"
                 android:textSize="16sp"
-                android:textColor="#4a5565"
+                android:textColor="@color/chat_filter_unselected"
                 android:fontFamily="@font/montserrat_regular" />
 
         </LinearLayout>
@@ -120,7 +120,7 @@
             android:id="@+id/recycler_chats"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:clipToPadding="false"
             android:scrollbars="vertical" />
 
@@ -134,7 +134,7 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:visibility="gone">
 
         <ProgressBar
@@ -170,7 +170,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@color/surface"
     android:visibility="gone"
     android:elevation="8dp">
 
@@ -179,7 +179,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
         android:gravity="center_vertical"
@@ -245,7 +245,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:clipToPadding="false" />
 
 </LinearLayout>

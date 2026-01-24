@@ -6,7 +6,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFFFF"
+        android:background="@color/bg_app"
         android:orientation="vertical">
 
         <LinearLayout
@@ -111,7 +111,7 @@
                                 android:text="Trending Topics"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
-                                android:textColor="#000000"/>
+                                android:textColor="@color/text_primary"/>
                         </LinearLayout>
 
                         <com.google.android.material.chip.ChipGroup
@@ -123,7 +123,7 @@
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="#EEEEEE"
+                            android:background="@color/divider"
                             android:layout_marginTop="16dp"
                             android:layout_marginBottom="16dp"/>
                     </LinearLayout>
@@ -134,7 +134,7 @@
                         android:text="Recent Searches"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"/>
+                        android:textColor="@color/text_primary"/>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_recent_list"
@@ -149,7 +149,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="No recent history"
-                        android:textColor="#9E9E9E"
+                        android:textColor="@color/text_secondary_light"
                         android:visibility="gone"/>
 
                 </LinearLayout>

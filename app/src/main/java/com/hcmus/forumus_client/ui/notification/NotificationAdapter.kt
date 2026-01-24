@@ -117,14 +117,18 @@ class NotificationAdapter(
 
             // Styling Logic
             if (!notification.isRead) {
-                // UNREAD: Blue dot, White background, Elevated
+                // UNREAD: Blue dot, Surface background, Elevated
                 binding.unreadIndicator.visibility = View.VISIBLE
-                binding.root.setBackgroundColor(Color.WHITE)
+                binding.root.setBackgroundColor(
+                    binding.root.context.getColor(com.hcmus.forumus_client.R.color.surface)
+                )
                 binding.root.elevation = 4f // Make it pop more if needed
             } else {
-                // READ: No dot, Gray background (Lighter/Dimmer), Flat
+                // READ: No dot, Slightly different background, Flat
                 binding.unreadIndicator.visibility = View.GONE
-                binding.root.setBackgroundColor(Color.parseColor("#F2F4F7")) // Very light gray for read
+                binding.root.setBackgroundColor(
+                    binding.root.context.getColor(com.hcmus.forumus_client.R.color.bg_app)
+                )
                 binding.root.elevation = 0f
             }
 

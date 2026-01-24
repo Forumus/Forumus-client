@@ -6,7 +6,7 @@
     android:padding="16dp"
     android:text="See more notifications"
     android:gravity="center"
-    android:textColor="#3F78E0"
+    android:textColor="@color/primary"
     android:textSize="14sp"
     android:background="?attr/selectableItemBackground"
     android:textStyle="bold"
