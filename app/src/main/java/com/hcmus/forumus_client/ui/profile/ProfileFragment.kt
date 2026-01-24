@@ -36,6 +36,8 @@ class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
     private val viewModel: ProfileViewModel by viewModels()
     private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
+    private val notificationViewModel: com.hcmus.forumus_client.ui.notification.NotificationViewModel by activityViewModels()
+    private val chatsViewModel: com.hcmus.forumus_client.ui.chats.ChatsViewModel by activityViewModels()
     private val navController by lazy { findNavController() }
     private lateinit var profileAdapter: ProfileAdapter
 
@@ -229,6 +231,17 @@ class ProfileFragment : Fragment() {
                 placeholder(R.drawable.default_avatar)
                 error(R.drawable.default_avatar)
             }
+        }
+
+        // Update badge counts
+        notificationViewModel.unreadCount.observe(viewLifecycleOwner) { count ->
+            android.util.Log.d("ProfileFragment", "Notification badge update: $count")
+            binding.bottomBar.setNotificationBadge(count)
+        }
+
+        chatsViewModel.unreadChatCount.observe(viewLifecycleOwner) { count ->
+            android.util.Log.d("ProfileFragment", "Chat badge update: $count")
+            binding.bottomBar.setChatBadge(count)
         }
 
         // Update statistics display

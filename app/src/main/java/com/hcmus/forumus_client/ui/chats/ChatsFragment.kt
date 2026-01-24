@@ -36,7 +36,7 @@ import androidx.fragment.app.activityViewModels
 
 class ChatsFragment : Fragment (){
     private lateinit var binding: FragmentChatsBinding
-    private val viewModel: ChatsViewModel by viewModels()
+    private val viewModel: ChatsViewModel by activityViewModels()
     private val notificationViewModel: com.hcmus.forumus_client.ui.notification.NotificationViewModel by activityViewModels()
     private val navController by lazy { findNavController() }
     private lateinit var chatsAdapter: ChatsAdapter
@@ -114,8 +114,13 @@ class ChatsFragment : Fragment (){
         }
 
         notificationViewModel.unreadCount.observe(viewLifecycleOwner) { count ->
-             android.util.Log.d("ChatsFragment", "Badge update: $count")
+             android.util.Log.d("ChatsFragment", "Notification badge update: $count")
              binding.bottomBar.setNotificationBadge(count)
+        }
+
+        viewModel.unreadChatCount.observe(viewLifecycleOwner) { count ->
+             android.util.Log.d("ChatsFragment", "Chat badge update: $count")
+             binding.bottomBar.setChatBadge(count)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->

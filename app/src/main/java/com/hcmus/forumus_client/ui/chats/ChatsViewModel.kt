@@ -41,8 +41,16 @@ class ChatsViewModel() : ViewModel() {
     private val _chatResult = MutableLiveData<ChatItem?>()
     val chatResult: LiveData<ChatItem?> = _chatResult
 
+    private val _unreadChatCount = MutableLiveData<Int>()
+    val unreadChatCount: LiveData<Int> = _unreadChatCount
+
     companion object {
         private const val TAG = "ChatsViewModel"
+    }
+
+    init {
+        // Load chats immediately when ViewModel is created to show badge count
+        loadChats(ChatType.DEFAULT_CHATS)
     }
 
     fun resetChatResult() {
@@ -61,7 +69,10 @@ class ChatsViewModel() : ViewModel() {
                 .collect { chatList ->
                     _chats.value = chatList
                     _isLoading.value = false
-                    Log.d(TAG, "Chats loaded: ${chatList.size} items")
+                    // Calculate total unread count
+                    val totalUnread = chatList.sumOf { it.unreadCount }
+                    _unreadChatCount.value = totalUnread
+                    Log.d(TAG, "Chats loaded: ${chatList.size} items, unread: $totalUnread")
                 }
         }
     }

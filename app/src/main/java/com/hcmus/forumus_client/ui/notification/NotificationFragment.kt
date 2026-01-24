@@ -21,6 +21,7 @@ class NotificationFragment : Fragment() {
     private var _binding: FragmentNotificationBinding? = null
     private val binding get() = _binding!!
     private val viewModel: NotificationViewModel by activityViewModels()
+    private val chatsViewModel: com.hcmus.forumus_client.ui.chats.ChatsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -168,6 +169,11 @@ class NotificationFragment : Fragment() {
         
         viewModel.unreadCount.observe(viewLifecycleOwner) { count ->
              binding.bottomBar.setNotificationBadge(count)
+        }
+
+        chatsViewModel.unreadChatCount.observe(viewLifecycleOwner) { count ->
+             android.util.Log.d("NotificationFragment", "Chat badge update: $count")
+             binding.bottomBar.setChatBadge(count)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->

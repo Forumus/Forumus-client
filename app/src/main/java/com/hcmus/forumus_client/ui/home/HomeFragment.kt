@@ -45,6 +45,7 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by viewModels()
     private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
     private val notificationViewModel: com.hcmus.forumus_client.ui.notification.NotificationViewModel by activityViewModels()
+    private val chatsViewModel: com.hcmus.forumus_client.ui.chats.ChatsViewModel by activityViewModels()
     private val navController by lazy { findNavController() }
 
     override fun onCreateView(
@@ -383,8 +384,13 @@ class HomeFragment : Fragment() {
         }
 
         notificationViewModel.unreadCount.observe(viewLifecycleOwner) { count ->
-             android.util.Log.d("HomeFragment", "Badge update: $count")
+             android.util.Log.d("HomeFragment", "Notification badge update: $count")
              binding.bottomBar.setNotificationBadge(count)
+        }
+
+        chatsViewModel.unreadChatCount.observe(viewLifecycleOwner) { count ->
+             android.util.Log.d("HomeFragment", "Chat badge update: $count")
+             binding.bottomBar.setChatBadge(count)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->

@@ -141,4 +141,18 @@ class BottomNavigationBar @JvmOverloads constructor(
             binding.badgeAlerts.visibility = GONE
         }
     }
+
+    /**
+     * Sets the chat badge count.
+     * @param count number of unread chats. 0 or less hides the badge.
+     */
+    fun setChatBadge(count: Int) {
+        android.util.Log.d("BottomNavigationBar", "Setting chat badge: $count")
+        if (count > 0) {
+            binding.badgeChat.visibility = VISIBLE
+            binding.badgeChat.text = if (count > 99) "99+" else count.toString()
+        } else {
+            binding.badgeChat.visibility = GONE
+        }
+    }
 }
