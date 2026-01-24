@@ -11,7 +11,8 @@ data class User (
     val followedPostIds: List<String> = emptyList(),
     val reportCount: Int = 0,
     val status: UserStatus = UserStatus.NORMAL,
-    val fcmToken: String? = null
+    val fcmToken: String? = null,
+    val blacklistedUntil: Long? = null
 )
 
 enum class UserRole {

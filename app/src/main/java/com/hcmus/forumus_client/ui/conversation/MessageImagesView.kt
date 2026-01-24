@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.hcmus.forumus_client.R
 
 class MessageImagesView @JvmOverloads constructor(
@@ -64,13 +65,14 @@ class MessageImagesView @JvmOverloads constructor(
     }
 
     private fun setupSingleImage(url: String) {
-        val imageView = createImageView(300, 200)
+        val imageView = createImageView(0, 0) // Dimensions will be set by LayoutParams
         loadImage(imageView, url, 0)
         
         val layoutParams = LayoutParams(LayoutParams.MATCH_CONSTRAINT, 200.dpToPx())
         layoutParams.startToStart = LayoutParams.PARENT_ID
         layoutParams.endToEnd = LayoutParams.PARENT_ID
         layoutParams.topToTop = LayoutParams.PARENT_ID
+        layoutParams.dimensionRatio = "3:2" // Maintain aspect ratio
         
         addView(imageView, layoutParams)
     }
@@ -249,15 +251,20 @@ class MessageImagesView @JvmOverloads constructor(
     private fun createImageView(width: Int, height: Int): ImageView {
         val imageView = ImageView(context)
         imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-        imageView.setBackgroundColor(0xFFE0E0E0.toInt())
+        imageView.setBackgroundResource(R.drawable.message_image_background)
+        imageView.clipToOutline = true
+        imageView.outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
         return imageView
     }
 
     private fun loadImage(imageView: ImageView, url: String, position: Int) {
+        val cornerRadius = 16.dpToPx()
+        
         val requestOptions = RequestOptions()
             .centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .timeout(10000)
+            .transform(RoundedCorners(cornerRadius))
         
         Glide.with(context)
             .load(url)

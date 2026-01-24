@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
@@ -24,6 +25,10 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Foreground service permissions for WorkManager -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:allowBackup="true"
@@ -68,6 +73,13 @@
             </intent-filter>
         </service>
 
+        <!-- WorkManager foreground service -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false"
+            tools:targetApi="q" />
+
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="false" />
@@ -86,6 +98,12 @@
         <activity
             android:name=".ui.auth.success.SuccessActivity"
             android:exported="false" />
+
+        <!-- Banned Activity -->
+        <activity
+            android:name=".ui.auth.banned.BannedActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
 
         <!-- Register Activity -->
         <activity

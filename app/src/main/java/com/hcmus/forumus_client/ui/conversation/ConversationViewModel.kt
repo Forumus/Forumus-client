@@ -1,24 +1,34 @@
 package com.hcmus.forumus_client.ui.conversation
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.gson.Gson
 import com.hcmus.forumus_client.data.model.Message
 import com.hcmus.forumus_client.data.model.MessageType
 import com.hcmus.forumus_client.data.repository.ChatRepository
+import com.hcmus.forumus_client.workers.SendMessageWorker
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.UUID
 
-class ConversationViewModel : ViewModel() {
+class ConversationViewModel(application: Application) : AndroidViewModel(application) {
     
     private val chatRepository = ChatRepository()
+    private val workManager = WorkManager.getInstance(application)
+    private val gson = Gson()
     private var messagesListener: ListenerRegistration? = null
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
@@ -148,16 +158,71 @@ class ConversationViewModel : ViewModel() {
             return
         }
 
-        // MEMORY FIX: Set loading states immediately to avoid context switching
-        _isLoading.value = true
-        _isUploading.value = hasImages
+        // If there are images, use WorkManager for background processing
+        if (hasImages) {
+            sendMessageWithWorkManager(chatId, content.trim(), type, imageUrls)
+        } else {
+            // For text-only messages, send immediately (faster)
+            sendMessageDirect(chatId, content.trim(), type, imageUrls)
+        }
+    }
 
-        // Single coroutine with minimal context switching
+    /**
+     * Send message with images using WorkManager for background processing.
+     * This ensures uploads continue even if the user navigates away.
+     */
+    private fun sendMessageWithWorkManager(
+        chatId: String,
+        content: String,
+        type: MessageType,
+        imageUrls: MutableList<String>
+    ) {
+        Log.d(TAG, "Enqueuing message send work with ${imageUrls.size} images")
+        
+        _isLoading.value = true
+        _isUploading.value = true
+
+        // Prepare input data for the worker
+        val inputData = Data.Builder()
+            .putString(SendMessageWorker.KEY_CHAT_ID, chatId)
+            .putString(SendMessageWorker.KEY_MESSAGE_CONTENT, content)
+            .putString(SendMessageWorker.KEY_MESSAGE_TYPE, type.name)
+            .putString(SendMessageWorker.KEY_IMAGE_URLS, gson.toJson(imageUrls))
+            .build()
+
+        // Create and enqueue the work request
+        val sendMessageWork = OneTimeWorkRequestBuilder<SendMessageWorker>()
+            .setInputData(inputData)
+            .build()
+
+        workManager.enqueue(sendMessageWork)
+
+        // Observe the work status
+        observeWorkStatus(sendMessageWork.id)
+        
+        // Clear UI states immediately (work continues in background)
+        _isLoading.value = false
+        _isUploading.value = false
+        _sendMessageResult.value = true
+        
+        Log.d(TAG, "Message send work enqueued. Upload will continue in background.")
+    }
+
+    /**
+     * Send message directly (for text-only messages).
+     */
+    private fun sendMessageDirect(
+        chatId: String,
+        content: String,
+        type: MessageType,
+        imageUrls: MutableList<String>
+    ) {
+        _isLoading.value = true
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = chatRepository.sendMessage(chatId, content.trim(), type, imageUrls)
+                val result = chatRepository.sendMessage(chatId, content, type, imageUrls)
 
-                // Single context switch for all UI updates
                 if (result.isSuccess) {
                     _sendMessageResult.value = true
                     Log.d(TAG, "Message sent successfully")
@@ -166,13 +231,38 @@ class ConversationViewModel : ViewModel() {
                     Log.e(TAG, "Error sending message", result.exceptionOrNull())
                 }
                 _isLoading.value = false
-                _isUploading.value = false
 
             } catch (e: Exception) {
+                _isLoading.value = false
                 Log.e(TAG, "Send message error: ${e.message}", e)
             }
         }
+    }
 
+    /**
+     * Observe the work status and log progress
+     */
+    private fun observeWorkStatus(workId: UUID) {
+        workManager.getWorkInfoByIdLiveData(workId).observeForever { workInfo ->
+            if (workInfo != null) {
+                when (workInfo.state) {
+                    WorkInfo.State.SUCCEEDED -> {
+                        Log.d(TAG, "Background message send completed successfully")
+                    }
+                    WorkInfo.State.FAILED -> {
+                        val error = workInfo.outputData.getString(SendMessageWorker.KEY_RESULT_ERROR)
+                        Log.e(TAG, "Background message send failed: $error")
+                        setErrorWithDebounce(error ?: "Failed to send message")
+                    }
+                    WorkInfo.State.RUNNING -> {
+                        Log.d(TAG, "Background message send in progress...")
+                    }
+                    else -> {
+                        Log.d(TAG, "Work state: ${workInfo.state}")
+                    }
+                }
+            }
+        }
     }
     
     private fun markMessagesAsRead(chatId: String) {

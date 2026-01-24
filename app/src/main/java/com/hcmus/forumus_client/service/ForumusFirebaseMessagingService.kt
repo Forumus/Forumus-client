@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class ForumusFirebaseMessagingService : FirebaseMessagingService() {
-    
+
     companion object {
         private const val TAG = "FCMService"
         private const val CHANNEL_ID = "chat_notifications"
@@ -39,18 +39,18 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
         Log.d(TAG, "NEW FCM TOKEN GENERATED!")
         Log.d(TAG, "Token: $token")
         Log.d(TAG, "=====================================")
-        
+
         // Save token to Firestore for the current user
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        
+
         if (userId == null) {
             Log.w(TAG, "User not authenticated - cannot save FCM token")
             Log.w(TAG, "Token will be saved when user logs in")
             return
         }
-        
+
         Log.d(TAG, "Saving token for user: $userId")
-        
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 FirebaseFirestore.getInstance()
@@ -75,12 +75,12 @@ class ForumusFirebaseMessagingService : FirebaseMessagingService() {
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(TAG, "Message data: ${remoteMessage.data}")
             val type = remoteMessage.data["type"]
-            
+
             if (type == "general_notification") {
                 val targetId = remoteMessage.data["targetId"] ?: ""
                 val title = remoteMessage.notification?.title ?: "New Notification"
                 val body = remoteMessage.notification?.body ?: "You have a new update"
-                
+
                 showGeneralNotification(title, body, targetId)
                 return
             }

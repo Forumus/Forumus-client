@@ -30,6 +30,7 @@
     <color name="light_gray">#E5E7EB</color>
     <color name="button_background_light">#F1F3F5</color>
     <color name="button_background_lighter">#F8F9FA</color>
+
     <!-- Voting colors -->
     <color name="vote_up_blue">@color/link_color</color>
     <color name="vote_down_red">#E04141</color>
@@ -89,4 +90,7 @@
 
     <color name="status_inactive">#EF4444</color>
     <color name="status_inactive_tonal">#FEE2E2</color>
+
+    <!-- Error colors -->
+    <color name="error_red">#E04141</color>
 </resources>

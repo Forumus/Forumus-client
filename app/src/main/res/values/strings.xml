@@ -86,6 +86,15 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="settings">Setting</string>
     
+    <!-- Banned screen -->
+    <string name="account_banned">Account Banned</string>
+    <string name="banned_message">Your account has been temporarily banned due to violations of our community guidelines. You will regain access when the ban period expires.</string>
+    <string name="ban_expiration_placeholder">Ban expires on: ...</string>
+    <string name="time_remaining">Time Remaining</string>
+    <string name="countdown_label">Days : Hours : Minutes : Seconds</string>
+    <string name="banned_info">Please note that repeated violations may lead to permanent account suspension.</string>
+    <string name="banned_icon">Banned icon</string>
+    
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="default_notification_channel_id">general_notification_channel</string>
