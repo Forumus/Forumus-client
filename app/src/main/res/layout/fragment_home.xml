@@ -10,6 +10,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/bg_app"
             android:orientation="vertical">
 
             <!-- Top App Bar -->
@@ -27,7 +28,8 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/postRecyclerView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:background="@color/bg_app"/>
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

@@ -268,14 +268,31 @@ class MainActivity : AppCompatActivity() {
     }
     
     /**
-     * Update status bar appearance based on current theme.
-     * Light theme = dark icons, Dark theme = light icons
+     * Update status bar and navigation bar appearance based on current theme.
+     * Light theme = dark icons/bars, Dark theme = light icons/bars
+     * Public so it can be called when theme is changed in SettingsFragment
      */
-    private fun updateStatusBarAppearance() {
+    fun updateStatusBarAppearance() {
         val preferencesManager = PreferencesManager(application)
         val isDarkMode = preferencesManager.isDarkModeEnabled
         
-        androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
-            .isAppearanceLightStatusBars = !isDarkMode
+        val windowInsetsController = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+        
+        // Set icon colors
+        windowInsetsController.isAppearanceLightStatusBars = !isDarkMode
+        windowInsetsController.isAppearanceLightNavigationBars = !isDarkMode
+        
+        // Set bar background colors from theme
+        window.statusBarColor = if (isDarkMode) {
+            getColor(com.hcmus.forumus_client.R.color.bg_app)
+        } else {
+            getColor(com.hcmus.forumus_client.R.color.white)
+        }
+        
+        window.navigationBarColor = if (isDarkMode) {
+            getColor(com.hcmus.forumus_client.R.color.bg_app)
+        } else {
+            getColor(com.hcmus.forumus_client.R.color.white)
+        }
     }
 }

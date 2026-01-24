@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 <FrameLayout
     android:layout_width="match_parent"
@@ -34,11 +35,13 @@
             android:textStyle="bold"
             android:lineSpacingExtra="4dp" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/ic_search"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:contentDescription="TODO"
             android:src="@drawable/ic_search"
+            app:tint="@color/text_primary"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="3dp" />
 

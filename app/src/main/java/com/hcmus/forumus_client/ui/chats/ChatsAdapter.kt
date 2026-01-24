@@ -64,11 +64,18 @@ class ChatsAdapter(
             binding.contactName.text = chatItem.contactName
             binding.lastMessage.text = chatItem.lastMessage
 
-            Glide.with(itemView.context)
-                .load(chatItem.profilePictureUrl)
-                .placeholder(R.drawable.ic_default_profile)
-                .circleCrop()
-                .into(binding.profileImage)
+            // Load profile image with Glide (with null safety)
+            if (!chatItem.profilePictureUrl.isNullOrEmpty()) {
+                Glide.with(itemView.context)
+                    .load(chatItem.profilePictureUrl)
+                    .placeholder(R.drawable.ic_default_profile)
+                    .error(R.drawable.ic_default_profile)
+                    .circleCrop()
+                    .into(binding.profileImage)
+            } else {
+                // Set default image if URL is null or empty
+                binding.profileImage.setImageResource(R.drawable.ic_default_profile)
+            }
             
             // Set timestamp and color based on unread status
             binding.messageTime.text = chatItem.timestamp
@@ -101,9 +108,6 @@ class ChatsAdapter(
             } else {
                 binding.unreadCount.visibility = View.GONE
             }
-            
-            // Set profile image (placeholder for now)
-            binding.profileImage.setImageResource(R.drawable.ic_default_profile)
         }
     }
 

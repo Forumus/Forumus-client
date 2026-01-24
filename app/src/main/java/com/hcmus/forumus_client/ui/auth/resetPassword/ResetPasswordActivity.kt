@@ -19,8 +19,15 @@ class ResetPasswordActivity : AppCompatActivity() {
     private var userEmail: String = "longto@discord.com" // Default or passed from intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme preference
+        val preferencesManager = com.hcmus.forumus_client.data.local.PreferencesManager(this)
+        if (preferencesManager.isDarkModeEnabled) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+        
         super.onCreate(savedInstanceState)
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         binding = ActivityResetPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

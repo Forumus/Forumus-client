@@ -7,10 +7,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@color/post_background"
-    android:elevation="2dp"
-    android:paddingHorizontal="15dp"
-    android:paddingVertical="10dp"
-    android:layout_marginBottom="1dp">
+    android:paddingTop="10dp">
 
     <!-- Author Info Section -->
     <LinearLayout
@@ -19,6 +16,7 @@
         android:id="@+id/authorInfoContainer"
         android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:paddingHorizontal="15dp"
         android:layout_marginBottom="10dp">
 
         <!-- Author Avatar -->
@@ -39,7 +37,7 @@
             android:layout_height="wrap_content"
             android:text="Anonymous"
             android:textSize="12sp"
-            android:textColor="#2C2C2C"
+            android:textColor="@color/text_tertiary"
             android:fontFamily="@font/montserrat_regular"
             android:layout_marginEnd="8dp"/>
 
@@ -83,6 +81,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingHorizontal="15dp"
         android:layout_marginBottom="10dp">
 
         <!-- Post Title -->
@@ -113,10 +112,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:nestedScrollingEnabled="false"
+        android:paddingHorizontal="15dp"
         android:layout_marginBottom="10dp"/>
 
     <!-- Topic Tags Container -->
     <HorizontalScrollView
+        android:paddingHorizontal="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"
@@ -136,6 +137,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:paddingHorizontal="15dp"
         android:gravity="center_vertical">
 
         <!-- Upvote & Downvote Section -->
@@ -244,4 +246,11 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+    
+    <!-- Bottom border -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginTop="10dp" />
 </LinearLayout>

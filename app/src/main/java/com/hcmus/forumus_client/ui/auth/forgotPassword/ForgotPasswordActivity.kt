@@ -18,8 +18,15 @@ class ForgotPasswordActivity : AppCompatActivity() {
     private var userEmail: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme preference
+        val preferencesManager = com.hcmus.forumus_client.data.local.PreferencesManager(this)
+        if (preferencesManager.isDarkModeEnabled) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+        
         super.onCreate(savedInstanceState)
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         binding = ActivityForgotPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

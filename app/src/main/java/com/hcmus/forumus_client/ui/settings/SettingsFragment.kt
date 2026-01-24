@@ -74,12 +74,15 @@ class SettingsFragment : Fragment() {
         binding.swDarkMode.setOnCheckedChangeListener { _, isChecked ->
             viewModel.saveDarkModePreference(isChecked)
             
-            // Apply theme change immediately
+            // Apply theme change immediately - AppCompatDelegate handles it automatically
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
+            
+            // Update system status bar and navigation bar colors
+            (activity as? com.hcmus.forumus_client.ui.main.MainActivity)?.updateStatusBarAppearance()
         }
 
         // Push notifications toggle
