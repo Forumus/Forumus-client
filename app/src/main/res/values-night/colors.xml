@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Theme Colors -->
+    
+    <!-- Base colors (unchanged) -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- App specific colors for DARK MODE -->
+    <color name="background_light">#121212</color>
+    <color name="text_primary">#E5E5E5</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="hint_text">#80FFFFFF</color>
+    <color name="input_background">#2A2A2A</color>
+    <color name="button_primary">#E5E5E5</color>
+    <color name="link_color">#5A8FFF</color>
+    <color name="checkbox_border">#5A5A5A</color>
+    <color name="complementary_text">#808080</color>
+    
+    <!-- Login button gradient colors (slightly brighter for dark mode) -->
+    <color name="gradient_start">#5A8FFF</color>
+    <color name="gradient_end">#2DE8FF</color>
+
+    <!-- Logout button colors (adjusted for dark mode) -->
+    <color name="logout_border">#8B3A3A</color>
+    <color name="logout_text">#FF6B6B</color>
+
+    <!-- Post colors -->
+    <color name="post_background">#1E1E1E</color>
+    <color name="text_secondary_light">#808080</color>
+    <color name="text_tertiary">#B0B0B0</color>
+    <color name="divider">#3A3A3A</color>
+    <color name="light_gray">#2C2C2C</color>
+    <color name="button_background_light">#2C2C2C</color>
+    <color name="button_background_lighter">#333333</color>
+
+    <!-- Voting colors (adjusted for dark mode) -->
+    <color name="vote_up_blue">#5A8FFF</color>
+    <color name="vote_down_red">#FF6B6B</color>
+    
+    <!-- Chat screen colors -->
+    <color name="chat_time_blue">#5A8FFF</color>
+    <color name="chat_time_gray">#B0B0B0</color>
+    <color name="chat_message_delete_bg">#3A3A3A</color>
+    <color name="chat_message_unread">#F5F5F5</color>
+    <color name="chat_message_read">#B0B0B0</color>
+    <color name="chat_border">#3A3A3A</color>
+    <color name="chat_filter_unselected">#B0B0B0</color>
+
+    <!-- Edit Profile - Status colors (adjusted for dark mode) -->
+    <color name="status_normal">#34D399</color>
+    <color name="status_normal_tonal">#1A4D36</color>
+
+    <color name="status_banned">#FF6B6B</color>
+    <color name="status_banned_tonal">#4D2020</color>
+
+    <color name="status_warned">#FBBF24</color>
+    <color name="status_warned_tonal">#4D3D10</color>
+
+    <color name="status_reminded">#5A8FFF</color>
+    <color name="status_reminded_tonal">#1A2A4D</color>
+
+    <!-- Role colors (adjusted for dark mode) -->
+    <color name="role_student">#5A8FFF</color>
+    <color name="role_student_tonal">#1A2A4D</color>
+
+    <color name="role_teacher">#A78BFA</color>
+    <color name="role_teacher_tonal">#2A1A4D</color>
+
+    <color name="role_admin">#FBBF24</color>
+    <color name="role_admin_tonal">#4D3D10</color>
+
+    <!-- Surface and background colors -->
+    <color name="bg_app">#121212</color>
+    <color name="surface">#1E1E1E</color>
+    <color name="stroke">#3A3A3A</color>
+
+    <!-- Primary colors (adjusted for dark mode) -->
+    <color name="primary">#5A8FFF</color>
+    <color name="primary_tonal">#1A2A4D</color>
+
+    <!-- Danger colors (adjusted for dark mode) -->
+    <color name="danger">#FF6B6B</color>
+    <color name="danger_tonal">#4D2020</color>
+
+    <!-- Neutral tonal -->
+    <color name="neutral_tonal">#2C2C2C</color>
+    <color name="role">#7C7FFF</color>
+    <color name="role_tonal">#1A1A4D</color>
+
+    <color name="status_inactive">#FF6B6B</color>
+    <color name="status_inactive_tonal">#4D2020</color>
+
+    <!-- Error colors -->
+    <color name="error_red">#FF6B6B</color>
+</resources>

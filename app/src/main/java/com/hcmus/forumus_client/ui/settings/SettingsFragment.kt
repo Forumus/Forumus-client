@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -69,9 +70,16 @@ class SettingsFragment : Fragment() {
      * Setup preference toggle switches with saved state persistence
      */
     private fun setupToggleSwitches() {
-        // Dark mode toggle
+        // Dark mode toggle with theme application
         binding.swDarkMode.setOnCheckedChangeListener { _, isChecked ->
             viewModel.saveDarkModePreference(isChecked)
+            
+            // Apply theme change immediately
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
         }
 
         // Push notifications toggle

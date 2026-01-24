@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/surface">
 
     <!-- Divider Line -->
     <View
         android:layout_width="match_parent"
         android:layout_height="8dp"
-        android:background="#F5F5F5"/>
+        android:background="@color/bg_app"/>
 
     <!-- Comment Count Label -->
     <TextView
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:text="12 Comments"
         android:textSize="14sp"
-        android:textColor="#666666"
+        android:textColor="@color/text_tertiary"
         android:fontFamily="@font/montserrat_medium"
         android:paddingHorizontal="20dp"
         android:paddingVertical="12dp"/>
@@ -28,6 +28,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#EEEEEE"/>
+        android:background="@color/divider"/>
 
 </LinearLayout>
