@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F2F2">
+    android:background="@color/bg_app">
 
     <!-- Custom Header "Notification" -->
     <LinearLayout
@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:paddingHorizontal="22dp"
         android:paddingTop="14dp"
         android:paddingBottom="20dp"
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:text="Notification"
             android:textSize="32sp"
-            android:textColor="@color/black"
+            android:textColor="@color/text_primary"
             android:fontFamily="@font/montserrat_semibold"
             android:textStyle="bold"
             android:lineSpacingExtra="4dp" />
@@ -50,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No notifications yet"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="@color/text_secondary_light"
         android:textSize="18sp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/bottomBar"

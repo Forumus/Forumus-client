@@ -93,4 +93,7 @@
 
     <!-- Error colors -->
     <color name="error_red">#E04141</color>
+    
+    <!-- Filter selection background -->
+    <color name="filter_selected_bg">#E1E1E1</color>
 </resources>

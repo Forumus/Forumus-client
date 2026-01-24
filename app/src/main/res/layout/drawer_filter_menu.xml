@@ -22,7 +22,7 @@
                 android:text="Browse &amp; Filter"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#333333"
+                android:textColor="@color/text_primary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
@@ -35,7 +35,7 @@
             android:text="SORT BY"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:textColor="#999999"
+            android:textColor="@color/text_secondary_light"
             android:layout_marginBottom="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -63,7 +63,7 @@
 
                 <TextView
                     android:text="New"
-                    android:textColor="#333333"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
                     android:layout_marginStart="16dp"
                     android:layout_width="wrap_content"
@@ -87,7 +87,7 @@
 
                 <TextView
                     android:text="Trending"
-                    android:textColor="#333333"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
                     android:layout_marginStart="16dp"
                     android:layout_width="wrap_content"
@@ -99,7 +99,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#EEEEEE"
+            android:background="@color/divider"
             android:layout_marginVertical="24dp"/>
 
         <!-- POPULAR TOPICS Section -->
@@ -107,7 +107,7 @@
             android:text="POPULAR TOPICS"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:textColor="#999999"
+            android:textColor="@color/text_secondary_light"
             android:layout_marginBottom="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>

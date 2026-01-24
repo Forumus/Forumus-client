@@ -36,7 +36,7 @@
                     android:layout_height="28dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_home"
-                    app:tint="#666666" />
+                    app:tint="@color/text_tertiary" />
                 <TextView
                     android:id="@+id/textHome"
                     android:layout_width="wrap_content"
@@ -44,7 +44,7 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/montserrat_regular"
                     android:text="Home"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -63,7 +63,7 @@
                     android:layout_height="28dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_explore"
-                    app:tint="#666666" />
+                    app:tint="@color/text_tertiary" />
                 <TextView
                     android:id="@+id/textExplore"
                     android:layout_width="wrap_content"
@@ -71,7 +71,7 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/montserrat_regular"
                     android:text="Explore"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -116,7 +116,7 @@
                         android:layout_height="28dp"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_notification"
-                        app:tint="#666666" />
+                        app:tint="@color/text_tertiary" />
 
                     <TextView
                         android:id="@+id/badgeAlerts"
@@ -140,7 +140,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_regular"
                     android:text="Notifications"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="10sp"
                     android:maxLines="1"
                     android:ellipsize="end" />
@@ -168,7 +168,7 @@
                         android:layout_marginTop="4dp"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_chat"
-                        app:tint="#666666" />
+                        app:tint="@color/text_tertiary" />
 
                     <TextView
                         android:id="@+id/badgeChat"
@@ -192,7 +192,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_regular"
                     android:text="Chat"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>

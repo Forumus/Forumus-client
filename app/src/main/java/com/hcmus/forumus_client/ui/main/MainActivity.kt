@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,6 +20,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.firebase.messaging.FirebaseMessaging
 import com.hcmus.forumus_client.NavGraphDirections
 import com.hcmus.forumus_client.R
+import com.hcmus.forumus_client.data.local.PreferencesManager
 import com.hcmus.forumus_client.data.model.UserStatus
 import com.hcmus.forumus_client.data.repository.UserRepository
 import com.hcmus.forumus_client.databinding.ActivityMainBinding
@@ -40,6 +42,9 @@ class MainActivity : AppCompatActivity() {
     private val mainSharedViewModel: MainSharedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme before super.onCreate()
+        applyTheme()
+        
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -49,8 +54,8 @@ class MainActivity : AppCompatActivity() {
         // Check if user is banned
         checkBanStatus()
         
-        // Force light status bar (dark icons)
-        androidx.core.view.WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
+        // Update status bar appearance based on theme
+        updateStatusBarAppearance()
         
         setupNavigation()
         loadInitialData()
@@ -245,5 +250,49 @@ class MainActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+    
+    /**
+     * Apply the saved theme preference from SharedPreferences.
+     * Called before super.onCreate() to ensure proper theme application.
+     */
+    private fun applyTheme() {
+        val preferencesManager = PreferencesManager(application)
+        val isDarkMode = preferencesManager.isDarkModeEnabled
+        
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+    }
+    
+    /**
+     * Update status bar and navigation bar appearance based on current theme.
+     * Light theme = dark icons/bars, Dark theme = light icons/bars
+     * Public so it can be called when theme is changed in SettingsFragment
+     */
+    fun updateStatusBarAppearance() {
+        val preferencesManager = PreferencesManager(application)
+        val isDarkMode = preferencesManager.isDarkModeEnabled
+        
+        val windowInsetsController = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+        
+        // Set icon colors
+        windowInsetsController.isAppearanceLightStatusBars = !isDarkMode
+        windowInsetsController.isAppearanceLightNavigationBars = !isDarkMode
+        
+        // Set bar background colors from theme
+        window.statusBarColor = if (isDarkMode) {
+            getColor(com.hcmus.forumus_client.R.color.bg_app)
+        } else {
+            getColor(com.hcmus.forumus_client.R.color.white)
+        }
+        
+        window.navigationBarColor = if (isDarkMode) {
+            getColor(com.hcmus.forumus_client.R.color.bg_app)
+        } else {
+            getColor(com.hcmus.forumus_client.R.color.white)
+        }
     }
 }

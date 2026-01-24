@@ -328,7 +328,7 @@ class HomeFragment : Fragment() {
                     TextView(requireContext()).apply {
                         text = topic.name
                         textSize = 14f
-                        setTextColor(android.graphics.Color.parseColor("#333333"))
+                        setTextColor(requireContext().getColor(R.color.text_primary))
                         layoutParams =
                                 LinearLayout.LayoutParams(
                                                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -359,7 +359,7 @@ class HomeFragment : Fragment() {
             val topicId = itemView.tag as? String ?: continue
 
             if (selectedTopics.contains(topicId)) {
-                itemView.setBackgroundColor(android.graphics.Color.parseColor("#E1E1E1"))
+                itemView.setBackgroundColor(requireContext().getColor(R.color.filter_selected_bg))
             } else {
                 val typedValue = TypedValue()
                 requireActivity()
@@ -445,14 +445,14 @@ class HomeFragment : Fragment() {
 
             // Update New item
             if (sortOption == HomeViewModel.SortOption.NEW) {
-                newItem?.setBackgroundColor(android.graphics.Color.parseColor("#E1E1E1"))
+                newItem?.setBackgroundColor(requireContext().getColor(R.color.filter_selected_bg))
             } else {
                 newItem?.setBackgroundResource(selectableBackground)
             }
 
             // Update Trending item
             if (sortOption == HomeViewModel.SortOption.TRENDING) {
-                trendingItem?.setBackgroundColor(android.graphics.Color.parseColor("#E1E1E1"))
+                trendingItem?.setBackgroundColor(requireContext().getColor(R.color.filter_selected_bg))
             } else {
                 trendingItem?.setBackgroundResource(selectableBackground)
             }

@@ -21,7 +21,7 @@
             android:id="@+id/profileHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:orientation="vertical"
             android:paddingHorizontal="15dp"
             android:paddingTop="10dp"
@@ -53,7 +53,7 @@
                     android:fontFamily="@font/montserrat_medium"
                     android:lineSpacingMultiplier="1.17"
                     android:text="Anonymous"
-                    android:textColor="#333D42"
+                    android:textColor="@color/text_primary"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -65,7 +65,7 @@
                     android:fontFamily="@font/montserrat_regular"
                     android:lineSpacingMultiplier="1.36"
                     android:text="23xxxxxx@student.hcmus.edu.vn"
-                    android:textColor="#5C6C74"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -92,7 +92,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
                         android:text="0"
-                        android:textColor="#2C2C2C"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp" />
 
                     <TextView
@@ -100,7 +100,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
                         android:text=" posts"
-                        android:textColor="#666666"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="13sp" />
                 </LinearLayout>
 
@@ -118,7 +118,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
                         android:text="0"
-                        android:textColor="#2C2C2C"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp" />
 
                     <TextView
@@ -126,7 +126,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
                         android:text=" replies"
-                        android:textColor="#666666"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="13sp" />
                 </LinearLayout>
 
@@ -143,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
                         android:text="0"
-                        android:textColor="#2C2C2C"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp" />
 
                     <TextView
@@ -151,7 +151,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
                         android:text=" upvotes"
-                        android:textColor="#666666"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -179,7 +179,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
                         android:text="General"
-                        android:textColor="#2C2C2C"
+                        android:textColor="@color/text_primary"
                         android:textSize="13sp" />
                 </LinearLayout>
 
@@ -197,7 +197,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
                         android:text="Post"
-                        android:textColor="#2C2C2C"
+                        android:textColor="@color/text_primary"
                         android:textSize="13sp" />
                 </LinearLayout>
 
@@ -214,7 +214,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
                         android:text="Reply"
-                        android:textColor="#2C2C2C"
+                        android:textColor="@color/text_primary"
                         android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>

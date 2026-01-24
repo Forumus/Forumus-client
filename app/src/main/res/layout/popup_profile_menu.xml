@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/view_profile"
                 android:textSize="14sp"
-                android:textColor="#2c2c2c"
+                android:textColor="@color/text_primary"
                 android:fontFamily="@font/montserrat_regular"
                 android:layout_marginStart="12dp" />
 
@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/edit_profile"
                 android:textSize="14sp"
-                android:textColor="#2c2c2c"
+                android:textColor="@color/text_primary"
                 android:fontFamily="@font/montserrat_regular"
                 android:layout_marginStart="12dp" />
 
@@ -70,7 +70,7 @@
         <View
             android:layout_width="206dp"
             android:layout_height="1dp"
-            android:background="#1a000000"
+            android:background="@color/divider"
             android:layout_marginBottom="8dp" />
 
         <LinearLayout
@@ -97,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/dark_mode"
                 android:textSize="14sp"
-                android:textColor="#2c2c2c"
+                android:textColor="@color/text_primary"
                 android:fontFamily="@font/montserrat_regular"
                 android:layout_marginStart="12dp" />
 
@@ -126,7 +126,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/settings"
                 android:textSize="14sp"
-                android:textColor="#2c2c2c"
+                android:textColor="@color/text_primary"
                 android:fontFamily="@font/montserrat_regular"
                 android:layout_marginStart="12dp" />
         </LinearLayout>

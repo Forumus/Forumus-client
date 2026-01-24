@@ -6,11 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/white"
-    android:elevation="2dp"
-    android:paddingHorizontal="15dp"
-    android:paddingVertical="10dp"
-    android:layout_marginBottom="1dp">
+    android:background="@color/post_background"
+    android:paddingTop="10dp">
 
     <!-- Author Info Section -->
     <LinearLayout
@@ -19,6 +16,7 @@
         android:id="@+id/authorInfoContainer"
         android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:paddingHorizontal="15dp"
         android:layout_marginBottom="10dp">
 
         <!-- Author Avatar -->
@@ -39,7 +37,7 @@
             android:layout_height="wrap_content"
             android:text="Anonymous"
             android:textSize="12sp"
-            android:textColor="#2C2C2C"
+            android:textColor="@color/text_tertiary"
             android:fontFamily="@font/montserrat_regular"
             android:layout_marginEnd="8dp"/>
 
@@ -50,7 +48,7 @@
             android:layout_height="wrap_content"
             android:text="•"
             android:textSize="12sp"
-            android:textColor="#999999"
+            android:textColor="@color/text_secondary_light"
             android:fontFamily="@font/montserrat_regular"
             android:layout_marginEnd="8dp"/>
 
@@ -62,7 +60,7 @@
             android:layout_height="wrap_content"
             android:text="2h"
             android:textSize="12sp"
-            android:textColor="#999999"
+            android:textColor="@color/text_secondary_light"
             android:fontFamily="@font/montserrat_regular" />
 
         <ImageButton
@@ -83,6 +81,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingHorizontal="15dp"
         android:layout_marginBottom="10dp">
 
         <!-- Post Title -->
@@ -92,7 +91,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_semibold"
             android:text="Post Title"
-            android:textColor="#2C2C2C"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="10dp"
             android:textSize="18sp" />
 
@@ -103,7 +102,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_regular"
             android:text="Excited to announce that registration for our annual Tech Fest is now open! Early bird discount available for the first 100 students."
-            android:textColor="#666666"
+            android:textColor="@color/text_tertiary"
             android:textSize="13sp" />
 
     </LinearLayout>
@@ -113,10 +112,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:nestedScrollingEnabled="false"
+        android:paddingHorizontal="15dp"
         android:layout_marginBottom="10dp"/>
 
     <!-- Topic Tags Container -->
     <HorizontalScrollView
+        android:paddingHorizontal="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"
@@ -136,6 +137,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:paddingHorizontal="15dp"
         android:gravity="center_vertical">
 
         <!-- Upvote & Downvote Section -->
@@ -157,7 +159,7 @@
                 android:src="@drawable/ic_upvote"
                 android:scaleType="fitCenter"
                 android:layout_marginEnd="15dp"
-                app:tint="#666666"
+                app:tint="@color/text_tertiary"
                 tools:ignore="TouchTargetSizeCheck"/>
 
             <!-- Upvote Count -->
@@ -167,7 +169,7 @@
                 android:layout_height="wrap_content"
                 android:text="0"
                 android:textSize="13sp"
-                android:textColor="#666666"
+                android:textColor="@color/text_tertiary"
                 android:fontFamily="@font/montserrat_regular"
                 android:layout_marginEnd="15dp" />
 
@@ -179,7 +181,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_downvote"
                 android:scaleType="fitCenter"
-                app:tint="#666666"
+                app:tint="@color/text_tertiary"
                 tools:ignore="TouchTargetSizeCheck"/>
         </LinearLayout>
 
@@ -209,7 +211,7 @@
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:src="@drawable/ic_comment"
-                    app:tint="#666666"
+                    app:tint="@color/text_tertiary"
                     android:scaleType="fitCenter"
                     android:layout_marginEnd="6dp"/>
 
@@ -220,7 +222,7 @@
                     android:layout_height="wrap_content"
                     android:text="0"
                     android:textSize="13sp"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_tertiary"
                     android:gravity="center"
                     android:fontFamily="@font/montserrat_regular"/>
             </LinearLayout>
@@ -239,9 +241,16 @@
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:src="@drawable/ic_share"
-                    app:tint="#666666"
+                    app:tint="@color/text_tertiary"
                     android:scaleType="fitCenter"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+    
+    <!-- Bottom border -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginTop="10dp" />
 </LinearLayout>
