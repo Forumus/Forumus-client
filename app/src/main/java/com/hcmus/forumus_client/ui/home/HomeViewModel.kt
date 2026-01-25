@@ -1,5 +1,6 @@
 package com.hcmus.forumus_client.ui.home
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
@@ -26,6 +27,13 @@ class HomeViewModel(
         private val postRepository: PostRepository = PostRepository(),
         private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
+
+    /**
+     * Initializes the summary cache with context. Call this from the Fragment/Activity.
+     */
+    fun initSummaryCache(context: Context) {
+        postRepository.initSummaryCache(context.applicationContext)
+    }
 
     // List of posts for the home feed
     private val _posts = MutableLiveData<List<Post>>(emptyList())

@@ -1,5 +1,6 @@
 package com.hcmus.forumus_client.ui.post.detail
 
+import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
@@ -49,6 +50,14 @@ class PostDetailViewModel(
     private val commentRepository: CommentRepository = CommentRepository(),
     private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
+
+    /**
+     * Initializes the summary cache with context. Call this from the Fragment/Activity.
+     */
+    fun initSummaryCache(context: Context) {
+        postRepository.initSummaryCache(context.applicationContext)
+    }
+
     // List of FeedItems (posts and comments) to display in RecyclerView
     private val _items = MutableLiveData<List<FeedItem>>(emptyList())
     val items: LiveData<List<FeedItem>> = _items

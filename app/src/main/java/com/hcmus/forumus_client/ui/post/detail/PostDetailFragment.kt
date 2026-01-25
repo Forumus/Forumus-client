@@ -53,6 +53,9 @@ class PostDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Initialize summary cache with context
+        viewModel.initSummaryCache(requireContext())
+
         val postId = args.postId
         if (postId.isEmpty()) {
             Toast.makeText(requireContext(), "Missing postId", Toast.LENGTH_SHORT).show()

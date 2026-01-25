@@ -61,6 +61,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Initialize summary cache with context
+        viewModel.initSummaryCache(requireContext())
+
         setupTopAppBar()
         setupSwipeRefresh()
         setupRecyclerView()
