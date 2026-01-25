@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import coil.load
+import coil.request.CachePolicy
 import com.hcmus.forumus_client.R
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -53,6 +54,11 @@ class PostMediaAdapter(
                     ivPostImage.load(item.imageUrl) {
                         crossfade(true)
                         error(R.drawable.error_image)
+                        placeholder(R.drawable.gray_background)
+                        // Enable aggressive caching
+                        memoryCachePolicy(CachePolicy.ENABLED)
+                        diskCachePolicy(CachePolicy.ENABLED)
+                        networkCachePolicy(CachePolicy.ENABLED)
 
                         listener(
                             onStart = { progressBar.visibility = View.VISIBLE },
@@ -65,6 +71,12 @@ class PostMediaAdapter(
                     ivPostImage.load(item.thumbnailUrl) {
                         crossfade(true)
                         error(R.drawable.gray_background)
+                        placeholder(R.drawable.gray_background)
+                        // Enable aggressive caching for video thumbnails
+                        memoryCachePolicy(CachePolicy.ENABLED)
+                        diskCachePolicy(CachePolicy.ENABLED)
+                        networkCachePolicy(CachePolicy.ENABLED)
+                        
                         listener(
                             onStart = { progressBar.visibility = View.VISIBLE },
                             onSuccess = { _, _ -> progressBar.visibility = View.GONE },

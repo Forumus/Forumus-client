@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
+import coil.request.CachePolicy
 import android.content.Intent
 import com.google.firebase.Timestamp
 import com.hcmus.forumus_client.data.model.PostAction
@@ -64,6 +65,10 @@ class PostViewHolder(
     val topicContainer: LinearLayout = itemView.findViewById(R.id.topicContainer)
     val imagesAdapter = PostMediaAdapter()
 
+    // Location views
+    private val locationButton: LinearLayout = itemView.findViewById(R.id.locationButton)
+    private val locationText: TextView = itemView.findViewById(R.id.locationText)
+
     var imagesLayoutManager: GridLayoutManager? = null
 
     // Expandable text state
@@ -110,12 +115,15 @@ class PostViewHolder(
         upvoteCount.text = post.upvoteCount.toString()
         replyCount.text = post.commentCount.toString()
 
-        // Load author avatar with fallback
+        // Load author avatar with fallback and caching
         authorAvatar.load(post.authorAvatarUrl) {
             crossfade(true)
             placeholder(R.drawable.default_avatar)
             error(R.drawable.default_avatar)
             transformations(CircleCropTransformation())
+            // Enable caching for avatar images
+            memoryCachePolicy(CachePolicy.ENABLED)
+            diskCachePolicy(CachePolicy.ENABLED)
         }
 
         // Apply visual feedback for user's vote state
@@ -123,6 +131,9 @@ class PostViewHolder(
 
         // Set up media (ảnh + video)
         setupMedia(post)
+
+        // Set up location display
+        setupLocation(post)
 
         // Bind topic tags
         topicContainer.removeAllViews()
@@ -304,6 +315,66 @@ class PostViewHolder(
         // Open Media Viewer when any media item is clicked. Convert to parcelable MediaViewerItem.
         imagesAdapter.setOnMediaClickListener { clickedIndex ->
             com.hcmus.forumus_client.ui.media.MediaViewerNavigator.open(itemView, post, clickedIndex)
+        }
+    }
+
+    /**
+     * Set up location display with name and coordinates
+     */
+    private fun setupLocation(post: Post) {
+        if (post.locationName != null && post.locationName!!.isNotBlank()) {
+            locationButton.visibility = View.VISIBLE
+            locationText.text = post.locationName
+            
+            // Click to open maps or show coordinates
+            locationButton.setOnClickListener {
+                openLocationInMaps(post)
+            }
+        } else {
+            locationButton.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Open location in maps app or show toast with coordinates
+     */
+    private fun openLocationInMaps(post: Post) {
+        val lat = post.latitude
+        val lng = post.longitude
+        
+        if (lat != null && lng != null) {
+            try {
+                // Create intent to open Google Maps
+                val gmmIntentUri = android.net.Uri.parse("geo:$lat,$lng?q=$lat,$lng(${post.locationName})")
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+                
+                // Check if Google Maps is installed
+                if (mapIntent.resolveActivity(itemView.context.packageManager) != null) {
+                    itemView.context.startActivity(mapIntent)
+                } else {
+                    // Fallback to browser maps
+                    val browserIntent = Intent(
+                        Intent.ACTION_VIEW,
+                        android.net.Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng")
+                    )
+                    itemView.context.startActivity(browserIntent)
+                }
+            } catch (e: Exception) {
+                // Show coordinates in toast as fallback
+                android.widget.Toast.makeText(
+                    itemView.context,
+                    "${post.locationName}\nLat: $lat, Long: $lng",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else {
+            // Show location name only
+            android.widget.Toast.makeText(
+                itemView.context,
+                post.locationName,
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

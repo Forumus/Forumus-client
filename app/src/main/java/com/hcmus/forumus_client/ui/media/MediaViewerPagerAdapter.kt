@@ -10,6 +10,7 @@ import android.widget.MediaController
 import android.widget.VideoView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.request.CachePolicy
 import com.hcmus.forumus_client.R
 import kotlin.math.min
 
@@ -55,6 +56,10 @@ class MediaViewerPagerAdapter : RecyclerView.Adapter<MediaViewerPagerAdapter.Med
                     ivMedia.load(item.imageUrl) {
                         crossfade(true)
                         error(R.drawable.error_image)
+                        // Enable caching for full resolution images
+                        memoryCachePolicy(CachePolicy.ENABLED)
+                        diskCachePolicy(CachePolicy.ENABLED)
+                        networkCachePolicy(CachePolicy.ENABLED)
                     }
                 } else {
                     ivMedia.visibility = View.GONE
