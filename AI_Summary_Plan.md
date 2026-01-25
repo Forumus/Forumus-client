@@ -40,7 +40,7 @@
 
 ### Phase 1: Backend - DTOs & Core Services (Estimated: 3 hours)
 
-- [ ] **Task 1.1**: Create PostSummaryRequest DTO
+- [x] **Task 1.1**: Create PostSummaryRequest DTO
   - **Details**: 
     - Create file: `Forumus-server/src/main/java/com/hcmus/forumus_backend/dto/post/PostSummaryRequest.java`
     - Fields: `private String postId;`
@@ -52,7 +52,7 @@
     - Matches JSON structure: `{"postId": "POST_xxx"}`
   - **Time Estimate**: 15 minutes
 
-- [ ] **Task 1.2**: Create PostSummaryResponse DTO
+- [x] **Task 1.2**: Create PostSummaryResponse DTO
   - **Details**:
     - Create file: `Forumus-server/src/main/java/com/hcmus/forumus_backend/dto/post/PostSummaryResponse.java`
     - Fields: `boolean success`, `String summary`, `String errorMessage`, `boolean cached`
@@ -64,7 +64,7 @@
     - Factory methods simplify controller code
   - **Time Estimate**: 20 minutes
 
-- [ ] **Task 1.3**: Implement summarizePost method in PostService
+- [x] **Task 1.3**: Implement summarizePost method in PostService
   - **Details**:
     - Add method signature: `public PostSummaryResponse summarizePost(String postId)`
     - Fetch post from Firestore using existing `getPostById(String postId)` method
@@ -92,7 +92,7 @@
     - Logs request and response for debugging
   - **Time Estimate**: 1.5 hours
 
-- [ ] **Task 1.4**: Add summarize endpoint to PostController
+- [x] **Task 1.4**: Add summarize endpoint to PostController
   - **Details**:
     - Add to `Forumus-server/src/main/java/com/hcmus/forumus_backend/controller/PostController.java`
     - Endpoint mapping: `@PostMapping("/summarize")`
@@ -109,7 +109,7 @@
     - No authentication required (matches existing endpoints)
   - **Time Estimate**: 30 minutes
 
-- [ ] **Task 1.5**: Test backend endpoint manually
+- [x] **Task 1.5**: Test backend endpoint manually
   - **Details**:
     - Start Spring Boot server locally: `./mvnw spring-boot:run`
     - Test with curl or Postman:
