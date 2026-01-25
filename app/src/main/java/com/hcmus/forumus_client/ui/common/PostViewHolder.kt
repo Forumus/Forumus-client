@@ -66,6 +66,12 @@ class PostViewHolder(
 
     var imagesLayoutManager: GridLayoutManager? = null
 
+    // Expandable text state
+    private var isContentExpanded = false
+    private var fullContent = ""
+    private val maxCollapsedLines = 4
+    private val showMoreText = " Show more..."
+
     init {
         rvPostImages.adapter = imagesAdapter
     }
@@ -94,7 +100,11 @@ class PostViewHolder(
 
         // Bind post content
         postTitle.text = post.title
-        postContent.text = post.content
+        
+        // Reset expansion state when binding new content
+        isContentExpanded = false
+        fullContent = post.content
+        setupExpandableContent()
 
         // Bind vote counts
         upvoteCount.text = post.upvoteCount.toString()
@@ -318,5 +328,79 @@ class PostViewHolder(
         } else {
             "now"
         }
+    }
+
+    /**
+     * Set up expandable content functionality.
+     * If content is too long (exceeds maxCollapsedLines), show truncated version with "Show more..."
+     * Clicking on the text toggles between expanded and collapsed states.
+     */
+    private fun setupExpandableContent() {
+        // First, set full content to measure it
+        postContent.text = fullContent
+        postContent.maxLines = Int.MAX_VALUE
+        
+        // Post a task to check line count after layout
+        postContent.post {
+            val lineCount = postContent.lineCount
+            
+            if (lineCount > maxCollapsedLines) {
+                // Content is long enough to collapse
+                if (!isContentExpanded) {
+                    // Show collapsed version with "Show more..."
+                    setCollapsedContent()
+                } else {
+                    // Show full content
+                    setExpandedContent()
+                }
+                
+                // Set up click listener to toggle expansion
+                postContent.setOnClickListener {
+                    isContentExpanded = !isContentExpanded
+                    if (isContentExpanded) {
+                        setExpandedContent()
+                    } else {
+                        setCollapsedContent()
+                    }
+                }
+            } else {
+                // Content is short, no need for expansion
+                postContent.text = fullContent
+                postContent.setOnClickListener(null)
+            }
+        }
+    }
+
+    /**
+     * Display collapsed version of the content with "Show more..." at the end
+     */
+    private fun setCollapsedContent() {
+        postContent.maxLines = maxCollapsedLines
+        
+        // Create spannable text with "Show more..." in a different color
+        val collapsedText = fullContent
+        val spannable = SpannableString(collapsedText + showMoreText)
+        
+        // Make "Show more..." clickable and styled
+        val showMoreColor = androidx.core.content.ContextCompat.getColor(
+            itemView.context, 
+            R.color.primary
+        )
+        spannable.setSpan(
+            ForegroundColorSpan(showMoreColor),
+            collapsedText.length,
+            spannable.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        
+        postContent.text = spannable
+    }
+
+    /**
+     * Display full expanded content
+     */
+    private fun setExpandedContent() {
+        postContent.maxLines = Int.MAX_VALUE
+        postContent.text = fullContent
     }
 }

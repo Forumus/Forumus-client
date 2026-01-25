@@ -71,8 +71,16 @@ class HomeFragment : Fragment() {
         setupDrawer()
         observeViewModel()
 
-        viewModel.loadPosts()
-        viewModel.loadTopics()
+        // Only load posts if they haven't been loaded yet
+        // This prevents reloading when navigating back from post detail
+        if (viewModel.posts.value.isNullOrEmpty()) {
+            viewModel.loadPosts()
+        }
+        
+        // Only load topics if they haven't been loaded yet
+        if (viewModel.topics.value.isNullOrEmpty()) {
+            viewModel.loadTopics()
+        }
 
     }
 

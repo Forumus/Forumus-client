@@ -103,7 +103,8 @@
             android:fontFamily="@font/montserrat_regular"
             android:text="Excited to announce that registration for our annual Tech Fest is now open! Early bird discount available for the first 100 students."
             android:textColor="@color/text_tertiary"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:ellipsize="end" />
 
     </LinearLayout>
 
