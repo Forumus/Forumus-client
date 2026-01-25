@@ -11,6 +11,7 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.ItemChatMessageBinding
 import android.util.Log
 import com.bumptech.glide.Glide
+import com.hcmus.forumus_client.data.repository.ChatRepository
 
 class ChatsAdapter(
     private val onChatClick: (ChatItem) -> Unit,
@@ -77,9 +78,14 @@ class ChatsAdapter(
                 binding.profileImage.setImageResource(R.drawable.ic_default_profile)
             }
             
+            // Get current user ID and unread status
+            val currentUserId = ChatRepository.getCurrentUserId()
+            val isUnreadForCurrentUser = currentUserId?.let { chatItem.isUnread(it) } ?: false
+            val unreadCountForCurrentUser = currentUserId?.let { chatItem.getUnreadCount(it) } ?: 0
+            
             // Set timestamp and color based on unread status
             binding.messageTime.text = chatItem.timestamp
-            if (chatItem.isUnread) {
+            if (isUnreadForCurrentUser) {
                 binding.messageTime.setTextColor(
                     ContextCompat.getColor(itemView.context, R.color.chat_time_blue)
                 )
@@ -102,9 +108,9 @@ class ChatsAdapter(
             }
             
             // Handle unread count visibility
-            if (chatItem.isUnread && chatItem.unreadCount > 0) {
+            if (isUnreadForCurrentUser && unreadCountForCurrentUser > 0) {
                 binding.unreadCount.visibility = View.VISIBLE
-                binding.unreadCountText.text = chatItem.unreadCount.toString()
+                binding.unreadCountText.text = unreadCountForCurrentUser.toString()
             } else {
                 binding.unreadCount.visibility = View.GONE
             }

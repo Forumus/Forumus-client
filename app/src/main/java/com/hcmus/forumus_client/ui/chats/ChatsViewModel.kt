@@ -69,8 +69,13 @@ class ChatsViewModel() : ViewModel() {
                 .collect { chatList ->
                     _chats.value = chatList
                     _isLoading.value = false
-                    // Calculate total unread count
-                    val totalUnread = chatList.sumOf { it.unreadCount }
+                    // Calculate total unread count for current user
+                    val currentUserId = ChatRepository.getCurrentUserId()
+                    val totalUnread = if (currentUserId != null) {
+                        chatList.sumOf { it.getUnreadCount(currentUserId) }
+                    } else {
+                        0
+                    }
                     _unreadChatCount.value = totalUnread
                     Log.d(TAG, "Chats loaded: ${chatList.size} items, unread: $totalUnread")
                 }

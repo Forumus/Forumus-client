@@ -6,7 +6,7 @@ data class ChatItem(
     val id: String = "",
     val lastMessage: String = "",
     val lastUpdate: Timestamp? = null,
-    val unreadCount: Int = 0,
+    val unreadCounts: Map<String, Int> = emptyMap(),
     val userIds: List<String> = emptyList(),
     val chatDeleted: Map<String, Boolean> = emptyMap()
 ) {
@@ -14,6 +14,11 @@ data class ChatItem(
     var contactName: String = ""
     var email: String = ""
     var profilePictureUrl: String? = null
-    var isUnread: Boolean = false
     var timestamp: String = ""
+    
+    // Computed property for current user's unread count
+    fun getUnreadCount(userId: String): Int = unreadCounts[userId] ?: 0
+    
+    // Computed property for current user's unread status
+    fun isUnread(userId: String): Boolean = getUnreadCount(userId) > 0
 }

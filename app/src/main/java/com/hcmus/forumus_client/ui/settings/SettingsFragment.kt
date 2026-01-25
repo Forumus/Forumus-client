@@ -119,14 +119,14 @@ class SettingsFragment : Fragment() {
             navController.navigate(R.id.action_settingsFragment_to_savedPostsFragment)
         }
 
-        // Help center - mock toast
+        // Help center - navigate to help center screen
         binding.llHelpCenter.setOnClickListener {
-            Toast.makeText(requireContext(), "Help Center - Coming Soon", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.action_settingsFragment_to_helpCenterFragment)
         }
 
-        // Community guidelines - mock toast
+        // Community guidelines - navigate to guidelines screen
         binding.llCommunityGuidelines.setOnClickListener {
-            Toast.makeText(requireContext(), "Community Guidelines - Coming Soon", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.action_settingsFragment_to_communityGuidelinesFragment)
         }
 
         // About forumus - mock toast

@@ -59,13 +59,31 @@
         <action
             android:id="@+id/action_settingsFragment_to_savedPostsFragment"
             app:destination="@id/savedPostsFragment"
-            app:enterAnim="@android:anim/fade_in"
-            app:exitAnim="@android:anim/fade_out" />
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_settingsFragment_to_aboutFragment"
             app:destination="@id/aboutFragment"
-            app:enterAnim="@android:anim/fade_in"
-            app:exitAnim="@android:anim/fade_out" />
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_settingsFragment_to_communityGuidelinesFragment"
+            app:destination="@id/communityGuidelinesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_settingsFragment_to_helpCenterFragment"
+            app:destination="@id/helpCenterFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <!-- Saved Posts Fragment -->
@@ -80,6 +98,20 @@
         android:id="@+id/aboutFragment"
         android:name="com.hcmus.forumus_client.ui.settings.about.AboutFragment"
         android:label="About Forumus">
+    </fragment>
+
+    <!-- Community Guidelines Fragment -->
+    <fragment
+        android:id="@+id/communityGuidelinesFragment"
+        android:name="com.hcmus.forumus_client.ui.settings.guidelines.CommunityGuidelinesFragment"
+        android:label="Community Guidelines">
+    </fragment>
+
+    <!-- Help Center Fragment -->
+    <fragment
+        android:id="@+id/helpCenterFragment"
+        android:name="com.hcmus.forumus_client.ui.settings.helpcenter.HelpCenterFragment"
+        android:label="Help Center">
     </fragment>
 
     <!-- Edit Profile Fragment -->

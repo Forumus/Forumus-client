@@ -96,6 +96,15 @@
     <string name="banned_info">Please note that repeated violations may lead to permanent account suspension.</string>
     <string name="banned_icon">Banned icon</string>
     
+    <!-- Community Guidelines -->
+    <string name="community_guidelines_icon">Community guidelines icon</string>
+    <string name="guideline_icon">Guideline icon</string>
+    <string name="expand_collapse">Expand or collapse</string>
+    
+    <!-- Help Center -->
+    <string name="help_center_icon">Help center icon</string>
+    <string name="help_topic_icon">Help topic icon</string>
+    
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="default_notification_channel_id">general_notification_channel</string>
