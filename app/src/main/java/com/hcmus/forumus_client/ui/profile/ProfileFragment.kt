@@ -178,8 +178,8 @@ class ProfileFragment : Fragment() {
                         val shareDialog = SharePostDialog.newInstance(post.id)
                         shareDialog.show(childFragmentManager, "SharePostDialog")
                     }
-                    PostAction.AUTHOR_PROFILE -> {
-                        // Already on profile, ignore
+                    PostAction.AUTHOR_PROFILE, PostAction.SUMMARY -> {
+                        // Already on profile or summary not applicable here, ignore
                     }
                     PostAction.MENU -> {
                         showPostMenu(post, view)

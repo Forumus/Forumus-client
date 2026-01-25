@@ -1,5 +1,6 @@
 package com.hcmus.forumus_client.ui.post.detail
 
+import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
@@ -49,6 +50,14 @@ class PostDetailViewModel(
     private val commentRepository: CommentRepository = CommentRepository(),
     private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
+
+    /**
+     * Initializes the summary cache with context. Call this from the Fragment/Activity.
+     */
+    fun initSummaryCache(context: Context) {
+        postRepository.initSummaryCache(context.applicationContext)
+    }
+
     // List of FeedItems (posts and comments) to display in RecyclerView
     private val _items = MutableLiveData<List<FeedItem>>(emptyList())
     val items: LiveData<List<FeedItem>> = _items
@@ -81,6 +90,13 @@ class PostDetailViewModel(
     // Save post result for UI feedback
     private val _savePostResult = MutableLiveData<SavePostResult?>()
     val savePostResult: LiveData<SavePostResult?> = _savePostResult
+
+    // AI Summary state
+    private val _summaryResult = MutableLiveData<Result<String>?>()
+    val summaryResult: LiveData<Result<String>?> = _summaryResult
+
+    private val _isSummaryLoading = MutableLiveData<Boolean>(false)
+    val isSummaryLoading: LiveData<Boolean> = _isSummaryLoading
 
     private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
     val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
@@ -455,5 +471,33 @@ class PostDetailViewModel(
      */
     fun clearSavePostResult() {
         _savePostResult.value = null
+    }
+
+    /**
+     * Requests an AI-generated summary for the current post.
+     * Prevents duplicate requests while one is in progress.
+     */
+    fun requestSummary() {
+        val postId = currentPost?.id ?: return
+        if (_isSummaryLoading.value == true) return
+
+        viewModelScope.launch {
+            _isSummaryLoading.value = true
+            try {
+                val result = postRepository.getPostSummary(postId)
+                _summaryResult.value = result
+            } catch (e: Exception) {
+                _summaryResult.value = Result.failure(e)
+            } finally {
+                _isSummaryLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Clears the summary result after it has been handled by the UI.
+     */
+    fun clearSummaryResult() {
+        _summaryResult.value = null
     }
 }

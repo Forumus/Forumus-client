@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -59,6 +60,9 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Initialize summary cache with context
+        viewModel.initSummaryCache(requireContext())
 
         setupTopAppBar()
         setupSwipeRefresh()
@@ -154,6 +158,7 @@ class HomeFragment : Fragment() {
                             val shareDialog = SharePostDialog.newInstance(post.id)
                             shareDialog.show(childFragmentManager, "SharePostDialog")
                         }
+                        PostAction.SUMMARY -> viewModel.onPostAction(post, PostAction.SUMMARY)
                         PostAction.AUTHOR_PROFILE -> {
                             // Navigate to ProfileFragment using Safe Args
                             val action =
@@ -441,6 +446,23 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // Observe AI summary loading state for button UI
+        viewModel.summaryLoadingPostId.observe(viewLifecycleOwner) { loadingPostId ->
+            homeAdapter.setSummaryLoadingPostId(loadingPostId)
+        }
+
+        // Observe AI summary result to show dialog or error
+        viewModel.summaryResult.observe(viewLifecycleOwner) { result ->
+            result?.let { (postId, summaryResult) ->
+                summaryResult.onSuccess { summary ->
+                    showSummaryDialog(summary)
+                }.onFailure { error ->
+                    showSummaryError(error.message ?: "Failed to generate summary")
+                }
+                viewModel.clearSummaryResult()
+            }
+        }
+
         mainSharedViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             binding.topAppBar.setProfileImage(user?.profilePictureUrl)
         }
@@ -493,5 +515,32 @@ class HomeFragment : Fragment() {
 
         // Show popup at menu button
         popupMenu.show(menuButton)
+    }
+
+    /**
+     * Displays a bottom sheet dialog with the AI-generated summary.
+     *
+     * @param summary The summary text to display
+     */
+    private fun showSummaryDialog(summary: String) {
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.dialog_post_summary, null)
+
+        view.findViewById<TextView>(R.id.tvSummaryContent).text = summary
+        view.findViewById<ImageButton>(R.id.btnClose).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
+    /**
+     * Displays an error toast when summary generation fails.
+     *
+     * @param message The error message to display
+     */
+    private fun showSummaryError(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 }

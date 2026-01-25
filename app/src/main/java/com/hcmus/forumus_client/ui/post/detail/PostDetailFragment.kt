@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -50,6 +52,9 @@ class PostDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Initialize summary cache with context
+        viewModel.initSummaryCache(requireContext())
 
         val postId = args.postId
         if (postId.isEmpty()) {
@@ -150,6 +155,9 @@ class PostDetailFragment : Fragment() {
                     PostAction.SHARE -> {
                         val shareDialog = SharePostDialog.newInstance(post.id)
                         shareDialog.show(childFragmentManager, "SharePostDialog")
+                    }
+                    PostAction.SUMMARY -> {
+                        viewModel.requestSummary()
                     }
                         PostAction.AUTHOR_PROFILE -> {
                             val action = PostDetailFragmentDirections.actionGlobalProfileFragment(post.authorId)
@@ -260,6 +268,50 @@ class PostDetailFragment : Fragment() {
             }
             binding.bottomInputBar.setHint(hint)
         }
+
+        // Observe AI summary loading state for button UI
+        viewModel.isSummaryLoading.observe(viewLifecycleOwner) { isLoading ->
+            detailAdapter.setSummaryLoading(isLoading)
+        }
+
+        // Observe AI summary result to show dialog or error
+        viewModel.summaryResult.observe(viewLifecycleOwner) { result ->
+            result?.let { summaryResult ->
+                summaryResult.onSuccess { summary ->
+                    showSummaryDialog(summary)
+                }.onFailure { error ->
+                    showSummaryError(error.message ?: "Failed to generate summary")
+                }
+                viewModel.clearSummaryResult()
+            }
+        }
+    }
+
+    /**
+     * Displays a bottom sheet dialog with the AI-generated summary.
+     *
+     * @param summary The summary text to display
+     */
+    private fun showSummaryDialog(summary: String) {
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.dialog_post_summary, null)
+
+        view.findViewById<TextView>(R.id.tvSummaryContent).text = summary
+        view.findViewById<ImageButton>(R.id.btnClose).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
+    /**
+     * Displays an error toast when summary generation fails.
+     *
+     * @param message The error message to display
+     */
+    private fun showSummaryError(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     /**
