@@ -82,6 +82,13 @@ class PostDetailViewModel(
     private val _savePostResult = MutableLiveData<SavePostResult?>()
     val savePostResult: LiveData<SavePostResult?> = _savePostResult
 
+    // AI Summary state
+    private val _summaryResult = MutableLiveData<Result<String>?>()
+    val summaryResult: LiveData<Result<String>?> = _summaryResult
+
+    private val _isSummaryLoading = MutableLiveData<Boolean>(false)
+    val isSummaryLoading: LiveData<Boolean> = _isSummaryLoading
+
     private val _topics = MutableLiveData<List<com.hcmus.forumus_client.data.model.Topic>>(emptyList())
     val topics: LiveData<List<com.hcmus.forumus_client.data.model.Topic>> = _topics
 
@@ -455,5 +462,33 @@ class PostDetailViewModel(
      */
     fun clearSavePostResult() {
         _savePostResult.value = null
+    }
+
+    /**
+     * Requests an AI-generated summary for the current post.
+     * Prevents duplicate requests while one is in progress.
+     */
+    fun requestSummary() {
+        val postId = currentPost?.id ?: return
+        if (_isSummaryLoading.value == true) return
+
+        viewModelScope.launch {
+            _isSummaryLoading.value = true
+            try {
+                val result = postRepository.getPostSummary(postId)
+                _summaryResult.value = result
+            } catch (e: Exception) {
+                _summaryResult.value = Result.failure(e)
+            } finally {
+                _isSummaryLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Clears the summary result after it has been handled by the UI.
+     */
+    fun clearSummaryResult() {
+        _summaryResult.value = null
     }
 }

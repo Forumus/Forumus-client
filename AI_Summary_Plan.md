@@ -611,7 +611,7 @@
 
 ### Phase 5: Apply Same Pattern to PostDetailFragment (Estimated: 1.5 hours)
 
-- [ ] **Task 5.1**: Add summary state to PostDetailViewModel
+- [x] **Task 5.1**: Add summary state to PostDetailViewModel ✅
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/ui/post/detail/PostDetailViewModel.kt`
     - Add same LiveData properties as HomeViewModel:
@@ -647,22 +647,24 @@
     - Matches HomeViewModel pattern
   - **Time Estimate**: 30 minutes
 
-- [ ] **Task 5.2**: Add summary button to fragment_post_detail.xml (if applicable)
+- [x] **Task 5.2**: Add summary button to fragment_post_detail.xml (if applicable) ✅
   - **Details**:
     - Check if post detail view uses same `post_item.xml` or has separate layout
     - If separate: Add summary button following same pattern as Task 3.3
     - If reuses `post_item.xml`: Button already included, skip this task
+  - **Result**: PostDetailAdapter reuses PostViewHolder with post_item.xml, so summary button already included from Phase 3
   - **Dependencies**: Task 3.3
   - **Acceptance Criteria**:
     - Summary button visible in post detail view
     - Consistent styling with home feed
   - **Time Estimate**: 20 minutes (if needed)
 
-- [ ] **Task 5.3**: Add summary observers to PostDetailFragment
+- [x] **Task 5.3**: Add summary observers to PostDetailFragment ✅
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/ui/post/detail/PostDetailFragment.kt`
     - Add observers and dialog methods (same as HomeFragment)
     - Wire up summary button click to `viewModel.requestSummary()`
+    - Added `setSummaryLoading()` method to PostDetailAdapter
   - **Dependencies**: Task 5.1, Task 5.2
   - **Acceptance Criteria**:
     - Summary works identically in detail view

@@ -43,6 +43,9 @@ class PostDetailAdapter(
     // Map of topic id to Topic object
     private var topicMap: Map<String, Topic> = emptyMap()
 
+    // Track if AI summary is loading for the post
+    private var isSummaryLoading: Boolean = false
+
     /**
      * Updates the adapter with the list of topics.
      *
@@ -117,7 +120,10 @@ class PostDetailAdapter(
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is FeedItem.PostItem -> (holder as PostViewHolder).bind(item.post, topicMap)
+            is FeedItem.PostItem -> {
+                (holder as PostViewHolder).bind(item.post, topicMap)
+                holder.setSummaryLoading(isSummaryLoading)
+            }
             is FeedItem.CommentItem -> (holder as CommentViewHolder).bind(item.comment, true)
         }
     }
@@ -128,4 +134,18 @@ class PostDetailAdapter(
      * @return The size of the items list
      */
     override fun getItemCount(): Int = items.size
+
+    /**
+     * Updates the AI summary loading state for the post.
+     * Since there's only one post at position 0, we notify that item.
+     *
+     * @param isLoading True if summary is being fetched, false otherwise
+     */
+    fun setSummaryLoading(isLoading: Boolean) {
+        isSummaryLoading = isLoading
+        // Post is always at position 0, notify to update loading state
+        if (items.isNotEmpty() && items[0] is FeedItem.PostItem) {
+            notifyItemChanged(0, "summary_loading")
+        }
+    }
 }
