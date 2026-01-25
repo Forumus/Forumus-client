@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Left dot - top, fading -->
+    <item
+        android:width="3dp"
+        android:height="3dp"
+        android:gravity="top|start">
+        <shape android:shape="oval">
+            <solid android:color="@color/primary" />
+            <size android:width="3dp" android:height="3dp" />
+        </shape>
+    </item>
+    
+    <!-- Center dot - rising, bright -->
+    <item
+        android:width="6dp"
+        android:height="6dp"
+        android:gravity="center">
+        <shape android:shape="oval">
+            <solid android:color="@color/primary" />
+            <size android:width="6dp" android:height="6dp" />
+        </shape>
+    </item>
+    
+    <!-- Right dot - bottom, getting brighter -->
+    <item
+        android:width="5dp"
+        android:height="5dp"
+        android:gravity="bottom|end">
+        <shape android:shape="oval">
+            <solid android:color="@color/primary" />
+            <size android:width="5dp" android:height="5dp" />
+        </shape>
+    </item>
+</layer-list>

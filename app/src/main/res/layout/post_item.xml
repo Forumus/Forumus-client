@@ -244,19 +244,20 @@
                     android:scaleType="fitCenter"/>
             </LinearLayout>
 
-            <!-- Summary Loading Indicator -->
+            <!-- Summary Loading Indicator - Modern AI Animation -->
             <FrameLayout
                 android:id="@+id/summaryLoadingContainer"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:visibility="gone"
                 android:layout_marginEnd="8dp">
-                <ProgressBar
+                <ImageView
                     android:id="@+id/summaryLoading"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_gravity="center"
-                    style="?android:attr/progressBarStyleSmall"/>
+                    android:src="@drawable/ai_loading_animation"
+                    android:contentDescription="AI loading"/>
             </FrameLayout>
 
             <!-- Share Button -->
