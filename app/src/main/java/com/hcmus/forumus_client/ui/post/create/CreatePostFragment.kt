@@ -35,7 +35,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-// --- IMPORT GOOGLE MAPS & PLACES ---
+// --- IMPORT GOOGLE MAPS & PLACES (Quan trọng) ---
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
@@ -47,7 +47,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
-// ------------------------------------
+// ------------------------------------------------
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
@@ -101,6 +101,7 @@ class CreatePostFragment : Fragment() {
         if (uris.isNotEmpty()) { viewModel.addImages(uris); setBottomSheetState(false) }
     }
 
+    // Launcher cho Google Autocomplete (Tìm kiếm địa điểm)
     private val startAutocomplete = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.let { intent ->
@@ -118,6 +119,7 @@ class CreatePostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Init Places (Lưu ý: Thay API Key của bạn vào đây nếu chưa có)
         if (!Places.isInitialized()) {
             Places.initialize(requireContext(), "AIzaSyBSvLkWXEj9agyzUv2bzi4AA1ihj7pnxmY")
         }
@@ -140,7 +142,7 @@ class CreatePostFragment : Fragment() {
         val onPhotoClick = View.OnClickListener { checkPermissionAndPickImage() }
         val onTopicClick = View.OnClickListener { showTopicSelectionDialog() }
 
-        // Mở BottomSheet chọn vị trí
+        // Mở BottomSheet chọn vị trí (Style Instagram)
         val onLocationClick = View.OnClickListener {
             val currentUser = viewModel.currentUser.value
             val locationSheet = LocationPickerBottomSheet(
@@ -149,6 +151,7 @@ class CreatePostFragment : Fragment() {
                     updateLocationUI(place.name, place.latLng?.latitude, place.latLng?.longitude)
                 },
                 onSearchClick = {
+                    // Mở màn hình tìm kiếm của Google
                     val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
                     val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(requireContext())
                     startAutocomplete.launch(intent)
@@ -157,11 +160,13 @@ class CreatePostFragment : Fragment() {
             locationSheet.show(parentFragmentManager, "LocationPicker")
         }
 
+        // Gán sự kiện cho các nút trong Bottom Sheet mở rộng
         binding.btnCamera.setOnClickListener(onCameraClick)
         binding.btnAttachImage.setOnClickListener(onPhotoClick)
         binding.btnAddTopic.setOnClickListener(onTopicClick)
         binding.btnCheckIn.setOnClickListener(onLocationClick)
 
+        // Gán sự kiện cho thanh công cụ nhanh (Quick Toolbar)
         binding.btnQuickPhoto.setOnClickListener(onPhotoClick)
         binding.btnQuickCamera.setOnClickListener(onCameraClick)
         binding.btnQuickTopic.setOnClickListener(onTopicClick)
@@ -169,7 +174,7 @@ class CreatePostFragment : Fragment() {
 
         binding.btnMoreOptions.setOnClickListener { setBottomSheetState(true) }
 
-        // --- SỰ KIỆN CHO UI VỊ TRÍ MỚI ---
+        // --- XỬ LÝ SỰ KIỆN CHO THẺ VỊ TRÍ (CHIP/TAG STYLE) ---
         // 1. Click vào thẻ -> Mở Map Preview
         binding.layoutLocation.setOnClickListener {
             if (selectedLat != null && selectedLng != null) {
@@ -177,7 +182,7 @@ class CreatePostFragment : Fragment() {
             }
         }
 
-        // 2. Click vào nút X -> Xóa
+        // 2. Click vào nút X -> Xóa vị trí
         binding.btnRemoveLocation.setOnClickListener {
             selectedLocationName = null
             selectedLat = null
@@ -194,10 +199,21 @@ class CreatePostFragment : Fragment() {
         binding.edtTitle.addTextChangedListener(textWatcher)
         binding.edtContent.addTextChangedListener(textWatcher)
 
+        // --- SUBMIT POST ---
         binding.btnSubmitPost.setOnClickListener {
             val title = binding.edtTitle.text.toString().trim()
             val content = binding.edtContent.text.toString().trim()
-            viewModel.createPost(title, content, selectedTopicsList, requireContext(), selectedLocationName, selectedLat, selectedLng)
+
+            // Gọi ViewModel và truyền thông tin vị trí vào
+            viewModel.createPost(
+                title = title,
+                content = content,
+                selectedTopics = selectedTopicsList,
+                context = requireContext(),
+                locationName = selectedLocationName,
+                lat = selectedLat,
+                lng = selectedLng
+            )
         }
     }
 
@@ -210,8 +226,8 @@ class CreatePostFragment : Fragment() {
             // Cập nhật tên vào thẻ đẹp
             binding.tvLocationName.text = name
             binding.layoutLocation.visibility = View.VISIBLE
-            // Đổi màu nút ở toolbar dưới cùng để biết là đã chọn
-            binding.btnQuickLocation.setColorFilter(ContextCompat.getColor(requireContext(), R.color.primary))
+            // Đổi màu nút ở toolbar dưới cùng (Màu xanh #1976D2)
+            binding.btnQuickLocation.setColorFilter(Color.parseColor("#1976D2"))
         }
     }
 
@@ -258,6 +274,7 @@ class CreatePostFragment : Fragment() {
 
     private fun createCustomMarker(avatarBitmap: Bitmap): Bitmap {
         val context = requireContext()
+        // Đảm bảo bạn đã có file ic_map_pin_frame.xml trong drawable
         val pinDrawable = ContextCompat.getDrawable(context, R.drawable.ic_map_pin_frame) ?: return avatarBitmap
         val w = pinDrawable.intrinsicWidth; val h = pinDrawable.intrinsicHeight
         val bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
@@ -269,12 +286,14 @@ class CreatePostFragment : Fragment() {
         return bm
     }
 
-    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
+    // --- CÁC HÀM UI HELPERS KHÁC ---
     private fun updateTopicChips() {
         binding.chipGroupTopics.removeAllViews()
         selectedTopicsList.forEach { topicName ->
             val chip = Chip(requireContext())
             chip.text = topicName
+            chip.isCheckable = false
+            chip.isCloseIconVisible = true
             chip.chipBackgroundColor = ColorStateList.valueOf(getColorForTopic(topicName))
             chip.setTextColor(Color.BLACK)
             chip.setOnCloseIconClickListener {
