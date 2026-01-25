@@ -6,7 +6,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/surface">
+        android:background="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,7 +27,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="12dp"
                     android:src="@drawable/ic_back"
-                    app:tint="@color/text_primary" />
+                    app:tint="#1A1A1A" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -36,7 +36,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_toEndOf="@id/btnClose"
                     android:text="Create post"
-                    android:textColor="@color/text_primary"
+                    android:textColor="#1A1A1A"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -58,7 +58,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/divider" />
+                android:background="#EEEEEE" />
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
@@ -104,7 +104,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Loading..."
-                                android:textColor="@color/text_primary"
+                                android:textColor="#000000"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
@@ -114,7 +114,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
                                 android:text="loading@email.com"
-                                android:textColor="@color/text_secondary_light"
+                                android:textColor="#757575"
                                 android:textSize="12sp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -131,8 +131,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:visibility="gone"
-                        app:cardBackgroundColor="#E3F2FD"
-                        app:cardCornerRadius="20dp"
+                        app:cardBackgroundColor="#E8EAF6"
+                        app:cardCornerRadius="100dp"
                         app:cardElevation="0dp"
                         tools:visibility="visible">
 
@@ -147,33 +147,40 @@
                             android:paddingBottom="8dp">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
                                 android:src="@drawable/ic_location"
-                                app:tint="#1976D2" />
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_marginEnd="4dp"
+                                android:text="is at"
+                                android:textColor="#757575"
+                                android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tvLocationName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
                                 android:layout_marginEnd="8dp"
                                 android:maxWidth="200dp"
                                 android:ellipsize="end"
                                 android:maxLines="1"
                                 android:text="Hồ Chí Minh City"
-                                android:textColor="#1976D2"
+                                android:textColor="#283593"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <ImageView
                                 android:id="@+id/btnRemoveLocation"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:background="?attr/selectableItemBackgroundBorderless"
-                                android:padding="4dp"
                                 android:src="@drawable/ic_close"
-                                app:tint="#1976D2" />
+                                app:tint="#757575" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
@@ -187,8 +194,8 @@
                         android:paddingTop="16dp"
                         android:paddingBottom="8dp"
                         android:paddingHorizontal="4dp"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="@color/text_secondary_light"
+                        android:textColor="#000000"
+                        android:textColorHint="#9E9E9E"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
@@ -201,7 +208,7 @@
                         android:hint="What's on your mind?"
                         android:inputType="textMultiLine|textCapSentences"
                         android:padding="16dp"
-                        android:textColorHint="@color/text_secondary_light"
+                        android:textColorHint="#9E9E9E"
                         android:textSize="16sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -228,7 +235,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="bottom"
-            android:background="@color/surface"
+            android:background="#FFFFFF"
             android:elevation="8dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -285,7 +292,7 @@
             android:id="@+id/bottomSheetLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/surface"
+            android:background="#FFFFFF"
             android:clickable="true"
             android:elevation="16dp"
             android:fillViewport="true"
@@ -309,7 +316,7 @@
                     android:layout_height="4dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="12dp"
-                    android:background="@color/divider" />
+                    android:background="#E0E0E0" />
 
                 <LinearLayout
                     android:id="@+id/btnAttachImage"
@@ -336,7 +343,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Photo/video"
-                        android:textColor="@color/text_primary"
+                        android:textColor="#000000"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -365,7 +372,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Camera"
-                        android:textColor="@color/text_primary"
+                        android:textColor="#000000"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -393,7 +400,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Topic"
-                        android:textColor="@color/text_primary"
+                        android:textColor="#000000"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -421,7 +428,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Check in"
-                        android:textColor="@color/text_primary"
+                        android:textColor="#000000"
                         android:textSize="16sp" />
                 </LinearLayout>
 

@@ -5,8 +5,10 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -22,7 +24,6 @@ import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -34,7 +35,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-// --- IMPORT MAP & PLACES ---
+// --- IMPORT GOOGLE MAPS & PLACES ---
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
@@ -45,9 +46,8 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.widget.Autocomplete
-import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
-// ---------------------------
+// ------------------------------------
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
@@ -56,8 +56,6 @@ import com.hcmus.forumus_client.data.model.TopicItem
 import com.hcmus.forumus_client.databinding.FragmentCreatePostBinding
 import java.io.File
 import kotlin.math.abs
-import android.content.res.ColorStateList
-import android.graphics.Color
 
 class CreatePostFragment : Fragment() {
     private lateinit var binding: FragmentCreatePostBinding
@@ -172,14 +170,14 @@ class CreatePostFragment : Fragment() {
         binding.btnMoreOptions.setOnClickListener { setBottomSheetState(true) }
 
         // --- SỰ KIỆN CHO UI VỊ TRÍ MỚI ---
-        // 1. Click vào tên địa điểm -> Xem lại Map Preview
+        // 1. Click vào thẻ -> Mở Map Preview
         binding.layoutLocation.setOnClickListener {
             if (selectedLat != null && selectedLng != null) {
                 showMapPreviewDialog(selectedLocationName ?: "Location", selectedLat!!, selectedLng!!)
             }
         }
 
-        // 2. Click vào nút X -> Xóa địa điểm
+        // 2. Click vào nút X -> Xóa
         binding.btnRemoveLocation.setOnClickListener {
             selectedLocationName = null
             selectedLat = null
@@ -209,13 +207,15 @@ class CreatePostFragment : Fragment() {
         selectedLng = lng
 
         if (name != null) {
+            // Cập nhật tên vào thẻ đẹp
             binding.tvLocationName.text = name
             binding.layoutLocation.visibility = View.VISIBLE
+            // Đổi màu nút ở toolbar dưới cùng để biết là đã chọn
             binding.btnQuickLocation.setColorFilter(ContextCompat.getColor(requireContext(), R.color.primary))
         }
     }
 
-    // --- LOGIC HIỂN THỊ MAP PREVIEW (DÙNG LẠI TỪ BOTTOMSHEET) ---
+    // --- MAP PREVIEW ---
     private fun showMapPreviewDialog(name: String, lat: Double, lng: Double) {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.layout_dialog_map_preview)
@@ -226,7 +226,7 @@ class CreatePostFragment : Fragment() {
         val btnClose = dialog.findViewById<Button>(R.id.btnCloseMap)
 
         tvTitle.text = name
-        btnClose.text = "Close" // Đổi nút Done thành Close vì chỉ xem thôi
+        btnClose.text = "Close"
 
         MapsInitializer.initialize(requireContext())
         mapView.onCreate(dialog.onSaveInstanceState())
@@ -237,7 +237,6 @@ class CreatePostFragment : Fragment() {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
             loadAvatarMarker(googleMap, latLng)
         }
-
         btnClose.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
@@ -246,50 +245,46 @@ class CreatePostFragment : Fragment() {
         val currentUser = viewModel.currentUser.value
         val url = currentUser?.profilePictureUrl ?: "https://ui-avatars.com/api/?name=User"
 
-        Glide.with(this)
-            .asBitmap()
-            .load(url)
-            .circleCrop()
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    try {
-                        val customMarker = createCustomMarker(resource)
-                        googleMap.addMarker(
-                            MarkerOptions()
-                                .position(latLng)
-                                .icon(BitmapDescriptorFactory.fromBitmap(customMarker))
-                                .anchor(0.5f, 1.0f)
-                        )
-                    } catch (e: Exception) { e.printStackTrace() }
-                }
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
+        Glide.with(this).asBitmap().load(url).circleCrop().into(object : CustomTarget<Bitmap>() {
+            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                try {
+                    val customMarker = createCustomMarker(resource)
+                    googleMap.addMarker(MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromBitmap(customMarker)).anchor(0.5f, 1.0f))
+                } catch (e: Exception) {}
+            }
+            override fun onLoadCleared(placeholder: Drawable?) {}
+        })
     }
 
     private fun createCustomMarker(avatarBitmap: Bitmap): Bitmap {
         val context = requireContext()
         val pinDrawable = ContextCompat.getDrawable(context, R.drawable.ic_map_pin_frame) ?: return avatarBitmap
-
-        val pinWidth = pinDrawable.intrinsicWidth
-        val pinHeight = pinDrawable.intrinsicHeight
-        val combinedBitmap = Bitmap.createBitmap(pinWidth, pinHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(combinedBitmap)
-
-        pinDrawable.setBounds(0, 0, pinWidth, pinHeight)
-        pinDrawable.draw(canvas)
-
-        val padding = (pinWidth * 0.12f).toInt()
-        val avatarSize = pinWidth - (padding * 2)
-        val scaledAvatar = Bitmap.createScaledBitmap(avatarBitmap, avatarSize, avatarSize, false)
-
-        val leftOffset = (pinWidth - avatarSize) / 2f
-        val topOffset = (pinWidth - avatarSize) / 2f
-
-        canvas.drawBitmap(scaledAvatar, leftOffset, topOffset, null)
-        return combinedBitmap
+        val w = pinDrawable.intrinsicWidth; val h = pinDrawable.intrinsicHeight
+        val bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val cv = Canvas(bm)
+        pinDrawable.setBounds(0, 0, w, h); pinDrawable.draw(cv)
+        val pad = (w * 0.12f).toInt(); val size = w - pad * 2
+        val avt = Bitmap.createScaledBitmap(avatarBitmap, size, size, false)
+        cv.drawBitmap(avt, (w - size) / 2f, (w - size) / 2f, null)
+        return bm
     }
 
-    // --- CÁC PHẦN CÒN LẠI (OBSERVER, ADAPTER...) GIỮ NGUYÊN ---
+    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
+    private fun updateTopicChips() {
+        binding.chipGroupTopics.removeAllViews()
+        selectedTopicsList.forEach { topicName ->
+            val chip = Chip(requireContext())
+            chip.text = topicName
+            chip.chipBackgroundColor = ColorStateList.valueOf(getColorForTopic(topicName))
+            chip.setTextColor(Color.BLACK)
+            chip.setOnCloseIconClickListener {
+                selectedTopicsList.remove(topicName)
+                updateTopicChips()
+            }
+            binding.chipGroupTopics.addView(chip)
+        }
+    }
+
     private fun setupObservers() {
         viewModel.postState.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -315,8 +310,6 @@ class CreatePostFragment : Fragment() {
         viewModel.suggestedTopics.observe(viewLifecycleOwner) { /* AI Logic */ }
     }
 
-    // Các hàm helper cũ giữ nguyên (showTopicSelectionDialog, updateTopicChips, launchCamera...)
-    // (Mình rút gọn để tiết kiệm không gian, bạn giữ nguyên code cũ của các hàm này nhé)
     private fun showTopicSelectionDialog() {
         val dialog = BottomSheetDialog(requireContext())
         val dialogView = layoutInflater.inflate(R.layout.layout_dialog_topic_selection, null)
@@ -390,23 +383,6 @@ class CreatePostFragment : Fragment() {
         btnClose.setOnClickListener { dialog.dismiss() }
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         dialog.show()
-    }
-
-    private fun updateTopicChips() {
-        binding.chipGroupTopics.removeAllViews()
-        selectedTopicsList.forEach { topicName ->
-            val chip = Chip(requireContext())
-            chip.text = topicName
-            chip.isCheckable = false
-            chip.isCloseIconVisible = true
-            chip.chipBackgroundColor = ColorStateList.valueOf(getColorForTopic(topicName))
-            chip.setTextColor(Color.BLACK)
-            chip.setOnCloseIconClickListener {
-                selectedTopicsList.remove(topicName)
-                updateTopicChips()
-            }
-            binding.chipGroupTopics.addView(chip)
-        }
     }
 
     private fun getColorForTopic(topic: String): Int {
