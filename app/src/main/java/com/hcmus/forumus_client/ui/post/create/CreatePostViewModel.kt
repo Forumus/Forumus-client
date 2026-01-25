@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -49,6 +50,9 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
     private val repository = PostRepository()
+
+    // Key cho SharedPreferences
+    private val PREFS_NAME = "forumus_post_draft"
 
     init {
         fetchCurrentUser()
@@ -98,15 +102,95 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
         _selectedImages.value = currentList
     }
 
-    // --- HÀM NÀY ĐÃ ĐƯỢC CẬP NHẬT ĐỂ NHẬN VỊ TRÍ (Location) ---
+    // --- CÁC HÀM XỬ LÝ DRAFT (LƯU NHÁP) ---
+
+    // 1. Lưu nháp vào Local
+    fun saveDraft(
+        context: Context,
+        title: String,
+        content: String,
+        locationName: String?,
+        lat: Double?,
+        lng: Double?,
+        topics: List<String>
+    ) {
+        val sharedPref = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("draft_title", title)
+            putString("draft_content", content)
+            putString("draft_location_name", locationName)
+            putString("draft_lat", lat?.toString()) // SharedPrefs ko lưu Double, convert sang String
+            putString("draft_lng", lng?.toString())
+
+            // Lưu list Topic thành chuỗi cách nhau dấu phẩy
+            putString("draft_topics", topics.joinToString(","))
+
+            // Lưu list ảnh (URI) thành chuỗi
+            val imageUris = _selectedImages.value?.joinToString(";") { it.toString() } ?: ""
+            putString("draft_images", imageUris)
+
+            apply() // Lưu bất đồng bộ
+        }
+        Log.d("Draft", "Saved draft locally")
+    }
+
+    // 2. Khôi phục bản nháp
+    fun restoreDraft(context: Context): Map<String, Any?>? {
+        val sharedPref = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val title = sharedPref.getString("draft_title", "")
+        val content = sharedPref.getString("draft_content", "")
+        val imagesStr = sharedPref.getString("draft_images", "")
+
+        // Nếu không có dữ liệu quan trọng thì coi như không có draft
+        if (title.isNullOrEmpty() && content.isNullOrEmpty() && imagesStr.isNullOrEmpty()) {
+            return null
+        }
+
+        val locationName = sharedPref.getString("draft_location_name", null)
+        val latStr = sharedPref.getString("draft_lat", null)
+        val lngStr = sharedPref.getString("draft_lng", null)
+        val topicsStr = sharedPref.getString("draft_topics", "")
+
+        val lat = latStr?.toDoubleOrNull()
+        val lng = lngStr?.toDoubleOrNull()
+        val topics = if (topicsStr.isNullOrEmpty()) emptyList() else topicsStr.split(",")
+
+        // Khôi phục ảnh vào LiveData ngay lập tức để RecyclerView update
+        if (!imagesStr.isNullOrEmpty()) {
+            val uris = imagesStr.split(";").map { it.toUri() }.toMutableList()
+            _selectedImages.value = uris
+        }
+
+        return mapOf(
+            "title" to title,
+            "content" to content,
+            "locationName" to locationName,
+            "lat" to lat,
+            "lng" to lng,
+            "topics" to topics
+        )
+    }
+
+    // 3. Xóa bản nháp (Khi post thành công hoặc Discard)
+    fun clearDraft(context: Context) {
+        val sharedPref = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            clear()
+            apply()
+        }
+        _selectedImages.value = mutableListOf() // Reset UI ảnh
+        Log.d("Draft", "Draft cleared")
+    }
+
+    // --- CREATE POST ---
     fun createPost(
         title: String,
         content: String,
         selectedTopics: List<String>,
         context: Context,
-        locationName: String? = null, // Thêm tham số
-        lat: Double? = null,          // Thêm tham số
-        lng: Double? = null           // Thêm tham số
+        locationName: String? = null,
+        lat: Double? = null,
+        lng: Double? = null
     ) {
         _postState.value = PostState.Loading
 
@@ -137,24 +221,20 @@ class CreatePostViewModel(application: Application) : AndroidViewModel(applicati
                     imageUrls = localImageUrls,
                     videoUrls = localVideoUrls,
                     topicIds = selectedTopics.map { it.trim().lowercase().replace(" ", "_") },
-
-                    // Gán thông tin vị trí vào Post
                     locationName = locationName,
                     latitude = lat,
                     longitude = lng
                 )
 
-                //  Gọi Repository để xử lý upload và lưu
-                //  Gọi Repository để xử lý upload và lưu
                 val saveResult = repository.savePost(context, post)
 
                 if (saveResult.isSuccess) {
                     val postId = saveResult.getOrNull()
                     if (postId != null) {
-                        // Post saved as PENDING. 
-                        // Backend PostListener will handle validation asynchronously.
                         withContext(Dispatchers.Main) {
-                             _postState.value = PostState.Success
+                            // Đăng thành công -> Xóa nháp
+                            clearDraft(context)
+                            _postState.value = PostState.Success
                         }
                     } else {
                         withContext(Dispatchers.Main) {

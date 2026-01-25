@@ -35,7 +35,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-// --- IMPORT GOOGLE MAPS & PLACES (Quan trọng) ---
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
@@ -47,7 +46,6 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
-// ------------------------------------------------
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
@@ -72,6 +70,9 @@ class CreatePostFragment : Fragment() {
     private val MAX_TOPIC_LIMIT = 5
     private var tempImageUri: Uri? = null
     private val selectedTopicsList = ArrayList<String>()
+
+    // Cờ kiểm soát trạng thái để tránh lưu nháp khi đã post xong hoặc discard
+    private var isPostSubmittedOrDiscarded = false
 
     // --- LAUNCHERS ---
     private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -101,7 +102,6 @@ class CreatePostFragment : Fragment() {
         if (uris.isNotEmpty()) { viewModel.addImages(uris); setBottomSheetState(false) }
     }
 
-    // Launcher cho Google Autocomplete (Tìm kiếm địa điểm)
     private val startAutocomplete = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.let { intent ->
@@ -119,7 +119,6 @@ class CreatePostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Init Places (Lưu ý: Thay API Key của bạn vào đây nếu chưa có)
         if (!Places.isInitialized()) {
             Places.initialize(requireContext(), "AIzaSyBSvLkWXEj9agyzUv2bzi4AA1ihj7pnxmY")
         }
@@ -133,6 +132,64 @@ class CreatePostFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { handleExit() }
         validatePostButton()
         viewModel.getAllTopics()
+
+        // --- KHÔI PHỤC DỮ LIỆU NHÁP (RESTORE) ---
+        restoreDraftData()
+    }
+
+    // Hàm khôi phục dữ liệu từ ViewModel lên UI
+    private fun restoreDraftData() {
+        val draft = viewModel.restoreDraft(requireContext())
+        if (draft != null) {
+            // Khôi phục Text
+            binding.edtTitle.setText(draft["title"] as? String ?: "")
+            binding.edtContent.setText(draft["content"] as? String ?: "")
+
+            // Khôi phục Location
+            val locName = draft["locationName"] as? String
+            val lat = draft["lat"] as? Double
+            val lng = draft["lng"] as? Double
+
+            if (locName != null && lat != null && lng != null) {
+                updateLocationUI(locName, lat, lng)
+            }
+
+            // Khôi phục Topics
+            val topics = draft["topics"] as? List<String>
+            if (!topics.isNullOrEmpty()) {
+                selectedTopicsList.clear()
+                selectedTopicsList.addAll(topics)
+                // Đợi observer allTopics load xong sẽ update màu, nhưng gọi tạm update để hiện text
+                updateTopicChips()
+            }
+            // Ảnh đã được viewModel restore vào LiveData -> setupObservers sẽ tự update UI
+            Toast.makeText(context, "Draft restored", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // --- AUTO SAVE (TỰ ĐỘNG LƯU KHI THOÁT/ẨN APP) ---
+    override fun onPause() {
+        super.onPause()
+        if (!isPostSubmittedOrDiscarded) {
+            performSaveDraft()
+        }
+    }
+
+    // Hàm thực hiện lưu nháp
+    private fun performSaveDraft() {
+        val title = binding.edtTitle.text.toString()
+        val content = binding.edtContent.text.toString()
+
+        // Dù rỗng cũng lưu để đảm bảo trạng thái nhất quán
+        viewModel.saveDraft(
+            requireContext(),
+            title,
+            content,
+            selectedLocationName,
+            selectedLat,
+            selectedLng,
+            selectedTopicsList
+        )
     }
 
     private fun setupListeners() {
@@ -142,7 +199,6 @@ class CreatePostFragment : Fragment() {
         val onPhotoClick = View.OnClickListener { checkPermissionAndPickImage() }
         val onTopicClick = View.OnClickListener { showTopicSelectionDialog() }
 
-        // Mở BottomSheet chọn vị trí (Style Instagram)
         val onLocationClick = View.OnClickListener {
             val currentUser = viewModel.currentUser.value
             val locationSheet = LocationPickerBottomSheet(
@@ -151,7 +207,6 @@ class CreatePostFragment : Fragment() {
                     updateLocationUI(place.name, place.latLng?.latitude, place.latLng?.longitude)
                 },
                 onSearchClick = {
-                    // Mở màn hình tìm kiếm của Google
                     val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
                     val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(requireContext())
                     startAutocomplete.launch(intent)
@@ -160,13 +215,11 @@ class CreatePostFragment : Fragment() {
             locationSheet.show(parentFragmentManager, "LocationPicker")
         }
 
-        // Gán sự kiện cho các nút trong Bottom Sheet mở rộng
         binding.btnCamera.setOnClickListener(onCameraClick)
         binding.btnAttachImage.setOnClickListener(onPhotoClick)
         binding.btnAddTopic.setOnClickListener(onTopicClick)
         binding.btnCheckIn.setOnClickListener(onLocationClick)
 
-        // Gán sự kiện cho thanh công cụ nhanh (Quick Toolbar)
         binding.btnQuickPhoto.setOnClickListener(onPhotoClick)
         binding.btnQuickCamera.setOnClickListener(onCameraClick)
         binding.btnQuickTopic.setOnClickListener(onTopicClick)
@@ -174,15 +227,12 @@ class CreatePostFragment : Fragment() {
 
         binding.btnMoreOptions.setOnClickListener { setBottomSheetState(true) }
 
-        // --- XỬ LÝ SỰ KIỆN CHO THẺ VỊ TRÍ (CHIP/TAG STYLE) ---
-        // 1. Click vào thẻ -> Mở Map Preview
         binding.layoutLocation.setOnClickListener {
             if (selectedLat != null && selectedLng != null) {
                 showMapPreviewDialog(selectedLocationName ?: "Location", selectedLat!!, selectedLng!!)
             }
         }
 
-        // 2. Click vào nút X -> Xóa vị trí
         binding.btnRemoveLocation.setOnClickListener {
             selectedLocationName = null
             selectedLat = null
@@ -199,22 +249,47 @@ class CreatePostFragment : Fragment() {
         binding.edtTitle.addTextChangedListener(textWatcher)
         binding.edtContent.addTextChangedListener(textWatcher)
 
-        // --- SUBMIT POST ---
         binding.btnSubmitPost.setOnClickListener {
             val title = binding.edtTitle.text.toString().trim()
             val content = binding.edtContent.text.toString().trim()
-
-            // Gọi ViewModel và truyền thông tin vị trí vào
             viewModel.createPost(
-                title = title,
-                content = content,
-                selectedTopics = selectedTopicsList,
-                context = requireContext(),
-                locationName = selectedLocationName,
-                lat = selectedLat,
-                lng = selectedLng
+                title, content, selectedTopicsList, requireContext(),
+                locationName = selectedLocationName, lat = selectedLat, lng = selectedLng
             )
         }
+    }
+
+    private fun handleExit() {
+        // Luôn hiện dialog confirm khi thoát, cho phép người dùng chọn Save/Discard
+        showExitConfirmationDialog()
+    }
+
+    private fun showExitConfirmationDialog() {
+        val dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.layout_exit_confirmation, null)
+        dialog.setContentView(view)
+
+        // Nút Save as draft
+        view.findViewById<View>(R.id.btnSaveDraft).setOnClickListener {
+            performSaveDraft()
+            isPostSubmittedOrDiscarded = false // Để onPause không cần lưu lại lần nữa (hoặc cứ để nó lưu cũng ko sao)
+            Toast.makeText(context, "Draft saved locally", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+            findNavController().popBackStack()
+        }
+
+        // Nút Discard post (Xóa nháp)
+        view.findViewById<View>(R.id.btnDiscardPost).setOnClickListener {
+            isPostSubmittedOrDiscarded = true // Đánh dấu để onPause KHÔNG lưu lại
+            viewModel.clearDraft(requireContext())
+            dialog.dismiss()
+            findNavController().popBackStack()
+        }
+
+        view.findViewById<View>(R.id.btnContinueEditing).setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun updateLocationUI(name: String?, lat: Double?, lng: Double?) {
@@ -223,15 +298,12 @@ class CreatePostFragment : Fragment() {
         selectedLng = lng
 
         if (name != null) {
-            // Cập nhật tên vào thẻ đẹp
             binding.tvLocationName.text = name
             binding.layoutLocation.visibility = View.VISIBLE
-            // Đổi màu nút ở toolbar dưới cùng (Màu xanh #1976D2)
-            binding.btnQuickLocation.setColorFilter(Color.parseColor("#1976D2"))
+            binding.btnQuickLocation.setColorFilter(ContextCompat.getColor(requireContext(), R.color.primary))
         }
     }
 
-    // --- MAP PREVIEW ---
     private fun showMapPreviewDialog(name: String, lat: Double, lng: Double) {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.layout_dialog_map_preview)
@@ -274,7 +346,6 @@ class CreatePostFragment : Fragment() {
 
     private fun createCustomMarker(avatarBitmap: Bitmap): Bitmap {
         val context = requireContext()
-        // Đảm bảo bạn đã có file ic_map_pin_frame.xml trong drawable
         val pinDrawable = ContextCompat.getDrawable(context, R.drawable.ic_map_pin_frame) ?: return avatarBitmap
         val w = pinDrawable.intrinsicWidth; val h = pinDrawable.intrinsicHeight
         val bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
@@ -286,7 +357,6 @@ class CreatePostFragment : Fragment() {
         return bm
     }
 
-    // --- CÁC HÀM UI HELPERS KHÁC ---
     private fun updateTopicChips() {
         binding.chipGroupTopics.removeAllViews()
         selectedTopicsList.forEach { topicName ->
@@ -308,7 +378,13 @@ class CreatePostFragment : Fragment() {
         viewModel.postState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is PostState.Loading -> { binding.btnSubmitPost.isEnabled = false; binding.btnSubmitPost.text = "Posting..." }
-                is PostState.Success -> { Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show(); findNavController().popBackStack() }
+                is PostState.Success -> {
+                    // Post thành công -> Đánh dấu xong để onPause không lưu lại -> Xóa draft
+                    isPostSubmittedOrDiscarded = true
+                    // ViewModel đã tự gọi clearDraft trong hàm createPost khi success rồi
+                    Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                }
                 is PostState.Error -> { binding.btnSubmitPost.isEnabled = true; binding.btnSubmitPost.text = "POST"; Toast.makeText(context, state.msg, Toast.LENGTH_SHORT).show() }
             }
         }
@@ -481,23 +557,6 @@ class CreatePostFragment : Fragment() {
             adapter = imageAdapter
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
-    }
-
-    private fun handleExit() {
-        val title = binding.edtTitle.text.toString().trim()
-        val content = binding.edtContent.text.toString().trim()
-        val hasImages = !viewModel.selectedImages.value.isNullOrEmpty()
-        if (title.isNotEmpty() || content.isNotEmpty() || hasImages) showExitConfirmationDialog() else findNavController().popBackStack()
-    }
-
-    private fun showExitConfirmationDialog() {
-        val dialog = BottomSheetDialog(requireContext())
-        val view = layoutInflater.inflate(R.layout.layout_exit_confirmation, null)
-        dialog.setContentView(view)
-        view.findViewById<View>(R.id.btnSaveDraft).setOnClickListener { dialog.dismiss(); findNavController().popBackStack() }
-        view.findViewById<View>(R.id.btnDiscardPost).setOnClickListener { dialog.dismiss(); findNavController().popBackStack() }
-        view.findViewById<View>(R.id.btnContinueEditing).setOnClickListener { dialog.dismiss() }
-        dialog.show()
     }
 
     private fun setBottomSheetState(isExpanded: Boolean) {
