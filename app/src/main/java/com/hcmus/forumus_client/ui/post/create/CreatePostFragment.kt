@@ -54,6 +54,7 @@ import com.hcmus.forumus_client.data.model.TopicItem
 import com.hcmus.forumus_client.databinding.FragmentCreatePostBinding
 import java.io.File
 import kotlin.math.abs
+import com.hcmus.forumus_client.BuildConfig
 
 class CreatePostFragment : Fragment() {
     private lateinit var binding: FragmentCreatePostBinding
@@ -120,7 +121,7 @@ class CreatePostFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (!Places.isInitialized()) {
-            Places.initialize(requireContext(), "AIzaSyBSvLkWXEj9agyzUv2bzi4AA1ihj7pnxmY")
+            Places.initialize(requireContext(), BuildConfig.PLACES_API_KEY)
         }
         placesClient = Places.createClient(requireContext())
 
