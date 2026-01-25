@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:text="Report"
                 android:textSize="14sp"
-                android:textColor="#2c2c2c"
+                android:textColor="@color/text_primary"
                 android:fontFamily="@font/montserrat_regular"
                 android:layout_marginStart="12dp" />
 
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:text="Save"
                 android:textSize="14sp"
-                android:textColor="#2c2c2c"
+                android:textColor="@color/text_primary"
                 android:fontFamily="@font/montserrat_regular"
                 android:layout_marginStart="12dp" />
         </LinearLayout>

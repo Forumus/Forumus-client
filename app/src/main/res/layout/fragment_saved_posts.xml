@@ -12,14 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#FFFFFF">
+        android:background="@color/bg_app">
 
         <!-- Header with back button -->
         <LinearLayout
             android:id="@+id/ll_header"
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="16dp"
@@ -35,7 +35,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/back"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_back" />
+                android:src="@drawable/ic_back"
+                app:tint="@color/text_primary" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -51,7 +52,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#E0E0E0" />
+            android:background="@color/divider" />
 
         <!-- Empty state view -->
         <LinearLayout
@@ -76,7 +77,7 @@
                 android:text="No Saved Posts"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#666666"
+                android:textColor="@color/text_tertiary"
                 android:layout_marginTop="16dp" />
 
             <TextView
@@ -84,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:text="Save posts to view them here later"
                 android:textSize="14sp"
-                android:textColor="#999999"
+                android:textColor="@color/text_secondary_light"
                 android:layout_marginTop="8dp"
                 android:gravity="center" />
 
@@ -100,6 +101,7 @@
                 android:id="@+id/rvSavedPosts"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/bg_app"
                 android:clipToPadding="false"
                 android:paddingBottom="8dp" />
 

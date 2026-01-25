@@ -5,48 +5,59 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:background="?attr/selectableItemBackground"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:background="?attr/selectableItemBackground">
 
-        <!-- Profile picture -->
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/image_profile"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_profile_placeholder"
-            app:civ_border_width="1dp"
-            app:civ_border_color="@color/light_gray" />
-
-        <!-- User info -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
-            android:orientation="vertical">
+            android:padding="16dp"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/text_user_name"
-                android:layout_width="wrap_content"
+            <!-- Profile picture -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/image_profile"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_profile_placeholder"
+                app:civ_border_width="1dp"
+                app:civ_border_color="@color/light_gray" />
+
+            <!-- User info -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="User Name"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:fontFamily="@font/montserrat_medium" />
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/text_user_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="user@example.com"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:fontFamily="@font/montserrat_regular"
-                android:layout_marginTop="2dp" />
+                <TextView
+                    android:id="@+id/text_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="User Name"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:fontFamily="@font/montserrat_medium" />
 
+                <TextView
+                    android:id="@+id/text_user_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="user@example.com"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
         </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"/>
 
     </LinearLayout>
 

@@ -24,11 +24,23 @@ class SplashActivity : AppCompatActivity() {
     private val splashTimeOut: Long = 1500 // 1.5 seconds
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme preference BEFORE setting content view
+        val preferencesManager = PreferencesManager(this)
+        if (preferencesManager.isDarkModeEnabled) {
+            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+            )
+        } else {
+            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+            )
+        }
+        
         super.onCreate(savedInstanceState)
         
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
         
-        preferenceManager = PreferencesManager(this)
+        this.preferenceManager = preferencesManager  // Reuse the instance
         tokenManager = TokenManager(this)
         
         // Navigate after splash timeout

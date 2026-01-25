@@ -77,6 +77,26 @@ class TopAppBar @JvmOverloads constructor(
         // Inflate the popup menu layout using view binding
         val popupBinding = PopupProfileMenuBinding.inflate(LayoutInflater.from(context))
 
+        // Check current theme mode
+        val preferencesManager = com.hcmus.forumus_client.data.local.PreferencesManager(context)
+        val isDarkMode = preferencesManager.isDarkModeEnabled
+        
+        // Update dark mode button text and icon based on current theme
+        // The btnDarkMode is a LinearLayout containing an ImageView and TextView
+        val darkModeContainer = popupBinding.btnDarkMode
+        val darkModeIcon = darkModeContainer.getChildAt(0) as android.widget.ImageView
+        val darkModeTextView = darkModeContainer.getChildAt(1) as android.widget.TextView
+        
+        if (isDarkMode) {
+            // Currently in dark mode, show "Light Mode" to switch to light
+            darkModeIcon.setImageResource(R.drawable.ic_sun)
+            darkModeTextView.text = context.getString(R.string.light_mode)
+        } else {
+            // Currently in light mode, show "Dark Mode" to switch to dark
+            darkModeIcon.setImageResource(R.drawable.ic_theme)
+            darkModeTextView.text = context.getString(R.string.dark_mode)
+        }
+
         // Create popup window with wrap content dimensions and focus enabled
         val popupWindow = PopupWindow(
             popupBinding.root,

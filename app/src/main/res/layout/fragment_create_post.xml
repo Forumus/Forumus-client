@@ -27,7 +27,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="12dp"
                     android:src="@drawable/ic_back"
-                    app:tint="#1A1A1A" />
+                    app:tint="@color/text_primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -36,7 +36,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_toEndOf="@id/btnClose"
                     android:text="Create post"
-                    android:textColor="#1A1A1A"
+                    android:textColor="@color/text_primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -58,7 +58,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#EEEEEE" />
+                android:background="@color/divider" />
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
@@ -104,7 +104,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Loading..."
-                                android:textColor="#000000"
+                                android:textColor="@color/text_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
@@ -114,7 +114,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
                                 android:text="loading@email.com"
-                                android:textColor="#757575"
+                                android:textColor="@color/text_secondary_light"
                                 android:textSize="12sp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -152,8 +152,8 @@
                         android:paddingTop="16dp"
                         android:paddingBottom="8dp"
                         android:paddingHorizontal="4dp"
-                        android:textColor="#000000"
-                        android:textColorHint="#9E9E9E"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary_light"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
@@ -301,7 +301,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Photo/video"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -330,7 +330,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Camera"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -358,7 +358,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Topic"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -386,7 +386,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Check in"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp" />
                 </LinearLayout>
 
