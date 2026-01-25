@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- This drawable automatically switches between dark and light logos based on theme -->
+    <!-- Dark logo for light mode (default) -->
+    <item android:drawable="@drawable/ic_logo_dark" />
+</selector>

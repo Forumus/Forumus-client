@@ -58,16 +58,17 @@ class TopicAdapter(
         }
 
         private fun updateSelectionState(card: MaterialCardView, isSelected: Boolean) {
+            val context = card.context
             if (isSelected) {
-                // Màu xanh giống ảnh 2 (#2196F3)
-                card.strokeColor = Color.parseColor("#2196F3")
-                card.strokeWidth = 4 // Viền dày lên
-                card.setCardBackgroundColor(Color.parseColor("#E3F2FD")) // Nền xanh nhạt
+                // Selected state - blue theme
+                card.strokeColor = context.getColor(com.hcmus.forumus_client.R.color.primary)
+                card.strokeWidth = 4 // Thicker border
+                card.setCardBackgroundColor(context.getColor(com.hcmus.forumus_client.R.color.primary_tonal))
             } else {
-                // Trạng thái bình thường
-                card.strokeColor = Color.parseColor("#E0E0E0")
+                // Normal state - theme-aware
+                card.strokeColor = context.getColor(com.hcmus.forumus_client.R.color.divider)
                 card.strokeWidth = 2
-                card.setCardBackgroundColor(Color.WHITE)
+                card.setCardBackgroundColor(context.getColor(com.hcmus.forumus_client.R.color.surface))
             }
         }
     }
