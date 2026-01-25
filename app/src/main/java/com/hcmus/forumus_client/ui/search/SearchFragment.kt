@@ -65,7 +65,6 @@ class SearchFragment : Fragment() {
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 updateLayoutForTab(tab?.position ?: 0)
-                // Search lại nếu ô search đang có chữ
                 val query = binding.searchView.query.toString()
                 if (query.isNotEmpty()) performSearch(query)
             }
@@ -73,25 +72,18 @@ class SearchFragment : Fragment() {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
-        // Mặc định tab đầu tiên
         updateLayoutForTab(0)
     }
 
-    // --- CẬP NHẬT HINT TEXT KHI CHUYỂN TAB ---
     private fun updateLayoutForTab(position: Int) {
         val isPostTab = position == 0
-
-        // 1. Thay đổi gợi ý trong ô tìm kiếm
         if (isPostTab) {
             binding.searchView.queryHint = "Search posts, topics..."
         } else {
             binding.searchView.queryHint = "Search name, email..."
         }
-
-        // 2. Ẩn hiện Trending (Chỉ có ở Post)
         binding.sectionTrending.visibility = if (isPostTab) View.VISIBLE else View.GONE
 
-        // 3. Cập nhật dữ liệu lịch sử cho Adapter
         if (isPostTab) {
             val list = viewModel.recentPostKeywords.value ?: emptyList()
             historyAdapter.submitList(list)
@@ -110,7 +102,6 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupAdapters() {
-        // Result Adapters
         postsAdapter = HomeAdapter(emptyList()) { post, action, _ ->
             if (action == PostAction.OPEN) {
                 val navAction = NavGraphDirections.actionGlobalPostDetailFragment(post.id)
@@ -127,7 +118,6 @@ class SearchFragment : Fragment() {
         binding.rvUsersResults.layoutManager = LinearLayoutManager(requireContext())
         binding.rvUsersResults.adapter = userAdapter
 
-        // History Adapter
         historyAdapter = HistoryAdapter { keyword ->
             binding.searchView.setQuery(keyword, true)
         }
@@ -145,13 +135,16 @@ class SearchFragment : Fragment() {
         binding.layoutSuggestions.visibility = if (show) View.VISIBLE else View.GONE
         binding.layoutResults.visibility = if (show) View.GONE else View.VISIBLE
         if (show) {
-            // Khi hiện lại suggestions, cập nhật lại list lịch sử theo tab hiện tại
             updateLayoutForTab(binding.tabLayout.selectedTabPosition)
         }
     }
 
     private fun setupObservers() {
-        // Trending
+        // [MỚI] Quan sát danh sách Topic và đưa vào Adapter để hiển thị tên đẹp
+        viewModel.allTopics.observe(viewLifecycleOwner) { topics ->
+            postsAdapter.setTopics(topics)
+        }
+
         viewModel.trendingTopics.observe(viewLifecycleOwner) { topics ->
             binding.chipGroupTrending.removeAllViews()
             for (topic in topics) {
@@ -170,14 +163,13 @@ class SearchFragment : Fragment() {
             }
         }
 
-        // Kết quả Search Post
         viewModel.postResults.observe(viewLifecycleOwner) { posts ->
             if (binding.tabLayout.selectedTabPosition == 0) {
                 postsAdapter.submitList(posts)
                 binding.tvNoResults.visibility = if (posts.isEmpty()) View.VISIBLE else View.GONE
             }
         }
-        // Kết quả Search People
+
         viewModel.userResults.observe(viewLifecycleOwner) { users ->
             if (binding.tabLayout.selectedTabPosition == 1) {
                 binding.rvPostsResults.visibility = View.GONE
@@ -187,14 +179,13 @@ class SearchFragment : Fragment() {
             }
         }
 
-        // Observer riêng cho 2 list lịch sử
+        // Observer lịch sử (giữ nguyên)
         viewModel.recentPostKeywords.observe(viewLifecycleOwner) { list ->
             if (binding.tabLayout.selectedTabPosition == 0) {
                 historyAdapter.submitList(list)
                 checkHistoryVisibility(list)
             }
         }
-
         viewModel.recentPeopleKeywords.observe(viewLifecycleOwner) { list ->
             if (binding.tabLayout.selectedTabPosition == 1) {
                 historyAdapter.submitList(list)
@@ -207,7 +198,6 @@ class SearchFragment : Fragment() {
         }
     }
 
-    // --- Adapter Lịch sử ---
     class HistoryAdapter(
         private var keywords: List<String> = emptyList(),
         private val onClick: (String) -> Unit

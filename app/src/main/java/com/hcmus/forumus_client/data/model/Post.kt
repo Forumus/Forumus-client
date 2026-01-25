@@ -39,5 +39,8 @@ data class Post(
 
 	@get:Exclude
 	@set:Exclude
-	var userVote: VoteState = VoteState.NONE
+	var userVote: VoteState = VoteState.NONE,
+
+	@get:Exclude @set:Exclude
+	var topicNames: List<String> = emptyList()
 )

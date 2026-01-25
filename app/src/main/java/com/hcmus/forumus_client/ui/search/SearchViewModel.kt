@@ -6,9 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Timestamp
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.Topic
@@ -29,7 +27,6 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private val gson = Gson()
 
     private val PREFS_NAME = "search_history_prefs"
-    // Hai key riêng biệt cho 2 loại tìm kiếm
     private val KEY_POST_KEYWORDS = "key_post_keywords"
     private val KEY_PEOPLE_KEYWORDS = "key_people_keywords"
 
@@ -43,7 +40,10 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private val _trendingTopics = MutableLiveData<List<Topic>>()
     val trendingTopics: LiveData<List<Topic>> = _trendingTopics
 
-    // --- TÁCH BIỆT LỊCH SỬ TỪ KHÓA ---
+    // [MỚI] LiveData chứa tất cả Topic để truyền sang Fragment -> Adapter
+    private val _allTopics = MutableLiveData<List<Topic>>()
+    val allTopics: LiveData<List<Topic>> = _allTopics
+
     private val _recentPostKeywords = MutableLiveData<List<String>>()
     val recentPostKeywords: LiveData<List<String>> = _recentPostKeywords
 
@@ -53,8 +53,28 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
+    // [MỚI] Map ID -> Name để tìm kiếm (Ví dụ: "cs" -> "Computer Science")
+    private var topicNameMap: Map<String, String> = emptyMap()
+
     init {
         loadAllHistory()
+        // [MỚI] Tải danh sách Topic ngay khi khởi tạo
+        preloadAllTopics()
+    }
+
+    private fun preloadAllTopics() {
+        viewModelScope.launch(Dispatchers.IO) {
+            // Lấy tất cả topic từ Repository
+            val topics = postRepository.getAllTopics()
+
+            // 1. Lưu vào LiveData để Fragment quan sát và đưa vào Adapter (Sửa lỗi hiển thị)
+            withContext(Dispatchers.Main) {
+                _allTopics.value = topics
+            }
+
+            // 2. Tạo Map tra cứu để dùng cho logic tìm kiếm (Sửa lỗi tìm kiếm)
+            topicNameMap = topics.associate { it.id to it.name }
+        }
     }
 
     fun loadTrendingTopics() {
@@ -75,7 +95,6 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     fun searchPosts(query: String) {
         if (query.isBlank()) { _postResults.value = emptyList(); return }
 
-        // Lưu vào lịch sử POST
         addPostKeyword(query)
 
         _isLoading.value = true
@@ -83,11 +102,25 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
         viewModelScope.launch(Dispatchers.IO) {
             val allPosts = postRepository.searchPostsCandidates()
+
             val filtered = allPosts.filter { post ->
+                // 1. Tìm trong Tiêu đề
                 val titleNorm = removeAccents(post.title)
-                val topicNorms = post.topicIds.map { removeAccents(it) }
-                titleNorm.contains(normalizedQuery) || topicNorms.any { it.contains(normalizedQuery) }
+
+                // 2. [ĐÃ SỬA] Tìm trong Tên Chủ Đề (Topic Name) thay vì ID
+                val hasMatchingTopic = post.topicIds.any { topicId ->
+                    // Lấy tên thật từ Map, nếu không có thì dùng tạm ID
+                    val realName = topicNameMap[topicId] ?: topicId
+                    val topicNameNorm = removeAccents(realName)
+
+                    // So sánh query với Tên chủ đề
+                    topicNameNorm.contains(normalizedQuery)
+                }
+
+                // Logic OR: Trùng tiêu đề HOẶC Trùng tên chủ đề
+                titleNorm.contains(normalizedQuery) || hasMatchingTopic
             }
+
             withContext(Dispatchers.Main) {
                 _postResults.value = filtered
                 _isLoading.value = false
@@ -95,24 +128,17 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    // --- TÌM KIẾM NGƯỜI DÙNG (NAME/EMAIL) ---
+    // ... (Các phần searchUsers, History giữ nguyên không đổi) ...
     fun searchUsers(query: String) {
         if (query.isBlank()) { _userResults.value = emptyList(); return }
-
-        // Lưu vào lịch sử PEOPLE
         addPeopleKeyword(query)
-
         _isLoading.value = true
         val normalizedQuery = removeAccents(query)
-
         viewModelScope.launch(Dispatchers.IO) {
-            // Lấy danh sách candidate và lọc theo tên hoặc email
             val allUsers = userRepository.searchUsersCandidates()
-
             val filtered = allUsers.filter { user ->
                 val nameNorm = removeAccents(user.fullName)
                 val emailNorm = removeAccents(user.email)
-
                 nameNorm.contains(normalizedQuery) || emailNorm.contains(normalizedQuery)
             }
             withContext(Dispatchers.Main) {
@@ -122,22 +148,12 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    // --- QUẢN LÝ LỊCH SỬ ---
     private fun loadAllHistory() {
         try {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val type = object : TypeToken<List<String>>() {}.type
-
-            // Load Post Keywords
-            val postJson = prefs.getString(KEY_POST_KEYWORDS, "[]")
-            val postList: List<String> = gson.fromJson(postJson, type) ?: emptyList()
-            _recentPostKeywords.value = postList
-
-            // Load People Keywords
-            val peopleJson = prefs.getString(KEY_PEOPLE_KEYWORDS, "[]")
-            val peopleList: List<String> = gson.fromJson(peopleJson, type) ?: emptyList()
-            _recentPeopleKeywords.value = peopleList
-
+            _recentPostKeywords.value = gson.fromJson(prefs.getString(KEY_POST_KEYWORDS, "[]"), type) ?: emptyList()
+            _recentPeopleKeywords.value = gson.fromJson(prefs.getString(KEY_PEOPLE_KEYWORDS, "[]"), type) ?: emptyList()
         } catch (e: Exception) {
             _recentPostKeywords.value = emptyList()
             _recentPeopleKeywords.value = emptyList()
@@ -161,8 +177,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         list.removeAll { it.equals(trimmed, ignoreCase = true) }
         list.add(0, trimmed)
         if (list.size > 5) list.removeAt(list.size - 1)
-
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(key, gson.toJson(list)).apply()
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putString(key, gson.toJson(list)).apply()
     }
 }
