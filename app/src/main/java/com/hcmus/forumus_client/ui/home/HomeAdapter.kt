@@ -34,6 +34,9 @@ class HomeAdapter(
     // Flag to show loading indicator
     private var isLoadingMore = false
 
+    // Track which post is currently loading AI summary
+    private var summaryLoadingPostId: String? = null
+
     /**
      * Determines the view type for a given position. Returns VIEW_TYPE_LOADING if showing loading
      * indicator, otherwise VIEW_TYPE_POST.
@@ -75,6 +78,7 @@ class HomeAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is PostViewHolder) {
             holder.bind(items[position], topicMap)
+            holder.setSummaryLoading(items[position].id == summaryLoadingPostId)
         }
         // LoadingViewHolder doesn't need binding
     }
@@ -123,6 +127,27 @@ class HomeAdapter(
         } else if (!isLoading && wasLoading) {
             // Hide loading indicator
             notifyItemRemoved(items.size)
+        }
+    }
+
+    /**
+     * Sets the post ID that is currently loading an AI summary.
+     * Updates the UI to show/hide loading indicators on the affected posts.
+     *
+     * @param postId The ID of the post loading summary, or null if none
+     */
+    fun setSummaryLoadingPostId(postId: String?) {
+        val oldId = summaryLoadingPostId
+        summaryLoadingPostId = postId
+
+        // Notify items that need to update their loading state
+        if (oldId != null) {
+            val oldIndex = items.indexOfFirst { it.id == oldId }
+            if (oldIndex >= 0) notifyItemChanged(oldIndex, "summary_loading")
+        }
+        if (postId != null) {
+            val newIndex = items.indexOfFirst { it.id == postId }
+            if (newIndex >= 0) notifyItemChanged(newIndex, "summary_loading")
         }
     }
 

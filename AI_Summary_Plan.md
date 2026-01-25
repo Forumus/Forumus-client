@@ -436,7 +436,7 @@
 
 ### Phase 4: Android - ViewModel & Fragment Logic (Estimated: 3 hours)
 
-- [ ] **Task 4.1**: Add summary state properties to HomeViewModel
+- [x] **Task 4.1**: Add summary state properties to HomeViewModel
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/ui/home/HomeViewModel.kt`
     - Add LiveData properties after `_savePostResult`:
@@ -455,7 +455,7 @@
     - No compilation errors
   - **Time Estimate**: 15 minutes
 
-- [ ] **Task 4.2**: Implement requestSummary method in HomeViewModel
+- [x] **Task 4.2**: Implement requestSummary method in HomeViewModel
   - **Details**:
     - Add method in `HomeViewModel.kt`:
       ```kotlin
@@ -488,7 +488,7 @@
     - Handles both success and failure
   - **Time Estimate**: 30 minutes
 
-- [ ] **Task 4.3**: Update onPostAction to handle SUMMARY action
+- [x] **Task 4.3**: Update onPostAction to handle SUMMARY action
   - **Details**:
     - Edit `onPostAction` method in `HomeViewModel.kt`
     - Add case for SUMMARY:
@@ -509,7 +509,7 @@
     - No compilation errors
   - **Time Estimate**: 10 minutes
 
-- [ ] **Task 4.4**: Add summary observers in HomeFragment
+- [x] **Task 4.4**: Add summary observers in HomeFragment
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/ui/home/HomeFragment.kt`
     - Add observers in `onViewCreated` or appropriate lifecycle method:
@@ -540,7 +540,7 @@
     - Result cleared after handling
   - **Time Estimate**: 30 minutes
 
-- [ ] **Task 4.5**: Implement showSummaryDialog method in HomeFragment
+- [x] **Task 4.5**: Implement showSummaryDialog method in HomeFragment
   - **Details**:
     - Add method in `HomeFragment.kt`:
       ```kotlin
@@ -569,7 +569,7 @@
     - No crashes on configuration change
   - **Time Estimate**: 30 minutes
 
-- [ ] **Task 4.6**: Update HomeAdapter to handle loading state
+- [x] **Task 4.6**: Update HomeAdapter to handle loading state
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/ui/home/HomeAdapter.kt`
     - Add property and method:
