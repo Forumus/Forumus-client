@@ -3,6 +3,8 @@ package com.hcmus.forumus_client.data.remote
 import com.hcmus.forumus_client.data.dto.EmailResponse
 import com.hcmus.forumus_client.data.dto.GetSuggestedTopicsRequest
 import com.hcmus.forumus_client.data.dto.GetSuggestedTopicsResponse
+import com.hcmus.forumus_client.data.dto.PostSummaryRequest
+import com.hcmus.forumus_client.data.dto.PostSummaryResponse
 import com.hcmus.forumus_client.data.dto.ResetPasswordRequest
 import com.hcmus.forumus_client.data.dto.ResetPasswordResponse
 import com.hcmus.forumus_client.data.dto.SendOTPRequest
@@ -42,4 +44,9 @@ interface ApiService {
     suspend fun validatePost(
         @Body request: com.hcmus.forumus_client.data.dto.PostIdRequest
     ): Response<com.hcmus.forumus_client.data.dto.PostValidationResponse>
+
+    @POST(ApiConstants.SUMMARIZE_POST)
+    suspend fun summarizePost(
+        @Body request: PostSummaryRequest
+    ): Response<PostSummaryResponse>
 }

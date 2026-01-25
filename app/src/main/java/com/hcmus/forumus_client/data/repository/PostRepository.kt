@@ -613,4 +613,33 @@ class PostRepository(
             Result.failure(e)
         }
     }
+
+    /**
+     * Generates an AI-powered summary for a post.
+     *
+     * @param postId The ID of the post to summarize
+     * @return Result containing the summary string on success, or an exception on failure
+     */
+    suspend fun getPostSummary(postId: String): Result<String> {
+        return try {
+            val request = com.hcmus.forumus_client.data.dto.PostSummaryRequest(postId)
+            val response = NetworkService.apiService.summarizePost(request)
+
+            if (response.isSuccessful && response.body()?.success == true) {
+                val summary = response.body()?.summary
+                if (summary != null) {
+                    Result.success(summary)
+                } else {
+                    Result.failure(Exception("Empty summary returned"))
+                }
+            } else {
+                val errorMsg = response.body()?.errorMessage
+                    ?: "Failed to generate summary: ${response.code()}"
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
+            Log.e("PostRepository", "Error getting summary: ${e.message}")
+            Result.failure(e)
+        }
+    }
 }

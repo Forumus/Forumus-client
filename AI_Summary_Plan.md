@@ -132,7 +132,7 @@
 
 ### Phase 2: Android - Data Layer (Estimated: 2.5 hours)
 
-- [ ] **Task 2.1**: Add SUMMARIZE_POST constant to ApiConstants
+- [x] **Task 2.1**: Add SUMMARIZE_POST constant to ApiConstants
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/utils/ApiConstants.kt`
     - Add constant: `const val SUMMARIZE_POST = "api/posts/summarize"`
@@ -143,7 +143,7 @@
     - No compilation errors
   - **Time Estimate**: 5 minutes
 
-- [ ] **Task 2.2**: Create PostSummaryDto.kt with request and response classes
+- [x] **Task 2.2**: Create PostSummaryDto.kt with request and response classes
   - **Details**:
     - Create file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/data/dto/PostSummaryDto.kt`
     - Add `PostSummaryRequest` data class:
@@ -171,7 +171,7 @@
     - Fields match backend DTO exactly
   - **Time Estimate**: 15 minutes
 
-- [ ] **Task 2.3**: Add summarizePost method to ApiService interface
+- [x] **Task 2.3**: Add summarizePost method to ApiService interface
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/data/remote/ApiService.kt`
     - Add method after `validatePost`:
@@ -189,7 +189,7 @@
     - Follows suspend function pattern
   - **Time Estimate**: 10 minutes
 
-- [ ] **Task 2.4**: Add getPostSummary method to PostRepository
+- [x] **Task 2.4**: Add getPostSummary method to PostRepository
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/data/repository/PostRepository.kt`
     - Add method after `validatePost`:
@@ -226,7 +226,7 @@
     - Logs errors for debugging
   - **Time Estimate**: 30 minutes
 
-- [ ] **Task 2.5**: Add import statements and verify compilation
+- [x] **Task 2.5**: Add import statements and verify compilation
   - **Details**:
     - Verify all imports are correct in modified files
     - Run Gradle sync: `./gradlew build` or Android Studio sync
