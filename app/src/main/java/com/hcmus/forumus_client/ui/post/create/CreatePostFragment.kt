@@ -238,7 +238,6 @@ class CreatePostFragment : Fragment() {
             selectedLat = null
             selectedLng = null
             binding.layoutLocation.visibility = View.GONE
-            binding.btnQuickLocation.clearColorFilter()
         }
 
         val textWatcher = object : android.text.TextWatcher {
@@ -300,7 +299,6 @@ class CreatePostFragment : Fragment() {
         if (name != null) {
             binding.tvLocationName.text = name
             binding.layoutLocation.visibility = View.VISIBLE
-            binding.btnQuickLocation.setColorFilter(ContextCompat.getColor(requireContext(), R.color.primary))
         }
     }
 
