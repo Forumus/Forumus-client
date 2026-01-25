@@ -157,6 +157,11 @@ class SavedPostsFragment : Fragment() {
                     )
                 navController.navigate(action)
             }
+            PostAction.SUMMARY -> {
+                // Navigate to post detail for summary view
+                val action = HomeFragmentDirections.actionGlobalPostDetailFragment(post.id)
+                navController.navigate(action)
+            }
         }
     }
 

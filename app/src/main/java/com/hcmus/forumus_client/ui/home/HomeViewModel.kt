@@ -1,5 +1,6 @@
 package com.hcmus.forumus_client.ui.home
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
@@ -27,6 +28,13 @@ class HomeViewModel(
         private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
 
+    /**
+     * Initializes the summary cache with context. Call this from the Fragment/Activity.
+     */
+    fun initSummaryCache(context: Context) {
+        postRepository.initSummaryCache(context.applicationContext)
+    }
+
     // List of posts for the home feed
     private val _posts = MutableLiveData<List<Post>>(emptyList())
     val posts: LiveData<List<Post>> = _posts
@@ -46,6 +54,13 @@ class HomeViewModel(
     // Save post result for UI feedback
     private val _savePostResult = MutableLiveData<SavePostResult?>()
     val savePostResult: LiveData<SavePostResult?> = _savePostResult
+
+    // AI Summary state
+    private val _summaryResult = MutableLiveData<Pair<String, Result<String>>?>()
+    val summaryResult: LiveData<Pair<String, Result<String>>?> = _summaryResult
+
+    private val _summaryLoadingPostId = MutableLiveData<String?>()
+    val summaryLoadingPostId: LiveData<String?> = _summaryLoadingPostId
 
     // Pagination state
     private var lastDocument: com.google.firebase.firestore.DocumentSnapshot? = null
@@ -245,8 +260,39 @@ class HomeViewModel(
         when (postAction) {
             PostAction.UPVOTE -> handleVote(post, isUpvote = true)
             PostAction.DOWNVOTE -> handleVote(post, isUpvote = false)
+            PostAction.SUMMARY -> requestSummary(post.id)
             else -> Unit
         }
+    }
+
+    /**
+     * Requests an AI-generated summary for a post.
+     * Prevents duplicate requests for the same post.
+     *
+     * @param postId The ID of the post to summarize
+     */
+    fun requestSummary(postId: String) {
+        // Prevent duplicate requests
+        if (_summaryLoadingPostId.value == postId) return
+
+        viewModelScope.launch {
+            _summaryLoadingPostId.value = postId
+            try {
+                val result = postRepository.getPostSummary(postId)
+                _summaryResult.value = postId to result
+            } catch (e: Exception) {
+                _summaryResult.value = postId to Result.failure(e)
+            } finally {
+                _summaryLoadingPostId.value = null
+            }
+        }
+    }
+
+    /**
+     * Clears the summary result after it has been handled by the UI.
+     */
+    fun clearSummaryResult() {
+        _summaryResult.value = null
     }
 
     /**

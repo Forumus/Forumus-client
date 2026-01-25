@@ -7,6 +7,7 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
@@ -49,6 +50,10 @@ class PostViewHolder(
     val replyCount: TextView = itemView.findViewById(R.id.replyCount)
     val shareButton: LinearLayout = itemView.findViewById(R.id.shareButton)
     val menuButton: ImageButton = itemView.findViewById(R.id.menuButton)
+
+    // AI Summary views
+    val summaryButton: LinearLayout = itemView.findViewById(R.id.summaryButton)
+    val summaryLoadingContainer: FrameLayout = itemView.findViewById(R.id.summaryLoadingContainer)
 
     // Root view for click handling
     val rootLayout: LinearLayout = itemView.findViewById(R.id.postItem)
@@ -183,9 +188,19 @@ class PostViewHolder(
         downvoteIcon.setOnClickListener { onActionClick(post, PostAction.DOWNVOTE, it) }
         replyButton.setOnClickListener { onActionClick(post, PostAction.REPLY, it) }
         shareButton.setOnClickListener { onActionClick(post, PostAction.SHARE, it) }
+        summaryButton.setOnClickListener { onActionClick(post, PostAction.SUMMARY, it) }
         authorAvatar.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE, it) }
         authorName.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE, it) }
         menuButton.setOnClickListener { onActionClick(post, PostAction.MENU, it) }
+    }
+
+    /**
+     * Toggle loading state for the AI Summary button.
+     * Shows/hides the loading indicator and summary button accordingly.
+     */
+    fun setSummaryLoading(isLoading: Boolean) {
+        summaryButton.visibility = if (isLoading) View.GONE else View.VISIBLE
+        summaryLoadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
     private fun applyVoteUI(post: Post) {

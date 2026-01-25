@@ -25,6 +25,7 @@ import com.hcmus.forumus_client.data.model.PostStatus
 import com.hcmus.forumus_client.data.model.Topic
 import com.google.firebase.firestore.FieldValue
 import com.hcmus.forumus_client.data.remote.NetworkService
+import com.hcmus.forumus_client.data.cache.SummaryCacheManager
 
 /**
  * Repository for managing post data operations with Firestore.
@@ -33,10 +34,21 @@ import com.hcmus.forumus_client.data.remote.NetworkService
 class PostRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val userRepository: UserRepository = UserRepository()
+    private val userRepository: UserRepository = UserRepository(),
+    private var summaryCacheManager: SummaryCacheManager? = null
 ) {
     companion object {
         private const val BATCH_LIMIT = 450 // chừa buffer, Firestore limit 500 ops/batch
+        private const val TAG = "PostRepository"
+    }
+
+    /**
+     * Initializes the summary cache manager. Must be called with application context.
+     */
+    fun initSummaryCache(context: Context) {
+        if (summaryCacheManager == null) {
+            summaryCacheManager = SummaryCacheManager.getInstance(context)
+        }
     }
 
     suspend fun updateAuthorInfoInPosts(
@@ -612,5 +624,94 @@ class PostRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    /**
+     * Generates an AI-powered summary for a post with intelligent caching.
+     * 
+     * Caching Strategy:
+     * 1. Check local cache first (fastest response)
+     * 2. If cache miss or expired, call server API
+     * 3. Server may return cached response (avoiding AI call)
+     * 4. Store new summaries in local cache with content hash
+     * 5. Invalidate cache when content hash changes
+     *
+     * @param postId The ID of the post to summarize
+     * @return Result containing the summary string on success, or an exception on failure
+     */
+    suspend fun getPostSummary(postId: String): Result<String> {
+        return try {
+            // Check local cache first
+            val cache = summaryCacheManager
+            if (cache != null) {
+                val cachedEntry = cache.get(postId)
+                if (cachedEntry != null) {
+                    Log.d(TAG, "Local cache HIT for post $postId")
+                    return Result.success(cachedEntry.summary)
+                }
+                Log.d(TAG, "Local cache MISS for post $postId - calling server")
+            }
+            
+            // Call server API
+            val request = com.hcmus.forumus_client.data.dto.PostSummaryRequest(postId)
+            val response = NetworkService.apiService.summarizePost(request)
+
+            if (response.isSuccessful && response.body()?.success == true) {
+                val body = response.body()!!
+                val summary = body.summary
+                
+                if (summary != null) {
+                    // Cache the response locally
+                    val contentHash = body.contentHash
+                    val generatedAt = body.generatedAt
+                    val expiresAt = body.expiresAt
+                    
+                    if (cache != null && contentHash != null && generatedAt != null) {
+                        cache.put(
+                            postId = postId,
+                            summary = summary,
+                            contentHash = contentHash,
+                            generatedAt = generatedAt,
+                            expiresAt = expiresAt
+                        )
+                        Log.d(TAG, "Cached summary for post $postId (serverCached: ${body.cached})")
+                        Log.d(TAG, cache.getCacheStatusSummary())
+                    }
+                    
+                    Result.success(summary)
+                } else {
+                    Result.failure(Exception("Empty summary returned"))
+                }
+            } else {
+                val errorMsg = response.body()?.errorMessage
+                    ?: "Failed to generate summary: ${response.code()}"
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting summary: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Invalidates the local cache for a specific post.
+     * Call this when a post is updated.
+     */
+    fun invalidateSummaryCache(postId: String) {
+        summaryCacheManager?.remove(postId)
+    }
+
+    /**
+     * Clears all cached summaries.
+     */
+    fun clearSummaryCache() {
+        summaryCacheManager?.clearAll()
+    }
+
+    /**
+     * Gets cache statistics for debugging.
+     */
+    fun getSummaryCacheStats(): String {
+        return summaryCacheManager?.getCacheStatusSummary() ?: "Cache not initialized"
     }
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Left dot - disappeared -->
+    
+    <!-- Center dot - top, fading -->
+    <item
+        android:width="4dp"
+        android:height="4dp"
+        android:gravity="top|center_horizontal">
+        <shape android:shape="oval">
+            <solid android:color="@color/primary" />
+            <size android:width="4dp" android:height="4dp" />
+        </shape>
+    </item>
+    
+    <!-- Right dot - rising, bright -->
+    <item
+        android:width="6dp"
+        android:height="6dp"
+        android:gravity="center_vertical|end">
+        <shape android:shape="oval">
+            <solid android:color="@color/primary" />
+            <size android:width="6dp" android:height="6dp" />
+        </shape>
+    </item>
+    
+    <!-- New left dot appearing at bottom -->
+    <item
+        android:width="4dp"
+        android:height="4dp"
+        android:gravity="bottom|start">
+        <shape android:shape="oval">
+            <solid android:color="@color/primary" />
+            <size android:width="4dp" android:height="4dp" />
+        </shape>
+    </item>
+</layer-list>
