@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.repository.ChatRepository
+import com.hcmus.forumus_client.data.repository.UserRepository
 import com.hcmus.forumus_client.utils.SharePostUtil
 import kotlinx.coroutines.launch
 import androidx.core.graphics.toColorInt
@@ -34,6 +35,7 @@ class SharePostDialog : DialogFragment() {
     private var postId: String = ""
     private lateinit var recipientAdapter: ShareRecipientAdapter
     private val chatRepository = ChatRepository()
+    private val userRepository = UserRepository()
     
     // UI Components
     private lateinit var etSearchRecipient: EditText
@@ -63,7 +65,6 @@ class SharePostDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
-        val recipients = SharePostUtil.getMockRecipients()
         
         // Inflate custom layout
         val customView = layoutInflater.inflate(R.layout.dialog_share_post, null)
@@ -86,9 +87,13 @@ class SharePostDialog : DialogFragment() {
             updateSelectionCounter()
         }
         
-        // Set initial list
-        recipientAdapter.setFullList(recipients)
         rvShareRecipients.adapter = recipientAdapter
+        
+        // Fetch recipients from database
+        lifecycleScope.launch {
+            val recipients = SharePostUtil.getRecipients(userRepository)
+            recipientAdapter.setFullList(recipients)
+        }
         
         // Setup search filter
         etSearchRecipient.addTextChangedListener(object : TextWatcher {

@@ -6,6 +6,7 @@ import com.hcmus.forumus_client.data.model.UserRole
 import com.hcmus.forumus_client.data.model.UserStatus
 import com.hcmus.forumus_client.data.repository.ChatRepository
 import com.hcmus.forumus_client.data.repository.PostRepository
+import com.hcmus.forumus_client.data.repository.UserRepository
 
 object SharePostUtil {
 
@@ -105,10 +106,42 @@ object SharePostUtil {
     }
 
     /**
+     * Gets recipients for share dialog from the database.
+     * Fetches users from Firestore via UserRepository, excluding the current user.
+     * @param userRepository The UserRepository instance to use for fetching users
+     * @return List of users to share with (excluding current user)
+     */
+    suspend fun getRecipients(userRepository: UserRepository = UserRepository()): List<User> {
+        return try {
+            Log.d(TAG, "Fetching recipients from database")
+            val allUsers = userRepository.searchUsersCandidates()
+            
+            // Get current user to exclude from recipients
+            val currentUser = userRepository.getCurrentUser()
+            val currentUserId = currentUser?.uid
+            
+            // Filter out current user from recipients
+            val recipients = if (currentUserId != null) {
+                allUsers.filter { it.uid != currentUserId }
+            } else {
+                allUsers
+            }
+            
+            Log.d(TAG, "Retrieved ${recipients.size} recipients from database (excluding current user)")
+            recipients
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching recipients", e)
+            emptyList()
+        }
+    }
+
+    /**
      * Gets mock recipients for share dialog. In a real implementation, this would fetch the user's
      * contacts or chat list.
      * @return List of mock users to share with
+     * @deprecated Use getRecipients() instead to fetch real users from database
      */
+    @Deprecated("Use getRecipients() instead", ReplaceWith("getRecipients()"))
     fun getMockRecipients(): List<User> {
         return listOf(
                 User(
