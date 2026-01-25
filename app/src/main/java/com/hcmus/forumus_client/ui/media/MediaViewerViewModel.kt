@@ -53,4 +53,14 @@ class MediaViewerViewModel(application: Application) : AndroidViewModel(applicat
         val size = _mediaItems.value?.size ?: 0
         if (idx < size - 1) _currentIndex.value = idx + 1
     }
+
+    /**
+     * Set the current index directly (used by ViewPager2 callback)
+     */
+    fun setCurrentIndex(index: Int) {
+        val size = _mediaItems.value?.size ?: 0
+        if (index in 0 until size) {
+            _currentIndex.value = index
+        }
+    }
 }
