@@ -311,10 +311,6 @@ class ConversationFragment : Fragment() {
             showImageSelectionDialog()
         }
 
-        binding.btnVoice.setOnClickListener {
-            // Handle voice recording
-        }
-
         // Handle Enter key press in EditText
         binding.etMessage.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEND) {

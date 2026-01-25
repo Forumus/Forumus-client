@@ -198,14 +198,6 @@
                     android:maxLines="1"
                     android:imeOptions="actionSend" />
 
-                <ImageButton
-                    android:id="@+id/btn_voice"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_mic"
-                    android:contentDescription="Voice"
-                    app:tint="@color/text_tertiary" />
             </LinearLayout>
 
             <FrameLayout
