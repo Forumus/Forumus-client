@@ -14,7 +14,7 @@
             android:id="@+id/ll_header"
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="16dp"
@@ -101,7 +101,7 @@
                     android:layout_marginHorizontal="1dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardBackgroundColor="@color/surface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -112,30 +112,30 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="About This Platform"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
+                            android:layout_marginBottom="12dp"
                             android:fontFamily="@font/montserrat_semibold"
-                            android:layout_marginBottom="12dp" />
+                            android:text="About This Platform"
+                            android:textColor="@color/text_primary"
+                            android:textSize="18sp" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Forumus is an internal online forum developed specifically for members of the University of Science – Vietnam National University Ho Chi Minh City."
-                            android:textSize="15sp"
-                            android:textColor="@color/text_primary"
+                            android:layout_marginBottom="16dp"
                             android:fontFamily="@font/montserrat_regular"
                             android:lineSpacingExtra="4dp"
-                            android:layout_marginBottom="16dp" />
+                            android:text="Forumus is an internal online forum developed specifically for members of the University of Science – Vietnam National University Ho Chi Minh City."
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="The platform is designed to provide a safe, professional, and friendly academic discussion space where students, lecturers, and academic staff can connect and collaborate."
-                            android:textSize="15sp"
-                            android:textColor="@color/text_primary"
                             android:fontFamily="@font/montserrat_regular"
-                            android:lineSpacingExtra="4dp" />
+                            android:lineSpacingExtra="4dp"
+                            android:text="The platform is designed to provide a safe, professional, and friendly academic discussion space where students, lecturers, and academic staff can connect and collaborate."
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 

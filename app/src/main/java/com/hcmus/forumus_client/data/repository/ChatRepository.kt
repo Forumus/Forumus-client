@@ -51,11 +51,8 @@ class ChatRepository {
         val query = chatsCollection
             .whereArrayContains("userIds", currentUserId)
 
-        val finalQuery = if (chatType == ChatType.UNREAD_CHATS) {
-            query.whereNotEqualTo("unreadCount", 0)
-        } else {
-            query
-        }
+        // For UNREAD_CHATS, we'll filter after fetching since we need to check per-user unread count
+        val finalQuery = query
 
         val listener = finalQuery
             .orderBy("lastUpdate", Query.Direction.DESCENDING)
@@ -82,7 +79,6 @@ class ChatRepository {
                                     chatItem?.let { chat ->
                                         // Set UI properties
                                         chat.timestamp = formatTimestamp(chat.lastUpdate)
-                                        chat.isUnread = chat.unreadCount > 0
 
                                         // Fetch Name Logic (Preserved from your original code)
                                         Log.d(TAG, chat.toString())
@@ -112,9 +108,16 @@ class ChatRepository {
 
                         // Wait for all parallel fetches to complete
                         val chats = deferredChats.awaitAll().filterNotNull()
+                        
+                        // Filter by chatType if needed
+                        val filteredChats = if (chatType == ChatType.UNREAD_CHATS) {
+                            chats.filter { it.getUnreadCount(currentUserId) > 0 }
+                        } else {
+                            chats
+                        }
 
                         // 4. Emit the result to the flow
-                        trySend(chats)
+                        trySend(filteredChats)
                     }
                 }
             }
@@ -261,19 +264,36 @@ class ChatRepository {
                 throw Exception("Failed to send message: ${e.message}")
             }
 
-            // Update chat metadata separately - non-blocking
+            // Update chat metadata separately - increment unread count for OTHER user only
             try {
-                chatsCollection
-                    .document(chatId)
-                    .update(
-                        mapOf(
-                            "lastMessage" to content,
-                            "lastUpdate" to timestamp,
-                            "unreadCount" to FieldValue.increment(1),
-                            "isUnread" to true
+                // Get chat to find the recipient user
+                val chatDoc = chatsCollection.document(chatId).get().await()
+                val userIds = chatDoc.get("userIds") as? List<String> ?: emptyList()
+                val recipientId = userIds.firstOrNull { it != currentUserId }
+                
+                if (recipientId != null) {
+                    chatsCollection
+                        .document(chatId)
+                        .update(
+                            mapOf(
+                                "lastMessage" to content,
+                                "lastUpdate" to timestamp,
+                                "unreadCounts.$recipientId" to FieldValue.increment(1)
+                            )
                         )
-                    )
-                    .await()
+                        .await()
+                } else {
+                    // Fallback: just update message and timestamp
+                    chatsCollection
+                        .document(chatId)
+                        .update(
+                            mapOf(
+                                "lastMessage" to content,
+                                "lastUpdate" to timestamp
+                            )
+                        )
+                        .await()
+                }
             } catch (e: Exception) {
                 Log.w(TAG, "Chat metadata update failed, but message was sent: ${e.message}")
             }
@@ -298,7 +318,10 @@ class ChatRepository {
                 id = chatId,
                 lastMessage = "",
                 lastUpdate = timestamp,
-                unreadCount = 0,
+                unreadCounts = mapOf(
+                    currentUserId to 0,
+                    otherUserId to 0
+                ),
                 userIds = listOf(currentUserId, otherUserId),
                 chatDeleted = mapOf(
                     currentUserId to false,
@@ -340,7 +363,10 @@ class ChatRepository {
                     id = existingChat.id,
                     lastMessage = existingChat.getString("lastMessage") ?: "",
                     lastUpdate = existingChat.getTimestamp("lastUpdate"),
-                    unreadCount = (existingChat.getLong("unreadCount") ?: 0L).toInt(),
+                    unreadCounts = existingChat.get("unreadCounts") as? Map<String, Int> ?: mapOf(
+                        currentUserId to 0,
+                        otherUserId to 0
+                    ),
                     userIds = existingChat.get("userIds") as? List<String> ?: emptyList()
                 )
             } else {
@@ -379,12 +405,15 @@ class ChatRepository {
         }
     }
     
-    // Mark messages as read
+    // Mark messages as read for current user only
     suspend fun markMessagesAsRead(chatId: String): Result<Unit> {
         return try {
+            val currentUserId = getCurrentUserId()
+                ?: return Result.failure(Exception("User not authenticated"))
+            
             chatsCollection
                 .document(chatId)
-                .update("unreadCount", 0)
+                .update("unreadCounts.$currentUserId", 0)
                 .await()
             
             Result.success(Unit)
