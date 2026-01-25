@@ -227,6 +227,38 @@
                     android:fontFamily="@font/montserrat_regular"/>
             </LinearLayout>
 
+            <!-- AI Summary Button -->
+            <LinearLayout
+                android:id="@+id/summaryButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:background="@drawable/button_background_light"
+                android:layout_marginEnd="8dp">
+                <ImageView
+                    android:id="@+id/summaryIcon"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:src="@drawable/ic_ai_sparkle"
+                    app:tint="@color/text_tertiary"
+                    android:scaleType="fitCenter"/>
+            </LinearLayout>
+
+            <!-- Summary Loading Indicator -->
+            <FrameLayout
+                android:id="@+id/summaryLoadingContainer"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:visibility="gone"
+                android:layout_marginEnd="8dp">
+                <ProgressBar
+                    android:id="@+id/summaryLoading"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    style="?android:attr/progressBarStyleSmall"/>
+            </FrameLayout>
+
             <!-- Share Button -->
             <LinearLayout
                 android:id="@+id/shareButton"

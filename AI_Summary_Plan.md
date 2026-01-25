@@ -242,7 +242,7 @@
 
 ### Phase 3: Android - UI Components (Estimated: 2.5 hours)
 
-- [ ] **Task 3.1**: Create ic_ai_sparkle.xml vector drawable
+- [x] **Task 3.1**: Create ic_ai_sparkle.xml vector drawable
   - **Details**:
     - Create file: `Forumus-client/app/src/main/res/drawable/ic_ai_sparkle.xml`
     - Use Material Design "auto_awesome" icon or custom sparkle:
@@ -264,7 +264,7 @@
     - Supports tinting via `app:tint`
   - **Time Estimate**: 15 minutes
 
-- [ ] **Task 3.2**: Add SUMMARY action to PostAction enum
+- [x] **Task 3.2**: Add SUMMARY action to PostAction enum
   - **Details**:
     - Find and edit PostAction enum (likely in `data/model/` or inline)
     - Search for: `enum class PostAction`
@@ -276,7 +276,7 @@
     - No impact on existing functionality
   - **Time Estimate**: 10 minutes
 
-- [ ] **Task 3.3**: Add Summary button to post_item.xml layout
+- [x] **Task 3.3**: Add Summary button to post_item.xml layout
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/res/layout/post_item.xml`
     - Locate `replyShareContainer` LinearLayout (around line 195)
@@ -322,7 +322,7 @@
     - Layout preview shows correctly in Android Studio
   - **Time Estimate**: 30 minutes
 
-- [ ] **Task 3.4**: Add summary button bindings to PostViewHolder
+- [x] **Task 3.4**: Add summary button bindings to PostViewHolder
   - **Details**:
     - Edit file: `Forumus-client/app/src/main/java/com/hcmus/forumus_client/ui/common/PostViewHolder.kt`
     - Add view bindings after `shareButton`:
@@ -348,7 +348,7 @@
     - Loading state toggles visibility correctly
   - **Time Estimate**: 30 minutes
 
-- [ ] **Task 3.5**: Create dialog_post_summary.xml layout
+- [x] **Task 3.5**: Create dialog_post_summary.xml layout
   - **Details**:
     - Create file: `Forumus-client/app/src/main/res/layout/dialog_post_summary.xml`
     - Layout structure:
