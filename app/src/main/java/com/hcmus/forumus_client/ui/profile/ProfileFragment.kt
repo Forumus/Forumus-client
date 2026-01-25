@@ -209,7 +209,11 @@ class ProfileFragment : Fragment() {
                         }
                     }
 
-                    CommentAction.VIEW_REPLIES -> TODO()
+                    CommentAction.VIEW_REPLIES -> {
+                        val navAction = ProfileFragmentDirections
+                            .actionGlobalPostDetailFragment(comment.postId)
+                        navController.navigate(navAction)
+                    }
                 }
             }
         )
