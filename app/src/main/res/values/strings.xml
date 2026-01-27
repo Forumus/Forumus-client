@@ -406,4 +406,12 @@
     <string name="about_university_name">University of Science – Vietnam National University Ho Chi Minh City</string>
     <string name="about_copyright">© 2025 Forumus Development Team</string>
     <string name="about_disclaimer">This application is developed for academic purposes only and is not intended for commercial use.</string>
+    
+    <!-- Profile Screen -->
+    <string name="profile_tab_general">General</string>
+    <string name="profile_tab_post">Post</string>
+    <string name="profile_tab_reply">Reply</string>
+    <string name="profile_stat_posts">posts</string>
+    <string name="profile_stat_replies">replies</string>
+    <string name="profile_stat_upvotes">upvotes</string>
 </resources>

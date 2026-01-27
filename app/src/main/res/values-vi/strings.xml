@@ -411,4 +411,12 @@
     <string name="about_university_name">Trường Đại học Khoa học Tự nhiên – ĐHQG-HCM</string>
     <string name="about_copyright">© 2025 Đội ngũ Phát triển Forumus</string>
     <string name="about_disclaimer">Ứng dụng này được phát triển cho mục đích học thuật và không dành cho mục đích thương mại.</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_tab_general">Tổng quan</string>
+    <string name="profile_tab_post">Bài đăng</string>
+    <string name="profile_tab_reply">Phản hồi</string>
+    <string name="profile_stat_posts">bài đăng</string>
+    <string name="profile_stat_replies">phản hồi</string>
+    <string name="profile_stat_upvotes">tán thành</string>
 </resources>
