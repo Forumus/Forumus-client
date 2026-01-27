@@ -406,11 +406,28 @@ class HomeFragment : Fragment() {
 
     /** Observe all ViewModel LiveData streams and update UI accordingly. */
     private fun observeViewModel() {
-        viewModel.posts.observe(viewLifecycleOwner) { posts -> homeAdapter.submitList(posts) }
+        viewModel.posts.observe(viewLifecycleOwner) { posts ->
+            // Preserve scroll position during updates
+            val layoutManager = binding.postRecyclerView.layoutManager as? LinearLayoutManager
+            val firstVisiblePosition = layoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
+            val scrollOffset = layoutManager?.findViewByPosition(firstVisiblePosition)?.top ?: 0
+            
+            homeAdapter.submitList(posts)
+            
+            // Restore scroll position if it changed
+            if (firstVisiblePosition > 0) {
+                binding.postRecyclerView.post {
+                    layoutManager?.scrollToPositionWithOffset(firstVisiblePosition, scrollOffset)
+                }
+            }
+        }
 
         viewModel.topics.observe(viewLifecycleOwner) { topics ->
-            populateTopics(topics)
-            homeAdapter.setTopics(topics)
+            // Only update if topics list is not empty to prevent redundant calls
+            if (topics.isNotEmpty()) {
+                populateTopics(topics)
+                homeAdapter.setTopics(topics)
+            }
         }
 
         notificationViewModel.unreadCount.observe(viewLifecycleOwner) { count ->
