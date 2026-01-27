@@ -105,6 +105,11 @@
     <string name="help_center_icon">Help center icon</string>
     <string name="help_topic_icon">Help topic icon</string>
     
+    <!-- Language Settings -->
+    <string name="language">Language</string>
+    <string name="english">English</string>
+    <string name="vietnamese">Vietnamese</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="default_notification_channel_id">general_notification_channel</string>

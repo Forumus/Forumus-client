@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
@@ -40,6 +43,7 @@ class SettingsFragment : Fragment() {
         setupHeaderActions()
         setupProfileSection()
         setupToggleSwitches()
+        setupLanguageSpinner()
         setupMenuActions()
         observeViewModel()
 
@@ -97,6 +101,30 @@ class SettingsFragment : Fragment() {
     }
 
     /**
+     * Setup language selection spinner
+     */
+    private fun setupLanguageSpinner() {
+        val languages = listOf("English", "Vietnamese")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, languages)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        
+        binding.spinnerLanguage.adapter = adapter
+        
+        binding.spinnerLanguage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedLanguage = languages[position]
+                if (selectedLanguage != viewModel.language.value) {
+                    viewModel.saveLanguagePreference(selectedLanguage)
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Do nothing
+            }
+        }
+    }
+
+    /**
      * Setup menu action click listeners
      */
     private fun setupMenuActions() {
@@ -148,6 +176,8 @@ class SettingsFragment : Fragment() {
         viewModel.user.observe(viewLifecycleOwner) { user ->
             binding.ivUserAvatar.load(user.profilePictureUrl) {
                 crossfade(true)
+                placeholder(R.drawable.default_avatar)
+                error(R.drawable.default_avatar)
             }
             binding.tvUserName.text = user.fullName
             binding.tvUserEmail.text = user.email
@@ -167,6 +197,15 @@ class SettingsFragment : Fragment() {
         // Observe email notifications preference
         viewModel.isEmailNotificationsEnabled.observe(viewLifecycleOwner) { isEnabled ->
             binding.swEmailNotifications.isChecked = isEnabled
+        }
+
+        // Observe language preference
+        viewModel.language.observe(viewLifecycleOwner) { language ->
+            val languages = listOf("English", "Vietnamese")
+            val index = languages.indexOf(language)
+            if (index >= 0 && binding.spinnerLanguage.selectedItemPosition != index) {
+                binding.spinnerLanguage.setSelection(index)
+            }
         }
     }
 }
