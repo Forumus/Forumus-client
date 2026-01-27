@@ -2,6 +2,7 @@ package com.hcmus.forumus_client.ui.post.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.data.model.Comment
 import com.hcmus.forumus_client.data.model.CommentAction
@@ -47,12 +48,20 @@ class PostDetailAdapter(
 
     /**
      * Updates the adapter with the list of topics.
+     * Only triggers update if topics actually changed to prevent redundant re-renders.
      *
      * @param topics The list of topics to map
      */
     fun setTopics(topics: List<Topic>) {
-        this.topicMap = topics.associateBy { it.id }
-        notifyDataSetChanged()
+        val newTopicMap = topics.associateBy { it.id }
+        // Only update if topics actually changed
+        if (newTopicMap != topicMap) {
+            this.topicMap = newTopicMap
+            // Only notify the post item (always at position 0) with topics payload
+            if (items.isNotEmpty() && items[0] is FeedItem.PostItem) {
+                notifyItemChanged(0, "topics")
+            }
+        }
     }
 
     /**
@@ -125,6 +134,90 @@ class PostDetailAdapter(
         // Post is always at position 0, notify to update loading state
         if (itemCount > 0 && getItem(0) is FeedItem.PostItem) {
             notifyItemChanged(0, "summary_loading")
+        }
+    }
+
+    /**
+     * DiffUtil callback for calculating the difference between two lists of feed items.
+     * This enables efficient, targeted updates instead of full list redraws.
+     */
+    private class FeedItemDiffCallback(
+        private val oldList: List<FeedItem>,
+        private val newList: List<FeedItem>
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldItem = oldList[oldItemPosition]
+            val newItem = newList[newItemPosition]
+            
+            return when {
+                oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem ->
+                    oldItem.post.id == newItem.post.id
+                oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem ->
+                    oldItem.comment.id == newItem.comment.id
+                else -> false
+            }
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldItem = oldList[oldItemPosition]
+            val newItem = newList[newItemPosition]
+            
+            return when {
+                oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem -> {
+                    val old = oldItem.post
+                    val new = newItem.post
+                    old.title == new.title &&
+                    old.content == new.content &&
+                    old.upvoteCount == new.upvoteCount &&
+                    old.downvoteCount == new.downvoteCount &&
+                    old.commentCount == new.commentCount &&
+                    old.userVote == new.userVote &&
+                    old.topicIds == new.topicIds
+                }
+                oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem -> {
+                    val old = oldItem.comment
+                    val new = newItem.comment
+                    old.content == new.content &&
+                    old.upvoteCount == new.upvoteCount &&
+                    old.downvoteCount == new.downvoteCount &&
+                    old.commentCount == new.commentCount &&
+                    old.userVote == new.userVote
+                }
+                else -> false
+            }
+        }
+
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+            val oldItem = oldList[oldItemPosition]
+            val newItem = newList[newItemPosition]
+            
+            // Return specific payload for targeted updates
+            return when {
+                oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem -> {
+                    val old = oldItem.post
+                    val new = newItem.post
+                    when {
+                        old.upvoteCount != new.upvoteCount ||
+                        old.downvoteCount != new.downvoteCount ||
+                        old.userVote != new.userVote -> "votes"
+                        old.topicIds != new.topicIds -> "topics"
+                        else -> null
+                    }
+                }
+                oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem -> {
+                    val old = oldItem.comment
+                    val new = newItem.comment
+                    if (old.upvoteCount != new.upvoteCount ||
+                        old.downvoteCount != new.downvoteCount ||
+                        old.userVote != new.userVote) "votes" else null
+                }
+                else -> null
+            }
         }
     }
 }
