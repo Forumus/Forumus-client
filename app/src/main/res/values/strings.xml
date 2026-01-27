@@ -364,7 +364,6 @@
     <string name="violation_copyright_desc">Copies content without credit. Uploads copyrighted media without permission.</string>
     <string name="topic_biology">Biology</string>
     <string name="see_more_notifications">See more notifications</string>
-    <string name="notification_header">Header</string>
     <string name="message_sent_placeholder">I\'m doing great! Thanks for asking</string>
     <string name="message_sent_time">10:32 AM</string>
     <string name="message_received_placeholder">Hey! How are you doing?</string>
@@ -444,4 +443,23 @@
     <string name="search_users_hint">Search users...</string>
     <string name="no_users_found">No users found</string>
     <string name="chat_deleted">Chat deleted</string>
+
+    <!-- Notifications -->
+    <string name="notification_title">Notification</string>
+    <string name="no_notifications_yet">No notifications yet</string>
+    <string name="today">Today</string>
+    <string name="earlier">Earlier</string>
+    <string name="just_now">Just now</string>
+    <string name="noti_upvoted">upvoted your post</string>
+    <string name="noti_commented">commented on your post</string>
+    <string name="noti_replied">replied to your comment</string>
+    <string name="noti_removed_post">removed your post</string>
+    <string name="noti_rejected_post">rejected your post</string>
+    <string name="noti_approved_post">approved your post</string>
+    <string name="noti_status_changed_admin">Admin has modified your status</string>
+    <string name="noti_interacted">interacted with you</string>
+    <string name="reason_label">Reason: %s</string>
+    <string name="original_post_fallback">Original Post</string>
+    <string name="content_not_available">Content not available</string>
+    <string name="notification_header">Notification</string>
 </resources>

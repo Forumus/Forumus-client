@@ -21,7 +21,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Notification"
+            android:text="@string/notification_title"
             android:textSize="32sp"
             android:textColor="@color/text_primary"
             android:fontFamily="@font/montserrat_semibold"
@@ -49,7 +49,7 @@
         android:id="@+id/tvEmptyState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No notifications yet"
+        android:text="@string/no_notifications_yet"
         android:textColor="@color/text_secondary_light"
         android:textSize="18sp"
         android:visibility="gone"

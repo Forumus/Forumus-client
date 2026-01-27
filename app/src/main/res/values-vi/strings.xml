@@ -369,7 +369,6 @@
     <string name="violation_copyright_desc">Sao chép nội dung không ghi nguồn. Tải lên phương tiện có bản quyền mà không được phép.</string>
     <string name="topic_biology">Sinh học</string>
     <string name="see_more_notifications">Xem thêm thông báo</string>
-    <string name="notification_header">Tiêu đề</string>
     <string name="message_sent_placeholder">Tôi đang rất ổn! Cảm ơn đã hỏi thăm</string>
     <string name="message_sent_time">10:32 SA</string>
     <string name="message_received_placeholder">Chào! Bạn có khỏe không?</string>
@@ -449,4 +448,23 @@
     <string name="search_users_hint">Tìm kiếm người dùng...</string>
     <string name="no_users_found">Không tìm thấy người dùng</string>
     <string name="chat_deleted">Đã xóa đoạn chat</string>
+
+    <!-- Notifications -->
+    <string name="notification_title">Thông báo</string>
+    <string name="no_notifications_yet">Chưa có thông báo nào</string>
+    <string name="today">Hôm nay</string>
+    <string name="earlier">Trước đó</string>
+    <string name="just_now">Vừa xong</string>
+    <string name="noti_upvoted">đã upvote bài viết của bạn</string>
+    <string name="noti_commented">đã bình luận về bài viết của bạn</string>
+    <string name="noti_replied">đã trả lời bình luận của bạn</string>
+    <string name="noti_removed_post">đã xóa bài viết của bạn</string>
+    <string name="noti_rejected_post">đã từ chối bài viết của bạn</string>
+    <string name="noti_approved_post">đã duyệt bài viết của bạn</string>
+    <string name="noti_status_changed_admin">Admin đã thay đổi trạng thái của bạn</string>
+    <string name="noti_interacted">đã tương tác với bạn</string>
+    <string name="reason_label">Lý do: %s</string>
+    <string name="original_post_fallback">Bài viết gốc</string>
+    <string name="content_not_available">Nội dung không có sẵn</string>
+    <string name="notification_header">Thông báo</string>
 </resources>

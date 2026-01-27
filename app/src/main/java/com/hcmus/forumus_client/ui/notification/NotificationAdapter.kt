@@ -50,7 +50,7 @@ class NotificationAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
-            is NotificationListItem.Header -> (holder as HeaderViewHolder).bind(item.title)
+            is NotificationListItem.Header -> (holder as HeaderViewHolder).bind(item.titleResId)
             is NotificationListItem.Item -> (holder as NotificationViewHolder).bind(item.notification)
             is NotificationListItem.ShowMore -> (holder as ShowMoreViewHolder).bind()
         }
@@ -61,6 +61,7 @@ class NotificationAdapter(
 
         fun bind(notification: Notification) {
             val actor = notification.actorName
+            val context = binding.root.context
             var typeText = ""
             var iconRes = com.hcmus.forumus_client.R.drawable.noti_comment
             var customTitle: String? = null
@@ -68,35 +69,35 @@ class NotificationAdapter(
             when (notification.type) {
                 "UPVOTE" -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_vote
-                    typeText = "upvoted your post"
+                    typeText = context.getString(com.hcmus.forumus_client.R.string.noti_upvoted)
                 }
                 "COMMENT" -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_comment
-                    typeText = "commented on your post"
+                    typeText = context.getString(com.hcmus.forumus_client.R.string.noti_commented)
                 }
                 "REPLY" -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_comment
-                    typeText = "replied to your comment"
+                    typeText = context.getString(com.hcmus.forumus_client.R.string.noti_replied)
                 }
                 "POST_DELETED" -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_remove_post
-                    typeText = "removed your post"
+                    typeText = context.getString(com.hcmus.forumus_client.R.string.noti_removed_post)
                 }
                 "POST_REJECTED" -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_post_reject
-                    typeText = "rejected your post"
+                    typeText = context.getString(com.hcmus.forumus_client.R.string.noti_rejected_post)
                 }
                 "POST_APPROVED" -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_post_approve
-                    typeText = "approved your post"
+                    typeText = context.getString(com.hcmus.forumus_client.R.string.noti_approved_post)
                 }
                 "STATUS_CHANGED" -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_status
-                    customTitle = "Admin has modified your status"
+                    customTitle = context.getString(com.hcmus.forumus_client.R.string.noti_status_changed_admin)
                 }
                 else -> {
                     iconRes = com.hcmus.forumus_client.R.drawable.noti_comment
-                    typeText = "interacted with you"
+                    typeText = context.getString(com.hcmus.forumus_client.R.string.noti_interacted)
                 }
             }
             
@@ -112,7 +113,7 @@ class NotificationAdapter(
 
             val timeAgo = notification.createdAt?.toDate()?.time?.let {
                 DateUtils.getRelativeTimeSpanString(it, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS)
-            } ?: "Just now"
+            } ?: context.getString(com.hcmus.forumus_client.R.string.just_now)
             binding.tvTime.text = timeAgo
 
             // Styling Logic
@@ -140,8 +141,8 @@ class NotificationAdapter(
 
     inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvTitle: android.widget.TextView = itemView as android.widget.TextView
-        fun bind(title: String) {
-            tvTitle.text = title
+        fun bind(titleResId: Int) {
+            tvTitle.setText(titleResId)
         }
     }
 
