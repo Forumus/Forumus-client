@@ -497,4 +497,8 @@
     <string name="msg_found_topics">Found suggested topics!</string>
     <string name="msg_no_suggestions">No suggestions</string>
     <string name="action_close">Close</string>
+    <!-- Logout -->
+    <string name="logout_title">Logout</string>
+    <string name="logout_confirmation_message">Are you sure you want to log out?</string>
+    <string name="logout_confirm">Logout</string>
 </resources>

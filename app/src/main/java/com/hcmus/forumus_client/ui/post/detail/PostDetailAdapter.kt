@@ -2,6 +2,8 @@ package com.hcmus.forumus_client.ui.post.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.data.model.Comment
 import com.hcmus.forumus_client.data.model.CommentAction
@@ -31,7 +33,7 @@ import com.hcmus.forumus_client.data.model.Topic
 class PostDetailAdapter(
     private val onPostAction: (Post, PostAction, View) -> Unit,
     private val onCommentAction: (Comment, CommentAction) -> Unit,
-) : androidx.recyclerview.widget.ListAdapter<FeedItem, RecyclerView.ViewHolder>(FeedItemDiffCallback()) {
+) : ListAdapter<FeedItem, RecyclerView.ViewHolder>(FeedItemDiffCallback()) {
 
     companion object {
         // View type constants for determining which ViewHolder to use
@@ -47,12 +49,20 @@ class PostDetailAdapter(
 
     /**
      * Updates the adapter with the list of topics.
+     * Only triggers update if topics actually changed to prevent redundant re-renders.
      *
      * @param topics The list of topics to map
      */
     fun setTopics(topics: List<Topic>) {
-        this.topicMap = topics.associateBy { it.id }
-        notifyDataSetChanged()
+        val newTopicMap = topics.associateBy { it.id }
+        // Only update if topics actually changed
+        if (newTopicMap != topicMap) {
+            this.topicMap = newTopicMap
+            // Only notify the post item (always at position 0) with topics payload
+            if (currentList.isNotEmpty() && currentList[0] is FeedItem.PostItem) {
+                notifyItemChanged(0, "topics")
+            }
+        }
     }
 
     /**
@@ -115,6 +125,45 @@ class PostDetailAdapter(
     }
 
     /**
+     * Binds data with payloads for partial updates.
+     * This prevents full item rebinding when only specific fields change.
+     */
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isEmpty()) {
+            // Full bind
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            val item = getItem(position)
+            // Handle partial updates
+            for (payload in payloads) {
+                when (payload) {
+                    "votes" -> {
+                        when (item) {
+                            is FeedItem.PostItem -> (holder as PostViewHolder).updateVotes(item.post)
+                            is FeedItem.CommentItem -> (holder as CommentViewHolder).updateVotes(item.comment)
+                        }
+                    }
+                    "summary_loading" -> {
+                        if (holder is PostViewHolder && item is FeedItem.PostItem) {
+                            holder.setSummaryLoading(isSummaryLoading)
+                        }
+                    }
+                    "topics" -> {
+                        if (holder is PostViewHolder && item is FeedItem.PostItem) {
+                            holder.updateTopics(item.post, topicMap)
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    /**
      * Updates the AI summary loading state for the post.
      * Since there's only one post at position 0, we notify that item.
      *
@@ -129,7 +178,7 @@ class PostDetailAdapter(
     }
 }
 
-class FeedItemDiffCallback : androidx.recyclerview.widget.DiffUtil.ItemCallback<FeedItem>() {
+class FeedItemDiffCallback : DiffUtil.ItemCallback<FeedItem>() {
     override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
         return when {
             oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem ->
@@ -142,5 +191,29 @@ class FeedItemDiffCallback : androidx.recyclerview.widget.DiffUtil.ItemCallback<
 
     override fun areContentsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
         return oldItem == newItem
+    }
+
+    override fun getChangePayload(oldItem: FeedItem, newItem: FeedItem): Any? {
+        return when {
+            oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem -> {
+                val old = oldItem.post
+                val new = newItem.post
+                when {
+                    old.upvoteCount != new.upvoteCount ||
+                    old.downvoteCount != new.downvoteCount ||
+                    old.userVote != new.userVote -> "votes"
+                    old.topicIds != new.topicIds -> "topics"
+                    else -> null
+                }
+            }
+            oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem -> {
+                val old = oldItem.comment
+                val new = newItem.comment
+                if (old.upvoteCount != new.upvoteCount ||
+                    old.downvoteCount != new.downvoteCount ||
+                    old.userVote != new.userVote) "votes" else null
+            }
+            else -> null
+        }
     }
 }

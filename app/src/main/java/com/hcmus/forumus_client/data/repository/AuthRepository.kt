@@ -223,6 +223,9 @@ class AuthRepository (
     }
 
     fun logout() {
+        // Terminate Firestore first to cancel all active listeners
+        // This prevents PERMISSION_DENIED errors when auth state changes
+        firestore.terminate()
         firebaseAuth.signOut()
         tokenManager?.clearSession()
     }
