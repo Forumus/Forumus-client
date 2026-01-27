@@ -427,4 +427,11 @@
         <item quantity="one">Hide %d reply</item>
         <item quantity="other">Hide %d replies</item>
     </plurals>
+    
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">User Profile</string>
+    <string name="upload_avatar">Upload avatar</string>
+    <string name="full_name_label">Full name</string>
+    <string name="discard">Discard</string>
+    <string name="saving">Saving...</string>
 </resources>

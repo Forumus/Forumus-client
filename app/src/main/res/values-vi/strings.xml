@@ -432,4 +432,11 @@
         <item quantity="one">Ẩn %d phản hồi</item>
         <item quantity="other">Ẩn %d phản hồi</item>
     </plurals>
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">Hồ sơ người dùng</string>
+    <string name="upload_avatar">Tải ảnh lên</string>
+    <string name="full_name_label">Họ và tên</string>
+    <string name="discard">Hủy</string>
+    <string name="saving">Đang lưu...</string>
 </resources>
