@@ -45,6 +45,10 @@ class SharePostDialog : DialogFragment() {
     private lateinit var llSelectionCounter: LinearLayout
     private lateinit var btnShare: Button
     private lateinit var btnCancel: Button
+    private lateinit var progressBar: View
+    
+    // Track sharing state
+    private var isSharing = false
 
     companion object {
         private const val ARG_POST_ID = "postId"
@@ -77,6 +81,7 @@ class SharePostDialog : DialogFragment() {
         llSelectionCounter = customView.findViewById(R.id.llSelectionCounter)
         btnShare = customView.findViewById(R.id.btnShare)
         btnCancel = customView.findViewById(R.id.btnCancel)
+        progressBar = customView.findViewById(R.id.progressBar)
         
         // Setup RecyclerView
         rvShareRecipients.layoutManager = LinearLayoutManager(context)
@@ -165,7 +170,14 @@ class SharePostDialog : DialogFragment() {
     }
 
     private fun sharePostToRecipients(selectedIds: List<String>) {
+        // Prevent duplicate submissions
+        if (isSharing) return
+        
         lifecycleScope.launch {
+            // Show loading state
+            isSharing = true
+            setLoadingState(true)
+            
             var successCount = 0
             var failureCount = 0
             
@@ -184,6 +196,10 @@ class SharePostDialog : DialogFragment() {
                 }
             }
             
+            // Hide loading state
+            isSharing = false
+            setLoadingState(false)
+            
             // Show result toast
             val message = when {
                 failureCount == 0 -> "Post shared successfully to $successCount contact${if (successCount > 1) "s" else ""}"
@@ -193,6 +209,28 @@ class SharePostDialog : DialogFragment() {
             
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             dismiss()
+        }
+    }
+    
+    /**
+     * Sets the loading state of the dialog.
+     * Disables buttons and shows progress indicator during sharing.
+     */
+    private fun setLoadingState(loading: Boolean) {
+        btnShare.isEnabled = !loading
+        btnCancel.isEnabled = !loading
+        etSearchRecipient.isEnabled = !loading
+        rvShareRecipients.isEnabled = !loading
+        ivClearSelection.isEnabled = !loading
+        
+        if (loading) {
+            progressBar.visibility = View.VISIBLE
+            btnShare.text = "Sharing..."
+            btnShare.alpha = 0.6f
+        } else {
+            progressBar.visibility = View.GONE
+            btnShare.text = "Share"
+            btnShare.alpha = 1.0f
         }
     }
 }

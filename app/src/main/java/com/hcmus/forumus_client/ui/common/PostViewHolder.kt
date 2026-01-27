@@ -205,11 +205,40 @@ class PostViewHolder(
 
         // Set up click listeners for all interactive elements
         rootLayout.setOnClickListener { onActionClick(post, PostAction.OPEN, it) }
-        upvoteIcon.setOnClickListener { onActionClick(post, PostAction.UPVOTE, it) }
-        downvoteIcon.setOnClickListener { onActionClick(post, PostAction.DOWNVOTE, it) }
+        upvoteIcon.setOnClickListener { 
+            // Briefly disable to prevent duplicate taps during optimistic update
+            if (upvoteIcon.isEnabled) {
+                upvoteIcon.isEnabled = false
+                downvoteIcon.isEnabled = false
+                onActionClick(post, PostAction.UPVOTE, it)
+                // Re-enable after brief delay
+                upvoteIcon.postDelayed({
+                    upvoteIcon.isEnabled = true
+                    downvoteIcon.isEnabled = true
+                }, 300)
+            }
+        }
+        downvoteIcon.setOnClickListener { 
+            // Briefly disable to prevent duplicate taps during optimistic update
+            if (downvoteIcon.isEnabled) {
+                upvoteIcon.isEnabled = false
+                downvoteIcon.isEnabled = false
+                onActionClick(post, PostAction.DOWNVOTE, it)
+                // Re-enable after brief delay
+                downvoteIcon.postDelayed({
+                    upvoteIcon.isEnabled = true
+                    downvoteIcon.isEnabled = true
+                }, 300)
+            }
+        }
         replyButton.setOnClickListener { onActionClick(post, PostAction.REPLY, it) }
         shareButton.setOnClickListener { onActionClick(post, PostAction.SHARE, it) }
-        summaryButton.setOnClickListener { onActionClick(post, PostAction.SUMMARY, it) }
+        summaryButton.setOnClickListener { 
+            // Disable summary button during loading to prevent duplicate requests
+            if (summaryButton.isEnabled) {
+                onActionClick(post, PostAction.SUMMARY, it)
+            }
+        }
         authorAvatar.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE, it) }
         authorName.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE, it) }
         menuButton.setOnClickListener { onActionClick(post, PostAction.MENU, it) }
@@ -218,10 +247,12 @@ class PostViewHolder(
     /**
      * Toggle loading state for the AI Summary button.
      * Shows/hides the loading indicator and summary button accordingly.
+     * Disables button during loading to prevent duplicate requests.
      */
     fun setSummaryLoading(isLoading: Boolean) {
         summaryButton.visibility = if (isLoading) View.GONE else View.VISIBLE
         summaryLoadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
+        summaryButton.isEnabled = !isLoading
     }
 
     private fun applyVoteUI(post: Post) {
