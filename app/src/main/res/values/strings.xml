@@ -165,6 +165,15 @@
     <!-- Map & Location -->
     <string name="place_name">Place Name</string>
     <string name="address_details">Address details...</string>
+
+    <!-- Share Dialog -->
+    <string name="share_post_title">Share Post</string>
+    <string name="share_post_description">Select contacts to share this post with</string>
+    <string name="search_contacts_hint">Search contacts...</string>
+    <string name="contacts_selected_format">Contacts selected: %d</string>
+    <string name="share_action">Share</string>
+    <string name="cancel_action">Cancel</string>
+    <string name="clear_selection_desc">Clear selection</string>
     
     <!-- User Search & Profile -->
     <string name="user_name_placeholder">User Name</string>
@@ -181,6 +190,31 @@
     <string name="violation_spam">Spam</string>
     <string name="violation_detail">Detail</string>
     <string name="violation_content">This content is considered spam or misleading.</string>
+
+    <!-- Violation Types -->
+    <string name="violation_scam_name">Scam - Fraud</string>
+    <string name="violation_scam_desc">Attempts to deceive users for financial or personal gain. Fake giveaways, phishing links, impersonation of admins/moderators. Requests money, account info, or sensitive data under false pretenses. Posts promoting fraudulent services.</string>
+    
+    <string name="violation_violence_name">Violence, Hate Speech</string>
+    <string name="violation_violence_desc">Encourages violence or threats. Insults or discriminates based on race, gender, religion, etc.</string>
+    
+    <string name="violation_inappropriate_name">Inappropriate Content</string>
+    <string name="violation_inappropriate_desc">Contains vulgar, offensive, or explicit materials. NSFW/18+ content not for educational purposes.</string>
+    
+    <string name="violation_misinfo_name">Misinformation</string>
+    <string name="violation_misinfo_desc">Spreads false or unverified information. Misleading claims that cause confusion.</string>
+    
+    <string name="violation_illegal_name">Illegal Content</string>
+    <string name="violation_illegal_desc">Promotes hacking, cracking, gambling, drugs, weapons, etc.</string>
+    
+    <string name="violation_harassment_name">Harassment - Abusive Language</string>
+    <string name="violation_harassment_desc">Personal attacks or insults. Toxic communication targeting individuals or groups.</string>
+    
+    <string name="violation_privacy_name">Privacy Violation (Doxxing)</string>
+    <string name="violation_privacy_desc">Reveals personal data such as phone numbers, addresses, ID numbers. Exposes private information without consent.</string>
+    
+    <string name="violation_copyright_name">Copyright Violation</string>
+    <string name="violation_copyright_desc">Copies content without credit. Uploads copyrighted media without permission.</string>
     <string name="topic_biology">Biology</string>
     <string name="see_more_notifications">See more notifications</string>
     <string name="notification_header">Header</string>

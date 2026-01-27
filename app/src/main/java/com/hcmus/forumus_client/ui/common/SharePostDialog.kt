@@ -123,6 +123,9 @@ class SharePostDialog : DialogFragment() {
                 Toast.makeText(context, "Please select at least one recipient", Toast.LENGTH_SHORT).show()
             }
         }
+
+        // Initialize counter and button state
+        updateSelectionCounter()
         
         // Create dialog
         val dialog = AlertDialog.Builder(context)
@@ -143,7 +146,7 @@ class SharePostDialog : DialogFragment() {
      */
     private fun updateSelectionCounter() {
         val count = recipientAdapter.getSelectedUserIds().size
-        tvSelectionCount.text = "Contacts selected: $count"
+        tvSelectionCount.text = getString(R.string.contacts_selected_format, count)
         
         // Show/hide clear button based on selection
         ivClearSelection.visibility = if (count > 0) {
@@ -160,7 +163,7 @@ class SharePostDialog : DialogFragment() {
         } else {
             btnShare.isEnabled = false
             btnShare.setBackgroundResource(R.drawable.button_share_post_background_gray)
-            btnShare.setTextColor("#999999".toColorInt())
+            btnShare.setTextColor(Color.parseColor("#666666"))
         }
     }
 

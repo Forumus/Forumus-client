@@ -149,6 +149,7 @@
     <string name="choose_topics_limit">Chọn tối đa 5 chủ đề</string>
     <string name="done">Xong</string>
     <string name="report">Báo cáo</string>
+
     <string name="save">Lưu</string>
     <string name="map_preview">Xem trước bản đồ</string>
     <string name="place_name_placeholder">Tên địa điểm</string>
@@ -171,6 +172,15 @@
     <string name="place_name">Tên địa điểm</string>
     <string name="address_details">Chi tiết địa chỉ...</string>
 
+    <!-- Share Dialog -->
+    <string name="share_post_title">Chia sẻ bài viết</string>
+    <string name="share_post_description">Chọn liên hệ để chia sẻ bài viết này</string>
+    <string name="search_contacts_hint">Tìm kiếm liên hệ...</string>
+    <string name="contacts_selected_format">Đã chọn: %d</string>
+    <string name="share_action">Chia sẻ</string>
+    <string name="cancel_action">Hủy</string>
+    <string name="clear_selection_desc">Xóa lựa chọn</string>
+
     <!-- User Search & Profile -->
     <string name="user_name_placeholder">Tên người dùng</string>
     <string name="user_email_placeholder">user@example.com</string>
@@ -186,6 +196,31 @@
     <string name="violation_spam">Spam</string>
     <string name="violation_detail">Chi tiết</string>
     <string name="violation_content">Nội dung này bị coi là spam hoặc gây hiểu lầm.</string>
+
+    <!-- Violation Types -->
+    <string name="violation_scam_name">Lừa đảo - Gian lận</string>
+    <string name="violation_scam_desc">Cố gắng lừa dối người dùng vì lợi ích tài chính hoặc cá nhân. Quà tặng giả, liên kết lừa đảo, mạo danh quản trị viên/người kiểm duyệt. Yêu cầu tiền, thông tin tài khoản hoặc dữ liệu nhạy cảm dưới vỏ bọc giả tạo. Bài đăng quảng bá dịch vụ gian lận.</string>
+    
+    <string name="violation_violence_name">Bạo lực, Ngôn từ kích động thù địch</string>
+    <string name="violation_violence_desc">Khuyến khích bạo lực hoặc đe dọa. Xúc phạm hoặc phân biệt đối xử dựa trên chủng tộc, giới tính, tôn giáo, v.v.</string>
+    
+    <string name="violation_inappropriate_name">Nội dung không phù hợp</string>
+    <string name="violation_inappropriate_desc">Chứa tài liệu thô tục, phản cảm hoặc khiêu dâm. Nội dung NSFW/18+ không nhằm mục đích giáo dục.</string>
+    
+    <string name="violation_misinfo_name">Thông tin sai lệch</string>
+    <string name="violation_misinfo_desc">Lan truyền thông tin sai lệch hoặc chưa được kiểm chứng. Tuyên bố gây hiểu lầm gây hoang mang.</string>
+    
+    <string name="violation_illegal_name">Nội dung bất hợp pháp</string>
+    <string name="violation_illegal_desc">Quảng bá hack, crack, cờ bạc, ma túy, vũ khí, v.v.</string>
+    
+    <string name="violation_harassment_name">Quấy rối - Ngôn ngữ lăng mạ</string>
+    <string name="violation_harassment_desc">Tấn công cá nhân hoặc lăng mạ. Giao tiếp độc hại nhắm vào cá nhân hoặc nhóm.</string>
+    
+    <string name="violation_privacy_name">Vi phạm quyền riêng tư (Doxxing)</string>
+    <string name="violation_privacy_desc">Tiết lộ dữ liệu cá nhân như số điện thoại, địa chỉ, số CMND. Phơi bày thông tin riêng tư mà không có sự đồng ý.</string>
+    
+    <string name="violation_copyright_name">Vi phạm bản quyền</string>
+    <string name="violation_copyright_desc">Sao chép nội dung không ghi nguồn. Tải lên phương tiện có bản quyền mà không được phép.</string>
     <string name="topic_biology">Sinh học</string>
     <string name="see_more_notifications">Xem thêm thông báo</string>
     <string name="notification_header">Tiêu đề</string>

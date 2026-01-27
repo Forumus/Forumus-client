@@ -69,8 +69,9 @@
             android:layout_height="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_open_actions"
+            android:src="@drawable/ic_more_vert"
             android:scaleType="fitCenter"
+            app:tint="@color/text_tertiary"
             tools:ignore="TouchTargetSizeCheck"/>
 
     </LinearLayout>
