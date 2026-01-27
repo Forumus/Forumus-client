@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Forumus</string>
+    <string name="title_home">Trang chủ</string>
+    <string name="title_dashboard">Bảng tin</string>
+    <string name="title_notifications">Thông báo</string>
+
+    <!-- Registration screen -->
+    <string name="app_logo">Logo Forumus</string>
+    <string name="start_connecting">Bắt đầu kết nối</string>
+    <string name="by_creating_account">bằng cách tạo tài khoản</string>
+    <string name="full_name">Họ và tên</string>
+    <string name="valid_email">Email hợp lệ</string>
+    <string name="phone_number">Số điện thoại</string>
+    <string name="strong_password">Mật khẩu mạnh</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="next">Tiếp theo</string>
+    <string name="register">Đăng ký</string>
+    <string name="already_member_login">Đã là thành viên? Đăng nhập</string>
+    <string name="already_member">Đã là thành viên?</string>
+    <string name="login_now">Đăng nhập ngay</string>
+    <string name="terms_conditions">Bằng cách đánh dấu vào ô, bạn đồng ý với Điều khoản và Điều kiện của chúng tôi</string>
+
+    <!-- Verification screen -->
+    <string name="back">Quay lại</string>
+    <string name="almost_there">Sắp hoàn tất</string>
+    <string name="verification_description">Vui lòng nhập mã 6 chữ số được gửi đến email %s của bạn để xác minh.</string>
+    <string name="verify">Xác minh</string>
+    <string name="didnt_receive_code">Không nhận được mã? Gửi lại</string>
+    <string name="request_new_code_timer">Yêu cầu mã mới trong %s</string>
+    <string name="otp_digit_hint">0</string>
+
+    <!-- Login screen -->
+    <string name="welcome_back">Chào mừng trở lại</string>
+    <string name="sign_in_to_access">đăng nhập để truy cập tài khoản của bạn</string>
+    <string name="enter_your_email">Nhập email của bạn</string>
+    <string name="password">Mật khẩu</string>
+    <string name="remember_me">Ghi nhớ tôi</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="login">Đăng nhập</string>
+    <string name="new_member">Thành viên mới?</string>
+    <string name="register_now">Đăng ký ngay</string>
+    <string name="new_member_register">Thành viên mới? Đăng ký ngay</string>
+
+    <!-- Success screen -->
+    <string name="success">Thành công</string>
+    <string name="success_congratulations">Chúc mừng! Bạn đã xác thực thành công</string>
+    <string name="finish">Hoàn tất</string>
+    <string name="success_icon">Biểu tượng thành công</string>
+
+    <!-- Forgot Password screen -->
+    <string name="forgot_password_title">Quên mật khẩu</string>
+    <string name="forgot_password_subtitle">Vui lòng nhập email bạn đã đăng ký. Nếu trùng khớp, chúng tôi sẽ gửi <b>mã xác minh</b> đến email của bạn.</string>
+    <string name="your_email">Email của bạn</string>
+    <string name="submit">Gửi</string>
+
+    <!-- Reset Password screen -->
+    <string name="reset_password_title">Đặt lại mật khẩu</string>
+    <string name="reset_password_subtitle">Vui lòng nhập email bạn đã đăng ký. Nếu trùng khớp, chúng tôi sẽ gửi <b>mã xác minh</b> đến email của bạn.</string>
+    <string name="retype_password">Nhập lại mật khẩu</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="cancel">Hủy</string>
+
+    <!-- Welcome screen -->
+    <string name="get_started">Bắt đầu</string>
+    <string name="privacy_policy_text">Bằng cách cung cấp thông tin, bạn đồng ý với việc xử lý dữ liệu theo <u>Chính sách quyền riêng tư</u> của chúng tôi</string>
+
+    <!-- Slide screen -->
+    <string name="slide_title_1">Cùng nhau học tập</string>
+    <string name="slide_subtitle_1">Khám phá các chủ đề bạn quan tâm, đặt câu hỏi và nhận thông tin từ những người học và chuyên gia thực tế.</string>
+    <string name="slide_title_2">Chia sẻ kiến thức</string>
+    <string name="slide_subtitle_2">Giúp người khác phát triển bằng cách đăng câu trả lời, hướng dẫn hoặc chia sẻ kinh nghiệm của bạn — mỗi đóng góp đều có giá trị</string>
+    <string name="slide_title_3">Tham gia cộng đồng</string>
+    <string name="slide_subtitle_3">Kết nối với những người cùng chí hướng, tham gia thảo luận và là một phần của cộng đồng học tập hỗ trợ lẫn nhau.</string>
+
+    <string name="select_role">Chọn vai trò</string>
+    <string name="student">Học sinh</string>
+    <string name="teacher">Giáo viên</string>
+
+    <!-- Your other strings -->
+    <string name="menu">Menu</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="profile">Hồ sơ</string>
+    <string name="home">Trang chủ</string>
+    <string name="explore">Khám phá</string>
+
+    <!-- Profile Popup Menu -->
+    <string name="view_profile">Xem hồ sơ</string>
+    <string name="edit_profile">Chỉnh sửa hồ sơ</string>
+    <string name="dark_mode">Chế độ tối</string>
+    <string name="light_mode">Chế độ sáng</string>
+    <string name="settings_title">Cài đặt</string>
+    <string name="header_settings">Cài đặt</string>
+    <string name="settings">Cài đặt</string>
+    <string name="section_account">TÀI KHOẢN</string>
+    <string name="section_preferences">TÙY CHỈNH</string>
+    <string name="section_content">NỘI DUNG</string>
+    <string name="section_support">HỖ TRỢ</string>
+    <string name="pref_push_notifications">Thông báo đẩy</string>
+    <string name="pref_email_notifications">Thông báo qua Email</string>
+    <string name="menu_saved_posts_title">Bài viết đã lưu</string>
+    <string name="menu_help_center_title">Trung tâm trợ giúp</string>
+    <string name="menu_community_guidelines_title">Nguyên tắc cộng đồng</string>
+    <string name="menu_about_forumus_title">Về Forumus</string>
+    <string name="action_logout">Đăng xuất</string>
+    <string name="footer_app_version">Forumus v1.0.0</string>
+    <string name="footer_copyright">© 2025 Cộng đồng Forumus</string>
+
+    <!-- Banned screen -->
+    <string name="account_banned">Tài khoản bị cấm</string>
+    <string name="banned_message">Tài khoản của bạn đã bị cấm tạm thời do vi phạm nguyên tắc cộng đồng. Bạn sẽ lấy lại quyền truy cập khi hết thời hạn cấm.</string>
+    <string name="ban_expiration_placeholder">Lệnh cấm hết hạn vào: ...</string>
+    <string name="time_remaining">Thời gian còn lại</string>
+    <string name="countdown_label">Ngày : Giờ : Phút : Giây</string>
+    <string name="banned_info">Xin lưu ý rằng vi phạm nhiều lần có thể dẫn đến việc đình chỉ tài khoản vĩnh viễn.</string>
+    <string name="banned_icon">Biểu tượng bị cấm</string>
+
+    <!-- Community Guidelines -->
+    <string name="community_guidelines_icon">Biểu tượng nguyên tắc cộng đồng</string>
+    <string name="guideline_icon">Biểu tượng nguyên tắc</string>
+    <string name="expand_collapse">Mở rộng hoặc thu gọn</string>
+
+    <!-- Help Center -->
+    <string name="help_center_icon">Biểu tượng trung tâm trợ giúp</string>
+    <string name="help_topic_icon">Biểu tượng chủ đề trợ giúp</string>
+
+    <!-- Language Settings -->
+    <string name="language">Ngôn ngữ</string>
+    <string name="english">Tiếng Anh</string>
+    <string name="vietnamese">Tiếng Việt</string>
+
+    <!-- Navigation Header -->
+    <string name="browse_and_filter">Duyệt và Lọc</string>
+    <string name="sort_by">Sắp xếp theo</string>
+    <string name="sort_new">Mới</string>
+    <string name="sort_trending">Xu hướng</string>
+    <string name="popular_tags">Thẻ phổ biến</string>
+
+    <!-- Post Item -->
+    <string name="anonymous">Ẩn danh</string>
+    <string name="post_title_placeholder">Tiêu đề bài viết</string>
+    <string name="post_content_placeholder">Rất vui được thông báo rằng đăng ký cho Lễ hội Công nghệ hàng năm của chúng tôi hiện đã mở! Giảm giá đăng ký sớm cho 100 sinh viên đầu tiên.</string>
+    <string name="location_placeholder">Vị trí</string>
+    <string name="time_placeholder">2g</string>
+    <string name="time_ago_placeholder">2g trước</string>
+
+    <!-- Dialogs -->
+    <string name="select_topics">Chọn chủ đề</string>
+    <string name="choose_topics_limit">Chọn tối đa 5 chủ đề</string>
+    <string name="done">Xong</string>
+    <string name="report">Báo cáo</string>
+    <string name="save">Lưu</string>
+    <string name="map_preview">Xem trước bản đồ</string>
+    <string name="place_name_placeholder">Tên địa điểm</string>
+    <string name="finish_post_later">Hoàn thành bài viết sau?</string>
+    <string name="save_as_draft">Lưu nháp</string>
+    <string name="discard_post">Hủy bài viết</string>
+    <string name="continue_editing">Tiếp tục chỉnh sửa</string>
+    <string name="select_location">Chọn vị trí</string>
+    <string name="search_location_hint">Tìm kiếm vị trí...</string>
+    <string name="add_location">Thêm vị trí</string>
+    <string name="preview_on_map">Xem trên bản đồ</string>
+
+    <!-- Chat Item -->
+    <string name="chat_name_placeholder">Sarah Johnson</string>
+    <string name="chat_time_placeholder">2p</string>
+    <string name="chat_message_placeholder">Chào! Bạn đã xem ảnh cuối tuần trước chưa?</string>
+    <string name="chat_unread_count_placeholder">3</string>
+
+    <!-- Map & Location -->
+    <string name="place_name">Tên địa điểm</string>
+    <string name="address_details">Chi tiết địa chỉ...</string>
+
+    <!-- User Search & Profile -->
+    <string name="user_name_placeholder">Tên người dùng</string>
+    <string name="user_email_placeholder">user@example.com</string>
+
+    <!-- Dialogs & Popups -->
+    <string name="select_topics_title">Chọn Chủ Đề</string>
+    <string name="select_topics_subtitle">Chọn tối đa 5 chủ đề</string>
+    <string name="ai_topic_suggestion">Gợi ý chủ đề AI</string>
+    <string name="sparkle_emoji">✨ </string>
+    <string name="loading_more_posts">Đang tải thêm bài viết...</string>
+
+    <!-- Validation & Help -->
+    <string name="violation_spam">Spam</string>
+    <string name="violation_detail">Chi tiết</string>
+    <string name="violation_content">Nội dung này bị coi là spam hoặc gây hiểu lầm.</string>
+    <string name="topic_biology">Sinh học</string>
+    <string name="see_more_notifications">Xem thêm thông báo</string>
+    <string name="notification_header">Tiêu đề</string>
+    <string name="message_sent_placeholder">Tôi đang rất ổn! Cảm ơn đã hỏi thăm</string>
+    <string name="message_sent_time">10:32 SA</string>
+    <string name="message_received_placeholder">Chào! Bạn có khỏe không?</string>
+    <string name="message_received_time">10:30 SA</string>
+    <string name="help_topic_title">Tiêu đề chủ đề</string>
+    <string name="help_topic_content">Nội dung chủ đề trợ giúp tại đây</string>
+    <string name="guideline_section_title">Tiêu đề mục</string>
+    <string name="guideline_content_placeholder">• Nguyên tắc 1\n• Nguyên tắc 2</string>
+    <string name="chat_read_name">Emma Williams</string>
+    <string name="chat_read_time">1g</string>
+    <string name="chat_read_message">Hẹn gặp bạn vào ngày mai lúc 3 giờ chiều 👋</string>
+    <string name="plus_three">+3</string>
+
+    <!-- App Bar -->
+    <string name="forumus_title">Forumus</string>
+
+    <!-- Validation numbers -->
+    <string name="number_one">1</string>
+    <string name="number_zero">0</string>
+    <string name="dot_separator">•</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Xin chào blank fragment</string>
+    <string name="default_notification_channel_id">general_notification_channel</string>
+</resources>

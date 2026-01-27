@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -104,18 +105,42 @@ class SettingsFragment : Fragment() {
      * Setup language selection spinner
      */
     private fun setupLanguageSpinner() {
+        // Use localized strings for display
         val languages = listOf(getString(R.string.english), getString(R.string.vietnamese))
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, languages)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         
         binding.spinnerLanguage.adapter = adapter
         
+        // set selection based on current viewmodel value to avoid infinite loop or wrong selection on init
+        viewModel.language.value?.let { currentLang ->
+            // Map saved "English"/"Vietnamese" or code to display string
+            // This logic might need to be robust if viewModel stores codes vs display names
+             val index = if (currentLang.equals("Vietnamese", ignoreCase = true) || currentLang == "vi") {
+                 1
+             } else {
+                 0
+             }
+             binding.spinnerLanguage.setSelection(index, false)
+        }
+
         binding.spinnerLanguage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedLanguage = languages[position]
-                if (selectedLanguage != viewModel.language.value) {
-                    viewModel.saveLanguagePreference(selectedLanguage)
-                }
+                // Determine language code
+                val selectedLangCode = if (position == 1) "vi" else "en"
+                val selectedLangName = if (position == 1) "Vietnamese" else "English"
+                
+                // Only proceed if the selected language is different from current
+                // We compare against the LiveData value
+                 val currentStoredLang = viewModel.language.value
+                 if (currentStoredLang != selectedLangName) {
+                     // 1. Save to ViewModel/Preferences
+                     viewModel.saveLanguagePreference(selectedLangName)
+                     
+                     // 2. Apply Locale using AppCompatDelegate
+                     val appLocale = LocaleListCompat.forLanguageTags(selectedLangCode)
+                     AppCompatDelegate.setApplicationLocales(appLocale)
+                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -201,11 +226,13 @@ class SettingsFragment : Fragment() {
 
         // Observe language preference
         viewModel.language.observe(viewLifecycleOwner) { language ->
-            val languages = listOf("English", "Vietnamese")
-            val index = languages.indexOf(language)
-            if (index >= 0 && binding.spinnerLanguage.selectedItemPosition != index) {
-                binding.spinnerLanguage.setSelection(index)
-            }
+           // Update spinner selection if needed
+           val isVietnamese = language.equals("Vietnamese", ignoreCase = true) || language == "vi"
+           val index = if (isVietnamese) 1 else 0
+           
+           if (binding.spinnerLanguage.selectedItemPosition != index) {
+               binding.spinnerLanguage.setSelection(index)
+           }
         }
     }
 }
