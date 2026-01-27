@@ -494,6 +494,12 @@ class HomeFragment : Fragment() {
 
         viewModel.selectedTopics.observe(viewLifecycleOwner) { selected ->
             updateTopicSelectionUI(selected)
+            
+            // Scroll to top when topic filter is applied/changed
+            // This helps user see filtered results from the beginning
+            if (selected.isNotEmpty()) {
+                binding.postRecyclerView.smoothScrollToPosition(0)
+            }
         }
 
         viewModel.sortOption.observe(viewLifecycleOwner) { sortOption ->
@@ -519,6 +525,12 @@ class HomeFragment : Fragment() {
                 trendingItem?.setBackgroundColor(requireContext().getColor(R.color.filter_selected_bg))
             } else {
                 trendingItem?.setBackgroundResource(selectableBackground)
+            }
+            
+            // Scroll to top when sort is applied (not NONE)
+            // This ensures user sees highest-ranked posts after sorting
+            if (sortOption != HomeViewModel.SortOption.NONE) {
+                binding.postRecyclerView.smoothScrollToPosition(0)
             }
         }
     }

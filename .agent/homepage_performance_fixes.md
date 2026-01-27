@@ -81,6 +81,12 @@
    - Only update topics if list is not empty
    - Prevents redundant calls with empty data
 
+3. **Auto-Scroll to Top on Sort/Filter**
+   - Smooth scroll to position 0 when sort applied (New/Trending)
+   - Scroll to top when topic filters changed
+   - Helps users immediately see highest-ranked/filtered content
+   - Uses `smoothScrollToPosition(0)` for smooth animation
+
 ### PostDetail Changes
 
 #### PostDetailAdapter.kt
@@ -149,7 +155,8 @@
 ✅ **Smooth scrolling** maintained during all operations  
 ✅ **No flicker** when cached data loads  
 ✅ **Stable UI** - elements don't shift unexpectedly  
-✅ **Comment votes** also instant with optimistic updates (PostDetail)
+✅ **Comment votes** also instant with optimistic updates (PostDetail)  
+✅ **Auto-scroll to top** when sorting/filtering applied - see top results immediately
 
 ## Testing Recommendations
 
@@ -170,6 +177,18 @@
    - Navigate away from home
    - Return to home screen
    - Verify: No visible reload/flash
+   - Apply topic filter
+   - Verify: Feed scrolls to top smoothly
+   - Remove filter
+   - Verify: Scroll position maintained
+
+5. **Sort Test**
+   - Scroll to middle/bottom of feed
+   - Tap "New" or "Trending" sort button
+   - Verify: Feed scrolls to top smoothly
+   - Verify: Top-ranked posts visible immediately
+   - Toggle sort off (tap same button)
+   - Verify: Feed stays at current position
    - Verify: Same scroll position maintained
 
 4. **Topic Filter Test**
