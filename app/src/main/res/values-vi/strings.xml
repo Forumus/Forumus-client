@@ -467,4 +467,14 @@
     <string name="original_post_fallback">Bài viết gốc</string>
     <string name="content_not_available">Nội dung không có sẵn</string>
     <string name="notification_header">Thông báo</string>
+
+    <!-- Explore/Search -->
+    <string name="search_hint_posts">Tìm kiếm bài viết, chủ đề...</string>
+    <string name="search_hint_people">Tìm tên, email...</string>
+    <string name="tab_posts">Bài viết</string>
+    <string name="tab_people">Mọi người</string>
+    <string name="trending_topics">Chủ đề thịnh hành</string>
+    <string name="recent_searches">Tìm kiếm gần đây</string>
+    <string name="no_recent_history">Chưa có lịch sử tìm kiếm</string>
+    <string name="no_results_found">Không tìm thấy kết quả</string>
 </resources>

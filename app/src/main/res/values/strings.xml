@@ -462,4 +462,14 @@
     <string name="original_post_fallback">Original Post</string>
     <string name="content_not_available">Content not available</string>
     <string name="notification_header">Notification</string>
+
+    <!-- Explore/Search -->
+    <string name="search_hint_posts">Search posts, topics...</string>
+    <string name="search_hint_people">Search name, email...</string>
+    <string name="tab_posts">Posts</string>
+    <string name="tab_people">People</string>
+    <string name="trending_topics">Trending Topics</string>
+    <string name="recent_searches">Recent Searches</string>
+    <string name="no_recent_history">No recent history</string>
+    <string name="no_results_found">No results found</string>
 </resources>

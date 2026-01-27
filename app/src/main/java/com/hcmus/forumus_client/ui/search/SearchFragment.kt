@@ -78,9 +78,9 @@ class SearchFragment : Fragment() {
     private fun updateLayoutForTab(position: Int) {
         val isPostTab = position == 0
         if (isPostTab) {
-            binding.searchView.queryHint = "Search posts, topics..."
+            binding.searchView.queryHint = getString(com.hcmus.forumus_client.R.string.search_hint_posts)
         } else {
-            binding.searchView.queryHint = "Search name, email..."
+            binding.searchView.queryHint = getString(com.hcmus.forumus_client.R.string.search_hint_people)
         }
         binding.sectionTrending.visibility = if (isPostTab) View.VISIBLE else View.GONE
 
