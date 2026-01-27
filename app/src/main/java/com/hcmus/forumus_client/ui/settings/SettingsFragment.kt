@@ -1,10 +1,12 @@
 package com.hcmus.forumus_client.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.FragmentSettingsBinding
+import com.hcmus.forumus_client.ui.auth.login.LoginActivity
 import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.home.HomeFragmentDirections
 import kotlin.getValue
@@ -134,9 +137,9 @@ class SettingsFragment : Fragment() {
             navController.navigate(R.id.action_settingsFragment_to_aboutFragment)
         }
 
-        // Logout - mock toast
+        // Logout - show confirmation dialog
         binding.llLogout.setOnClickListener {
-            Toast.makeText(requireContext(), "Logout - Coming Soon", Toast.LENGTH_SHORT).show()
+            showLogoutConfirmationDialog()
         }
     }
 
@@ -168,5 +171,40 @@ class SettingsFragment : Fragment() {
         viewModel.isEmailNotificationsEnabled.observe(viewLifecycleOwner) { isEnabled ->
             binding.swEmailNotifications.isChecked = isEnabled
         }
+
+        // Observe logout completion to navigate to login screen
+        viewModel.logoutCompleted.observe(viewLifecycleOwner) { isLoggedOut ->
+            if (isLoggedOut) {
+                navigateToLogin()
+            }
+        }
+    }
+
+    /**
+     * Show confirmation dialog before logging out
+     */
+    private fun showLogoutConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.logout_title)
+            .setMessage(R.string.logout_confirmation_message)
+            .setPositiveButton(R.string.logout_confirm) { _, _ ->
+                viewModel.logout()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /**
+     * Navigate to login screen and clear back stack
+     */
+    private fun navigateToLogin() {
+        // Clear session first - Firestore.terminate() cancels all active listeners
+        // before Firebase signout to prevent PERMISSION_DENIED errors
+        viewModel.clearSession()
+        
+        val intent = Intent(requireContext(), LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        requireActivity().finish()
     }
 }
