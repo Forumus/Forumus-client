@@ -439,4 +439,14 @@
     <string name="full_name_label">Họ và tên</string>
     <string name="discard">Hủy</string>
     <string name="saving">Đang lưu...</string>
+
+    <!-- Chats -->
+    <string name="chats_title">Đoạn chat</string>
+    <string name="filter_all">Tất cả</string>
+    <string name="filter_unread">Chưa đọc</string>
+    <string name="no_chats_available">Không có đoạn chat nào</string>
+    <string name="loading_chats">Đang tải đoạn chat...</string>
+    <string name="search_users_hint">Tìm kiếm người dùng...</string>
+    <string name="no_users_found">Không tìm thấy người dùng</string>
+    <string name="chat_deleted">Đã xóa đoạn chat</string>
 </resources>

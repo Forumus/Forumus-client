@@ -278,7 +278,7 @@ class ChatsFragment : Fragment (){
         dialogView.findViewById<Button>(R.id.btn_delete).setOnClickListener {
             dialog.dismiss()
             viewModel.deleteChat(chatItem.id)
-            Toast.makeText(requireContext(), "Chat deleted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.chat_deleted), Toast.LENGTH_SHORT).show()
         }
 
         dialog.show()
