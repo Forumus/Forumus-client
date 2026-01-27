@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -132,7 +133,7 @@ class SettingsFragment : Fragment() {
             navController.navigate(R.id.action_settingsFragment_to_communityGuidelinesFragment)
         }
 
-        // About forumus - mock toast
+        // About forumus
         binding.llAboutForumus.setOnClickListener {
             navController.navigate(R.id.action_settingsFragment_to_aboutFragment)
         }
@@ -184,7 +185,7 @@ class SettingsFragment : Fragment() {
      * Show confirmation dialog before logging out
      */
     private fun showLogoutConfirmationDialog() {
-        AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.logout_title)
             .setMessage(R.string.logout_confirmation_message)
             .setPositiveButton(R.string.logout_confirm) { _, _ ->
@@ -192,6 +193,12 @@ class SettingsFragment : Fragment() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+        
+        // Set button text colors for visibility
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.logout_text))
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
     }
 
     /**
