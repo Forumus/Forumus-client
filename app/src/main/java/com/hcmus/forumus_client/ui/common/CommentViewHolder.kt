@@ -214,5 +214,14 @@ class CommentViewHolder(
             "now"
         }
     }
+
+    /**
+     * Update only vote-related UI elements without full rebinding.
+     * Used for optimistic UI updates.
+     */
+    fun updateVotes(comment: Comment) {
+        upvoteCount.text = comment.upvoteCount.toString()
+        applyVoteUI(comment)
+    }
 }
 
