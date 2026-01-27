@@ -145,8 +145,25 @@ class CommentViewHolder(
         // Only show for root-level comments (no parent) that have replies
         if (comment.commentCount > 0 && comment.parentCommentId == null) {
             viewRepliesButton.visibility = View.VISIBLE
-            val repliesText = if (comment.commentCount == 1) "View 1 reply" else "View ${comment.commentCount} replies"
-            viewRepliesText.text = repliesText
+            
+            val resources = itemView.resources
+            if (comment.isRepliesExpanded) {
+                // Expanded state: "Hide x replies" and rotated arrow
+                viewRepliesText.text = resources.getQuantityString(
+                    R.plurals.hide_replies, 
+                    comment.commentCount, 
+                    comment.commentCount
+                )
+                viewRepliesChevron.rotation = 180f
+            } else {
+                // Collapsed state: "View x replies" and normal arrow
+                viewRepliesText.text = resources.getQuantityString(
+                    R.plurals.view_replies, 
+                    comment.commentCount, 
+                    comment.commentCount
+                )
+                viewRepliesChevron.rotation = 0f
+            }
         } else {
             viewRepliesButton.visibility = View.GONE
         }
@@ -228,7 +245,7 @@ class CommentViewHolder(
                     diffMs < 60 * 60 * 1000 -> "${diffMs / (60 * 1000)}m"
                     diffMs < 24 * 60 * 60 * 1000 -> "${diffMs / (60 * 60 * 1000)}h"
                     diffMs < 7 * 24 * 60 * 60 * 1000 -> "${diffMs / (24 * 60 * 60 * 1000)}d"
-                    else -> SimpleDateFormat("MMM dd", Locale.getDefault()).format(date)
+                    else -> SimpleDateFormat(itemView.context.getString(R.string.date_format_short_month_day), Locale.getDefault()).format(date)
                 }
             } catch (e: Exception) {
                 Log.e("CommentViewHolder", "Error formatting timestamp", e)

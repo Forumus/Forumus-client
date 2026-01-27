@@ -3,6 +3,7 @@ package com.hcmus.forumus_client.ui.post.detail
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.data.model.Comment
 import com.hcmus.forumus_client.data.model.CommentAction
@@ -30,10 +31,9 @@ import com.hcmus.forumus_client.data.model.Topic
  * @param onCommentAction Callback when user interacts with a comment
  */
 class PostDetailAdapter(
-    private var items: List<FeedItem> = emptyList(),
     private val onPostAction: (Post, PostAction, View) -> Unit,
     private val onCommentAction: (Comment, CommentAction) -> Unit,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : ListAdapter<FeedItem, RecyclerView.ViewHolder>(FeedItemDiffCallback()) {
 
     companion object {
         // View type constants for determining which ViewHolder to use
@@ -59,25 +59,10 @@ class PostDetailAdapter(
         if (newTopicMap != topicMap) {
             this.topicMap = newTopicMap
             // Only notify the post item (always at position 0) with topics payload
-            if (items.isNotEmpty() && items[0] is FeedItem.PostItem) {
+            if (currentList.isNotEmpty() && currentList[0] is FeedItem.PostItem) {
                 notifyItemChanged(0, "topics")
             }
         }
-    }
-
-    /**
-     * Updates the adapter with a new list of items using DiffUtil for efficient updates.
-     * This prevents unnecessary re-renders and maintains scroll position.
-     *
-     * @param newItems The new list of feed items to display
-     */
-    fun submitList(newItems: List<FeedItem>) {
-        val oldItems = items
-        val diffCallback = FeedItemDiffCallback(oldItems, newItems)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        
-        items = newItems
-        diffResult.dispatchUpdatesTo(this)
     }
 
     /**
@@ -87,7 +72,7 @@ class PostDetailAdapter(
      * @return TYPE_POST if item is a PostItem, TYPE_COMMENT if item is a CommentItem
      */
     override fun getItemViewType(position: Int): Int {
-        return when (items[position]) {
+        return when (getItem(position)) {
             is FeedItem.PostItem -> TYPE_POST
             is FeedItem.CommentItem -> TYPE_COMMENT
         }
@@ -130,7 +115,7 @@ class PostDetailAdapter(
      * @param position The position of the item in the adapter
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val item = items[position]) {
+        when (val item = getItem(position)) {
             is FeedItem.PostItem -> {
                 (holder as PostViewHolder).bind(item.post, topicMap)
                 holder.setSummaryLoading(isSummaryLoading)
@@ -152,7 +137,7 @@ class PostDetailAdapter(
             // Full bind
             super.onBindViewHolder(holder, position, payloads)
         } else {
-            val item = items[position]
+            val item = getItem(position)
             // Handle partial updates
             for (payload in payloads) {
                 when (payload) {
@@ -179,13 +164,6 @@ class PostDetailAdapter(
     }
 
     /**
-     * Returns the total number of items in the adapter.
-     *
-     * @return The size of the items list
-     */
-    override fun getItemCount(): Int = items.size
-
-    /**
      * Updates the AI summary loading state for the post.
      * Since there's only one post at position 0, we notify that item.
      *
@@ -194,92 +172,48 @@ class PostDetailAdapter(
     fun setSummaryLoading(isLoading: Boolean) {
         isSummaryLoading = isLoading
         // Post is always at position 0, notify to update loading state
-        if (items.isNotEmpty() && items[0] is FeedItem.PostItem) {
+        if (itemCount > 0 && getItem(0) is FeedItem.PostItem) {
             notifyItemChanged(0, "summary_loading")
         }
     }
+}
 
-    /**
-     * DiffUtil callback for calculating the difference between two lists of feed items.
-     * This enables efficient, targeted updates instead of full list redraws.
-     */
-    private class FeedItemDiffCallback(
-        private val oldList: List<FeedItem>,
-        private val newList: List<FeedItem>
-    ) : DiffUtil.Callback() {
-
-        override fun getOldListSize(): Int = oldList.size
-
-        override fun getNewListSize(): Int = newList.size
-
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            val oldItem = oldList[oldItemPosition]
-            val newItem = newList[newItemPosition]
-            
-            return when {
-                oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem ->
-                    oldItem.post.id == newItem.post.id
-                oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem ->
-                    oldItem.comment.id == newItem.comment.id
-                else -> false
-            }
+class FeedItemDiffCallback : DiffUtil.ItemCallback<FeedItem>() {
+    override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        return when {
+            oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem ->
+                oldItem.post.id == newItem.post.id
+            oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem ->
+                oldItem.comment.id == newItem.comment.id
+            else -> false
         }
+    }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            val oldItem = oldList[oldItemPosition]
-            val newItem = newList[newItemPosition]
-            
-            return when {
-                oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem -> {
-                    val old = oldItem.post
-                    val new = newItem.post
-                    old.title == new.title &&
-                    old.content == new.content &&
-                    old.upvoteCount == new.upvoteCount &&
-                    old.downvoteCount == new.downvoteCount &&
-                    old.commentCount == new.commentCount &&
-                    old.userVote == new.userVote &&
-                    old.topicIds == new.topicIds
-                }
-                oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem -> {
-                    val old = oldItem.comment
-                    val new = newItem.comment
-                    old.content == new.content &&
-                    old.upvoteCount == new.upvoteCount &&
-                    old.downvoteCount == new.downvoteCount &&
-                    old.commentCount == new.commentCount &&
-                    old.userVote == new.userVote
-                }
-                else -> false
-            }
-        }
+    override fun areContentsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        return oldItem == newItem
+    }
 
-        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-            val oldItem = oldList[oldItemPosition]
-            val newItem = newList[newItemPosition]
-            
-            // Return specific payload for targeted updates
-            return when {
-                oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem -> {
-                    val old = oldItem.post
-                    val new = newItem.post
-                    when {
-                        old.upvoteCount != new.upvoteCount ||
-                        old.downvoteCount != new.downvoteCount ||
-                        old.userVote != new.userVote -> "votes"
-                        old.topicIds != new.topicIds -> "topics"
-                        else -> null
-                    }
+    override fun getChangePayload(oldItem: FeedItem, newItem: FeedItem): Any? {
+        return when {
+            oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem -> {
+                val old = oldItem.post
+                val new = newItem.post
+                when {
+                    old.upvoteCount != new.upvoteCount ||
+                    old.downvoteCount != new.downvoteCount ||
+                    old.userVote != new.userVote -> "votes"
+                    old.topicIds != new.topicIds -> "topics"
+                    else -> null
                 }
-                oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem -> {
-                    val old = oldItem.comment
-                    val new = newItem.comment
-                    if (old.upvoteCount != new.upvoteCount ||
-                        old.downvoteCount != new.downvoteCount ||
-                        old.userVote != new.userVote) "votes" else null
-                }
-                else -> null
             }
+            oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem -> {
+                val old = oldItem.comment
+                val new = newItem.comment
+                if (old.upvoteCount != new.upvoteCount ||
+                    old.downvoteCount != new.downvoteCount ||
+                    old.userVote != new.userVote) "votes" else null
+            }
+            else -> null
         }
     }
 }

@@ -11,7 +11,7 @@
         android:id="@+id/tvPlaceName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Place Name"
+        android:text="@string/place_name"
         android:textStyle="bold"
         android:textColor="#000000"
         android:textSize="16sp"/>
@@ -20,7 +20,7 @@
         android:id="@+id/tvPlaceAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Address details..."
+        android:text="@string/address_details"
         android:textColor="#757575"
         android:textSize="14sp"
         android:layout_marginTop="2dp"/>

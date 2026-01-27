@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="Community Guidelines"
+                android:text="@string/menu_community_guidelines_title"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:fontFamily="@font/montserrat_semibold" />
@@ -72,7 +72,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="Building a Respectful\nAcademic Community"
+                        android:text="@string/community_hero_title"
                         android:textSize="18sp"
                         android:textColor="@color/text_primary"
                         android:fontFamily="@font/montserrat_semibold"
@@ -83,7 +83,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="These guidelines help maintain a safe, professional, and friendly environment for all members of our academic community."
+                        android:text="@string/community_hero_subtitle"
                         android:textSize="14sp"
                         android:textColor="@color/text_secondary"
                         android:fontFamily="@font/montserrat_regular"
@@ -118,9 +118,9 @@
                         android:layout_marginBottom="16dp" />
 
                     <TextView
+                        android:id="@+id/tv_last_updated"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Last updated: January 2026"
                         android:textSize="12sp"
                         android:textColor="@color/text_secondary"
                         android:fontFamily="@font/montserrat_regular"
@@ -130,7 +130,7 @@
                         android:id="@+id/tv_contact"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Questions? Contact us"
+                        android:text="@string/footer_contact_us"
                         android:textSize="13sp"
                         android:textColor="@color/link_color"
                         android:fontFamily="@font/montserrat_medium"

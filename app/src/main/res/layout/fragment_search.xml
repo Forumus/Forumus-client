@@ -12,7 +12,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#4285F4"
+            android:background="@color/bg_app"
             android:elevation="4dp"
             android:orientation="vertical"
             android:paddingTop="12dp">
@@ -25,53 +25,45 @@
                 android:paddingHorizontal="16dp"
                 android:paddingBottom="12dp">
 
-                <ImageButton
-                    android:id="@+id/btn_back"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_back"
-                    app:tint="#FFFFFF" />
-
                 <androidx.appcompat.widget.SearchView
                     android:id="@+id/search_view"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    android:layout_marginStart="12dp"
                     android:background="@drawable/bg_search_field"
                     app:iconifiedByDefault="false"
                     app:queryBackground="@null"
                     app:submitBackground="@null"
                     app:searchIcon="@drawable/ic_search"
-                    app:queryHint="Search posts, topics..." />
+                    app:queryHint="@string/search_hint_posts" />
             </LinearLayout>
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:background="#4285F4"
-                app:tabIndicatorColor="#FFFFFF"
+                android:background="@color/bg_app"
+                app:tabIndicatorColor="@color/primary"
                 app:tabIndicatorHeight="3dp"
-                app:tabSelectedTextColor="#FFFFFF"
-                app:tabTextColor="#B3FFFFFF"
-                app:tabRippleColor="#80FFFFFF">
+                app:tabSelectedTextColor="@color/primary"
+                app:tabTextColor="@color/text_tertiary"
+                app:tabRippleColor="?attr/colorControlHighlight">
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Posts" />
+                    android:text="@string/tab_posts" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="People" />
+                    android:text="@string/tab_people" />
             </com.google.android.material.tabs.TabLayout>
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/layout_suggestions"
@@ -103,12 +95,12 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@drawable/ic_trending_up"
-                                app:tint="#4285F4"/>
+                                app:tint="@color/primary"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
-                                android:text="Trending Topics"
+                                android:text="@string/trending_topics"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/text_primary"/>
@@ -131,7 +123,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Recent Searches"
+                        android:text="@string/recent_searches"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="@color/text_primary"/>
@@ -148,7 +140,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="No recent history"
+                        android:text="@string/no_recent_history"
                         android:textColor="@color/text_secondary_light"
                         android:visibility="gone"/>
 
@@ -180,7 +172,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:indeterminateTint="#4285F4"
+                    android:indeterminateTint="@color/primary"
                     android:visibility="gone"/>
 
                 <TextView
@@ -188,10 +180,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="No results found"
+                    android:text="@string/no_results_found"
                     android:visibility="gone"/>
             </FrameLayout>
 
         </FrameLayout>
+
+        <com.hcmus.forumus_client.ui.common.BottomNavigationBar
+            android:id="@+id/bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </layout>

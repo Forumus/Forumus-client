@@ -23,7 +23,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Spam"
+                android:text="@string/violation_spam"
                 android:textSize="14sp"
                 android:textColor="@color/text_primary" />
 
@@ -32,7 +32,7 @@
                 android:id="@+id/tv_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Detail"
+                android:text="@string/violation_detail"
                 android:textSize="12sp"
                 android:textColor="@color/link_color" />
         </LinearLayout>
@@ -43,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="This content is considered spam or misleading."
+            android:text="@string/violation_content"
             android:textSize="12sp"
             android:textColor="@color/text_tertiary"
             android:visibility="gone" />

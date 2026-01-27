@@ -106,7 +106,7 @@ class EditProfileFragment : Fragment() {
                 binding.saveButton.isEnabled = enabled
                 binding.discardButton.isEnabled = enabled
                 binding.fullnameInputLayout.isEnabled = enabled
-                binding.saveButton.text = if (state.isSaving) "Saving..." else "Save"
+                binding.saveButton.text = if (state.isSaving) getString(R.string.saving) else getString(R.string.save)
 
                 // Nếu chưa chọn preview mà user thay đổi avatarUrl (sau save) thì load lại
                 val user = state.user

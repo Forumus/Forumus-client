@@ -29,5 +29,9 @@ data class Comment(
 
     @get:Exclude
     @set:Exclude
-    var userVote: VoteState = VoteState.NONE
+    var userVote: VoteState = VoteState.NONE,
+
+    @get:Exclude
+    @set:Exclude
+    var isRepliesExpanded: Boolean = false
 )

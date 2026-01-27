@@ -118,13 +118,13 @@ class NotificationFragment : Fragment() {
                     tvNotificationMessage.text = notification.previewText
                     
                     if (!notification.rejectionReason.isNullOrEmpty()) {
-                        tvRejectionReason.text = "Reason: ${notification.rejectionReason}"
+                        tvRejectionReason.text = getString(R.string.reason_label, notification.rejectionReason)
                         tvRejectionReason.visibility = View.VISIBLE
                     } else {
                         tvRejectionReason.visibility = View.GONE
                     }
-                    tvOriginalTitle.text = notification.originalPostTitle ?: "Original Post"
-                    tvOriginalContent.text = notification.originalPostContent ?: "Content not available"
+                    tvOriginalTitle.text = notification.originalPostTitle ?: getString(R.string.original_post_fallback)
+                    tvOriginalContent.text = notification.originalPostContent ?: getString(R.string.content_not_available)
 
                     btnDismiss.setOnClickListener {
                         dialog.dismiss()

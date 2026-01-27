@@ -20,6 +20,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_DARK_MODE_ENABLED = "dark_mode_enabled"
         private const val KEY_PUSH_NOTIFICATIONS_ENABLED = "push_notifications_enabled"
         private const val KEY_EMAIL_NOTIFICATIONS_ENABLED = "email_notifications_enabled"
+        private const val KEY_LANGUAGE = "language"
         
         const val DEFAULT_SESSION_TIMEOUT_DAYS = 7
     }
@@ -68,4 +69,11 @@ class PreferencesManager(context: Context) {
     var isEmailNotificationsEnabled: Boolean
         get() = sharedPreferences.getBoolean(KEY_EMAIL_NOTIFICATIONS_ENABLED, true)
         set(value) = sharedPreferences.edit { putBoolean(KEY_EMAIL_NOTIFICATIONS_ENABLED, value) }
+
+    /**
+     * Language preference. Defaults to "English".
+     */
+    var language: String
+        get() = sharedPreferences.getString(KEY_LANGUAGE, "English") ?: "English"
+        set(value) = sharedPreferences.edit { putString(KEY_LANGUAGE, value) }
 }

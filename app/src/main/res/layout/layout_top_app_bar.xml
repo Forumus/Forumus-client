@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/nanum_myeongjo_regular"
-                android:text="Forumus"
+                android:text="@string/forumus_title"
                 android:textColor="@color/text_primary"
                 android:textSize="20sp" />
         </LinearLayout>
