@@ -31,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
         const val VERIFICATION_TYPE = "verification_type"
+        const val EXTRA_PERFORM_LOGOUT = "extra_perform_logout"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

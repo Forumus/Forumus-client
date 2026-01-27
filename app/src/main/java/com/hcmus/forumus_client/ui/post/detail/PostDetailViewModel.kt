@@ -218,55 +218,195 @@ class PostDetailViewModel(
     }
 
     /**
-     * Handles voting action on a post.
-     *
-     * Updates the post's vote state on the server, then updates local state and rebuilds items.
+     * Handles voting action on a post using optimistic UI updates.
+     * Updates UI immediately, then persists to server. Rolls back on error.
      *
      * @param post The post being voted on
      * @param isUpvote True for upvote, false for downvote
      */
     fun handleVote(post: Post, isUpvote: Boolean) {
         viewModelScope.launch {
+            // Calculate optimistic update
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                _error.value = "User not logged in"
+                return@launch
+            }
+
+            val currentVote = post.votedUsers[userId]
+            var upvoteChange = 0
+            var downvoteChange = 0
+            var newVoteState: com.hcmus.forumus_client.data.model.VoteState
+
+            if (isUpvote) {
+                when (currentVote) {
+                    com.hcmus.forumus_client.data.model.VoteState.UPVOTE -> {
+                        upvoteChange = -1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.NONE
+                    }
+                    com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE -> {
+                        upvoteChange = 1
+                        downvoteChange = -1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.UPVOTE
+                    }
+                    else -> {
+                        upvoteChange = 1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.UPVOTE
+                    }
+                }
+            } else {
+                when (currentVote) {
+                    com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE -> {
+                        downvoteChange = -1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.NONE
+                    }
+                    com.hcmus.forumus_client.data.model.VoteState.UPVOTE -> {
+                        upvoteChange = -1
+                        downvoteChange = 1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE
+                    }
+                    else -> {
+                        downvoteChange = 1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE
+                    }
+                }
+            }
+
+            // Create optimistic post update
+            val optimisticVotedUsers = post.votedUsers.toMutableMap()
+            if (newVoteState == com.hcmus.forumus_client.data.model.VoteState.NONE) {
+                optimisticVotedUsers.remove(userId)
+            } else {
+                optimisticVotedUsers[userId] = newVoteState
+            }
+
+            val optimisticPost = post.copy(
+                upvoteCount = post.upvoteCount + upvoteChange,
+                downvoteCount = post.downvoteCount + downvoteChange,
+                userVote = newVoteState,
+                votedUsers = optimisticVotedUsers
+            )
+
+            // Apply optimistic update immediately
+            currentPost = optimisticPost
+            rebuildItems()
+
             try {
-                val updatedPost = if (isUpvote) {
+                // Perform actual vote action on repository
+                val actualUpdatedPost = if (isUpvote) {
                     postRepository.toggleUpvote(post)
                 } else {
                     postRepository.toggleDownvote(post)
                 }
 
-                // Update current post and rebuild display items
-                currentPost = updatedPost
+                // Update with actual server response
+                currentPost = actualUpdatedPost
                 rebuildItems()
             } catch (e: Exception) {
-                // Error handled silently - could show toast if needed
+                // Rollback optimistic update on error
+                currentPost = post
+                rebuildItems()
+                _error.value = e.message
             }
         }
     }
 
     /**
-     * Handles voting action on a comment.
-     *
-     * Updates the comment's vote state on the server, then updates local state and rebuilds items.
+     * Handles voting action on a comment using optimistic UI updates.
+     * Updates UI immediately, then persists to server. Rolls back on error.
      *
      * @param comment The comment being voted on
      * @param isUpvote True for upvote, false for downvote
      */
     fun handleVote(comment: Comment, isUpvote: Boolean) {
         viewModelScope.launch {
+            // Calculate optimistic update
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                _error.value = "User not logged in"
+                return@launch
+            }
+
+            val currentVote = comment.votedUsers[userId]
+            var upvoteChange = 0
+            var downvoteChange = 0
+            var newVoteState: com.hcmus.forumus_client.data.model.VoteState
+
+            if (isUpvote) {
+                when (currentVote) {
+                    com.hcmus.forumus_client.data.model.VoteState.UPVOTE -> {
+                        upvoteChange = -1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.NONE
+                    }
+                    com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE -> {
+                        upvoteChange = 1
+                        downvoteChange = -1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.UPVOTE
+                    }
+                    else -> {
+                        upvoteChange = 1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.UPVOTE
+                    }
+                }
+            } else {
+                when (currentVote) {
+                    com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE -> {
+                        downvoteChange = -1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.NONE
+                    }
+                    com.hcmus.forumus_client.data.model.VoteState.UPVOTE -> {
+                        upvoteChange = -1
+                        downvoteChange = 1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE
+                    }
+                    else -> {
+                        downvoteChange = 1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE
+                    }
+                }
+            }
+
+            // Create optimistic comment update
+            val optimisticVotedUsers = comment.votedUsers.toMutableMap()
+            if (newVoteState == com.hcmus.forumus_client.data.model.VoteState.NONE) {
+                optimisticVotedUsers.remove(userId)
+            } else {
+                optimisticVotedUsers[userId] = newVoteState
+            }
+
+            val optimisticComment = comment.copy(
+                upvoteCount = comment.upvoteCount + upvoteChange,
+                downvoteCount = comment.downvoteCount + downvoteChange,
+                userVote = newVoteState,
+                votedUsers = optimisticVotedUsers
+            )
+
+            // Apply optimistic update immediately
+            allComments = allComments.map { c ->
+                if (c.id == comment.id) optimisticComment else c
+            }
+            rebuildItems()
+
             try {
-                val updatedComment = if (isUpvote) {
+                // Perform actual vote action on repository
+                val actualUpdatedComment = if (isUpvote) {
                     commentRepository.toggleUpvote(comment)
                 } else {
                     commentRepository.toggleDownvote(comment)
                 }
 
-                // Update comments list and rebuild display items
+                // Update with actual server response
                 allComments = allComments.map { c ->
-                    if (c.id == comment.id) updatedComment else c
+                    if (c.id == comment.id) actualUpdatedComment else c
                 }
                 rebuildItems()
             } catch (e: Exception) {
-                // Error handled silently - could show toast if needed
+                // Rollback optimistic update on error
+                allComments = allComments.map { c ->
+                    if (c.id == comment.id) comment else c
+                }
+                rebuildItems()
+                _error.value = e.message
             }
         }
     }

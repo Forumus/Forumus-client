@@ -205,11 +205,40 @@ class PostViewHolder(
 
         // Set up click listeners for all interactive elements
         rootLayout.setOnClickListener { onActionClick(post, PostAction.OPEN, it) }
-        upvoteIcon.setOnClickListener { onActionClick(post, PostAction.UPVOTE, it) }
-        downvoteIcon.setOnClickListener { onActionClick(post, PostAction.DOWNVOTE, it) }
+        upvoteIcon.setOnClickListener { 
+            // Briefly disable to prevent duplicate taps during optimistic update
+            if (upvoteIcon.isEnabled) {
+                upvoteIcon.isEnabled = false
+                downvoteIcon.isEnabled = false
+                onActionClick(post, PostAction.UPVOTE, it)
+                // Re-enable after brief delay
+                upvoteIcon.postDelayed({
+                    upvoteIcon.isEnabled = true
+                    downvoteIcon.isEnabled = true
+                }, 300)
+            }
+        }
+        downvoteIcon.setOnClickListener { 
+            // Briefly disable to prevent duplicate taps during optimistic update
+            if (downvoteIcon.isEnabled) {
+                upvoteIcon.isEnabled = false
+                downvoteIcon.isEnabled = false
+                onActionClick(post, PostAction.DOWNVOTE, it)
+                // Re-enable after brief delay
+                downvoteIcon.postDelayed({
+                    upvoteIcon.isEnabled = true
+                    downvoteIcon.isEnabled = true
+                }, 300)
+            }
+        }
         replyButton.setOnClickListener { onActionClick(post, PostAction.REPLY, it) }
         shareButton.setOnClickListener { onActionClick(post, PostAction.SHARE, it) }
-        summaryButton.setOnClickListener { onActionClick(post, PostAction.SUMMARY, it) }
+        summaryButton.setOnClickListener { 
+            // Disable summary button during loading to prevent duplicate requests
+            if (summaryButton.isEnabled) {
+                onActionClick(post, PostAction.SUMMARY, it)
+            }
+        }
         authorAvatar.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE, it) }
         authorName.setOnClickListener { onActionClick(post, PostAction.AUTHOR_PROFILE, it) }
         menuButton.setOnClickListener { onActionClick(post, PostAction.MENU, it) }
@@ -218,10 +247,12 @@ class PostViewHolder(
     /**
      * Toggle loading state for the AI Summary button.
      * Shows/hides the loading indicator and summary button accordingly.
+     * Disables button during loading to prevent duplicate requests.
      */
     fun setSummaryLoading(isLoading: Boolean) {
         summaryButton.visibility = if (isLoading) View.GONE else View.VISIBLE
         summaryLoadingContainer.visibility = if (isLoading) View.VISIBLE else View.GONE
+        summaryButton.isEnabled = !isLoading
     }
 
     private fun applyVoteUI(post: Post) {
@@ -473,5 +504,74 @@ class PostViewHolder(
     private fun setExpandedContent() {
         postContent.maxLines = Int.MAX_VALUE
         postContent.text = fullContent
+    }
+
+    /**
+     * Update only vote-related UI elements without full rebinding.
+     * Used for optimistic UI updates.
+     */
+    fun updateVotes(post: Post) {
+        upvoteCount.text = post.upvoteCount.toString()
+        applyVoteUI(post)
+    }
+
+    /**
+     * Update only topic tags without full rebinding.
+     */
+    fun updateTopics(post: Post, topicMap: Map<String, Topic>?) {
+        topicContainer.removeAllViews()
+        if (topicMap != null && post.topicIds.isNotEmpty()) {
+            val density = itemView.resources.displayMetrics.density
+            val marginEnd = (8 * density).toInt()
+            val paddingH = (12 * density).toInt()
+            val paddingV = (6 * density).toInt()
+
+            post.topicIds.take(5).forEach { topicId ->
+                val topic = topicMap[topicId]
+                val topicName = topic?.name ?: topicId
+
+                // Colors
+                val defaultColor = "#4285F4".toColorInt()
+                var mainColor = defaultColor
+                var alpha = 0.1
+
+                if (topic != null) {
+                    try {
+                        if (topic.fillColor.isNotEmpty()) {
+                            mainColor = android.graphics.Color.parseColor(topic.fillColor)
+                        }
+                        alpha = topic.fillAlpha
+                        if (alpha < 0.0) alpha = 0.0
+                        if (alpha > 1.0) alpha = 1.0
+                    } catch (e: Exception) {
+                        android.util.Log.e("PostViewHolder", "Color parsing error", e)
+                    }
+                }
+
+                val alphaInt = (alpha * 255).toInt()
+                val backgroundColor = (alphaInt shl 24) or (mainColor and 0x00FFFFFF)
+
+                val backgroundDrawable = android.graphics.drawable.GradientDrawable().apply {
+                    shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    cornerRadius = 16 * density
+                    setColor(backgroundColor)
+                }
+
+                val textView = TextView(itemView.context).apply {
+                    text = topicName
+                    textSize = 12f
+                    setTextColor(mainColor)
+                    background = backgroundDrawable
+                    setPadding(paddingH, paddingV, paddingH, paddingV)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        setMargins(0, 0, marginEnd, 0)
+                    }
+                }
+                topicContainer.addView(textView)
+            }
+        }
     }
 }

@@ -75,7 +75,6 @@ class CreatePostFragment : Fragment() {
     // Cờ kiểm soát trạng thái để tránh lưu nháp khi đã post xong hoặc discard
     private var isPostSubmittedOrDiscarded = false
 
-    // --- LAUNCHERS ---
     private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) tempImageUri?.let { viewModel.addImages(listOf(it)); setBottomSheetState(false) }
     }
