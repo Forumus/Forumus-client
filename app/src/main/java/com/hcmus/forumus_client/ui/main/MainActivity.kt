@@ -234,6 +234,8 @@ class MainActivity : AppCompatActivity() {
                     
                     Log.d("MainActivity", "User is banned, navigating to BannedActivity")
                     navigateToBannedActivity(currentUser.blacklistedUntil)
+                } else {
+                    Log.d("MainActivity", "User is not banned")
                 }
             } catch (e: Exception) {
                 Log.e("MainActivity", "Error checking ban status", e)
