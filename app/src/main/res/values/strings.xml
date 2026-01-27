@@ -110,6 +110,87 @@
     <string name="english">English</string>
     <string name="vietnamese">Vietnamese</string>
 
+    <!-- Navigation Header -->
+    <string name="browse_and_filter">Browse and Filter</string>
+    <string name="sort_by">Sort by</string>
+    <string name="sort_new">New</string>
+    <string name="sort_trending">Trending</string>
+    <string name="popular_tags">Popular tags</string>
+
+    <!-- Post Item -->
+    <string name="anonymous">Anonymous</string>
+    <string name="post_title_placeholder">Post Title</string>
+    <string name="post_content_placeholder">Excited to announce that registration for our annual Tech Fest is now open! Early bird discount available for the first 100 students.</string>
+    <string name="location_placeholder">Location</string>
+    <string name="time_placeholder">2h</string>
+    <string name="time_ago_placeholder">2h ago</string>
+
+    <!-- Dialogs -->
+    <string name="select_topics">Select Topics</string>
+    <string name="choose_topics_limit">Choose up to 5 topics</string>
+    <string name="done">Done</string>
+    <string name="report">Report</string>
+    <string name="save">Save</string>
+    <string name="map_preview">Map Preview</string>
+    <string name="place_name_placeholder">Place Name</string>
+    <string name="finish_post_later">Finish your post later?</string>
+    <string name="save_as_draft">Save as draft</string>
+    <string name="discard_post">Discard post</string>
+    <string name="continue_editing">Continue editing</string>
+    <string name="select_location">Select Location</string>
+    <string name="search_location_hint">Search location...</string>
+    <string name="add_location">Add Location</string>
+    <string name="preview_on_map">Preview on map</string>
+
+    <!-- Chat Item -->
+    <string name="chat_name_placeholder">Sarah Johnson</string>
+    <string name="chat_time_placeholder">2m</string>
+    <string name="chat_message_placeholder">Hey! Did you see the photos from last weekend?</string>
+    <string name="chat_unread_count_placeholder">3</string>
+
+    <!-- Map & Location -->
+    <string name="place_name">Place Name</string>
+    <string name="address_details">Address details...</string>
+    
+    <!-- User Search & Profile -->
+    <string name="user_name_placeholder">User Name</string>
+    <string name="user_email_placeholder">user@example.com</string>
+
+    <!-- Dialogs & Popups -->
+    <string name="select_topics_title">Select Topics</string>
+    <string name="select_topics_subtitle">Choose up to 5 topics</string>
+    <string name="ai_topic_suggestion">AI Topic Suggestion</string>
+    <string name="sparkle_emoji">✨ </string>
+    <string name="loading_more_posts">Loading more posts...</string>
+
+    <!-- Validation & Help -->
+    <string name="violation_spam">Spam</string>
+    <string name="violation_detail">Detail</string>
+    <string name="violation_content">This content is considered spam or misleading.</string>
+    <string name="topic_biology">Biology</string>
+    <string name="see_more_notifications">See more notifications</string>
+    <string name="notification_header">Header</string>
+    <string name="message_sent_placeholder">I\'m doing great! Thanks for asking</string>
+    <string name="message_sent_time">10:32 AM</string>
+    <string name="message_received_placeholder">Hey! How are you doing?</string>
+    <string name="message_received_time">10:30 AM</string>
+    <string name="help_topic_title">Topic Title</string>
+    <string name="help_topic_content">Help topic content goes here</string>
+    <string name="guideline_section_title">Section Title</string>
+    <string name="guideline_content_placeholder">• Guideline 1\n• Guideline 2</string>
+    <string name="chat_read_name">Emma Williams</string>
+    <string name="chat_read_time">1h</string>
+    <string name="chat_read_message">See you tomorrow at 3pm 👋</string>
+    <string name="plus_three">+3</string>
+
+    <!-- App Bar -->
+    <string name="forumus_title">Forumus</string>
+    
+    <!-- Validation numbers -->
+    <string name="number_one">1</string>
+    <string name="number_zero">0</string>
+    <string name="dot_separator">•</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="default_notification_channel_id">general_notification_channel</string>

@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="Biology"
+        android:text="@string/topic_biology"
         android:textColor="@color/text_primary"
         android:textSize="13sp"
         android:textStyle="bold" />

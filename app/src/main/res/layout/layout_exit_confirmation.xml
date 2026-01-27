@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:paddingHorizontal="16dp"
-        android:text="Finish your post later?"
+        android:text="@string/finish_post_later"
         android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Save as draft"
+            android:text="@string/save_as_draft"
             android:textColor="#1A1A1A"
             android:textSize="16sp" />
     </LinearLayout>
@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Discard post"
+            android:text="@string/discard_post"
             android:textColor="#1A1A1A"
             android:textSize="16sp" />
     </LinearLayout>
@@ -88,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Continue editing"
+            android:text="@string/continue_editing"
             android:textColor="#4CAF50"
             android:textSize="16sp" />
     </LinearLayout>

@@ -28,7 +28,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Report"
+                android:text="@string/report"
                 android:textSize="14sp"
                 android:textColor="@color/text_primary"
                 android:fontFamily="@font/montserrat_regular"
@@ -63,7 +63,7 @@
                 android:id="@+id/tvSaveText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Save"
+                android:text="@string/save"
                 android:textSize="14sp"
                 android:textColor="@color/text_primary"
                 android:fontFamily="@font/montserrat_regular"

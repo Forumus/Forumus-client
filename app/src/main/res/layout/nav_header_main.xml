@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_semibold"
-                android:text="Browse and Filter"
+                android:text="@string/browse_and_filter"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:textColor="@color/text_primary"
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_regular"
-            android:text="Sort by"
+            android:text="@string/sort_by"
             android:textColor="#999999"
             android:textSize="16sp"
             android:paddingBottom="12dp"
@@ -69,7 +69,7 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/montserrat_regular"
-                android:text="New"
+                android:text="@string/sort_new"
                 android:textColor="@color/text_primary"
                 android:textSize="20sp" />
         </LinearLayout>
@@ -98,7 +98,7 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/montserrat_regular"
-                android:text="Trending"
+                android:text="@string/sort_trending"
                 android:textColor="@color/text_primary"
                 android:textSize="20sp" />
         </LinearLayout>
@@ -115,7 +115,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_regular"
-            android:text="Popular tags"
+            android:text="@string/popular_tags"
             android:textColor="#999999"
             android:textSize="16sp"
             android:paddingBottom="12dp"

@@ -104,7 +104,7 @@ class SettingsFragment : Fragment() {
      * Setup language selection spinner
      */
     private fun setupLanguageSpinner() {
-        val languages = listOf("English", "Vietnamese")
+        val languages = listOf(getString(R.string.english), getString(R.string.vietnamese))
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, languages)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         
