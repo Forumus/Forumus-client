@@ -107,6 +107,38 @@
 
     </LinearLayout>
 
+    <!-- Location Button (Optional - shown when post has location) -->
+    <LinearLayout
+        android:id="@+id/locationButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="15dp"
+        android:paddingVertical="8dp"
+        android:layout_marginBottom="10dp"
+        android:background="?attr/selectableItemBackground"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_location"
+            android:layout_marginEnd="6dp"
+            app:tint="@color/text_tertiary"
+            android:scaleType="fitCenter"/>
+
+        <TextView
+            android:id="@+id/locationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textSize="13sp"
+            android:textColor="@color/text_tertiary"
+            android:fontFamily="@font/montserrat_medium"/>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPostImages"
         android:layout_width="match_parent"
