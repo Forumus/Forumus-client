@@ -419,4 +419,17 @@
     <string name="profile_stat_posts">bài đăng</string>
     <string name="profile_stat_replies">phản hồi</string>
     <string name="profile_stat_upvotes">tán thành</string>
+
+    <!-- Date Formatting -->
+    <string name="date_format_short_month_day">dd MMM</string>
+
+    <!-- Comment Section -->
+    <plurals name="view_replies">
+        <item quantity="one">Xem %d phản hồi</item>
+        <item quantity="other">Xem %d phản hồi</item>
+    </plurals>
+    <plurals name="hide_replies">
+        <item quantity="one">Ẩn %d phản hồi</item>
+        <item quantity="other">Ẩn %d phản hồi</item>
+    </plurals>
 </resources>

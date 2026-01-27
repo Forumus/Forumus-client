@@ -414,4 +414,17 @@
     <string name="profile_stat_posts">posts</string>
     <string name="profile_stat_replies">replies</string>
     <string name="profile_stat_upvotes">upvotes</string>
+    
+    <!-- Date Formatting -->
+    <string name="date_format_short_month_day">MMM dd</string>
+    
+    <!-- Comment Section -->
+    <plurals name="view_replies">
+        <item quantity="one">View %d reply</item>
+        <item quantity="other">View %d replies</item>
+    </plurals>
+    <plurals name="hide_replies">
+        <item quantity="one">Hide %d reply</item>
+        <item quantity="other">Hide %d replies</item>
+    </plurals>
 </resources>

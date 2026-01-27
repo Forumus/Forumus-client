@@ -29,10 +29,9 @@ import com.hcmus.forumus_client.data.model.Topic
  * @param onCommentAction Callback when user interacts with a comment
  */
 class PostDetailAdapter(
-    private var items: List<FeedItem> = emptyList(),
     private val onPostAction: (Post, PostAction, View) -> Unit,
     private val onCommentAction: (Comment, CommentAction) -> Unit,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : androidx.recyclerview.widget.ListAdapter<FeedItem, RecyclerView.ViewHolder>(FeedItemDiffCallback()) {
 
     companion object {
         // View type constants for determining which ViewHolder to use
@@ -57,26 +56,13 @@ class PostDetailAdapter(
     }
 
     /**
-     * Updates the adapter with a new list of items and refreshes the entire view.
-     *
-     * This is a simple update mechanism - for large datasets consider using
-     * DiffUtil for more efficient updates.
-     *
-     * @param newItems The new list of feed items to display
-     */
-    fun submitList(newItems: List<FeedItem>) {
-        items = newItems
-        notifyDataSetChanged()
-    }
-
-    /**
      * Returns the view type for the item at the specified position.
      *
      * @param position The position of the item in the adapter
      * @return TYPE_POST if item is a PostItem, TYPE_COMMENT if item is a CommentItem
      */
     override fun getItemViewType(position: Int): Int {
-        return when (items[position]) {
+        return when (getItem(position)) {
             is FeedItem.PostItem -> TYPE_POST
             is FeedItem.CommentItem -> TYPE_COMMENT
         }
@@ -119,7 +105,7 @@ class PostDetailAdapter(
      * @param position The position of the item in the adapter
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val item = items[position]) {
+        when (val item = getItem(position)) {
             is FeedItem.PostItem -> {
                 (holder as PostViewHolder).bind(item.post, topicMap)
                 holder.setSummaryLoading(isSummaryLoading)
@@ -127,13 +113,6 @@ class PostDetailAdapter(
             is FeedItem.CommentItem -> (holder as CommentViewHolder).bind(item.comment, true)
         }
     }
-
-    /**
-     * Returns the total number of items in the adapter.
-     *
-     * @return The size of the items list
-     */
-    override fun getItemCount(): Int = items.size
 
     /**
      * Updates the AI summary loading state for the post.
@@ -144,8 +123,24 @@ class PostDetailAdapter(
     fun setSummaryLoading(isLoading: Boolean) {
         isSummaryLoading = isLoading
         // Post is always at position 0, notify to update loading state
-        if (items.isNotEmpty() && items[0] is FeedItem.PostItem) {
+        if (itemCount > 0 && getItem(0) is FeedItem.PostItem) {
             notifyItemChanged(0, "summary_loading")
         }
+    }
+}
+
+class FeedItemDiffCallback : androidx.recyclerview.widget.DiffUtil.ItemCallback<FeedItem>() {
+    override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        return when {
+            oldItem is FeedItem.PostItem && newItem is FeedItem.PostItem ->
+                oldItem.post.id == newItem.post.id
+            oldItem is FeedItem.CommentItem && newItem is FeedItem.CommentItem ->
+                oldItem.comment.id == newItem.comment.id
+            else -> false
+        }
+    }
+
+    override fun areContentsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        return oldItem == newItem
     }
 }
