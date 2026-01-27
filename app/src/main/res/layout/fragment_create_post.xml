@@ -323,13 +323,12 @@
                     android:layout_height="4dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="12dp"
-                    android:background="#E0E0E0" />
+                    android:background="@color/text_primary" />
 
                 <LinearLayout
                     android:id="@+id/btnAttachImage"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="16dp">
@@ -353,7 +352,6 @@
                     android:id="@+id/btnCamera"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="16dp">
@@ -377,7 +375,6 @@
                     android:id="@+id/btnAddTopic"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="16dp">
                     <ImageView
@@ -400,7 +397,6 @@
                     android:id="@+id/btnCheckIn"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="16dp">
                     <ImageView

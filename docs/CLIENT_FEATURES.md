@@ -178,11 +178,13 @@ flowchart TD
     D --> B
     C -->|Valid| E[Create Account]
     E --> F[Send OTP Email]
+    
     F --> G[Verification Screen]
     G --> H{Enter OTP}
     H -->|Valid| I[Complete Registration]
     I --> J[Success Screen]
     J --> K[Login Screen]
+    
     H -->|Invalid| L[Show Error / Resend OTP]
     L --> G
 ```

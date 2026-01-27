@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.hcmus.forumus_client.data.local.PreferencesManager
 import com.hcmus.forumus_client.data.model.User
+import com.hcmus.forumus_client.data.repository.AuthRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
 import kotlinx.coroutines.launch
 
@@ -28,7 +29,8 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(
     application: Application,
     private val userRepository: UserRepository = UserRepository(),
-    private val preferencesManager: PreferencesManager = PreferencesManager(application)
+    private val preferencesManager: PreferencesManager = PreferencesManager(application),
+    private val authRepository: AuthRepository = AuthRepository(context = application)
 ) : AndroidViewModel(application) {
 
     // Current user profile information
@@ -58,6 +60,10 @@ class SettingsViewModel(
     // Error message (null if no error)
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
+
+    // Logout completed event
+    private val _logoutCompleted = MutableLiveData<Boolean>()
+    val logoutCompleted: LiveData<Boolean> = _logoutCompleted
 
     /**
      * Load current user profile information from Firestore.
@@ -135,5 +141,18 @@ class SettingsViewModel(
     fun saveLanguagePreference(language: String) {
         _language.value = language
         preferencesManager.language = language
+     * Perform user logout.
+     * Signals the fragment to navigate to login screen.
+     */
+    fun logout() {
+        _logoutCompleted.value = true
+    }
+
+    /**
+     * Clear session data and sign out.
+     * Terminates Firestore to cancel all active listeners before signing out.
+     */
+    fun clearSession() {
+        authRepository.logout()
     }
 }

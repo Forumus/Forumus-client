@@ -219,11 +219,26 @@ class PostDetailFragment : Fragment() {
         }
 
         viewModel.items.observe(viewLifecycleOwner) { items ->
+            // Preserve scroll position during updates
+            val layoutManager = binding.postRecyclerView.layoutManager as? LinearLayoutManager
+            val firstVisiblePosition = layoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
+            val scrollOffset = layoutManager?.findViewByPosition(firstVisiblePosition)?.top ?: 0
+            
             detailAdapter.submitList(items)
+            
+            // Restore scroll position if it changed
+            if (firstVisiblePosition > 0) {
+                binding.postRecyclerView.post {
+                    layoutManager?.scrollToPositionWithOffset(firstVisiblePosition, scrollOffset)
+                }
+            }
         }
 
         viewModel.topics.observe(viewLifecycleOwner) { topics ->
-            detailAdapter.setTopics(topics)
+            // Only update if topics list is not empty to prevent redundant calls
+            if (topics.isNotEmpty()) {
+                detailAdapter.setTopics(topics)
+            }
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
