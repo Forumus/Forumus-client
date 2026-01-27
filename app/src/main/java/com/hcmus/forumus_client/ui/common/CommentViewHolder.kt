@@ -154,8 +154,32 @@ class CommentViewHolder(
 
         // Set up click listeners for all interactive elements
         rootLayout.setOnClickListener { onActionClick(comment, CommentAction.OPEN) }
-        upvoteIcon.setOnClickListener { onActionClick(comment, CommentAction.UPVOTE) }
-        downvoteIcon.setOnClickListener { onActionClick(comment, CommentAction.DOWNVOTE) }
+        upvoteIcon.setOnClickListener { 
+            // Briefly disable to prevent duplicate taps during optimistic update
+            if (upvoteIcon.isEnabled) {
+                upvoteIcon.isEnabled = false
+                downvoteIcon.isEnabled = false
+                onActionClick(comment, CommentAction.UPVOTE)
+                // Re-enable after brief delay
+                upvoteIcon.postDelayed({
+                    upvoteIcon.isEnabled = true
+                    downvoteIcon.isEnabled = true
+                }, 300)
+            }
+        }
+        downvoteIcon.setOnClickListener { 
+            // Briefly disable to prevent duplicate taps during optimistic update
+            if (downvoteIcon.isEnabled) {
+                upvoteIcon.isEnabled = false
+                downvoteIcon.isEnabled = false
+                onActionClick(comment, CommentAction.DOWNVOTE)
+                // Re-enable after brief delay
+                downvoteIcon.postDelayed({
+                    upvoteIcon.isEnabled = true
+                    downvoteIcon.isEnabled = true
+                }, 300)
+            }
+        }
         replyButton.setOnClickListener { onActionClick(comment, CommentAction.REPLY) }
         viewRepliesButton.setOnClickListener { onActionClick(comment, CommentAction.VIEW_REPLIES) }
         authorAvatar.setOnClickListener { onActionClick(comment, CommentAction.AUTHOR_PROFILE) }
@@ -213,6 +237,15 @@ class CommentViewHolder(
         } else {
             "now"
         }
+    }
+
+    /**
+     * Update only vote-related UI elements without full rebinding.
+     * Used for optimistic UI updates.
+     */
+    fun updateVotes(comment: Comment) {
+        upvoteCount.text = comment.upvoteCount.toString()
+        applyVoteUI(comment)
     }
 }
 

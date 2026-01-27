@@ -296,27 +296,95 @@ class HomeViewModel(
     }
 
     /**
-     * Processes voting logic for a post. Updates the post via repository and refreshes the posts
-     * list.
+     * Processes voting logic for a post using optimistic UI updates.
+     * Updates UI immediately, then persists to server. Rolls back on error.
      *
      * @param post The post to vote on
      * @param isUpvote True for upvote, false for downvote
      */
     private fun handleVote(post: Post, isUpvote: Boolean) {
         viewModelScope.launch {
+            // Calculate optimistic update
+            val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                _error.value = "User not logged in"
+                return@launch
+            }
+
+            val currentVote = post.votedUsers[userId]
+            var upvoteChange = 0
+            var downvoteChange = 0
+            var newVoteState: com.hcmus.forumus_client.data.model.VoteState
+
+            if (isUpvote) {
+                when (currentVote) {
+                    com.hcmus.forumus_client.data.model.VoteState.UPVOTE -> {
+                        upvoteChange = -1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.NONE
+                    }
+                    com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE -> {
+                        upvoteChange = 1
+                        downvoteChange = -1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.UPVOTE
+                    }
+                    else -> {
+                        upvoteChange = 1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.UPVOTE
+                    }
+                }
+            } else {
+                when (currentVote) {
+                    com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE -> {
+                        downvoteChange = -1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.NONE
+                    }
+                    com.hcmus.forumus_client.data.model.VoteState.UPVOTE -> {
+                        upvoteChange = -1
+                        downvoteChange = 1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE
+                    }
+                    else -> {
+                        downvoteChange = 1
+                        newVoteState = com.hcmus.forumus_client.data.model.VoteState.DOWNVOTE
+                    }
+                }
+            }
+
+            // Create optimistic post update
+            val optimisticVotedUsers = post.votedUsers.toMutableMap()
+            if (newVoteState == com.hcmus.forumus_client.data.model.VoteState.NONE) {
+                optimisticVotedUsers.remove(userId)
+            } else {
+                optimisticVotedUsers[userId] = newVoteState
+            }
+
+            val optimisticPost = post.copy(
+                upvoteCount = post.upvoteCount + upvoteChange,
+                downvoteCount = post.downvoteCount + downvoteChange,
+                userVote = newVoteState,
+                votedUsers = optimisticVotedUsers
+            )
+
+            // Apply optimistic update immediately
+            val currentList = _posts.value ?: emptyList()
+            _posts.value = currentList.map { p -> if (p.id == post.id) optimisticPost else p }
+
             try {
-                // Perform vote action on repository
-                val updatedPost =
+                // Perform actual vote action on repository
+                val actualUpdatedPost =
                         if (isUpvote) {
                             postRepository.toggleUpvote(post)
                         } else {
                             postRepository.toggleDownvote(post)
                         }
 
-                // Update posts list with the updated post
-                val currentList = _posts.value ?: emptyList()
-                _posts.value = currentList.map { p -> if (p.id == post.id) updatedPost else p }
+                // Update with actual server response
+                val finalList = _posts.value ?: emptyList()
+                _posts.value = finalList.map { p -> if (p.id == post.id) actualUpdatedPost else p }
             } catch (e: Exception) {
+                // Rollback optimistic update on error
+                val rollbackList = _posts.value ?: emptyList()
+                _posts.value = rollbackList.map { p -> if (p.id == post.id) post else p }
                 _error.value = e.message
             }
         }

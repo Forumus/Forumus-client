@@ -3,6 +3,7 @@ package com.hcmus.forumus_client.ui.home
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.Post
@@ -71,6 +72,7 @@ class HomeAdapter(
 
     /**
      * Binds data to the ViewHolder at the specified position.
+     * Supports partial updates via payloads for better performance.
      *
      * @param holder The ViewHolder to bind data to
      * @param position The position of the item in the list
@@ -84,6 +86,32 @@ class HomeAdapter(
     }
 
     /**
+     * Binds data with payloads for partial updates.
+     * This prevents full item rebinding when only specific fields change.
+     */
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isEmpty()) {
+            // Full bind
+            super.onBindViewHolder(holder, position, payloads)
+        } else if (holder is PostViewHolder) {
+            val post = items[position]
+            // Handle partial updates
+            for (payload in payloads) {
+                when (payload) {
+                    "votes" -> holder.updateVotes(post)
+                    "summary_loading" -> holder.setSummaryLoading(post.id == summaryLoadingPostId)
+                    "topics" -> holder.updateTopics(post, topicMap)
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    /**
      * Returns the total number of items including the loading indicator if shown.
      *
      * @return Size of the items list plus 1 if loading indicator is shown
@@ -93,23 +121,34 @@ class HomeAdapter(
     }
 
     /**
-     * Updates the adapter with a new list of posts.
+     * Updates the adapter with a new list of posts using DiffUtil for efficient updates.
+     * This prevents unnecessary re-renders and maintains scroll position.
      *
      * @param newItems The new list of posts to display
      */
     fun submitList(newItems: List<Post>) {
+        val oldItems = items
+        val diffCallback = PostDiffCallback(oldItems, newItems)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        
         items = newItems
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 
     /**
      * Updates the adapter with the list of topics.
+     * Only triggers update if topics actually changed to prevent redundant re-renders.
      *
      * @param topics The list of topics to map
      */
     fun setTopics(topics: List<Topic>) {
-        topicMap = topics.associateBy { it.id }
-        notifyDataSetChanged()
+        val newTopicMap = topics.associateBy { it.id }
+        // Only update if topics actually changed
+        if (newTopicMap != topicMap) {
+            topicMap = newTopicMap
+            // Notify items to rebind with new topic data
+            notifyItemRangeChanged(0, items.size, "topics")
+        }
     }
 
     /**
@@ -153,4 +192,54 @@ class HomeAdapter(
 
     /** ViewHolder for the loading indicator. */
     class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view)
+
+    /**
+     * DiffUtil callback for calculating the difference between two lists of posts.
+     * This enables efficient, targeted updates instead of full list redraws.
+     */
+    private class PostDiffCallback(
+        private val oldList: List<Post>,
+        private val newList: List<Post>
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].id == newList[newItemPosition].id
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val old = oldList[oldItemPosition]
+            val new = newList[newItemPosition]
+            
+            // Compare all fields that affect UI display
+            return old.title == new.title &&
+                   old.content == new.content &&
+                   old.upvoteCount == new.upvoteCount &&
+                   old.downvoteCount == new.downvoteCount &&
+                   old.commentCount == new.commentCount &&
+                   old.userVote == new.userVote &&
+                   old.imageUrls == new.imageUrls &&
+                   old.videoUrls == new.videoUrls &&
+                   old.topicIds == new.topicIds &&
+                   old.authorName == new.authorName &&
+                   old.authorAvatarUrl == new.authorAvatarUrl
+        }
+
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+            val old = oldList[oldItemPosition]
+            val new = newList[newItemPosition]
+            
+            // Return specific payload for targeted updates
+            return when {
+                old.upvoteCount != new.upvoteCount ||
+                old.downvoteCount != new.downvoteCount ||
+                old.userVote != new.userVote -> "votes"
+                old.topicIds != new.topicIds -> "topics"
+                else -> null
+            }
+        }
+    }
 }
