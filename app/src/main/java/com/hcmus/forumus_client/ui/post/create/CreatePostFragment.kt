@@ -395,8 +395,16 @@ class CreatePostFragment : Fragment() {
             user?.let {
                 binding.tvAuthorName.text = it.fullName
                 binding.tvAuthorEmail.text = it.email
-                val url = if (!it.profilePictureUrl.isNullOrEmpty()) it.profilePictureUrl else "https://ui-avatars.com/api/?name=${it.fullName}"
-                Glide.with(this).load(url).circleCrop().into(binding.ivAuthorAvatar)
+                if (!it.profilePictureUrl.isNullOrEmpty()) {
+                    Glide.with(this)
+                        .load(it.profilePictureUrl)
+                        .circleCrop()
+                        .placeholder(R.drawable.default_avatar)
+                        .error(R.drawable.default_avatar)
+                        .into(binding.ivAuthorAvatar)
+                } else {
+                    binding.ivAuthorAvatar.setImageResource(R.drawable.default_avatar)
+                }
             }
         }
         viewModel.topicColors.observe(viewLifecycleOwner) { if (selectedTopicsList.isNotEmpty()) updateTopicChips() }
