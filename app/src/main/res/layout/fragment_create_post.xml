@@ -35,7 +35,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart="16dp"
                     android:layout_toEndOf="@id/btnClose"
-                    android:text="Create post"
+                    android:text="@string/create_post_title"
                     android:textColor="#1A1A1A"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -50,7 +50,7 @@
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:paddingHorizontal="24dp"
-                    android:text="POST"
+                    android:text="@string/action_post"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -157,7 +157,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
                                 android:layout_marginEnd="4dp"
-                                android:text="is at"
+                                android:text="@string/location_is_at"
                                 android:textColor="#757575"
                                 android:textSize="13sp" />
 
@@ -189,7 +189,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        android:hint="Title"
+                        android:hint="@string/post_title_hint"
                         android:inputType="textCapSentences"
                         android:paddingTop="16dp"
                         android:paddingBottom="8dp"
@@ -205,7 +205,7 @@
                         android:layout_height="200dp"
                         android:background="@drawable/bg_input_area"
                         android:gravity="top"
-                        android:hint="What's on your mind?"
+                        android:hint="@string/post_content_hint"
                         android:inputType="textMultiLine|textCapSentences"
                         android:padding="16dp"
                         android:textColorHint="#9E9E9E"
@@ -342,7 +342,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Photo/video"
+                        android:text="@string/option_photo_video"
                         android:textColor="#000000"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -371,7 +371,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Camera"
+                        android:text="@string/option_camera"
                         android:textColor="#000000"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -399,7 +399,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Topic"
+                        android:text="@string/option_topic"
                         android:textColor="#000000"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -427,7 +427,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Check in"
+                        android:text="@string/option_check_in"
                         android:textColor="#000000"
                         android:textSize="16sp" />
                 </LinearLayout>
