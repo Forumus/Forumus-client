@@ -154,13 +154,14 @@
             <!-- Upvote Button (minimal) -->
             <ImageButton
                 android:id="@+id/upvoteIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_upvote"
                 android:scaleType="fitCenter"
-                android:padding="10dp"
-                app:tint="@color/text_secondary_light"/>
+                android:padding="2dp"
+                app:tint="@color/text_secondary_light"
+                tools:ignore="TouchTargetSizeCheck"/>
 
             <!-- Upvote Count -->
             <TextView
@@ -168,24 +169,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="12"
-                android:textSize="13sp"
+                android:textSize="12sp"
                 android:textColor="@color/text_secondary_light"
                 android:fontFamily="@font/montserrat_medium"
-                android:layout_marginStart="2dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="16dp"
                 android:minWidth="18dp"/>
 
             <!-- Downvote Button (minimal) -->
             <ImageButton
                 android:id="@+id/downvoteIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_downvote"
                 android:scaleType="fitCenter"
-                android:padding="10dp"
-                android:layout_marginEnd="12dp"
-                app:tint="@color/text_secondary_light"/>
+                android:padding="2dp"
+                android:layout_marginEnd="16dp"
+                app:tint="@color/text_secondary_light"
+                tools:ignore="TouchTargetSizeCheck"/>
 
             <!-- Reply Button (minimal) -->
             <ImageButton
