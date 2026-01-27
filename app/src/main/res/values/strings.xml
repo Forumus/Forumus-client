@@ -191,7 +191,154 @@
     <string name="violation_detail">Detail</string>
     <string name="violation_content">This content is considered spam or misleading.</string>
 
-    <!-- Violation Types -->
+    <!-- Help Center -->
+    <string name="title_help_center">Help Center</string>
+    <string name="help_hero_title">How can we help you?</string>
+    <string name="help_hero_subtitle">Find answers to frequently asked questions, learn how to use the platform, and get support when you need it.</string>
+    <string name="card_contact_support">Contact\nSupport</string>
+    <string name="card_report_issue">Report\nIssue</string>
+    <string name="section_faq">Frequently Asked Questions</string>
+    <string name="footer_still_need_help">Still need help?</string>
+    <string name="footer_contact_desc">Our support team is available to assist you</string>
+    <string name="email_subject_support">Support Request</string>
+    <string name="email_subject_issue">Issue Report</string>
+    <string name="email_subject_general">Help Request</string>
+    <string name="error_no_email_app">No email app found. Please email: %s</string>
+    <string name="error_email_client">Error opening email client</string>
+
+    <!-- Help Topics -->
+    <string name="help_topic_account_title">How do I create an account?</string>
+    <string name="help_topic_account_content">To create a new account on Forumus, navigate to the registration page and provide your full name, valid university email address, phone number, and a secure password. You will receive a 6-digit verification code via email that must be entered to complete the registration process. After verification, you will select your role (Student or Teacher) and gain full access to the platform. Only users with valid University of Science email addresses are permitted to register.</string>
+    
+    <string name="help_topic_post_title">How do I create a post or discussion?</string>
+    <string name="help_topic_post_content">To create a new post, tap the floating action button (+ icon) located at the bottom of the home screen. Select the appropriate topic category for your discussion, compose a clear and descriptive title, write your detailed question or content in the body section, and optionally attach images or documents to support your post. You may also add relevant topic tags to improve discoverability. Review your post for accuracy and clarity before tapping the \'Post\' button to publish it to the community. Your post will immediately become visible to other members in the selected category.</string>
+    
+    <string name="help_topic_comment_title">How do I comment on or reply to posts?</string>
+    <string name="help_topic_comment_content">To participate in a discussion, open any post by tapping on it from the feed. Scroll to the bottom of the post content where you will find the comment input field. Type your response, answer, or contribution in the text box. You may format your text and attach supporting materials if necessary. Tap the \'Send\' or \'Comment\' button to publish your response. Your comment will appear in the discussion thread and the original poster will receive a notification. You can also reply to specific comments by tapping the reply button beneath any existing comment, creating threaded discussions.</string>
+    
+    <string name="help_topic_voting_title">What is the voting system and how does it work?</string>
+    <string name="help_topic_voting_content">The voting system allows community members to evaluate the quality and relevance of posts and comments. Users can upvote content they find helpful, informative, or well-written by tapping the upward arrow icon. Conversely, users may downvote content that is inaccurate, unhelpful, or violates community standards by tapping the downward arrow. The total vote score (upvotes minus downvotes) is displayed next to each post and comment. Highly upvoted content rises to greater visibility, while downvoted content may be minimized. This democratic system helps surface the most valuable contributions and maintains content quality across the platform.</string>
+    
+    <string name="help_topic_notif_title">How do I manage my notifications?</string>
+    <string name="help_topic_notif_content">Notification preferences can be customized in the Settings menu accessible from your profile. Navigate to Settings and locate the notification section where you will find toggle switches for push notifications and email notifications. Enable push notifications to receive real-time alerts on your device when someone replies to your posts, comments on your contributions, mentions you in discussions, or when important platform announcements are made. Enable email notifications to receive periodic summaries or immediate alerts via your registered email address. You may disable either or both notification types at any time based on your preferences.</string>
+    
+    <string name="help_topic_save_title">How do I save posts for later reference?</string>
+    <string name="help_topic_save_content">To save a post for future reference, open the post you wish to bookmark and locate the save icon (bookmark symbol) typically found in the top-right corner or within the post options menu. Tap this icon to add the post to your saved collection. The icon will change appearance to indicate the post has been saved. All saved posts can be accessed later through the \'Saved Posts\' section in your Settings menu. This feature allows you to create a personal library of valuable discussions, important announcements, useful tutorials, or any content you wish to revisit. Saved posts remain accessible until you manually unsave them.</string>
+    
+    <string name="help_topic_search_title">How do I search for specific topics or discussions?</string>
+    <string name="help_topic_search_content">The search functionality is accessible via the search icon in the top navigation bar or the dedicated Search tab in the bottom navigation menu. Tap the search field and enter keywords, topic names, user names, or specific phrases related to the content you seek. The search algorithm will scan post titles, content body, comments, tags, and user profiles to return relevant results. You may filter search results by category, date range, post type, or vote score using the filter options. Advanced search features allow you to search within specific topic categories, find posts by particular users, or locate discussions from specific time periods.</string>
+    
+    <string name="help_topic_edit_profile_title">How do I edit my profile information?</string>
+    <string name="help_topic_edit_profile_content">To modify your profile details, navigate to the Settings screen from the home menu and select \'Edit Profile.\' You will be able to update your profile picture by uploading a new image, modify your display name, update your biography or personal description, change your academic role designation, and adjust your profile visibility settings. After making your desired changes, tap the \'Save\' button to apply the updates. Note that certain information such as your email address may require additional verification if changed. Your profile changes will be immediately visible to other community members unless you have restricted profile visibility in your privacy settings.</string>
+    
+    <string name="help_topic_message_title">How do I send private messages to other users?</string>
+    <string name="help_topic_message_content">To initiate a private conversation with another member, navigate to their profile by tapping their username from any post or comment. On their profile page, locate and tap the \'Message\' or envelope icon to open a private chat. Type your message in the input field at the bottom of the conversation screen and tap send. All private messages are end-to-end encrypted to ensure confidentiality. You can access all your ongoing conversations through the \'Chats\' tab in the bottom navigation menu. Message notifications can be customized in your notification settings to alert you of new messages.</string>
+    
+    <string name="help_topic_report_title">How do I report inappropriate content or behavior?</string>
+    <string name="help_topic_report_content">If you encounter content or user behavior that violates community guidelines, you can report it by tapping the three-dot menu (⋮) on any post or comment and selecting \'Report.\' Choose the most appropriate violation category from the list provided (e.g., harassment, spam, misinformation, inappropriate content). You may optionally provide additional context or details to help moderators understand the issue. Your report will be submitted anonymously to the moderation team for review. The team will investigate the matter and take appropriate action according to platform policies. You will receive confirmation that your report was received, and serious violations will be addressed promptly.</string>
+    
+    <string name="help_topic_reset_pass_title">How do I reset my password or recover my account?</string>
+    <string name="help_topic_reset_pass_content">If you have forgotten your password or are unable to access your account, navigate to the login screen and tap the \'Forgot Password?\' link located below the password input field. Enter your registered email address and tap \'Submit.\' You will receive an email containing a 6-digit verification code. Enter this code on the verification screen to confirm your identity. After successful verification, you will be prompted to create a new password. Ensure your new password meets the security requirements (minimum length, complexity). Once set, you can immediately log in using your new credentials. If you do not receive the verification email, check your spam folder or request a new code.</string>
+    
+    <string name="help_topic_dark_mode_title">How do I enable dark mode?</string>
+    <string name="help_topic_dark_mode_content">Dark mode provides a darker color scheme that is easier on the eyes in low-light conditions and may help conserve battery life on devices with OLED screens. To enable dark mode, navigate to the Settings screen from the main menu and locate the \'Dark Mode\' toggle switch in the preferences section. Tap the switch to enable dark mode, and the interface will immediately transition to the dark theme. All colors, backgrounds, and text will adjust to the darker palette while maintaining readability and visual hierarchy. You can disable dark mode at any time by toggling the same switch. Your dark mode preference is saved and will persist across app sessions.</string>
+    
+    <string name="help_topic_categories_title">What are topic categories and how do I use them?</string>
+    <string name="help_topic_categories_content">Topic categories are organizational structures that group related discussions together, making it easier for users to find relevant content. When creating a new post, you must select the most appropriate category (e.g., Biology, Computer Science, Mathematics, Campus Events). This categorization helps other users discover your post when browsing specific subjects. You can explore posts within particular categories by using the category filter on the home screen or search page. Each category may have specific guidelines or posting requirements, so review the category description before posting. Proper categorization is essential for maintaining an organized and navigable community.</string>
+    
+    <string name="help_topic_violation_title">What happens if I violate community guidelines?</string>
+    <string name="help_topic_violation_content">Violations of community guidelines are taken seriously and result in progressive enforcement actions. For minor first-time violations, you will receive an official warning, and the offending content will be removed. The warning will be documented in your account record. Repeated violations or disregard for platform rules will result in temporary account suspension, with the duration determined by the severity and frequency of infractions. During suspension, you will be unable to post, comment, or interact with the community, though you may still view content. Serious violations such as harassment, threats, sharing illegal content, or severe academic dishonesty may result in immediate permanent account termination. All enforcement decisions can be appealed to the moderation team by contacting support.</string>
+    
+    <string name="help_topic_about_title">What is Forumus and who can use it?</string>
+    <string name="help_topic_about_content">Forumus is an internal academic discussion platform developed exclusively for members of the University of Science – Vietnam National University Ho Chi Minh City. The platform is designed to provide a secure, professional, and collaborative environment where students, faculty members, lecturers, and academic staff can engage in meaningful discussions, share knowledge, ask questions, and support each other\'s learning journey. Access to Forumus requires a valid university email address and is restricted to verified members of the university community. The platform facilitates academic exchange across all disciplines and departments while maintaining high standards of discourse and respect.</string>
+
+    <!-- Community Guidelines -->
+    <string name="title_community_guidelines">Community Guidelines</string>
+    <string name="community_hero_title">Building a Respectful\nAcademic Community</string>
+    <string name="community_hero_subtitle">These guidelines help maintain a safe, professional, and friendly environment for all members of our academic community.</string>
+    <string name="footer_last_updated">Last updated: %s</string>
+    <string name="footer_contact_us">Questions? Contact us</string>
+    <string name="toast_contact_support_soon">Contact support - Coming Soon</string>
+
+    <!-- Guideline Sections -->
+    <string name="guideline_respect_title">Respectful Conduct and Civil Discourse</string>
+    <string name="guideline_respect_1">All members are required to treat fellow participants with utmost respect, courtesy, and professionalism in all interactions within the platform</string>
+    <string name="guideline_respect_2">Harassment, intimidation, bullying, personal attacks, or any form of abusive behavior directed toward other members is strictly prohibited and will result in immediate action</string>
+    <string name="guideline_respect_3">When engaging in disagreements or debates, members must maintain a constructive and professional tone, focusing on ideas rather than individuals</string>
+    <string name="guideline_respect_4">The use of hate speech, discriminatory language, offensive slurs, or any form of communication that targets individuals based on race, ethnicity, gender, religion, sexual orientation, disability, or other protected characteristics is expressly forbidden</string>
+    <string name="guideline_respect_5">Members are expected to acknowledge and respect diverse perspectives, opinions, and backgrounds, fostering an inclusive environment conducive to academic growth and intellectual exchange</string>
+    <string name="guideline_respect_6">All communication should be conducted in a manner that upholds the dignity and academic integrity of the University of Science community</string>
+
+    <string name="guideline_content_title">Content Submission Standards and Guidelines</string>
+    <string name="guideline_content_1">All posts and contributions must remain relevant to the designated topic category and adhere to the academic focus of the respective discussion area</string>
+    <string name="guideline_content_2">Post titles must be clear, descriptive, and accurately reflect the content being shared, enabling efficient navigation and search functionality for all users</string>
+    <string name="guideline_content_3">The posting of spam, unsolicited advertisements, excessive self-promotion, misleading clickbait, or repetitive content is strictly prohibited</string>
+    <string name="guideline_content_4">Members are required to utilize appropriate topic tags and categories to ensure proper content organization and enhance discoverability for the community</string>
+    <string name="guideline_content_5">Quality of contribution is prioritized over quantity; members are encouraged to thoughtfully compose their posts and comments before submission</string>
+    <string name="guideline_content_6">Prior to creating a new discussion thread, members should utilize the search functionality to verify that similar topics have not already been addressed</string>
+    <string name="guideline_content_7">All content should contribute meaningfully to academic discourse and align with the educational mission of the platform</string>
+    <string name="guideline_content_8">Members must ensure that their contributions are well-researched, factually accurate, and presented in a clear, professional manner</string>
+
+    <string name="guideline_prohibited_title">Prohibited Content and Activities</string>
+    <string name="guideline_prohibited_1">The posting, sharing, or promotion of any illegal content, activities, or materials that violate local, national, or international laws is absolutely prohibited</string>
+    <string name="guideline_prohibited_2">Adult content, not safe for work (NSFW) materials, sexually explicit content, or any form of inappropriate material is strictly forbidden on this platform</string>
+    <string name="guideline_prohibited_3">Content depicting graphic violence, gore, disturbing imagery, or materials intended to shock or distress other members will not be tolerated</string>
+    <string name="guideline_prohibited_4">The sharing, soliciting, or distributing of personal identifying information (doxxing) of any individual, whether a member of this community or otherwise, is expressly prohibited</string>
+    <string name="guideline_prohibited_5">The deliberate spreading of misinformation, disinformation, false news, unverified claims, or conspiracy theories is not permitted</string>
+    <string name="guideline_prohibited_6">Plagiarism, academic dishonesty, cheating facilitation, sharing of examination materials, or any activities that compromise academic integrity are strictly forbidden and may result in reporting to university authorities</string>
+    <string name="guideline_prohibited_7">Content that promotes dangerous activities, self-harm, or poses a threat to the safety and well-being of community members will be removed immediately</string>
+
+    <string name="guideline_security_title">Account Security and Authentication Policies</string>
+    <string name="guideline_security_1">Each individual member is permitted to maintain only one active account on the platform; the creation of multiple accounts for the purpose of circumventing restrictions or manipulating content is prohibited</string>
+    <string name="guideline_security_2">Impersonation of other individuals, including but not limited to students, faculty members, administrators, or public figures, is strictly forbidden</string>
+    <string name="guideline_security_3">Members are responsible for maintaining the security and confidentiality of their login credentials, including passwords and authentication information</string>
+    <string name="guideline_security_4">Any suspicious activity, unauthorized access attempts, security vulnerabilities, or potential breaches must be reported to the platform administrators immediately</string>
+    <string name="guideline_security_5">The sharing of account credentials with other individuals or allowing unauthorized access to your account is not permitted</string>
+    <string name="guideline_security_6">Members should utilize strong, unique passwords and enable all available security features to protect their accounts from unauthorized access</string>
+
+    <string name="guideline_ip_title">Intellectual Property Rights and Attribution</string>
+    <string name="guideline_ip_1">All members must respect and adhere to copyright laws, intellectual property rights, and academic attribution standards when sharing content on the platform</string>
+    <string name="guideline_ip_2">Proper citation and attribution must be provided for all quoted material, referenced works, external sources, and intellectual contributions of others</string>
+    <string name="guideline_ip_3">Plagiarism in any form, including the unauthorized use of others\' work without proper attribution, is strictly prohibited and constitutes a serious violation of academic integrity</string>
+    <string name="guideline_ip_4">Members may only post images, media files, documents, or other materials for which they possess appropriate rights, licenses, or permissions to share</string>
+    <string name="guideline_ip_5">When sharing copyrighted material, members must comply with fair use principles and applicable copyright exceptions for educational purposes</string>
+    <string name="guideline_ip_6">Original research, creative works, and intellectual contributions should be properly credited to their authors and creators</string>
+    <string name="guideline_ip_7">Any instances of copyright infringement or intellectual property violations should be reported to platform administrators for appropriate action</string>
+
+    <string name="guideline_moderation_title">Moderation Procedures and Enforcement Actions</string>
+    <string name="guideline_moderation_1">Platform moderators and administrators reserve the right to review, edit, relocate, or remove any content that violates these community guidelines or disrupts the platform\'s academic mission</string>
+    <string name="guideline_moderation_2">First-time violations of minor nature will typically result in an official warning and the removal of the offending content, with documentation maintained in the user\'s account record</string>
+    <string name="guideline_moderation_3">Repeated violations of community guidelines or persistent disregard for platform rules will result in temporary account suspension, with duration determined by the severity and frequency of infractions</string>
+    <string name="guideline_moderation_4">Serious violations, including but not limited to harassment, threats, doxxing, illegal content sharing, or severe academic dishonesty, may result in immediate and permanent account termination</string>
+    <string name="guideline_moderation_5">Members who disagree with moderation decisions may submit formal appeals to the platform administration team for review and reconsideration</string>
+    <string name="guideline_moderation_6">All enforcement actions are documented and may be shared with university administration in cases involving serious policy violations or potential threats to community safety</string>
+    <string name="guideline_moderation_7">The moderation team operates independently and impartially, applying these guidelines consistently across all members regardless of status or affiliation</string>
+
+    <string name="guideline_reporting_title">Violation Reporting Mechanisms and Procedures</string>
+    <string name="guideline_reporting_1">Members who observe content or behavior that violates these community guidelines are encouraged to utilize the platform\'s reporting functionality to bring such matters to the attention of moderators</string>
+    <string name="guideline_reporting_2">The reporting mechanism can be accessed via the report button or flag icon located on all posts, comments, and user profiles throughout the platform</string>
+    <string name="guideline_reporting_3">When submitting a report, members should provide specific, detailed information regarding the nature of the violation, including relevant context and evidence when available</string>
+    <string name="guideline_reporting_4">All reports are reviewed thoroughly by the moderation team in accordance with established procedures and timelines, with appropriate action taken based on the findings</string>
+    <string name="guideline_reporting_5">The platform provides anonymous reporting options for members who wish to report violations without revealing their identity, ensuring protection for those who raise concerns</string>
+    <string name="guideline_reporting_6">False or malicious reports submitted with the intent to harass other members or abuse the reporting system will be investigated and may result in disciplinary action against the reporting party</string>
+    <string name="guideline_reporting_7">Members will receive confirmation when their reports are received and may be contacted if additional information is required for the investigation</string>
+
+    <string name="guideline_privacy_title">Privacy Expectations and Data Protection</string>
+    <string name="guideline_privacy_1">Members should be aware that profile information, including name, email address, role designation, and biography, is visible to other authenticated members of the platform</string>
+    <string name="guideline_privacy_2">All posts, comments, and contributions made by members become part of the public record and are accessible to other community members indefinitely unless deleted</string>
+    <string name="guideline_privacy_3">Private messaging functionality employs end-to-end encryption to ensure the confidentiality and security of direct communications between members</string>
+    <string name="guideline_privacy_4">Members are strongly advised to review the platform\'s comprehensive Privacy Policy for detailed information regarding data collection, storage, processing, and protection practices</string>
+    <string name="guideline_privacy_5">Profile visibility settings and privacy controls are available within account settings, allowing members to customize what information is shared with the broader community</string>
+    <string name="guideline_privacy_6">The platform does not sell, share, or distribute personal member information to third parties without explicit consent, except as required by law or university policy</string>
+    <string name="guideline_privacy_7">Members should exercise discretion when sharing personal information in public posts or discussions and are responsible for their own privacy management</string>
+
+    <string name="guideline_updates_title">Guideline Amendments and Policy Updates</string>
+    <string name="guideline_updates_1">The platform administration reserves the right to modify, update, or amend these community guidelines at any time in response to evolving community needs, legal requirements, or operational considerations</string>
+    <string name="guideline_updates_2">All registered members will receive notification via email and in-platform announcements when significant changes to these guidelines are implemented</string>
+    <string name="guideline_updates_3">Continued use of the platform following the implementation of updated guidelines constitutes acceptance of and agreement to abide by the revised policies</string>
+    <string name="guideline_updates_4">Members are encouraged to review these community guidelines periodically to ensure familiarity with current standards and expectations</string>
+    <string name="guideline_updates_5">Questions, concerns, or suggestions regarding these guidelines may be directed to the platform administration team through official communication channels</string>
+    <string name="guideline_updates_6">The most current version of these guidelines will always be available through the Settings menu and will include the date of last revision for reference</string>
     <string name="violation_scam_name">Scam - Fraud</string>
     <string name="violation_scam_desc">Attempts to deceive users for financial or personal gain. Fake giveaways, phishing links, impersonation of admins/moderators. Requests money, account info, or sensitive data under false pretenses. Posts promoting fraudulent services.</string>
     
@@ -242,4 +389,21 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="default_notification_channel_id">general_notification_channel</string>
+    <!-- About Forumus -->
+    <string name="title_about_forumus">About Forumus</string>
+    <string name="app_subtitle">Academic Discussion Platform</string>
+    <string name="about_platform_title">About This Platform</string>
+    <string name="about_platform_desc_1">Forumus is an internal online forum developed specifically for members of the University of Science – Vietnam National University Ho Chi Minh City.</string>
+    <string name="about_platform_desc_2">The platform is designed to provide a safe, professional, and friendly academic discussion space where students, lecturers, and academic staff can connect and collaborate.</string>
+    <string name="about_features_title">Key Features</string>
+    <string name="about_feature_1">Share academic information and resources</string>
+    <string name="about_feature_2">Discuss learning and research-related topics</string>
+    <string name="about_feature_3">Support and help each other throughout study and research</string>
+    <string name="about_team_title">Development Team</string>
+    <string name="about_developed_by">Developed by:</string>
+    <string name="about_team_name">Forumus Development Team</string>
+    <string name="about_affiliation">Affiliation:</string>
+    <string name="about_university_name">University of Science – Vietnam National University Ho Chi Minh City</string>
+    <string name="about_copyright">© 2025 Forumus Development Team</string>
+    <string name="about_disclaimer">This application is developed for academic purposes only and is not intended for commercial use.</string>
 </resources>
