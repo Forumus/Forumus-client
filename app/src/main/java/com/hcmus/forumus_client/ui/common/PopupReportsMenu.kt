@@ -21,48 +21,49 @@ class PopupReportsMenu(
     var onViolationSelected: ((Violation) -> Unit)? = null
 
     // List of violation options
-    private val violations: List<Violation> = listOf(
-        Violation(
-            id = "vio_001",
-            name = "Scam - Fraud",
-            description = "Attempts to deceive users for financial or personal gain. Fake giveaways, phishing links, impersonation of admins/moderators. Requests money, account info, or sensitive data under false pretenses. Posts promoting fraudulent services."
-        ),
-        Violation(
-            id = "vio_002",
-            name = "Violence, Hate Speech",
-            description = "Encourages violence or threats. Insults or discriminates based on race, gender, religion, etc."
-        ),
-        Violation(
-            id = "vio_003",
-            name = "Inappropriate Content",
-            description = "Contains vulgar, offensive, or explicit materials. NSFW/18+ content not for educational purposes."
-        ),
-        Violation(
-            id = "vio_004",
-            name = "Misinformation",
-            description = "Spreads false or unverified information. Misleading claims that cause confusion."
-        ),
-        Violation(
-            id = "vio_005",
-            name = "Illegal Content",
-            description = "Promotes hacking, cracking, gambling, drugs, weapons, etc."
-        ),
-        Violation(
-            id = "vio_006",
-            name = "Harassment - Abusive Language",
-            description = "Personal attacks or insults. Toxic communication targeting individuals or groups."
-        ),
-        Violation(
-            id = "vio_007",
-            name = "Privacy Violation (Doxxing)",
-            description = "Reveals personal data such as phone numbers, addresses, ID numbers. Exposes private information without consent."
-        ),
-        Violation(
-            id = "vio_008",
-            name = "Copyright Violation",
-            description = "Copies content without credit. Uploads copyrighted media without permission."
+    private val violations: List<Violation>
+        get() = listOf(
+            Violation(
+                id = "vio_001",
+                name = activity.getString(R.string.violation_scam_name),
+                description = activity.getString(R.string.violation_scam_desc)
+            ),
+            Violation(
+                id = "vio_002",
+                name = activity.getString(R.string.violation_violence_name),
+                description = activity.getString(R.string.violation_violence_desc)
+            ),
+            Violation(
+                id = "vio_003",
+                name = activity.getString(R.string.violation_inappropriate_name),
+                description = activity.getString(R.string.violation_inappropriate_desc)
+            ),
+            Violation(
+                id = "vio_004",
+                name = activity.getString(R.string.violation_misinfo_name),
+                description = activity.getString(R.string.violation_misinfo_desc)
+            ),
+            Violation(
+                id = "vio_005",
+                name = activity.getString(R.string.violation_illegal_name),
+                description = activity.getString(R.string.violation_illegal_desc)
+            ),
+            Violation(
+                id = "vio_006",
+                name = activity.getString(R.string.violation_harassment_name),
+                description = activity.getString(R.string.violation_harassment_desc)
+            ),
+            Violation(
+                id = "vio_007",
+                name = activity.getString(R.string.violation_privacy_name),
+                description = activity.getString(R.string.violation_privacy_desc)
+            ),
+            Violation(
+                id = "vio_008",
+                name = activity.getString(R.string.violation_copyright_name),
+                description = activity.getString(R.string.violation_copyright_desc)
+            )
         )
-    )
 
     /**
      * Displays the reports menu at the specified anchor view position.

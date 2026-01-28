@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.os.LocaleListCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply saved theme before super.onCreate()
         applyTheme()
+        applyLocale()
         
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -266,6 +268,23 @@ class MainActivity : AppCompatActivity() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+    }
+
+    /**
+     * Apply the saved language preference from SharedPreferences.
+     * Ensures that if the app is restarted, the correct language is applied.
+     */
+    private fun applyLocale() {
+        val preferencesManager = PreferencesManager(application)
+        val language = preferencesManager.language
+        val code = if (language.equals("Vietnamese", ignoreCase = true) || language == "vi") "vi" else "en"
+        
+        // Sync with AppCompatDelegate if needed (e.g. fresh install or data clear)
+        val currentAppLocales = AppCompatDelegate.getApplicationLocales()
+        if (currentAppLocales.isEmpty) {
+             val appLocale = LocaleListCompat.forLanguageTags(code)
+             AppCompatDelegate.setApplicationLocales(appLocale)
         }
     }
     

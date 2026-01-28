@@ -421,7 +421,7 @@ class PostViewHolder(
                     diffMs < 60 * 60 * 1000 -> "${diffMs / (60 * 1000)}m"
                     diffMs < 24 * 60 * 60 * 1000 -> "${diffMs / (60 * 60 * 1000)}h"
                     diffMs < 7 * 24 * 60 * 60 * 1000 -> "${diffMs / (24 * 60 * 60 * 1000)}d"
-                    else -> SimpleDateFormat("MMM dd", Locale.getDefault()).format(date)
+                    else -> SimpleDateFormat(itemView.context.getString(R.string.date_format_short_month_day), Locale.getDefault()).format(date)
                 }
             } catch (e: Exception) {
                 Log.e("PostViewHolder", "Error formatting timestamp", e)

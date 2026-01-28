@@ -17,7 +17,7 @@
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select Topics"
+            android:text="@string/select_topics_title"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_title"
-            android:text="Choose up to 5 topics"
+            android:text="@string/select_topics_subtitle"
             android:textColor="@color/primary_tonal"
             android:textSize="12sp" />
 
@@ -71,7 +71,7 @@
                 android:id="@+id/tv_ai_emoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="✨ "
+                android:text="@string/sparkle_emoji"
                 android:textSize="18sp"
                 android:textColor="#FFFFFF"/>
 
@@ -79,7 +79,7 @@
                 android:id="@+id/tv_ai_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AI Topic Suggestion"
+                android:text="@string/ai_topic_suggestion"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
@@ -101,7 +101,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="10dp"
         android:backgroundTint="@color/primary"
-        android:text="Done"
+        android:text="@string/done"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
         android:textSize="16sp"

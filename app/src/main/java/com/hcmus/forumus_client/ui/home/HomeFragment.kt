@@ -388,8 +388,14 @@ class HomeFragment : Fragment() {
             // Ideally we set it as a tag in populateTopics.
             val topicId = itemView.tag as? String ?: continue
 
+            val iconView = itemView.getChildAt(0) as? ImageView
+            val textView = itemView.getChildAt(1) as? TextView
+
             if (selectedTopics.contains(topicId)) {
                 itemView.setBackgroundColor(requireContext().getColor(R.color.filter_selected_bg))
+                textView?.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                textView?.setTextColor(requireContext().getColor(R.color.primary))
+                iconView?.setColorFilter(requireContext().getColor(R.color.primary))
             } else {
                 val typedValue = TypedValue()
                 requireActivity()
@@ -400,6 +406,9 @@ class HomeFragment : Fragment() {
                 } else {
                     itemView.setBackgroundResource(0)
                 }
+                textView?.typeface = android.graphics.Typeface.DEFAULT
+                textView?.setTextColor(requireContext().getColor(R.color.text_primary))
+                iconView?.clearColorFilter()
             }
         }
     }
