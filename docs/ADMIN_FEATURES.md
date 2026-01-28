@@ -678,6 +678,175 @@ flowchart TD
 
 ---
 
+### 3.14 Topic Management
+
+**Description:**  
+The Topic Management feature provides administrators with comprehensive CRUD (Create, Read, Update, Delete) operations for managing forum topics and categories. Topics are used to organize posts and are displayed in charts, filters, and post metadata throughout the application. This feature is accessible directly from the Dashboard screen.
+
+**Key Components:**
+
+- **Topic List Display**: View all existing topics with names, descriptions, and post counts
+- **Add Topic**: Create new topics with validation for duplicate names
+- **Edit Topic**: Modify topic names and descriptions
+- **Delete Topic**: Remove topics with cascade handling for associated posts
+- **Post Count Tracking**: Real-time display of posts associated with each topic
+- **Validation**: Prevent duplicate topic names and empty fields
+
+**Features:**
+
+- Access via "Manage Topics" button on Dashboard (below pie chart)
+- Topic list with name, description, and post count display
+- Add new topic with name and description fields
+- Edit existing topic information
+- Delete topic with confirmation dialog
+- Post count badge for each topic
+- Input validation (no duplicates, required fields)
+- Real-time sync with Firebase Firestore
+- Automatic pie chart update after changes
+
+```mermaid
+flowchart TD
+    A[Dashboard Screen] --> B[Click Manage Topics Button]
+    B --> C[Load Topics from Firebase]
+    C --> D[Display Topic Management Dialog]
+    
+    D --> E{User Action}
+    
+    E -->|Add Topic| F[Show Add Topic Dialog]
+    F --> G[Enter Name & Description]
+    G --> H{Validate Input}
+    H -->|Valid| I[Check for Duplicates]
+    H -->|Invalid| J[Show Error Message]
+    I -->|Unique| K[Create Topic in Firebase]
+    I -->|Duplicate| J
+    K --> L[Refresh Topic List]
+    
+    E -->|Edit Topic| M[Show Edit Topic Dialog]
+    M --> N[Modify Name/Description]
+    N --> O{Validate Input}
+    O -->|Valid| P[Update Topic in Firebase]
+    O -->|Invalid| J
+    P --> L
+    
+    E -->|Delete Topic| Q[Show Delete Confirmation]
+    Q -->|Confirm| R[Delete Topic from Firebase]
+    Q -->|Cancel| D
+    R --> S[Update Posts with Topic]
+    S --> L
+    
+    E -->|Close| T[Update Dashboard Pie Chart]
+    
+    L --> D
+```
+
+**Related Screens:**
+
+- Dashboard (source and return)
+- Total Posts Screen (topics used in filters)
+- Post Detail Screen (topics displayed as tags)
+- AI Moderation Screen (topics shown in post cards)
+
+**Data Structure:**
+
+**Topic Document (Firestore):**
+```
+{
+  "id": "auto-generated",
+  "name": "Technology",
+  "description": "Posts about technology and innovation",
+  "createdAt": Timestamp,
+  "updatedAt": Timestamp
+}
+```
+
+**Business Rules:**
+
+1. **Topic Name Uniqueness**: No two topics can have the same name (case-insensitive)
+2. **Required Fields**: Both name and description are mandatory
+3. **Cascade Behavior**: When a topic is deleted, posts with that topic remain but topic reference is removed
+4. **Post Count**: Calculated dynamically by counting posts with matching topic
+5. **Character Limits**: 
+   - Name: 3-50 characters
+   - Description: 10-200 characters
+
+**Operations:**
+
+**1. View Topics List:**
+- Displays all topics in a scrollable list/dialog
+- Shows topic name, description snippet, and post count badge
+- Sorted by creation date (newest first) or alphabetically
+
+**2. Add New Topic:**
+- Opens dialog with two text input fields (Name, Description)
+- Validates inputs before submission
+- Checks for duplicate names in Firestore
+- Creates new document in `topics` collection
+- Refreshes topic list and pie chart
+
+**3. Edit Topic:**
+- Opens pre-filled dialog with current topic data
+- Allows modification of name and description
+- Re-validates inputs including duplicate check (excluding current topic)
+- Updates Firestore document
+- Refreshes displays
+
+**4. Delete Topic:**
+- Shows confirmation dialog with topic name and post count
+- Warning message if topic has associated posts
+- Deletes topic document from Firestore
+- Option to reassign posts to another topic (advanced implementation)
+- Refreshes topic list and pie chart
+
+**Screenshot Descriptions:**
+
+1. **Topic Management Dialog - List View**: Dialog showing scrollable list of topics with names, descriptions, post count badges (e.g., "15 posts"), edit/delete icons for each row, and "Add New Topic" button at bottom
+2. **Add Topic Dialog**: Modal with two text fields labeled "Topic Name" and "Topic Description", Cancel and Add buttons, input field borders in primary color
+3. **Add Topic - Validation Error**: Same dialog showing red error text "Topic name already exists" or "Name is required" below name field
+4. **Edit Topic Dialog**: Pre-filled dialog with existing topic data, "Edit Topic" title, Update and Cancel buttons
+5. **Delete Topic Confirmation**: Alert dialog with title "Delete Topic?", message showing topic name and warning "This topic has 12 posts. Continue?", Cancel and Delete buttons (red)
+6. **Topic List with Post Counts**: Each topic row showing badge with number like "8 posts" in a colored pill/chip
+7. **Empty Topics State**: Dialog showing "No topics yet. Create your first topic!" message with illustration
+8. **Topic Successfully Added Toast**: Toast/Snackbar notification "Topic added successfully" at bottom of screen
+9. **Topic List After Deletion**: Updated list with deleted topic removed and pie chart refreshed in background
+10. **Long Topic List Scrolling**: Dialog with 10+ topics demonstrating scroll behavior
+
+**Integration Points:**
+
+1. **Dashboard Pie Chart**: 
+   - Fetches topics for chart segments
+   - Updates automatically when topics change
+   - Shows post distribution by topic
+
+2. **Post Filters**:
+   - Total Posts Screen uses topics for filtering
+   - AI Moderation Screen shows topics on post cards
+   - Reported Posts display topic tags
+
+3. **Post Creation/Editing** (Client App):
+   - Users select from available topics when creating posts
+   - Topic dropdown populated from this collection
+
+4. **Analytics**:
+   - Dashboard statistics include topic-based metrics
+   - Bar chart can be filtered by topic (future enhancement)
+
+**Error Handling:**
+
+- **Duplicate Topic Name**: "A topic with this name already exists"
+- **Empty Fields**: "Topic name and description are required"
+- **Firebase Error**: "Failed to save topic. Please try again"
+- **Delete Failure**: "Cannot delete topic. Please try again"
+- **Network Error**: "No internet connection. Changes will sync when online"
+
+**Performance Considerations:**
+
+- Topics are cached with dashboard data (5-minute expiration)
+- Maximum 50 topics recommended for optimal pie chart display
+- Lazy loading for topic lists with 20+ items
+- Debounced validation for duplicate name checking
+
+---
+
 ## Libraries & Dependencies Summary
 
 | Library              | Version    | Purpose                 |
