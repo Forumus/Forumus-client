@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:paddingHorizontal="16dp"
     android:paddingVertical="12dp"
-    android:text="Header"
+    android:text="@string/notification_header"
     android:textSize="18sp"
     android:textStyle="bold"
     android:textColor="@color/text_primary"

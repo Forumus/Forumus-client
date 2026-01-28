@@ -227,7 +227,7 @@ class ProfileFragment : Fragment() {
     private fun observeViewModel() {
         // Update profile header with user information
         viewModel.user.observe(viewLifecycleOwner) { user ->
-            binding.username.text = user.fullName.ifBlank { "Anonymous" }
+            binding.username.text = user.fullName.ifBlank { getString(R.string.anonymous) }
             binding.userEmail.text = user.email
 
             binding.userAvatar.load(user.profilePictureUrl) {

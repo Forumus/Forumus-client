@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_medium"
                     android:lineSpacingMultiplier="1.17"
-                    android:text="Anonymous"
+                    android:text="@string/anonymous"
                     android:textColor="@color/text_primary"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -99,7 +99,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
-                        android:text=" posts"
+                        android:text="@string/profile_stat_posts"
+                        android:layout_marginStart="4dp"
                         android:textColor="@color/text_tertiary"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -125,7 +126,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
-                        android:text=" replies"
+                        android:text="@string/profile_stat_replies"
+                        android:layout_marginStart="4dp"
                         android:textColor="@color/text_tertiary"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -150,7 +152,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
-                        android:text=" upvotes"
+                        android:text="@string/profile_stat_upvotes"
+                        android:layout_marginStart="4dp"
                         android:textColor="@color/text_tertiary"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -178,7 +181,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
-                        android:text="General"
+                        android:text="@string/profile_tab_general"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -196,7 +199,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
-                        android:text="Post"
+                        android:text="@string/profile_tab_post"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -213,7 +216,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_regular"
-                        android:text="Reply"
+                        android:text="@string/profile_tab_reply"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp" />
                 </LinearLayout>

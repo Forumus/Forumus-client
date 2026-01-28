@@ -40,7 +40,7 @@
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
                     android:layout_marginEnd="8dp"
-                    android:text="Section Title"
+                    android:text="@string/guideline_section_title"
                     android:textSize="16sp"
                     android:textColor="@color/text_primary"
                     android:fontFamily="@font/montserrat_semibold" />
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:layout_marginStart="40dp"
-                android:text="• Guideline 1\n• Guideline 2"
+                android:text="@string/guideline_content_placeholder"
                 android:textSize="14sp"
                 android:textColor="@color/text_primary"
                 android:fontFamily="@font/montserrat_regular"

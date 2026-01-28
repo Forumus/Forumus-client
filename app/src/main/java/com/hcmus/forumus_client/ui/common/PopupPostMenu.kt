@@ -22,7 +22,8 @@ class PopupPostMenu(
     var onReportClick: ((Violation) -> Unit)? = null
 
     // Text to display on the save button (default is "Save")
-    var saveButtonText: String = "Save"
+    // Text to display on the save button (default is "Save")
+    var saveButtonText: String = activity.getString(R.string.save)
 
     // Inner popup menu for violations
     private var reportsMenu: PopupReportsMenu? = null
