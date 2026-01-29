@@ -121,10 +121,10 @@ class HomeViewModel(
                 // Check for active filters
                 val selected = _selectedTopics.value ?: emptySet()
                 if (selected.isNotEmpty()) {
-                    // SERVER-SIDE FILTERING: Fetch only topics
-                    // Limitation: Only filtering by the first selected topic for now
-                    // due to Firestore limitations on 'OR' queries without complex client-merging.
-                    posts = postRepository.getPostsByTopic(selected.first(), pageSize)
+                    // SERVER-SIDE FILTERING: Fetch posts matching ANY of the selected topics
+                    // Limitation: Firestore whereArrayContainsAny only supports up to 10 values.
+                    // Our UI enforces a limit of 5, so this is safe.
+                    posts = postRepository.getPostsByTopics(selected.toList(), pageSize)
                     lastDoc = null // Pagination not yet implemented for topic search
                     hasMorePosts = false 
                 } else {
