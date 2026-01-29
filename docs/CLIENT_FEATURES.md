@@ -402,6 +402,113 @@ flowchart TD
     V --> C
 ```
 
+**Key Files:**
+
+| File | Purpose |
+|------|---------|
+| `CreatePostFragment.kt` | Main UI Fragment handling user interactions, media selection, and form submission |
+| `CreatePostViewModel.kt` | ViewModel managing post state, draft persistence, and post creation logic |
+| `PostRepository.kt` | Repository handling Firestore operations, media upload to Firebase Storage |
+| `fragment_create_post.xml` | Layout file defining the post creation form UI |
+| `LocationPickerBottomSheet.kt` | Bottom sheet for location search and nearby places selection |
+| `TopicAdapter.kt` | RecyclerView adapter for topic selection dialog |
+| `SelectedImageAdapter.kt` | Adapter displaying selected images/videos with delete functionality |
+| `NearbyPlacesAdapter.kt` | Adapter for displaying nearby places in location picker |
+
+**Implementation Details:**
+
+| Feature | Implementation |
+|---------|----------------|
+| **Multi-Media Upload** | Images/videos uploaded to Firebase Storage with UUID-based naming, thumbnails generated for videos |
+| **Photo/Video Capture** | Uses `ActivityResultContracts.TakePicture` and `CaptureVideo` with FileProvider for temp storage |
+| **Gallery Selection** | `PickMultipleVisualMedia` contract supporting up to 10 images/videos |
+| **Video Duration Limit** | Videos limited to 60 seconds, validated before adding to selection |
+| **Topic Selection** | Custom dialog with checkbox list, max 5 topics limit |
+| **AI Topic Suggestions** | Backend API `/api/posts/getSuggestedTopics` analyzes title/content for relevant topics |
+| **Location Tagging** | Google Places API integration with Autocomplete and nearby places search |
+| **Map Preview** | Custom marker with user avatar displayed on Google Maps |
+| **Draft Auto-Save** | SharedPreferences-based draft saving on `onPause()`, restored on fragment creation |
+| **Form Validation** | Post button enabled only when title and content are non-empty |
+
+**Data Flow - Create Post:**
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Fragment as CreatePostFragment
+    participant VM as CreatePostViewModel
+    participant Repo as PostRepository
+    participant Storage as Firebase Storage
+    participant Firestore as Firestore
+
+    User->>Fragment: Fill form & tap Post
+    Fragment->>VM: createPost(title, content, topics, location)
+    VM->>VM: Set Loading state
+    VM->>Repo: savePost(context, post)
+    
+    loop For each image
+        Repo->>Storage: Upload image
+        Storage-->>Repo: Image URL
+    end
+    
+    loop For each video
+        Repo->>Storage: Upload video
+        Storage-->>Repo: Video URL
+        Repo->>Repo: Generate thumbnail
+        Repo->>Storage: Upload thumbnail
+        Storage-->>Repo: Thumbnail URL
+    end
+    
+    Repo->>Repo: Generate Post ID (POST_yyyyMMdd_HHmmss_random)
+    Repo->>Firestore: Save post document
+    Firestore-->>Repo: Success
+    
+    loop For each topic
+        Repo->>Firestore: Increment topic postCount
+    end
+    
+    Repo-->>VM: Result.success(postId)
+    VM->>VM: Clear draft
+    VM->>Fragment: PostState.Success
+    Fragment->>User: Navigate to Home
+```
+
+**Post Data Model:**
+
+```kotlin
+data class Post(
+    var id: String = "",
+    var authorId: String = "",
+    var authorName: String = "",
+    var authorRole: UserRole = UserRole.STUDENT,
+    var authorAvatarUrl: String? = "",
+    var createdAt: Timestamp? = null,
+    var title: String = "",
+    var content: String = "",
+    var upvoteCount: Int = 0,
+    var downvoteCount: Int = 0,
+    var commentCount: Int = 0,
+    var imageUrls: MutableList<String> = mutableListOf(),
+    var videoUrls: MutableList<String> = mutableListOf(),
+    var videoThumbnailUrls: MutableList<String?> = mutableListOf(),
+    var votedUsers: MutableMap<String, VoteState> = mutableMapOf(),
+    var status: PostStatus = PostStatus.PENDING,
+    var topicIds: List<String> = emptyList(),
+    var locationName: String? = null,
+    var latitude: Double? = null,
+    var longitude: Double? = null
+)
+```
+
+**Draft Management:**
+
+| Action | Behavior |
+|--------|----------|
+| **Auto-Save** | Triggered on `onPause()` - saves title, content, location, topics, and image URIs to SharedPreferences |
+| **Restore** | On fragment creation, checks for existing draft and prompts user to restore |
+| **Clear** | Draft cleared on successful post submission or user discard action |
+| **Exit Handling** | Shows BottomSheetDialog with options: Save Draft / Discard / Continue Editing |
+
 **Related App Screens:**
 - Create Post Fragment
 - Location Picker Bottom Sheet
@@ -415,6 +522,8 @@ flowchart TD
 - `create_post_ai_topics.png`: AI-suggested topics displayed as chips
 - `create_post_location_picker.png`: Bottom sheet with location search and nearby places
 - `create_post_map_preview.png`: Map preview dialog showing selected location
+- `create_post_draft_dialog.png`: Exit confirmation dialog with draft options
+- `create_post_media_preview.png`: Horizontal scrollable list of selected images/videos
 
 ---
 
@@ -577,7 +686,7 @@ flowchart TD
 ### 3.1 Universal Search
 
 **Name:** Universal Search  
-**Short Description:** Unified search functionality to find posts and users with tabbed interface, search history, and filter suggestions.
+**Short Description:** Unified search functionality to find posts and users with tabbed interface, search history, trending topics, and Vietnamese text support with accent-insensitive matching.
 
 ```mermaid
 flowchart TD
@@ -595,16 +704,149 @@ flowchart TD
     J -->|User| L[User Profile]
 ```
 
+**Key Files:**
+
+| File | Purpose |
+|------|---------|
+| `SearchFragment.kt` | Main UI Fragment handling search input, tab switching, and result display |
+| `SearchViewModel.kt` | ViewModel managing search logic, history persistence, and trending topics |
+| `UserAdapter.kt` | RecyclerView adapter for displaying user search results |
+| `HomeAdapter.kt` | Reused adapter for displaying post search results |
+| `HistoryAdapter.kt` | Inner adapter class for search history list |
+| `fragment_search.xml` | Layout file with SearchView, TabLayout, and result RecyclerViews |
+| `item_user_search.xml` | Layout for individual user search result item |
+
+**Implementation Details:**
+
+| Feature | Implementation |
+|---------|----------------|
+| **Tabbed Search** | `TabLayout` with two tabs: "Posts" and "People", switches search mode and results display |
+| **Search Bar** | `SearchView` with dynamic query hint based on selected tab |
+| **Post Search** | Searches by post title and topic names (not IDs), uses client-side filtering |
+| **User Search** | Searches by full name and email, excludes admin accounts from results |
+| **Accent-Insensitive** | `Normalizer.NFD` removes Vietnamese diacritics for better matching (e.g., "Nguyễn" matches "nguyen") |
+| **Search History** | Separate history lists for posts and users, stored in SharedPreferences with max 5 items |
+| **Trending Topics** | Displays top 5 topics by post count as clickable chips |
+| **Topic Lookup Map** | Pre-loads topic ID→Name mapping for accurate search against topic names |
+| **Loading State** | ProgressBar shown during search operations |
+| **Empty State** | Shows "No results" message when search yields no matches |
+
+**Data Flow - Search Posts:**
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Fragment as SearchFragment
+    participant VM as SearchViewModel
+    participant Repo as PostRepository
+    participant Prefs as SharedPreferences
+
+    User->>Fragment: Type query & submit
+    Fragment->>VM: searchPosts(query)
+    VM->>VM: Add to history
+    VM->>Prefs: Save history
+    VM->>VM: Normalize query (remove accents)
+    VM->>Repo: searchPostsCandidates()
+    Repo-->>VM: List<Post> (up to 100)
+    
+    loop For each post
+        VM->>VM: Normalize title
+        VM->>VM: Lookup topic names from Map
+        VM->>VM: Check title OR topic match
+    end
+    
+    VM->>Fragment: postResults LiveData
+    Fragment->>User: Display filtered posts
+```
+
+**Data Flow - Search Users:**
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Fragment as SearchFragment
+    participant VM as SearchViewModel
+    participant Repo as UserRepository
+
+    User->>Fragment: Switch to People tab
+    User->>Fragment: Type query & submit
+    Fragment->>VM: searchUsers(query)
+    VM->>VM: Add to history & normalize query
+    VM->>Repo: searchUsersCandidates()
+    Repo-->>VM: List<User>
+    
+    loop For each user
+        VM->>VM: Normalize name & email
+        VM->>VM: Check name OR email match
+        VM->>VM: Exclude admin accounts
+    end
+    
+    VM->>Fragment: userResults LiveData
+    Fragment->>User: Display filtered users
+```
+
+**Search Algorithm:**
+
+```kotlin
+// Post Search - matches title OR topic name
+val filtered = allPosts.filter { post ->
+    val titleNorm = removeAccents(post.title)
+    val hasMatchingTopic = post.topicIds.any { topicId ->
+        val realName = topicNameMap[topicId] ?: topicId
+        val topicNameNorm = removeAccents(realName)
+        topicNameNorm.contains(normalizedQuery)
+    }
+    titleNorm.contains(normalizedQuery) || hasMatchingTopic
+}
+
+// User Search - matches fullName OR email
+val filtered = allUsers.filter { user ->
+    val nameNorm = removeAccents(user.fullName)
+    val emailNorm = removeAccents(user.email)
+    nameNorm.contains(normalizedQuery) || emailNorm.contains(normalizedQuery)
+}
+
+// Accent removal for Vietnamese support
+private fun removeAccents(str: String?): String {
+    val nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD)
+    val pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
+    return pattern.matcher(nfdNormalizedString).replaceAll("").lowercase().trim()
+}
+```
+
+**Search History Management:**
+
+| Action | Behavior |
+|--------|----------|
+| **Add Keyword** | New keyword added to front of list, duplicates removed |
+| **Max Items** | Limited to 5 most recent keywords per category |
+| **Storage** | JSON serialized to SharedPreferences with Gson |
+| **Separate Lists** | Posts and People have independent history lists |
+| **Click History** | Tapping history item auto-fills SearchView and executes search |
+
+**UI Components:**
+
+| Component | Description |
+|-----------|-------------|
+| **SearchView** | Material SearchView with custom background, dynamic hint |
+| **TabLayout** | Two-tab layout (Posts/People) with indicator and ripple effect |
+| **Trending Chips** | ChipGroup displaying trending topics with dynamic colors from topic config |
+| **History List** | Simple list with search icon prefix for recent keywords |
+| **Results RecyclerViews** | Separate RecyclerViews for posts and users, toggled by tab |
+| **BottomNavigationBar** | Standard app navigation with Explore tab active |
+
 **Related App Screens:**
 - Search Fragment
-- Post Detail Fragment
-- Profile Fragment
+- Post Detail Fragment (from post result)
+- Profile Fragment (from user result)
 
 **Screenshot Descriptions:**
 - `search_empty.png`: Search screen with empty state and search history
 - `search_posts_results.png`: Search results showing matching posts
-- `search_users_results.png`: Search results showing matching users
+- `search_users_results.png`: Search results showing matching users with avatar, name, email
 - `search_no_results.png`: Empty results state with no matches message
+- `search_trending.png`: Trending topics section with colored chips
+- `search_history.png`: Recent search history list with search icons
 
 ---
 
