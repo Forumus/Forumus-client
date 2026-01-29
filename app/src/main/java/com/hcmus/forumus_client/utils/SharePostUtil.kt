@@ -120,14 +120,12 @@ object SharePostUtil {
             val currentUser = userRepository.getCurrentUser()
             val currentUserId = currentUser?.uid
             
-            // Filter out current user from recipients
-            val recipients = if (currentUserId != null) {
-                allUsers.filter { it.uid != currentUserId }
-            } else {
-                allUsers
+            // Filter out current user and ADMIN users from recipients
+            val recipients = allUsers.filter { user ->
+                user.uid != currentUserId && user.role != UserRole.ADMIN
             }
             
-            Log.d(TAG, "Retrieved ${recipients.size} recipients from database (excluding current user)")
+            Log.d(TAG, "Retrieved ${recipients.size} recipients from database (excluding current user and admins)")
             recipients
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching recipients", e)
