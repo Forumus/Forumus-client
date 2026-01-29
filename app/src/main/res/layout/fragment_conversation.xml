@@ -142,7 +142,8 @@
         <LinearLayout
             android:id="@+id/input_layout"
             android:layout_width="0dp"
-            android:layout_height="65dp"
+            android:layout_height="wrap_content"
+            android:minHeight="65dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
@@ -175,18 +176,20 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 android:background="@drawable/button_secondary_background"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
                 android:layout_marginEnd="8dp">
 
                 <EditText
                     android:id="@+id/et_message"
                     android:layout_width="0dp"
-                    android:layout_height="20dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:hint="Message..."
@@ -195,7 +198,9 @@
                     android:textColor="@color/text_primary"
                     android:fontFamily="@font/montserrat_regular"
                     android:inputType="textCapSentences|textMultiLine"
-                    android:maxLines="1"
+                    android:maxLines="5"
+                    android:scrollbars="vertical"
+                    android:overScrollMode="always"
                     android:imeOptions="actionSend" />
 
             </LinearLayout>
