@@ -462,6 +462,7 @@
     <string name="original_post_fallback">Original Post</string>
     <string name="content_not_available">Content not available</string>
     <string name="notification_header">Notification</string>
+    <string name="error_video_duration">Video cannot be longer than 1 minutes</string>
 
     <!-- Explore/Search -->
     <string name="search_hint_posts">Search posts, topics...</string>
