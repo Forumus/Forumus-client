@@ -128,19 +128,23 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    // ... (Các phần searchUsers, History giữ nguyên không đổi) ...
     fun searchUsers(query: String) {
         if (query.isBlank()) { _userResults.value = emptyList(); return }
         addPeopleKeyword(query)
         _isLoading.value = true
         val normalizedQuery = removeAccents(query)
+
         viewModelScope.launch(Dispatchers.IO) {
             val allUsers = userRepository.searchUsersCandidates()
             val filtered = allUsers.filter { user ->
+                if (user.email == "admin@admin.forumus.me") {
+                    return@filter false
+                }
                 val nameNorm = removeAccents(user.fullName)
                 val emailNorm = removeAccents(user.email)
                 nameNorm.contains(normalizedQuery) || emailNorm.contains(normalizedQuery)
             }
+
             withContext(Dispatchers.Main) {
                 _userResults.value = filtered
                 _isLoading.value = false
