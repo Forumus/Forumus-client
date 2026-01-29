@@ -80,7 +80,14 @@ class CreatePostFragment : Fragment() {
     }
 
     private val takeVideoLauncher = registerForActivityResult(ActivityResultContracts.CaptureVideo()) { success ->
-        if (success) tempImageUri?.let { viewModel.addImages(listOf(it)); setBottomSheetState(false) }
+        if (success) tempImageUri?.let { uri ->
+            if (isVideoDurationValid(uri)) {
+                viewModel.addImages(listOf(uri))
+                setBottomSheetState(false)
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.error_video_duration), Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private val requestVideoPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -99,7 +106,21 @@ class CreatePostFragment : Fragment() {
     }
 
     private val pickMedia = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(10)) { uris ->
-        if (uris.isNotEmpty()) { viewModel.addImages(uris); setBottomSheetState(false) }
+        if (uris.isNotEmpty()) {
+            // Lọc ra các file hợp lệ
+            val validUris = uris.filter { isVideoDurationValid(it) }
+
+            // Nếu có file bị loại, báo lỗi
+            if (validUris.size < uris.size) {
+                Toast.makeText(requireContext(), getString(R.string.error_video_duration), Toast.LENGTH_LONG).show()
+            }
+
+            // Chỉ thêm các file hợp lệ vào list
+            if (validUris.isNotEmpty()) {
+                viewModel.addImages(validUris)
+                setBottomSheetState(false)
+            }
+        }
     }
 
     private val startAutocomplete = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -574,5 +595,26 @@ class CreatePostFragment : Fragment() {
         val isValid = binding.edtTitle.text.toString().trim().isNotEmpty() && binding.edtContent.text.toString().trim().isNotEmpty()
         binding.btnSubmitPost.isEnabled = isValid
         binding.btnSubmitPost.alpha = if (isValid) 1.0f else 0.3f
+    }
+
+    // Hàm kiểm tra video có dưới 2 phút (120000ms) không
+    private fun isVideoDurationValid(uri: Uri): Boolean {
+        return try {
+            val mimeType = requireContext().contentResolver.getType(uri)
+            // Nếu là video thì mới kiểm tra
+            if (mimeType?.startsWith("video") == true) {
+                val retriever = android.media.MediaMetadataRetriever()
+                retriever.setDataSource(requireContext(), uri)
+                val time = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION)
+                val timeInMillis = time?.toLong() ?: 0
+                retriever.release()
+                // 60000 ms = 1 phút
+                timeInMillis <= 60000
+            } else {
+                true // Là ảnh thì luôn hợp lệ
+            }
+        } catch (e: Exception) {
+            true // Nếu lỗi đọc file (do file lạ) thì tạm cho qua
+        }
     }
 }
