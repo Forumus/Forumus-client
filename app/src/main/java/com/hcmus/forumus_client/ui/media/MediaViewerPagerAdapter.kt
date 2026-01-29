@@ -5,12 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.MediaController
 import android.widget.VideoView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.request.CachePolicy
+import com.github.chrisbanes.photoview.PhotoView
 import com.hcmus.forumus_client.R
 import kotlin.math.min
 
@@ -39,7 +39,7 @@ class MediaViewerPagerAdapter : RecyclerView.Adapter<MediaViewerPagerAdapter.Med
     }
 
     class MediaPageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val ivMedia: ImageView = itemView.findViewById(R.id.ivMedia)
+        private val ivMedia: PhotoView = itemView.findViewById(R.id.ivMedia)
         private val vvMedia: VideoView = itemView.findViewById(R.id.vvMedia)
 
         fun bind(item: MediaViewerItem) {
@@ -49,9 +49,12 @@ class MediaViewerPagerAdapter : RecyclerView.Adapter<MediaViewerPagerAdapter.Med
                     vvMedia.stopPlayback()
                     ivMedia.visibility = View.VISIBLE
 
-                    // Use fit mode: preserve aspect ratio, do not crop or stretch
+                    // Configure PhotoView for zoom functionality
+                    ivMedia.maximumScale = 5.0f
+                    ivMedia.mediumScale = 2.5f
+                    ivMedia.minimumScale = 1.0f
                     ivMedia.adjustViewBounds = true
-                    ivMedia.scaleType = ImageView.ScaleType.FIT_CENTER
+                    ivMedia.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
 
                     ivMedia.load(item.imageUrl) {
                         crossfade(true)
