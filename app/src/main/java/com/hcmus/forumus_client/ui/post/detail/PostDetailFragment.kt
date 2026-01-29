@@ -97,11 +97,28 @@ class PostDetailFragment : Fragment() {
                     }
 
                     ProfileMenuAction.EDIT_PROFILE -> {
-                        // TODO: Implement edit profile navigation
+                        navController.navigate(R.id.editProfileFragment)
                     }
 
                     ProfileMenuAction.TOGGLE_DARK_MODE -> {
-                        // TODO: Implement theme toggle
+                        // Toggle dark mode preference
+                        val preferencesManager = com.hcmus.forumus_client.data.local.PreferencesManager(requireContext())
+                        val currentMode = preferencesManager.isDarkModeEnabled
+                        preferencesManager.isDarkModeEnabled = !currentMode
+
+                        // Apply new theme
+                        if (!currentMode) {
+                            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                                androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+                            )
+                        } else {
+                            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                                androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+                            )
+                        }
+
+                        // Update system status bar and navigation bar colors
+                        (activity as? com.hcmus.forumus_client.ui.main.MainActivity)?.updateStatusBarAppearance()
                     }
 
                     ProfileMenuAction.SETTINGS -> {
