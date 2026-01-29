@@ -442,6 +442,14 @@ class PostDetailViewModel(
     }
 
     /**
+     * Cancels the current reply action.
+     * Clears the target comment.
+     */
+    fun cancelReply() {
+        _replyTargetComment.value = null
+    }
+
+    /**
      * Handles expand/collapse action for a comment.
      *
      * For root comments (parentCommentId == null), toggles their expansion state

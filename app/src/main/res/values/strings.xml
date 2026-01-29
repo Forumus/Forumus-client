@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Forumus</string>
+    <string name="replying_to_format">Replying to %1$s</string>
 
     <!-- Registration screen -->
     <string name="app_logo">Forumus Logo</string>

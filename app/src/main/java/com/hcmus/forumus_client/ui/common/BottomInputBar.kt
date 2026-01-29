@@ -29,10 +29,19 @@ class BottomInputBar @JvmOverloads constructor(
      * Callback triggered when the user taps the send button.
      * Provides the trimmed input text. Empty strings are filtered out.
      */
+    /**
+     * Callback triggered when the user taps the send button.
+     * Provides the trimmed input text. Empty strings are filtered out.
+     */
     var onSendClick: ((String) -> Unit)? = null
 
+    /**
+     * Callback triggered when the user cancels the reply mode.
+     */
+    var onCancelReply: (() -> Unit)? = null
+
     init {
-        orientation = HORIZONTAL
+        orientation = VERTICAL // Changed to vertical to stack banner and input
 
         binding.btnSendComment.setOnClickListener {
             val text = getInputText().trim()
@@ -41,12 +50,44 @@ class BottomInputBar @JvmOverloads constructor(
                 clearInput()
             }
         }
+
+        binding.btnCancelReply.setOnClickListener {
+            hideReplyBanner()
+            onCancelReply?.invoke()
+        }
     }
 
     /** Updates the input field hint text. */
     fun setHint(hint: String) {
         binding.etCommentInput.hint = hint
     }
+
+    /**
+     * Shows the "Replying to <user>" banner above the input.
+     * @param username The name of the user being replied to.
+     */
+    fun showReplyBanner(username: String) {
+        binding.tvReplyContext.text = context.getString(
+            com.hcmus.forumus_client.R.string.replying_to_format, 
+            username
+        )
+        binding.replyBannerContainer.visibility = VISIBLE
+        binding.replyDivider.visibility = VISIBLE
+        focusAndShowKeyboard()
+    }
+
+    /**
+     * Hides the reply banner.
+     */
+    fun hideReplyBanner() {
+        binding.replyBannerContainer.visibility = GONE
+        binding.replyDivider.visibility = GONE
+    }
+    
+    /**
+     * Check if reply banner is visible
+     */
+    fun isReplying(): Boolean = binding.replyBannerContainer.visibility == VISIBLE
 
     /**
      * Requests focus on the input field and shows the soft keyboard.

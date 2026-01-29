@@ -1,68 +1,118 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    
     <LinearLayout
-        android:id="@+id/inputBar"
+        android:id="@+id/rootContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="65dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="13dp"
+        android:orientation="vertical"
         android:background="@color/surface">
 
+        <!-- Banner for Replied User -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/replyBannerContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="40dp"
-            android:layout_weight="1"
             android:orientation="horizontal"
-            android:background="@drawable/button_secondary_background"
-            android:gravity="center_vertical"
+            android:background="@color/bg_app"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp"
-            android:layout_marginEnd="8dp">
+            android:gravity="center_vertical"
+            android:visibility="gone">
 
-            <EditText
-                android:id="@+id/etCommentInput"
+            <TextView
+                android:id="@+id/tvReplyContext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:hint="Write a comment..."
-                android:textColorHint="@color/complementary_text"
-                android:textSize="14sp"
-                android:textColor="@color/text_primary"
-                android:fontFamily="@font/montserrat_regular"
-                android:inputType="textCapSentences|textMultiLine"
-                android:maxLines="5"
-                android:scrollbars="vertical"
-                android:overScrollMode="always"
-                android:imeOptions="actionSend" />
+                android:text="Replying to username"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:fontFamily="@font/montserrat_medium" />
+
+            <ImageButton
+                android:id="@+id/btnCancelReply"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_close"
+                android:contentDescription="Cancel reply"
+                app:tint="@color/text_tertiary" />
 
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="24dp"
-            android:layout_height="24dp">
+        <View
+            android:id="@+id/replyDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:visibility="gone"/>
 
-            <ImageButton
-                android:id="@+id/btnSendComment"
+        <!-- Input Area -->
+        <LinearLayout
+            android:id="@+id/inputBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="65dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="13dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:background="@drawable/button_secondary_background"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:layout_marginEnd="8dp">
+
+                <EditText
+                    android:id="@+id/etCommentInput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:hint="Write a comment..."
+                    android:textColorHint="@color/complementary_text"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLines="5"
+                    android:scrollbars="vertical"
+                    android:overScrollMode="always"
+                    android:imeOptions="actionSend" />
+
+            </LinearLayout>
+
+            <FrameLayout
                 android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_send"
-                android:contentDescription="Send"
-                app:tint="@color/text_tertiary" />
+                android:layout_height="24dp">
 
-            <ProgressBar
-                android:id="@+id/pb_sending"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                android:indeterminateTint="@color/text_tertiary" />
-        </FrameLayout>
+                <ImageButton
+                    android:id="@+id/btnSendComment"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_send"
+                    android:contentDescription="Send"
+                    app:tint="@color/text_tertiary" />
+
+                <ProgressBar
+                    android:id="@+id/pb_sending"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:indeterminateTint="@color/text_tertiary" />
+            </FrameLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 </layout>

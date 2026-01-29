@@ -139,6 +139,9 @@ class PostDetailFragment : Fragment() {
             onSendClick = { text ->
                 viewModel.sendComment(text)
             }
+            onCancelReply = {
+                viewModel.cancelReply()
+            }
         }
     }
 
@@ -294,11 +297,14 @@ class PostDetailFragment : Fragment() {
 
         // Update input bar hint based on reply target (post or specific comment)
         viewModel.replyTargetComment.observe(viewLifecycleOwner) { target ->
-            val hint = when {
-                target == null -> "Write a comment..."
-                else -> "Reply to ${target.authorName}"
+            if (target != null) {
+                binding.bottomInputBar.showReplyBanner(target.authorName)
+                binding.bottomInputBar.setHint("Reply to ${target.authorName}")
+            } else {
+                binding.bottomInputBar.hideReplyBanner()
+                binding.bottomInputBar.setHint("Write a comment...")
+                binding.bottomInputBar.clearInput()
             }
-            binding.bottomInputBar.setHint(hint)
         }
 
         // Observe AI summary loading state for button UI
