@@ -25,11 +25,29 @@
                 android:layout_weight="1"
                 android:layout_height="0dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/postRecyclerView"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/bg_app"/>
+                    android:layout_height="match_parent">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/postRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:paddingBottom="80dp"
+                        android:background="@color/bg_app"/>
+
+                    <TextView
+                        android:id="@+id/tvEmptyState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="No posts found"
+                        android:textSize="18sp"
+                        android:textColor="@color/text_secondary"
+                        android:visibility="gone" />
+
+                </FrameLayout>
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

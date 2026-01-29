@@ -20,7 +20,7 @@
             android:id="@+id/tvShareTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Share Post"
+            android:text="@string/share_post_title"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary" />
@@ -29,7 +29,7 @@
             android:id="@+id/tvShareDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select contacts to share this post with"
+            android:text="@string/share_post_description"
             android:textSize="14sp"
             android:textColor="@color/text_tertiary"
             android:layout_marginTop="4dp" />
@@ -55,7 +55,7 @@
             android:id="@+id/etSearchRecipient"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:hint="Search contacts..."
+            android:hint="@string/search_contacts_hint"
             android:inputType="text"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
@@ -93,7 +93,7 @@
             android:layout_width="0dp"
             android:layout_height="24dp"
             android:layout_weight="1"
-            android:text="Contacts selected: 0"
+            android:text="@string/contacts_selected_format"
             android:id="@+id/tvSelectionCount"
             android:textSize="14sp"
             android:textColor="@android:color/darker_gray" />
@@ -103,7 +103,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:contentDescription="Clear selection"
+            android:contentDescription="@string/clear_selection_desc"
             android:visibility="gone" />
 
     </LinearLayout>
@@ -141,8 +141,8 @@
             android:layout_height="44dp"
             android:background="@drawable/button_outline_background_blue"
             android:minWidth="100dp"
-            android:text="Cancel"
-            android:textColor="@android:color/darker_gray" />
+            android:text="@string/cancel_action"
+            android:textColor="@color/text_primary" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnShare"
@@ -151,7 +151,7 @@
             android:layout_marginStart="8dp"
             android:background="@drawable/button_share_post_background_gray"
             android:minWidth="100dp"
-            android:text="Share"
+            android:text="@string/share_action"
             android:elevation="12dp"
             android:fontFamily="@font/montserrat_semibold"
             android:paddingHorizontal="24dp"

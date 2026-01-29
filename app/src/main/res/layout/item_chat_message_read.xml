@@ -47,7 +47,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:fontFamily="@font/montserrat_regular"
-                android:text="Emma Williams"
+                android:text="@string/chat_read_name"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp" />
 
@@ -58,7 +58,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:fontFamily="@font/montserrat_regular"
-                android:text="1h"
+                android:text="@string/chat_read_time"
                 android:textColor="@color/chat_time_gray"
                 android:textSize="12sp" />
 
@@ -77,7 +77,7 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/montserrat_regular"
                 android:maxLines="1"
-                android:text="See you tomorrow at 3pm 👋"
+                android:text="@string/chat_read_message"
                 android:textColor="@color/chat_message_read"
                 android:textSize="14sp" />
 

@@ -201,6 +201,8 @@ class PostDetailViewModel(
         // For each root comment, show it and conditionally show its replies
         for (root in roots) {
             // Always show root comment
+            // Update expansion state for UI binding
+            root.isRepliesExpanded = expandedRootIds.contains(root.id)
             result += FeedItem.CommentItem(root)
 
             // Show nested replies only if this root is expanded

@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="Help Center"
+                android:text="@string/title_help_center"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:fontFamily="@font/montserrat_semibold" />
@@ -66,13 +66,13 @@
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:src="@drawable/ic_logo"
-                        android:contentDescription="@string/help_center_icon" />
+                        android:contentDescription="@string/help_hero_title" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="How can we help you?"
+                        android:text="@string/help_hero_title"
                         android:textSize="18sp"
                         android:textColor="@color/text_primary"
                         android:fontFamily="@font/montserrat_semibold"
@@ -83,7 +83,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Find answers to frequently asked questions, learn how to use the platform, and get support when you need it."
+                        android:text="@string/help_hero_subtitle"
                         android:textSize="14sp"
                         android:textColor="@color/text_secondary"
                         android:fontFamily="@font/montserrat_regular"
@@ -128,7 +128,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="Contact\nSupport"
+                                android:text="@string/card_contact_support"
                                 android:textSize="13sp"
                                 android:textColor="@color/white"
                                 android:fontFamily="@font/montserrat_semibold"
@@ -165,7 +165,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="Report\nIssue"
+                                android:text="@string/card_report_issue"
                                 android:textSize="13sp"
                                 android:textColor="@color/text_primary"
                                 android:fontFamily="@font/montserrat_semibold"
@@ -181,7 +181,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="8dp"
-                    android:text="Frequently Asked Questions"
+                    android:text="@string/section_faq"
                     android:textSize="16sp"
                     android:textColor="@color/text_primary"
                     android:fontFamily="@font/montserrat_semibold" />
@@ -213,7 +213,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Still need help?"
+                        android:text="@string/footer_still_need_help"
                         android:textSize="14sp"
                         android:textColor="@color/text_primary"
                         android:fontFamily="@font/montserrat_semibold"
@@ -222,7 +222,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Our support team is available to assist you"
+                        android:text="@string/footer_contact_desc"
                         android:textSize="12sp"
                         android:textColor="@color/text_secondary"
                         android:fontFamily="@font/montserrat_regular"

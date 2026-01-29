@@ -3,9 +3,8 @@
     android:height="40dp"
     android:viewportWidth="40"
     android:viewportHeight="40">
-  <path
       android:pathData="M0,10C0,4.477 4.477,0 10,0H29.999C35.521,0 39.999,4.477 39.999,10V29.999C39.999,35.521 35.521,39.999 29.999,39.999H10C4.477,39.999 0,35.521 0,29.999V10Z"
-      android:fillColor="#EFF6FF"/>
+      android:fillColor="@color/primary_tonal"/>
   <path
       android:pathData="M25.832,27.499V25.833C25.832,24.948 25.481,24.101 24.856,23.476C24.231,22.85 23.383,22.499 22.499,22.499H17.499C16.615,22.499 15.768,22.85 15.142,23.476C14.517,24.101 14.166,24.948 14.166,25.833V27.499"
       android:strokeLineJoin="round"

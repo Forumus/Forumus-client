@@ -49,7 +49,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.btnBack.setOnClickListener { navController.popBackStack() }
+        setupBottomNavigation()
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -78,9 +78,9 @@ class SearchFragment : Fragment() {
     private fun updateLayoutForTab(position: Int) {
         val isPostTab = position == 0
         if (isPostTab) {
-            binding.searchView.queryHint = "Search posts, topics..."
+            binding.searchView.queryHint = getString(com.hcmus.forumus_client.R.string.search_hint_posts)
         } else {
-            binding.searchView.queryHint = "Search name, email..."
+            binding.searchView.queryHint = getString(com.hcmus.forumus_client.R.string.search_hint_people)
         }
         binding.sectionTrending.visibility = if (isPostTab) View.VISIBLE else View.GONE
 
@@ -213,13 +213,24 @@ class SearchFragment : Fragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val keyword = keywords[position]
             holder.textView.text = keyword
-            holder.textView.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_search, 0, 0, 0)
+            holder.textView.setCompoundDrawablesWithIntrinsicBounds(com.hcmus.forumus_client.R.drawable.ic_search, 0, 0, 0)
             holder.textView.compoundDrawablePadding = 24
             holder.itemView.setOnClickListener { onClick(keyword) }
         }
         override fun getItemCount() = keywords.size
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val textView: TextView = view.findViewById(android.R.id.text1)
+        }
+    }
+
+    private fun setupBottomNavigation() {
+        binding.bottomBar.apply {
+            setActiveTab(com.hcmus.forumus_client.ui.common.BottomNavigationBar.Tab.EXPLORE)
+            onHomeClick = { navController.navigate(com.hcmus.forumus_client.R.id.homeFragment) }
+            onExploreClick = { /* Already on Explore */ }
+            onCreatePostClick = { navController.navigate(com.hcmus.forumus_client.R.id.createPostFragment) }
+            onAlertsClick = { navController.navigate(NavGraphDirections.actionGlobalNotificationFragment()) }
+            onChatClick = { navController.navigate(com.hcmus.forumus_client.R.id.chatsFragment) }
         }
     }
 

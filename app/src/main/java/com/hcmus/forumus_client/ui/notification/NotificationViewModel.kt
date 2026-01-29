@@ -115,13 +115,13 @@ class NotificationViewModel : ViewModel() {
         
         // TODAY Section
         if (todayItems.isNotEmpty()) {
-            displayList.add(NotificationListItem.Header("Today"))
+            displayList.add(NotificationListItem.Header(com.hcmus.forumus_client.R.string.today))
             displayList.addAll(todayItems.map { NotificationListItem.Item(it) })
         }
         
         // EARLIER Section
         if (earlierItems.isNotEmpty()) {
-            displayList.add(NotificationListItem.Header("Before"))
+            displayList.add(NotificationListItem.Header(com.hcmus.forumus_client.R.string.earlier))
             
             if (isEarlierExpanded || earlierItems.size <= 5) {
                 displayList.addAll(earlierItems.map { NotificationListItem.Item(it) })

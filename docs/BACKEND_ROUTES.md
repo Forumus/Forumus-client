@@ -22,20 +22,20 @@ Spring Boot Backend for Android Kotlin Mobile Application
 
 The following table provides a comprehensive overview of all available API endpoints in the Forumus Backend system.
 
-| No. | Feature | Method | Endpoint | Category | Description |
-|-----|---------|--------|----------|----------|-------------|
-| 1 | Health Check | GET | `/api/health` | Core | Verifies server operational status |
-| 2 | Password Reset | POST | `/api/auth/resetPassword` | Authentication | Resets user password via Firebase Auth (admin only) |
-| 3 | Send OTP Email | POST | `/api/email/send-otp` | Email | Sends OTP verification code to user email |
-| 4 | Send Welcome Email | POST | `/api/email/send-welcome` | Email | Sends welcome email after account verification |
-| 5 | Send Report Email | POST | `/api/email/send-report` | Email | Sends account status notification email |
-| 6 | Ask Gemini AI | POST | `/api/posts/askGemini` | AI | General Q&A interaction with Gemini AI |
-| 7 | Validate Post | POST | `/api/posts/validatePost` | AI | AI-powered content moderation for posts |
-| 8 | Summarize Post | POST | `/api/posts/summarize` | AI | Generates AI summary with intelligent caching |
-| 9 | Get Suggested Topics | POST | `/api/posts/getSuggestedTopics` | AI | Extracts relevant topics using AI analysis |
-| 10 | Trigger Notification | POST | `/api/notifications` | Notifications | Sends push notification and stores in Firestore |
-| 11 | Get All Topics | GET | `/api/topics/getAll` | Topics | Retrieves all forum topics from cache |
-| 12 | Add Topics | POST | `/api/topics/add` | Topics | Adds new topics to the forum |
+| No. | Feature              | Method | Endpoint                        | Category       | Description                                         |
+| --- | -------------------- | ------ | ------------------------------- | -------------- | --------------------------------------------------- |
+| 1   | Health Check         | GET    | `/api/health`                   | Core           | Verifies server operational status                  |
+| 2   | Password Reset       | POST   | `/api/auth/resetPassword`       | Authentication | Resets user password via Firebase Auth (admin only) |
+| 3   | Send OTP Email       | POST   | `/api/email/send-otp`           | Email          | Sends OTP verification code to user email           |
+| 4   | Send Welcome Email   | POST   | `/api/email/send-welcome`       | Email          | Sends welcome email after account verification      |
+| 5   | Send Report Email    | POST   | `/api/email/send-report`        | Email          | Sends account status notification email             |
+| 6   | Ask Gemini AI        | POST   | `/api/posts/askGemini`          | AI             | General Q&A interaction with Gemini AI              |
+| 7   | Validate Post        | POST   | `/api/posts/validatePost`       | AI             | AI-powered content moderation for posts             |
+| 8   | Summarize Post       | POST   | `/api/posts/summarize`          | AI             | Generates AI summary with intelligent caching       |
+| 9   | Get Suggested Topics | POST   | `/api/posts/getSuggestedTopics` | AI             | Extracts relevant topics using AI analysis          |
+| 10  | Trigger Notification | POST   | `/api/notifications`            | Notifications  | Sends push notification and stores in Firestore     |
+| 11  | Get All Topics       | GET    | `/api/topics/getAll`            | Topics         | Retrieves all forum topics from cache               |
+| 12  | Add Topics           | POST   | `/api/topics/add`               | Topics         | Adds new topics to the forum                        |
 
 ---
 
@@ -50,9 +50,9 @@ A health check endpoint to verify that the Forumus Backend server is running and
 
 **Response Structure:**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| status | String | Server status indicator (UP) |
+| Field   | Type   | Description                   |
+| ------- | ------ | ----------------------------- |
+| status  | String | Server status indicator (UP)  |
 | message | String | Human-readable status message |
 
 ```mermaid
@@ -75,35 +75,56 @@ Allows administrators to reset a user's password in Firebase Authentication. Thi
 
 **Request Parameters:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| email | String | Yes | User's email address |
-| newPassword | String | Yes | New password to set |
-| secretKey | String | Yes | Admin secret key for authorization |
+| Field       | Type   | Required | Description                        |
+| ----------- | ------ | -------- | ---------------------------------- |
+| email       | String | Yes      | User's email address               |
+| newPassword | String | Yes      | New password to set                |
+| secretKey   | String | Yes      | Admin secret key for authorization |
 
 **Response Parameters:**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| success | Boolean | Operation result status |
-| message | String | Result message or error description |
+| Field   | Type    | Description                         |
+| ------- | ------- | ----------------------------------- |
+| success | Boolean | Operation result status             |
+| message | String  | Result message or error description |
 
 **Security Requirements:**
+
 - Requires valid secretKey matching server configuration
 - Returns 403 Forbidden if secret key is invalid
 - Returns 400 Bad Request if email or password is missing
 
 ```mermaid
-flowchart TD
-    A[Client Request] --> B{Validate Secret Key}
-    B -->|Invalid| C[403 Forbidden]
-    B -->|Valid| D{Validate Input}
-    D -->|Missing Fields| E[400 Bad Request]
-    D -->|Valid| F[Get User from Firebase]
-    F -->|Not Found| G[500 Error]
-    F -->|Found| H[Update Password]
-    H -->|Success| I[200 OK]
-    H -->|Failure| J[500 Error]
+sequenceDiagram
+    participant Client as Android App
+    participant Controller as AuthController
+    participant Firebase as Firebase Auth
+
+    Client->>Controller: POST /api/auth/resetPassword
+    Controller->>Controller: Validate Secret Key
+    alt Invalid Secret Key
+        Controller-->>Client: 403 Forbidden
+    else Valid Secret Key
+        Controller->>Controller: Validate Input
+        alt Missing Fields
+            Controller-->>Client: 400 Bad Request
+        else Valid Input
+            Controller->>Firebase: getUserByEmail()
+            alt User Not Found
+                Firebase-->>Controller: FirebaseAuthException
+                Controller-->>Client: 500 Error
+            else User Found
+                Controller->>Firebase: updateUser(password)
+                alt Update Success
+                    Firebase-->>Controller: Success
+                    Controller-->>Client: 200 OK - Password updated
+                else Update Failure
+                    Firebase-->>Controller: FirebaseAuthException
+                    Controller-->>Client: 500 Error
+                end
+            end
+        end
+    end
 ```
 
 ---
@@ -119,17 +140,17 @@ Sends a One-Time Password (OTP) verification email to a user during registration
 
 **Request Parameters:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| recipientEmail | String | Yes | Recipient's email address |
-| otpCode | String | Yes | OTP code to send |
+| Field          | Type   | Required | Description               |
+| -------------- | ------ | -------- | ------------------------- |
+| recipientEmail | String | Yes      | Recipient's email address |
+| otpCode        | String | Yes      | OTP code to send          |
 
 **Response Parameters:**
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field   | Type    | Description           |
+| ------- | ------- | --------------------- |
 | success | Boolean | Email delivery status |
-| message | String | Result message |
+| message | String  | Result message        |
 
 ```mermaid
 sequenceDiagram
@@ -157,26 +178,35 @@ Sends a welcome email to new users after successful account verification. This e
 
 **Request Parameters:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| recipientEmail | String | Yes | Recipient's email address |
-| userName | String | Yes | User's display name |
+| Field          | Type   | Required | Description               |
+| -------------- | ------ | -------- | ------------------------- |
+| recipientEmail | String | Yes      | Recipient's email address |
+| userName       | String | Yes      | User's display name       |
 
 **Response Parameters:**
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field   | Type    | Description           |
+| ------- | ------- | --------------------- |
 | success | Boolean | Email delivery status |
-| message | String | Result message |
+| message | String  | Result message        |
 
 ```mermaid
-flowchart LR
-    A[User Completes Verification] --> B[Android App]
-    B --> C[POST /api/email/send-welcome]
-    C --> D[Spring Boot Server]
-    D --> E[Generate HTML Template]
-    E --> F[SMTP Server]
-    F --> G[Welcome Email Delivered]
+sequenceDiagram
+    participant App as Android App
+    participant Controller as EmailController
+    participant Service as EmailService
+    participant Mail as SMTP Server
+    participant User as User Inbox
+
+    App->>Controller: POST /api/email/send-welcome
+    Controller->>Controller: Validate email format
+    Controller->>Service: sendWelcomeEmail()
+    Service->>Service: Generate HTML template
+    Service->>Mail: Send MIME message
+    Mail->>User: Deliver welcome email
+    Mail-->>Service: Delivery confirmed
+    Service-->>Controller: Success
+    Controller-->>App: 200 OK - Email sent
 ```
 
 ---
@@ -190,37 +220,51 @@ Sends an account status report email when a user's account status changes. This 
 
 **Request Parameters:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| recipientEmail | String | Yes | Recipient's email address |
-| userName | String | Yes | User's display name |
-| userStatus | String | Yes | New account status |
-| reportedPosts | Array | No | List of reported posts with title and reason |
+| Field          | Type   | Required | Description                                  |
+| -------------- | ------ | -------- | -------------------------------------------- |
+| recipientEmail | String | Yes      | Recipient's email address                    |
+| userName       | String | Yes      | User's display name                          |
+| userStatus     | String | Yes      | New account status                           |
+| reportedPosts  | Array  | No       | List of reported posts with title and reason |
 
 **User Status Values:**
 
-| Status | Description |
-|--------|-------------|
-| ACTIVE | Normal account status |
-| WARNING | Account has received a warning |
+| Status     | Description                       |
+| ---------- | --------------------------------- |
+| ACTIVE     | Normal account status             |
+| WARNING    | Account has received a warning    |
 | RESTRICTED | Account has limited functionality |
-| BANNED | Account is suspended |
+| BANNED     | Account is suspended              |
 
 **Response Parameters:**
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field   | Type    | Description           |
+| ------- | ------- | --------------------- |
 | success | Boolean | Email delivery status |
-| message | String | Result message |
+| message | String  | Result message        |
 
 ```mermaid
-flowchart TD
-    A[Status Change Detected] --> B{Validate UserStatus}
-    B -->|Invalid| C[400 Bad Request]
-    B -->|Valid| D[Generate Report HTML]
-    D --> E[Include Reported Posts]
-    E --> F[SMTP Server]
-    F --> G[Report Email Delivered]
+sequenceDiagram
+    participant App as Android App
+    participant Controller as EmailController
+    participant Service as EmailService
+    participant Mail as SMTP Server
+    participant User as User Inbox
+
+    App->>Controller: POST /api/email/send-report
+    Controller->>Controller: Validate Input
+    alt Invalid UserStatus
+        Controller-->>App: 400 Bad Request
+    else Valid
+        Controller->>Service: sendReportEmail()
+        Service->>Service: Generate Report HTML
+        Service->>Service: Include Reported Posts
+        Service->>Mail: Send MIME Message
+        Mail->>User: Deliver Report Email
+        Mail-->>Service: Delivery Confirmed
+        Service-->>Controller: Success
+        Controller-->>App: 200 OK - Email sent
+    end
 ```
 
 ---
@@ -278,14 +322,14 @@ A general-purpose endpoint for interaction with Gemini AI. Sends a question or p
 
 **Request Parameters:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| (body) | String | Yes | Plain text question or prompt |
+| Field  | Type   | Required | Description                   |
+| ------ | ------ | -------- | ----------------------------- |
+| (body) | String | Yes      | Plain text question or prompt |
 
 **Response Parameters:**
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field    | Type   | Description           |
+| -------- | ------ | --------------------- |
 | response | String | AI-generated response |
 
 **AI System Configuration:**
@@ -316,18 +360,19 @@ Validates a forum post using AI to ensure adherence to community guidelines. The
 
 **Request Parameters:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| postId | String | Yes | ID of the post to validate |
+| Field  | Type   | Required | Description                |
+| ------ | ------ | -------- | -------------------------- |
+| postId | String | Yes      | ID of the post to validate |
 
 **Response Parameters:**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| valid | Boolean | Validation result |
-| message | String | Rejection reasons if invalid, empty if valid |
+| Field   | Type    | Description                                  |
+| ------- | ------- | -------------------------------------------- |
+| valid   | Boolean | Validation result                            |
+| message | String  | Rejection reasons if invalid, empty if valid |
 
 **Validation Criteria:**
+
 - No offensive language or hate speech
 - No personal attacks
 - No inappropriate content
@@ -336,28 +381,47 @@ Validates a forum post using AI to ensure adherence to community guidelines. The
 - Relevant to academic topics
 
 ```mermaid
-flowchart TD
-    A[POST /api/posts/validatePost] --> B[Fetch Post from Firestore]
-    B -->|Not Found| C[Return: Post not found]
-    B -->|Found| D[Send to Gemini AI]
+sequenceDiagram
+    participant App as Android App
+    participant Controller as PostController
+    participant Service as PostService
+    participant Firestore as Firestore DB
+    participant Gemini as Gemini AI
+    participant NotifSvc as NotificationService
 
-    D --> E{AI Analysis}
-    E -->|Valid| F[Update Status: APPROVED]
-    E -->|Invalid| G[Update Status: REJECTED]
-
-    G --> H[Create Notification Request]
-    H --> I[Send Push Notification to Author]
-    I --> J[Save Notification to Firestore]
-
-    F --> K[Return: valid=true]
-    J --> L[Return: valid=false with reasons]
+    App->>Controller: POST /api/posts/validatePost
+    Controller->>Service: getPostById(postId)
+    Service->>Firestore: Get post document
+    alt Post Not Found
+        Firestore-->>Service: null
+        Service-->>Controller: null
+        Controller-->>App: Post not found
+    else Post Found
+        Firestore-->>Service: Post data
+        Service->>Service: Build validation prompt
+        Service->>Gemini: generateContent(prompt)
+        Gemini-->>Service: AI analysis result
+        Service->>Service: Parse JSON response
+        alt Valid Post
+            Service->>Firestore: Update status: APPROVED
+            Service-->>Controller: valid=true
+            Controller-->>App: 200 OK - Post approved
+        else Invalid Post
+            Service->>Firestore: Update status: REJECTED
+            Service->>NotifSvc: triggerNotification(POST_REJECTED)
+            NotifSvc->>Firestore: Save notification
+            NotifSvc->>NotifSvc: Send FCM push
+            Service-->>Controller: valid=false + reasons
+            Controller-->>App: 200 OK - Post rejected
+        end
+    end
 ```
 
 **Automatic Post Listener:**  
 Posts are also validated automatically when added to Firestore with PENDING status via a real-time listener.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph "Android App"
         A[User Creates Post]
     end
@@ -369,14 +433,26 @@ flowchart LR
     subgraph "Spring Boot Server"
         C[PostListener]
         D[PostService.validatePost]
-        E[Update Status]
+        E{Validation Result}
+        F[Update Status: APPROVED]
+        G[Update Status: REJECTED]
+        H[NotificationService]
+    end
+
+    subgraph "Firebase FCM"
+        I[Push Notification]
     end
 
     A -->|status: PENDING| B
     B -->|Real-time trigger| C
     C --> D
     D --> E
-    E -->|APPROVED/REJECTED| B
+    E -->|Valid| F
+    E -->|Invalid| G
+    F -->|APPROVED| B
+    G -->|REJECTED| B
+    G --> H
+    H --> I
 ```
 
 ---
@@ -390,52 +466,73 @@ Generates a concise AI-powered summary (2-3 sentences, maximum 100 words) of a f
 
 **Request Parameters:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| postId | String | Yes | ID of the post to summarize |
+| Field  | Type   | Required | Description                 |
+| ------ | ------ | -------- | --------------------------- |
+| postId | String | Yes      | ID of the post to summarize |
 
 **Response Parameters (Success):**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| success | Boolean | Operation status |
-| summary | String | Generated summary text |
-| fromCache | Boolean | Whether summary was retrieved from cache |
-| contentHash | String | Hash of post content for cache validation |
-| generatedAt | Long | Timestamp of summary generation |
+| Field       | Type    | Description                               |
+| ----------- | ------- | ----------------------------------------- |
+| success     | Boolean | Operation status                          |
+| summary     | String  | Generated summary text                    |
+| fromCache   | Boolean | Whether summary was retrieved from cache  |
+| contentHash | String  | Hash of post content for cache validation |
+| generatedAt | Long    | Timestamp of summary generation           |
 
 **Response Parameters (Error):**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| success | Boolean | false |
-| message | String | Error description |
+| Field   | Type    | Description       |
+| ------- | ------- | ----------------- |
+| success | Boolean | false             |
+| message | String  | Error description |
 
 ```mermaid
-flowchart TD
-    A[POST /api/posts/summarize] --> B[Fetch Post from Firestore]
-    B -->|Not Found| C[Return Error]
-    B -->|Found| D[Compute Content Hash]
+sequenceDiagram
+    participant App as Android App
+    participant Controller as PostController
+    participant Service as PostService
+    participant Cache as SummaryCacheService
+    participant Firestore as Firestore DB
+    participant Gemini as Gemini AI
 
-    D --> E{Check Cache}
-    E -->|Cache HIT| F[Return Cached Summary]
-    E -->|Cache MISS| G[Truncate Content]
-
-    G --> H[Send to Gemini AI]
-    H --> I[Clean Response]
-    I --> J[Store in Cache]
-    J --> K[Return New Summary]
+    App->>Controller: POST /api/posts/summarize
+    Controller->>Service: summarizePost(postId)
+    Service->>Firestore: Get post document
+    alt Post Not Found
+        Firestore-->>Service: null
+        Service-->>Controller: Error response
+        Controller-->>App: Post not found
+    else Post Found
+        Firestore-->>Service: Post data
+        Service->>Service: Compute content hash
+        Service->>Cache: get(postId, contentHash)
+        alt Cache HIT
+            Cache-->>Service: Cached summary
+            Service-->>Controller: Summary (fromCache=true)
+            Controller-->>App: 200 OK - Cached summary
+        else Cache MISS
+            Cache-->>Service: null
+            Service->>Service: Truncate content (max 5000 chars)
+            Service->>Gemini: generateContent(prompt)
+            Gemini-->>Service: AI-generated summary
+            Service->>Service: Clean response
+            Service->>Cache: put(postId, summary, hash)
+            Service-->>Controller: Summary (fromCache=false)
+            Controller-->>App: 200 OK - New summary
+        end
+    end
 ```
 
 **Caching Features:**
 
-| Feature | Description |
-|---------|-------------|
-| Content Hash | SHA-256 hash of title and content to detect changes |
-| TTL Support | Time-to-live for cache entries |
-| Hit Tracking | Tracks cache hits for monitoring |
-| Thread Safety | Uses ConcurrentHashMap |
-| Auto-invalidation | Cache invalidates when content changes |
+| Feature           | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| Content Hash      | SHA-256 hash of title and content to detect changes |
+| TTL Support       | Time-to-live for cache entries                      |
+| Hit Tracking      | Tracks cache hits for monitoring                    |
+| Thread Safety     | Uses ConcurrentHashMap                              |
+| Auto-invalidation | Cache invalidates when content changes              |
 
 ---
 
@@ -448,35 +545,47 @@ Uses Gemini AI to analyze a post's title and content, then suggests up to 3 rele
 
 **Request Parameters:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| title | String | Yes | Post title |
-| content | String | Yes | Post content |
+| Field   | Type   | Required | Description  |
+| ------- | ------ | -------- | ------------ |
+| title   | String | Yes      | Post title   |
+| content | String | Yes      | Post content |
 
 **Response Parameters (Success):**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| success | Boolean | Operation status |
-| topics | Array | List of matched TopicResponse objects |
+| Field   | Type    | Description                           |
+| ------- | ------- | ------------------------------------- |
+| success | Boolean | Operation status                      |
+| topics  | Array   | List of matched TopicResponse objects |
 
 **TopicResponse Structure:**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| topicId | String | Unique topic identifier |
-| name | String | Topic display name |
-| description | String | Topic description |
+| Field       | Type   | Description             |
+| ----------- | ------ | ----------------------- |
+| topicId     | String | Unique topic identifier |
+| name        | String | Topic display name      |
+| description | String | Topic description       |
 
 ```mermaid
-flowchart TD
-    A[POST /api/posts/getSuggestedTopics] --> B[Fetch All Topics from Cache]
-    B --> C[Build Topic List String]
-    C --> D[Create AI Prompt]
-    D --> E[Send to Gemini AI]
-    E --> F[Parse JSON Response]
-    F --> G[Filter Topics by Name]
-    G --> H[Return Matched Topics - max 3]
+sequenceDiagram
+    participant App as Android App
+    participant Controller as PostController
+    participant Service as PostService
+    participant Listener as TopicsListener
+    participant Gemini as Gemini AI
+
+    App->>Controller: POST /api/posts/getSuggestedTopics
+    Controller->>Service: extractTopics(title, content)
+    Service->>Listener: getAllTopics()
+    Listener-->>Service: List of all topics
+    Service->>Service: Build topic list string
+    Service->>Service: Create AI prompt
+    Service->>Gemini: generateContent(prompt)
+    Gemini-->>Service: JSON response with topics
+    Service->>Service: Parse JSON response
+    Service->>Service: Filter topics by name match
+    Service->>Service: Limit to max 3 topics
+    Service-->>Controller: Matched topics
+    Controller-->>App: 200 OK - Suggested topics
 ```
 
 ---
@@ -535,72 +644,90 @@ Triggers a push notification to a specific user. The system stores the notificat
 
 **Request Parameters:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| type | String | Yes | Notification type (see types below) |
-| actorId | String | No | ID of user who triggered the action |
-| actorName | String | No | Display name of actor |
-| targetId | String | No | Post ID or Comment ID |
-| targetUserId | String | Yes | User to receive notification |
-| previewText | String | No | Preview snippet of content |
-| originalPostTitle | String | No | For rejection notifications |
-| originalPostContent | String | No | For rejection notifications |
-| rejectionReason | String | No | Reason for post rejection |
+| Field               | Type   | Required | Description                         |
+| ------------------- | ------ | -------- | ----------------------------------- |
+| type                | String | Yes      | Notification type (see types below) |
+| actorId             | String | No       | ID of user who triggered the action |
+| actorName           | String | No       | Display name of actor               |
+| targetId            | String | No       | Post ID or Comment ID               |
+| targetUserId        | String | Yes      | User to receive notification        |
+| previewText         | String | No       | Preview snippet of content          |
+| originalPostTitle   | String | No       | For rejection notifications         |
+| originalPostContent | String | No       | For rejection notifications         |
+| rejectionReason     | String | No       | Reason for post rejection           |
 
 **Response:**
+
 - Success: "Notification triggered successfully"
 - Error: "Failed to trigger notification"
+
+```mermaid
+sequenceDiagram
+    participant App as Android App
+    participant Controller as NotificationController
+    participant Service as NotificationService
+    participant UserSvc as UserService
+    participant Firestore as Firestore DB
+    participant FCM as Firebase FCM
+
+    App->>Controller: POST /api/notifications
+    Controller->>Service: triggerNotification(request)
+    Service->>Service: Validate input
+    alt Missing targetUserId
+        Service-->>Controller: Failed
+        Controller-->>App: Failed to trigger notification
+    else Actor equals Target User
+        Service-->>Controller: Success (skipped)
+        Controller-->>App: Notification triggered successfully
+    else Valid Request
+        Service->>UserSvc: getUserById(targetUserId)
+        alt User Not Found
+            UserSvc-->>Service: null
+            Service-->>Controller: Failed
+            Controller-->>App: Failed to trigger notification
+        else User Found
+            UserSvc-->>Service: User data
+            Service->>Service: Generate notification ID
+            Service->>Service: Prepare notification data
+            Service->>Firestore: Write to users/{userId}/notifications/{id}
+            alt User has FCM Token
+                Service->>Service: Generate title and body
+                Service->>FCM: Send push notification
+                FCM-->>Service: Push sent
+            else No FCM Token
+                Service->>Service: Skip push notification
+            end
+            Service-->>Controller: Success
+            Controller-->>App: Notification triggered successfully
+        end
+    end
+```
 
 ---
 
 ### Notification Types
 
-| Type | Title | Body Template | Use Case |
-|------|-------|---------------|----------|
-| UPVOTE | New Upvote | {actor} upvoted your post: {preview} | User upvotes a post |
-| COMMENT | New Comment | {actor} commented on your post: {preview} | User comments on a post |
-| REPLY | New Reply | {actor} replied to your comment: {preview} | User replies to a comment |
-| POST_REJECTED | Post Rejected | {previewText} | AI rejects a post |
-| POST_APPROVED | Post Approved | {previewText} | AI approves a post |
-| POST_DELETED | Post Removed | {previewText} | Admin removes a post |
-| STATUS_CHANGED | Account Status Update | {previewText} | User account status changes |
+| Type           | Title                 | Body Template                              | Use Case                    |
+| -------------- | --------------------- | ------------------------------------------ | --------------------------- |
+| UPVOTE         | New Upvote            | {actor} upvoted your post: {preview}       | User upvotes a post         |
+| COMMENT        | New Comment           | {actor} commented on your post: {preview}  | User comments on a post     |
+| REPLY          | New Reply             | {actor} replied to your comment: {preview} | User replies to a comment   |
+| POST_REJECTED  | Post Rejected         | {previewText}                              | AI rejects a post           |
+| POST_APPROVED  | Post Approved         | {previewText}                              | AI approves a post          |
+| POST_DELETED   | Post Removed          | {previewText}                              | Admin removes a post        |
+| STATUS_CHANGED | Account Status Update | {previewText}                              | User account status changes |
 
 **Trigger Sources:**
 
-| Type | Trigger Source | Auto-Generated |
-|------|----------------|----------------|
-| UPVOTE | Android App | No |
-| COMMENT | Android App | No |
-| REPLY | Android App | No |
-| POST_REJECTED | PostListener / PostController | Yes |
-| POST_APPROVED | PostController | Yes |
-| POST_DELETED | Admin Action | No |
-| STATUS_CHANGED | Admin Action | No |
-
----
-
-### Notification Flow
-
-```mermaid
-flowchart TD
-    A[POST /api/notifications] --> B{Validate Input}
-    B -->|Missing targetUserId| C[Return: Failed]
-    B -->|Actor = Target User| D[Skip - Self Action]
-    B -->|Valid| E[Fetch Target User from Firestore]
-
-    E -->|User Not Found| F[Return: Failed]
-    E -->|Found| G[Generate Notification ID]
-
-    G --> H[Prepare Notification Data]
-    H --> I[Write to Firestore]
-
-    I --> J{User has FCM Token?}
-    J -->|No| K[Skip Push - Return Success]
-    J -->|Yes| L[Generate Title and Body]
-
-    L --> M[Send FCM Push]
-    M --> N[Return: Success]
-```
+| Type           | Trigger Source                | Auto-Generated |
+| -------------- | ----------------------------- | -------------- |
+| UPVOTE         | Android App                   | No             |
+| COMMENT        | Android App                   | No             |
+| REPLY          | Android App                   | No             |
+| POST_REJECTED  | PostListener / PostController | Yes            |
+| POST_APPROVED  | PostController                | Yes            |
+| POST_DELETED   | Admin Action                  | No             |
+| STATUS_CHANGED | Admin Action                  | No             |
 
 ---
 
@@ -608,33 +735,33 @@ flowchart TD
 
 **Path:** `users/{targetUserId}/notifications/{notificationId}`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | String | Unique notification identifier |
-| type | String | Notification type |
-| actorId | String | User who triggered the action |
-| actorName | String | Display name of actor |
-| targetId | String | Post ID or Comment ID |
-| previewText | String | Content preview snippet |
-| createdAt | Timestamp | Creation timestamp |
-| isRead | Boolean | Read status |
-| originalPostTitle | String | Optional - for rejections |
-| originalPostContent | String | Optional - for rejections |
-| rejectionReason | String | Optional - for rejections |
+| Field               | Type      | Description                    |
+| ------------------- | --------- | ------------------------------ |
+| id                  | String    | Unique notification identifier |
+| type                | String    | Notification type              |
+| actorId             | String    | User who triggered the action  |
+| actorName           | String    | Display name of actor          |
+| targetId            | String    | Post ID or Comment ID          |
+| previewText         | String    | Content preview snippet        |
+| createdAt           | Timestamp | Creation timestamp             |
+| isRead              | Boolean   | Read status                    |
+| originalPostTitle   | String    | Optional - for rejections      |
+| originalPostContent | String    | Optional - for rejections      |
+| rejectionReason     | String    | Optional - for rejections      |
 
 ---
 
 ### FCM Push Notification Payload Structure
 
-| Field | Path | Description |
-|-------|------|-------------|
-| token | root | User's FCM token |
-| title | notification | Notification title |
-| body | notification | Notification body text |
-| type | data | general_notification |
-| notificationId | data | UUID of notification |
-| targetId | data | Post/Comment ID for deep link |
-| click_action | data | FLUTTER_NOTIFICATION_CLICK |
+| Field          | Path         | Description                   |
+| -------------- | ------------ | ----------------------------- |
+| token          | root         | User's FCM token              |
+| title          | notification | Notification title            |
+| body           | notification | Notification body text        |
+| type           | data         | general_notification          |
+| notificationId | data         | UUID of notification          |
+| targetId       | data         | Post/Comment ID for deep link |
+| click_action   | data         | FLUTTER_NOTIFICATION_CLICK    |
 
 ---
 
@@ -736,18 +863,18 @@ Retrieves all available forum topics from the in-memory cache. Topics are pre-lo
 
 **Response Parameters (Success):**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| success | Boolean | Operation status |
-| topics | Array | List of TopicResponse objects |
+| Field   | Type    | Description                   |
+| ------- | ------- | ----------------------------- |
+| success | Boolean | Operation status              |
+| topics  | Array   | List of TopicResponse objects |
 
 **TopicResponse Structure:**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| topicId | String | Unique topic identifier |
-| name | String | Topic display name |
-| description | String | Topic description |
+| Field       | Type   | Description             |
+| ----------- | ------ | ----------------------- |
+| topicId     | String | Unique topic identifier |
+| name        | String | Topic display name      |
+| description | String | Topic description       |
 
 ```mermaid
 sequenceDiagram
@@ -779,31 +906,47 @@ Adds one or more new topics to the forum. Topics are stored in Firestore with au
 **Request Parameters:**
 Array of topic objects:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| name | String | Yes | Topic display name |
-| description | String | No | Topic description |
+| Field       | Type   | Required | Description        |
+| ----------- | ------ | -------- | ------------------ |
+| name        | String | Yes      | Topic display name |
+| description | String | No       | Topic description  |
 
 **Response Parameters:**
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field   | Type    | Description      |
+| ------- | ------- | ---------------- |
 | success | Boolean | Operation status |
 
 **Topic ID Generation:**
+
 - Input: "Machine Learning"
 - Output: "machine_learning"
 
 ```mermaid
-flowchart TD
-    A[POST /api/topics/add] --> B[Iterate Topic Requests]
-    B --> C[Generate Topic ID]
-    C --> D{Valid ID?}
-    D -->|Empty| E[Skip Topic]
-    D -->|Valid| F[Create TopicResponse]
-    F --> G[Write to Firestore]
-    G --> H[Real-time Listener Updates Cache]
-    H --> I[Return Success]
+sequenceDiagram
+    participant App as Android App
+    participant Controller as TopicController
+    participant Service as TopicService
+    participant Firestore as Firestore DB
+    participant Listener as TopicsListener
+
+    App->>Controller: POST /api/topics/add
+    Controller->>Service: addTopic(topicRequests)
+    loop For each topic request
+        Service->>Service: Generate topic ID (lowercase + underscores)
+        alt Valid ID
+            Service->>Service: Create TopicResponse
+            Service->>Firestore: Write to topics/{topicId}
+            Firestore-->>Service: Write successful
+            Note over Firestore,Listener: Real-time listener detects change
+            Firestore->>Listener: Document ADDED event
+            Listener->>Listener: Update cache
+        else Empty ID
+            Service->>Service: Skip topic
+        end
+    end
+    Service-->>Controller: Success
+    Controller-->>App: 200 OK - Topics added
 ```
 
 ---
@@ -817,12 +960,12 @@ A Spring component that maintains an in-memory cache of all topics, synchronized
 
 **Features:**
 
-| Feature | Description |
-|---------|-------------|
-| Fast Startup | Pre-loads all topics into cache |
+| Feature        | Description                                 |
+| -------------- | ------------------------------------------- |
+| Fast Startup   | Pre-loads all topics into cache             |
 | Real-time Sync | Listens for ADDED, MODIFIED, REMOVED events |
-| Thread-safe | Uses ConcurrentHashMap |
-| Zero Latency | API calls served from memory |
+| Thread-safe    | Uses ConcurrentHashMap                      |
+| Zero Latency   | API calls served from memory                |
 
 ```mermaid
 flowchart TB
@@ -861,12 +1004,12 @@ A Spring component that listens for new posts in Firestore and automatically tri
 
 **Features:**
 
-| Feature | Description |
-|---------|-------------|
-| Auto-validation | New PENDING posts are automatically validated |
-| Auto-notification | Rejected posts trigger user notifications |
-| Skip Initial | Ignores existing posts on startup |
-| Status Update | Automatically updates post status |
+| Feature           | Description                                   |
+| ----------------- | --------------------------------------------- |
+| Auto-validation   | New PENDING posts are automatically validated |
+| Auto-notification | Rejected posts trigger user notifications     |
+| Skip Initial      | Ignores existing posts on startup             |
+| Status Update     | Automatically updates post status             |
 
 ```mermaid
 flowchart TD
@@ -947,12 +1090,151 @@ sequenceDiagram
 
 ---
 
+### Real-time Message Listener
+
+**Component:** FirestoreMessageListener
+
+**Description:**  
+A Spring component that listens for new chat messages across all chat conversations using Firestore collection group queries. When a new message is detected, it automatically sends a push notification to the recipient via FCM.
+
+**Features:**
+
+| Feature                | Description                                                |
+| ---------------------- | ---------------------------------------------------------- |
+| Collection Group Query | Monitors all messages across all chats simultaneously      |
+| Duplicate Prevention   | Tracks processed messages to avoid duplicate notifications |
+| Skip Initial           | Ignores existing messages on startup                       |
+| Message Type Support   | Handles both TEXT and IMAGE message types                  |
+| Auto-notification      | Sends FCM push notification to message recipient           |
+
+**Message Types Handled:**
+
+| Type    | Notification Behavior                             |
+| ------- | ------------------------------------------------- |
+| TEXT    | Sends chat notification with message content      |
+| IMAGE   | Sends image message notification with image count |
+| DELETED | Skips notification (deleted messages)             |
+
+```mermaid
+flowchart TD
+    subgraph "Android App"
+        A[User Sends Message]
+    end
+
+    subgraph "Firestore"
+        B["chats/{chatId}/messages"]
+    end
+
+    subgraph "FirestoreMessageListener"
+        C{Is Initial Snapshot?}
+        D{Document Change Type}
+        E[handleNewMessage]
+    end
+
+    subgraph "Message Processing"
+        F{Message Type?}
+        G[Get Sender Info]
+        H[Get Chat Document]
+        I[Find Recipient]
+        J{Recipient has FCM Token?}
+        K[Send Chat Notification]
+        L[Send Image Notification]
+    end
+
+    A -->|New message| B
+    B -->|Snapshot Event| C
+    C -->|Yes| M[Skip - Pre-populate processed set]
+    C -->|No| D
+    D -->|ADDED| E
+
+    E --> F
+    F -->|DELETED| N[Skip Notification]
+    F -->|TEXT/IMAGE| G
+    G --> H
+    H --> I
+    I --> J
+    J -->|No| O[Skip - No FCM Token]
+    J -->|Yes| P{Message Type?}
+    P -->|TEXT| K
+    P -->|IMAGE| L
+```
+
+**Lifecycle:**
+
+```mermaid
+sequenceDiagram
+    participant Spring as Spring Boot
+    participant Listener as FirestoreMessageListener
+    participant Firestore as Firestore
+    participant UserSvc as UserService
+    participant FCMSvc as FCMService
+
+    Note over Spring,Listener: Server Startup
+    Spring->>Listener: PostConstruct startListening()
+    Listener->>Firestore: collectionGroup(messages).addSnapshotListener()
+    Firestore-->>Listener: Initial snapshot (skipped)
+    Listener->>Listener: Pre-populate processedMessages set
+
+    Note over Firestore,FCMSvc: New Message Sent
+    Firestore->>Listener: DocumentChange (ADDED)
+    Listener->>Listener: Check if already processed
+    Listener->>Listener: handleNewMessage()
+    Listener->>UserSvc: getUserById(senderId)
+    Listener->>Firestore: Get chat document
+    Listener->>Listener: Find recipient from userIds
+    Listener->>UserSvc: getUserById(recipientId)
+
+    alt Has FCM Token
+        alt Image Message
+            Listener->>FCMSvc: sendImageMessageNotification()
+        else Text Message
+            Listener->>FCMSvc: sendChatNotification()
+        end
+    else No FCM Token
+        Listener->>Listener: Skip notification
+    end
+
+    Note over Spring,Listener: Server Shutdown
+    Spring->>Listener: PreDestroy stopListening()
+    Listener->>Firestore: Remove listener
+```
+
+**Notification Payload Structure:**
+
+**Text Message:**
+
+| Field            | Path         | Description                   |
+| ---------------- | ------------ | ----------------------------- |
+| token            | root         | Recipient's FCM token         |
+| title            | notification | Sender's full name            |
+| body             | notification | Message content               |
+| chatId           | data         | Chat identifier for deep link |
+| senderId         | data         | Sender's user ID              |
+| senderEmail      | data         | Sender's email                |
+| senderProfileUrl | data         | Sender's profile picture URL  |
+
+**Image Message:**
+
+| Field            | Path         | Description                   |
+| ---------------- | ------------ | ----------------------------- |
+| token            | root         | Recipient's FCM token         |
+| title            | notification | Sender's full name            |
+| body             | notification | "Sent {count} image(s)"       |
+| imageContent     | notification | Message content/caption       |
+| chatId           | data         | Chat identifier for deep link |
+| senderId         | data         | Sender's user ID              |
+| senderEmail      | data         | Sender's email                |
+| senderProfileUrl | data         | Sender's profile picture URL  |
+
+---
+
 ### Real-time Listeners Summary
 
-| Listener | Collection | Purpose |
-|----------|------------|---------|
-| TopicsListener | topics | Cache topics for fast access |
-| PostListener | posts | Auto-validate new PENDING posts |
+| Listener                 | Collection                  | Purpose                         |
+| ------------------------ | --------------------------- | ------------------------------- |
+| TopicsListener           | topics                      | Cache topics for fast access    |
+| PostListener             | posts                       | Auto-validate new PENDING posts |
+| FirestoreMessageListener | messages (collection group) | Send chat message notifications |
 
 ---
 
@@ -1025,17 +1307,17 @@ flowchart TB
 
 ## Technology Stack
 
-| Component | Technology |
-|-----------|------------|
-| Backend Framework | Spring Boot 3.x |
-| Language | Java 17+ |
-| Database | Firebase Firestore |
-| Authentication | Firebase Auth |
+| Component          | Technology                     |
+| ------------------ | ------------------------------ |
+| Backend Framework  | Spring Boot 3.x                |
+| Language           | Java 17+                       |
+| Database           | Firebase Firestore             |
+| Authentication     | Firebase Auth                  |
 | Push Notifications | Firebase Cloud Messaging (FCM) |
-| AI/ML | Google Gemini 2.5 Flash |
-| Email | JavaMailSender (SMTP) |
-| Caching | In-memory (ConcurrentHashMap) |
-| Containerization | Docker |
+| AI/ML              | Google Gemini 2.5 Flash        |
+| Email              | JavaMailSender (SMTP)          |
+| Caching            | In-memory (ConcurrentHashMap)  |
+| Containerization   | Docker                         |
 
 ---
 

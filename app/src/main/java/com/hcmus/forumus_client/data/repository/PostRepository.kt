@@ -426,6 +426,43 @@ class PostRepository(
      * @param postIds List of post IDs to retrieve
      * @return List of enriched posts found (may be less than input if some posts don't exist)
      */
+
+    
+    /**
+     * Retrieves posts filtered by a specific topic.
+     * Uses server-side filtering via Firestore Array Contains query.
+     * Requires a composite index on 'topics' (Arrays) and 'createdAt' (Descending).
+     *
+     * @param topicId The ID of the topic to filter by
+     * @param limit Maximum number of posts to retrieve
+     * @return List of enriched posts
+     */
+    suspend fun getPostsByTopic(topicId: String, limit: Long = 50): List<Post> {
+        val userId = auth.currentUser?.uid
+        return try {
+            firestore.collection("posts")
+                .whereArrayContains("topics", topicId) // Must match Firestore field name "topics"
+                .whereEqualTo("status", PostStatus.APPROVED)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(limit)
+                .get()
+                .await()
+                .toObjects(Post::class.java)
+                .map { it.enrichForUser(userId) }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching posts by topic: $topicId", e)
+            emptyList()
+        }
+    }
+
+    /**
+     * Retrieves multiple posts by their IDs.
+     * Uses Firestore whereIn query which is limited to 10 items per query.
+     * Chunks large ID lists into multiple queries if needed.
+     *
+     * @param postIds List of post IDs to retrieve
+     * @return List of enriched posts found (may be less than input if some posts don't exist)
+     */
     suspend fun getPostsByIds(postIds: List<String>): List<Post> {
         if (postIds.isEmpty()) return emptyList()
 

@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Forumus</string>
+    <string name="title_home">Trang chủ</string>
+    <string name="title_dashboard">Bảng tin</string>
+    <string name="title_notifications">Thông báo</string>
+
+    <!-- Registration screen -->
+    <string name="app_logo">Logo Forumus</string>
+    <string name="start_connecting">Bắt đầu kết nối</string>
+    <string name="by_creating_account">bằng cách tạo tài khoản</string>
+    <string name="full_name">Họ và tên</string>
+    <string name="valid_email">Email hợp lệ</string>
+    <string name="phone_number">Số điện thoại</string>
+    <string name="strong_password">Mật khẩu mạnh</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="next">Tiếp theo</string>
+    <string name="register">Đăng ký</string>
+    <string name="already_member_login">Đã là thành viên? Đăng nhập</string>
+    <string name="already_member">Đã là thành viên?</string>
+    <string name="login_now">Đăng nhập ngay</string>
+    <string name="terms_conditions">Bằng cách đánh dấu vào ô, bạn đồng ý với Điều khoản và Điều kiện của chúng tôi</string>
+
+    <!-- Verification screen -->
+    <string name="back">Quay lại</string>
+    <string name="almost_there">Sắp hoàn tất</string>
+    <string name="verification_description">Vui lòng nhập mã 6 chữ số được gửi đến email %s của bạn để xác minh.</string>
+    <string name="verify">Xác minh</string>
+    <string name="didnt_receive_code">Không nhận được mã? Gửi lại</string>
+    <string name="request_new_code_timer">Yêu cầu mã mới trong %s</string>
+    <string name="otp_digit_hint">0</string>
+
+    <!-- Login screen -->
+    <string name="welcome_back">Chào mừng trở lại</string>
+    <string name="sign_in_to_access">đăng nhập để truy cập tài khoản của bạn</string>
+    <string name="enter_your_email">Nhập email của bạn</string>
+    <string name="password">Mật khẩu</string>
+    <string name="remember_me">Ghi nhớ tôi</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="login">Đăng nhập</string>
+    <string name="new_member">Thành viên mới?</string>
+    <string name="register_now">Đăng ký ngay</string>
+    <string name="new_member_register">Thành viên mới? Đăng ký ngay</string>
+
+    <!-- Success screen -->
+    <string name="success">Thành công</string>
+    <string name="success_congratulations">Chúc mừng! Bạn đã xác thực thành công</string>
+    <string name="finish">Hoàn tất</string>
+    <string name="success_icon">Biểu tượng thành công</string>
+
+    <!-- Forgot Password screen -->
+    <string name="forgot_password_title">Quên mật khẩu</string>
+    <string name="forgot_password_subtitle">Vui lòng nhập email bạn đã đăng ký. Nếu trùng khớp, chúng tôi sẽ gửi <b>mã xác minh</b> đến email của bạn.</string>
+    <string name="your_email">Email của bạn</string>
+    <string name="submit">Gửi</string>
+
+    <!-- Reset Password screen -->
+    <string name="reset_password_title">Đặt lại mật khẩu</string>
+    <string name="reset_password_subtitle">Vui lòng nhập email bạn đã đăng ký. Nếu trùng khớp, chúng tôi sẽ gửi <b>mã xác minh</b> đến email của bạn.</string>
+    <string name="retype_password">Nhập lại mật khẩu</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="cancel">Hủy</string>
+
+    <!-- Welcome screen -->
+    <string name="get_started">Bắt đầu</string>
+    <string name="privacy_policy_text">Bằng cách cung cấp thông tin, bạn đồng ý với việc xử lý dữ liệu theo <u>Chính sách quyền riêng tư</u> của chúng tôi</string>
+
+    <!-- Slide screen -->
+    <string name="slide_title_1">Cùng nhau học tập</string>
+    <string name="slide_subtitle_1">Khám phá các chủ đề bạn quan tâm, đặt câu hỏi và nhận thông tin từ những người học và chuyên gia thực tế.</string>
+    <string name="slide_title_2">Chia sẻ kiến thức</string>
+    <string name="slide_subtitle_2">Giúp người khác phát triển bằng cách đăng câu trả lời, hướng dẫn hoặc chia sẻ kinh nghiệm của bạn — mỗi đóng góp đều có giá trị</string>
+    <string name="slide_title_3">Tham gia cộng đồng</string>
+    <string name="slide_subtitle_3">Kết nối với những người cùng chí hướng, tham gia thảo luận và là một phần của cộng đồng học tập hỗ trợ lẫn nhau.</string>
+
+    <string name="select_role">Chọn vai trò</string>
+    <string name="student">Học sinh</string>
+    <string name="teacher">Giáo viên</string>
+
+    <!-- Your other strings -->
+    <string name="menu">Menu</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="profile">Hồ sơ</string>
+    <string name="home">Trang chủ</string>
+    <string name="explore">Khám phá</string>
+
+    <!-- Profile Popup Menu -->
+    <string name="view_profile">Xem hồ sơ</string>
+    <string name="edit_profile">Chỉnh sửa hồ sơ</string>
+    <string name="dark_mode">Chế độ tối</string>
+    <string name="light_mode">Chế độ sáng</string>
+    <string name="settings_title">Cài đặt</string>
+    <string name="header_settings">Cài đặt</string>
+    <string name="settings">Cài đặt</string>
+    <string name="section_account">TÀI KHOẢN</string>
+    <string name="section_preferences">TÙY CHỈNH</string>
+    <string name="section_content">NỘI DUNG</string>
+    <string name="section_support">HỖ TRỢ</string>
+    <string name="pref_push_notifications">Thông báo đẩy</string>
+    <string name="pref_email_notifications">Thông báo qua Email</string>
+    <string name="menu_saved_posts_title">Bài viết đã lưu</string>
+    <string name="menu_help_center_title">Trung tâm trợ giúp</string>
+    <string name="menu_community_guidelines_title">Nguyên tắc cộng đồng</string>
+    <string name="menu_about_forumus_title">Về Forumus</string>
+    <string name="action_logout">Đăng xuất</string>
+    <string name="footer_app_version">Forumus v1.0.0</string>
+    <string name="footer_copyright">© 2025 Cộng đồng Forumus</string>
+
+    <!-- Banned screen -->
+    <string name="account_banned">Tài khoản bị cấm</string>
+    <string name="banned_message">Tài khoản của bạn đã bị cấm tạm thời do vi phạm nguyên tắc cộng đồng. Bạn sẽ lấy lại quyền truy cập khi hết thời hạn cấm.</string>
+    <string name="ban_expiration_placeholder">Lệnh cấm hết hạn vào: ...</string>
+    <string name="time_remaining">Thời gian còn lại</string>
+    <string name="countdown_label">Ngày : Giờ : Phút : Giây</string>
+    <string name="banned_info">Xin lưu ý rằng vi phạm nhiều lần có thể dẫn đến việc đình chỉ tài khoản vĩnh viễn.</string>
+    <string name="banned_icon">Biểu tượng bị cấm</string>
+
+    <!-- Community Guidelines -->
+    <string name="community_guidelines_icon">Biểu tượng nguyên tắc cộng đồng</string>
+    <string name="guideline_icon">Biểu tượng nguyên tắc</string>
+    <string name="expand_collapse">Mở rộng hoặc thu gọn</string>
+
+    <!-- Help Center -->
+    <string name="help_center_icon">Biểu tượng trung tâm trợ giúp</string>
+    <string name="help_topic_icon">Biểu tượng chủ đề trợ giúp</string>
+
+    <!-- Language Settings -->
+    <string name="language">Ngôn ngữ</string>
+    <string name="english">Tiếng Anh</string>
+    <string name="vietnamese">Tiếng Việt</string>
+
+    <!-- Navigation Header -->
+    <string name="browse_and_filter">Duyệt và Lọc</string>
+    <string name="sort_by">Sắp xếp theo</string>
+    <string name="sort_new">Mới</string>
+    <string name="sort_trending">Xu hướng</string>
+    <string name="popular_tags">Thẻ phổ biến</string>
+
+    <!-- Post Item -->
+    <string name="anonymous">Ẩn danh</string>
+    <string name="post_title_placeholder">Tiêu đề bài viết</string>
+    <string name="post_content_placeholder">Rất vui được thông báo rằng đăng ký cho Lễ hội Công nghệ hàng năm của chúng tôi hiện đã mở! Giảm giá đăng ký sớm cho 100 sinh viên đầu tiên.</string>
+    <string name="location_placeholder">Vị trí</string>
+    <string name="time_placeholder">2g</string>
+    <string name="time_ago_placeholder">2g trước</string>
+
+    <!-- Dialogs -->
+    <string name="select_topics">Chọn chủ đề</string>
+    <string name="choose_topics_limit">Chọn tối đa 5 chủ đề</string>
+    <string name="done">Xong</string>
+    <string name="report">Báo cáo</string>
+
+    <string name="save">Lưu</string>
+    <string name="map_preview">Xem trước bản đồ</string>
+    <string name="place_name_placeholder">Tên địa điểm</string>
+    <string name="finish_post_later">Hoàn thành bài viết sau?</string>
+    <string name="save_as_draft">Lưu nháp</string>
+    <string name="discard_post">Hủy bài viết</string>
+    <string name="continue_editing">Tiếp tục chỉnh sửa</string>
+    <string name="select_location">Chọn vị trí</string>
+    <string name="search_location_hint">Tìm kiếm vị trí...</string>
+    <string name="add_location">Thêm vị trí</string>
+    <string name="preview_on_map">Xem trên bản đồ</string>
+
+    <!-- Chat Item -->
+    <string name="chat_name_placeholder">Sarah Johnson</string>
+    <string name="chat_time_placeholder">2p</string>
+    <string name="chat_message_placeholder">Chào! Bạn đã xem ảnh cuối tuần trước chưa?</string>
+    <string name="chat_unread_count_placeholder">3</string>
+
+    <!-- Map & Location -->
+    <string name="place_name">Tên địa điểm</string>
+    <string name="address_details">Chi tiết địa chỉ...</string>
+
+    <!-- Share Dialog -->
+    <string name="share_post_title">Chia sẻ bài viết</string>
+    <string name="share_post_description">Chọn liên hệ để chia sẻ bài viết này</string>
+    <string name="search_contacts_hint">Tìm kiếm liên hệ...</string>
+    <string name="contacts_selected_format">Đã chọn: %d</string>
+    <string name="share_action">Chia sẻ</string>
+    <string name="cancel_action">Hủy</string>
+    <string name="clear_selection_desc">Xóa lựa chọn</string>
+
+    <!-- User Search & Profile -->
+    <string name="user_name_placeholder">Tên người dùng</string>
+    <string name="user_email_placeholder">user@example.com</string>
+
+    <!-- Dialogs & Popups -->
+    <string name="select_topics_title">Chọn Chủ Đề</string>
+    <string name="select_topics_subtitle">Chọn tối đa 5 chủ đề</string>
+    <string name="ai_topic_suggestion">Gợi ý chủ đề AI</string>
+    <string name="sparkle_emoji">✨ </string>
+    <string name="loading_more_posts">Đang tải thêm bài viết...</string>
+
+    <!-- Validation & Help -->
+    <string name="violation_spam">Spam</string>
+    <string name="violation_detail">Chi tiết</string>
+    <string name="violation_content">Nội dung này bị coi là spam hoặc gây hiểu lầm.</string>
+
+    <!-- Help Center -->
+    <string name="title_help_center">Trung tâm trợ giúp</string>
+    <string name="help_hero_title">Chúng tôi có thể giúp gì cho bạn?</string>
+    <string name="help_hero_subtitle">Tìm câu trả lời cho các câu hỏi thường gặp, tìm hiểu cách sử dụng nền tảng và nhận hỗ trợ khi bạn cần.</string>
+    <string name="card_contact_support">Liên hệ\nHỗ trợ</string>
+    <string name="card_report_issue">Báo cáo\nVấn đề</string>
+    <string name="section_faq">Câu hỏi thường gặp</string>
+    <string name="footer_still_need_help">Vẫn cần trợ giúp?</string>
+    <string name="footer_contact_desc">Đội ngũ hỗ trợ của chúng tôi sẵn sàng hỗ trợ bạn</string>
+    <string name="email_subject_support">Yêu cầu hỗ trợ</string>
+    <string name="email_subject_issue">Báo cáo sự cố</string>
+    <string name="email_subject_general">Yêu cầu trợ giúp</string>
+    <string name="error_no_email_app">Không tìm thấy ứng dụng email. Vui lòng gửi email đến: %s</string>
+    <string name="error_email_client">Lỗi khi mở ứng dụng email</string>
+
+    <!-- Help Topics -->
+    <string name="help_topic_account_title">Làm cách nào để tạo tài khoản?</string>
+    <string name="help_topic_account_content">Để tạo tài khoản mới trên Forumus, hãy truy cập trang đăng ký và cung cấp tên đầy đủ, địa chỉ email trường đại học hợp lệ, số điện thoại và mật khẩu an toàn. Bạn sẽ nhận được mã xác minh gồm 6 chữ số qua email cần được nhập để hoàn tất quá trình đăng ký. Sau khi xác minh, bạn sẽ chọn vai trò của mình (Sinh viên hoặc Giáo viên) và có toàn quyền truy cập vào nền tảng. Chỉ những người dùng có địa chỉ email của Đại học Khoa học Tự nhiên mới được phép đăng ký.</string>
+    
+    <string name="help_topic_post_title">Làm cách nào để tạo bài đăng hoặc thảo luận?</string>
+    <string name="help_topic_post_content">Để tạo bài đăng mới, hãy nhấn vào nút hành động nổi (biểu tượng +) nằm ở cuối màn hình chính. Chọn danh mục chủ đề thích hợp cho cuộc thảo luận của bạn, soạn tiêu đề rõ ràng và mô tả, viết câu hỏi hoặc nội dung chi tiết của bạn vào phần thân và tùy chọn đính kèm hình ảnh hoặc tài liệu để hỗ trợ bài đăng của bạn. Bạn cũng có thể thêm các thẻ chủ đề có liên quan để cải thiện khả năng khám phá. Xem lại bài đăng của bạn để đảm bảo tính chính xác và rõ ràng trước khi nhấn nút \'Đăng\' để xuất bản nó cho cộng đồng. Bài đăng của bạn sẽ ngay lập tức hiển thị với các thành viên khác trong danh mục đã chọn.</string>
+    
+    <string name="help_topic_comment_title">Làm cách nào để bình luận hoặc trả lời bài đăng?</string>
+    <string name="help_topic_comment_content">Để tham gia thảo luận, hãy mở bất kỳ bài đăng nào bằng cách nhấn vào bài đăng đó từ nguồn cấp dữ liệu. Cuộn xuống cuối nội dung bài đăng, nơi bạn sẽ tìm thấy trường nhập bình luận. Nhập phản hồi, câu trả lời hoặc đóng góp của bạn vào hộp văn bản. Bạn có thể định dạng văn bản và đính kèm tài liệu hỗ trợ nếu cần. Nhấn nút \'Gửi\' hoặc \'Bình luận\' để xuất bản phản hồi của bạn. Bình luận của bạn sẽ xuất hiện trong luồng thảo luận và người đăng ban đầu sẽ nhận được thông báo. Bạn cũng có thể trả lời các bình luận cụ thể bằng cách nhấn vào nút trả lời bên dưới bất kỳ bình luận hiện có nào, tạo ra các cuộc thảo luận theo chuỗi.</string>
+    
+    <string name="help_topic_voting_title">Hệ thống bỏ phiếu là gì và nó hoạt động như thế nào?</string>
+    <string name="help_topic_voting_content">Hệ thống bỏ phiếu cho phép các thành viên cộng đồng đánh giá chất lượng và mức độ liên quan của các bài đăng và bình luận. Người dùng có thể tán thành nội dung mà họ thấy hữu ích, nhiều thông tin hoặc được viết tốt bằng cách nhấn vào biểu tượng mũi tên hướng lên. Ngược lại, người dùng có thể phản đối nội dung không chính xác, không hữu ích hoặc vi phạm tiêu chuẩn cộng đồng bằng cách nhấn vào mũi tên hướng xuống. Tổng số điểm bỏ phiếu (số phiếu tán thành trừ đi số phiếu phản đối) được hiển thị bên cạnh mỗi bài đăng và bình luận. Nội dung được tán thành cao sẽ hiển thị nhiều hơn, trong khi nội dung bị phản đối có thể bị giảm thiểu. Hệ thống dân chủ này giúp đưa những đóng góp có giá trị nhất lên và duy trì chất lượng nội dung trên toàn nền tảng.</string>
+    
+    <string name="help_topic_notif_title">Làm cách nào để quản lý thông báo?</string>
+    <string name="help_topic_notif_content">Tùy chọn thông báo có thể được tùy chỉnh trong menu Cài đặt có thể truy cập từ hồ sơ của bạn. Điều hướng đến Cài đặt và tìm phần thông báo, nơi bạn sẽ tìm thấy các công tắc bật tắt cho thông báo đẩy và thông báo email. Bật thông báo đẩy để nhận thông báo thời gian thực trên thiết bị của bạn khi ai đó trả lời bài đăng của bạn, bình luận về đóng góp của bạn, nhắc đến bạn trong các cuộc thảo luận hoặc khi có thông báo quan trọng của nền tảng. Bật thông báo email để nhận tóm tắt định kỳ hoặc thông báo ngay lập tức qua địa chỉ email đã đăng ký của bạn. Bạn có thể tắt một hoặc cả hai loại thông báo bất kỳ lúc nào dựa trên sở thích của mình.</string>
+    
+    <string name="help_topic_save_title">Làm cách nào để lưu bài đăng để tham khảo sau?</string>
+    <string name="help_topic_save_content">Để lưu một bài đăng để tham khảo trong tương lai, hãy mở bài đăng bạn muốn đánh dấu và tìm biểu tượng lưu (biểu tượng dấu trang) thường thấy ở góc trên bên phải hoặc trong menu tùy chọn bài đăng. Nhấn vào biểu tượng này để thêm bài đăng vào bộ sưu tập đã lưu của bạn. Biểu tượng sẽ thay đổi giao diện để biểu thị bài đăng đã được lưu. Tất cả các bài đăng đã lưu có thể được truy cập sau thông qua phần \'Bài đăng đã lưu\' trong menu Cài đặt của bạn. Tính năng này cho phép bạn tạo thư viện cá nhân gồm các cuộc thảo luận có giá trị, thông báo quan trọng, hướng dẫn hữu ích hoặc bất kỳ nội dung nào bạn muốn xem lại. Các bài đăng đã lưu vẫn có thể truy cập được cho đến khi bạn bỏ lưu thủ công.</string>
+    
+    <string name="help_topic_search_title">Làm cách nào để tìm kiếm các chủ đề hoặc cuộc thảo luận cụ thể?</string>
+    <string name="help_topic_search_content">Chức năng tìm kiếm có thể truy cập thông qua biểu tượng tìm kiếm ở thanh điều hướng trên cùng hoặc tab Tìm kiếm chuyên dụng trong menu điều hướng dưới cùng. Nhấn vào trường tìm kiếm và nhập từ khóa, tên chủ đề, tên người dùng hoặc các cụm từ cụ thể liên quan đến nội dung bạn tìm kiếm. Thuật toán tìm kiếm sẽ quét tiêu đề bài đăng, nội dung, bình luận, thẻ và hồ sơ người dùng để trả về kết quả có liên quan. Bạn có thể lọc kết quả tìm kiếm theo danh mục, phạm vi ngày, loại bài đăng hoặc điểm bỏ phiếu bằng cách sử dụng các tùy chọn bộ lọc. Các tính năng tìm kiếm nâng cao cho phép bạn tìm kiếm trong các danh mục chủ đề cụ thể, tìm bài đăng của những người dùng cụ thể hoặc định vị các cuộc thảo luận từ các khoảng thời gian cụ thể.</string>
+    
+    <string name="help_topic_edit_profile_title">Làm cách nào để chỉnh sửa thông tin hồ sơ?</string>
+    <string name="help_topic_edit_profile_content">Để sửa đổi chi tiết hồ sơ của bạn, hãy điều hướng đến màn hình Cài đặt từ menu chính và chọn \'Chỉnh sửa hồ sơ.\' Bạn sẽ có thể cập nhật ảnh hồ sơ của mình bằng cách tải lên hình ảnh mới, sửa đổi tên hiển thị, cập nhật tiểu sử hoặc mô tả cá nhân, thay đổi chỉ định vai trò học thuật và điều chỉnh cài đặt hiển thị hồ sơ của bạn. Sau khi thực hiện các thay đổi mong muốn, hãy nhấn nút \'Lưu\' để áp dụng các bản cập nhật. Lưu ý rằng một số thông tin nhất định như địa chỉ email của bạn có thể cần xác minh thêm nếu thay đổi. Các thay đổi hồ sơ của bạn sẽ ngay lập tức hiển thị với các thành viên cộng đồng khác trừ khi bạn đã hạn chế khả năng hiển thị hồ sơ trong cài đặt quyền riêng tư của mình.</string>
+    
+    <string name="help_topic_message_title">Làm cách nào để gửi tin nhắn riêng cho người dùng khác?</string>
+    <string name="help_topic_message_content">Để bắt đầu cuộc trò chuyện riêng tư với thành viên khác, hãy điều hướng đến hồ sơ của họ bằng cách nhấn vào tên người dùng của họ từ bất kỳ bài đăng hoặc bình luận nào. Trên trang hồ sơ của họ, hãy tìm và nhấn vào biểu tượng \'Tin nhắn\' hoặc phong bì để mở cuộc trò chuyện riêng tư. Nhập tin nhắn của bạn vào trường nhập ở cuối màn hình cuộc trò chuyện và nhấn gửi. Tất cả các tin nhắn riêng tư đều được mã hóa đầu cuối để đảm bảo tính bảo mật. Bạn có thể truy cập tất cả các cuộc hội thoại đang diễn ra của mình thông qua tab \'Trò chuyện\' trong menu điều hướng dưới cùng. Thông báo tin nhắn có thể được tùy chỉnh trong cài đặt thông báo để thông báo cho bạn về tin nhắn mới.</string>
+    
+    <string name="help_topic_report_title">Làm cách nào để báo cáo nội dung hoặc hành vi không phù hợp?</string>
+    <string name="help_topic_report_content">Nếu bạn gặp nội dung hoặc hành vi của người dùng vi phạm nguyên tắc cộng đồng, bạn có thể báo cáo bằng cách nhấn vào menu ba chấm (⋮) trên bất kỳ bài đăng hoặc bình luận nào và chọn \'Báo cáo.\' Chọn danh mục vi phạm thích hợp nhất từ danh sách được cung cấp (ví dụ: quấy rối, spam, thông tin sai lệch, nội dung không phù hợp). Tùy chọn, bạn có thể cung cấp thêm ngữ cảnh hoặc chi tiết để giúp người kiểm duyệt hiểu vấn đề. Báo cáo của bạn sẽ được gửi ẩn danh đến nhóm kiểm duyệt để xem xét. Nhóm sẽ điều tra vấn đề và thực hiện hành động thích hợp theo chính sách của nền tảng. Bạn sẽ nhận được xác nhận rằng báo cáo của bạn đã được nhận và các vi phạm nghiêm trọng sẽ được giải quyết kịp thời.</string>
+    
+    <string name="help_topic_reset_pass_title">Làm cách nào để đặt lại mật khẩu hoặc khôi phục tài khoản?</string>
+    <string name="help_topic_reset_pass_content">Nếu bạn quên mật khẩu hoặc không thể truy cập tài khoản của mình, hãy điều hướng đến màn hình đăng nhập và nhấn vào liên kết \'Quên mật khẩu?\' nằm bên dưới trường nhập mật khẩu. Nhập địa chỉ email đã đăng ký của bạn và nhấn \'Gửi.\' Bạn sẽ nhận được email chứa mã xác minh gồm 6 chữ số. Nhập mã này trên màn hình xác minh để xác nhận danh tính của bạn. Sau khi xác minh thành công, bạn sẽ được nhắc tạo mật khẩu mới. Đảm bảo mật khẩu mới của bạn đáp ứng các yêu cầu bảo mật (độ dài tối thiểu, độ phức tạp). Sau khi thiết lập, bạn có thể đăng nhập ngay lập tức bằng thông tin đăng nhập mới của mình. Nếu bạn không nhận được email xác minh, hãy kiểm tra thư mục spam hoặc yêu cầu mã mới.</string>
+    
+    <string name="help_topic_dark_mode_title">Làm cách nào để bật chế độ tối?</string>
+    <string name="help_topic_dark_mode_content">Chế độ tối cung cấp bảng màu tối hơn, dễ nhìn hơn trong điều kiện ánh sáng yếu và có thể giúp tiết kiệm pin trên các thiết bị có màn hình OLED. Để bật chế độ tối, hãy điều hướng đến màn hình Cài đặt từ menu chính và tìm công tắc chuyển đổi \'Chế độ tối\' trong phần tùy chọn. Nhấn vào công tắc để bật chế độ tối và giao diện sẽ chuyển ngay sang chủ đề tối. Tất cả màu sắc, hình nền và văn bản sẽ điều chỉnh theo bảng màu tối hơn trong khi vẫn duy trì khả năng đọc và phân cấp trực quan. Bạn có thể tắt chế độ tối bất kỳ lúc nào bằng cách chuyển đổi cùng một công tắc. Tùy chọn chế độ tối của bạn được lưu và sẽ tồn tại qua các phiên ứng dụng.</string>
+    
+    <string name="help_topic_categories_title">Danh mục chủ đề là gì và làm cách nào để sử dụng chúng?</string>
+    <string name="help_topic_categories_content">Danh mục chủ đề là cấu trúc tổ chức nhóm các cuộc thảo luận liên quan lại với nhau, giúp người dùng dễ dàng tìm thấy nội dung có liên quan hơn. Khi tạo bài đăng mới, bạn phải chọn danh mục thích hợp nhất (ví dụ: Sinh học, Khoa học máy tính, Toán học, Sự kiện trong khuôn viên trường). Phân loại này giúp người dùng khác khám phá bài đăng của bạn khi duyệt các chủ đề cụ thể. Bạn có thể khám phá các bài đăng trong các danh mục cụ thể bằng cách sử dụng bộ lọc danh mục trên màn hình chính hoặc trang tìm kiếm. Mỗi danh mục có thể có các nguyên tắc hoặc yêu cầu đăng bài cụ thể, vì vậy hãy xem lại mô tả danh mục trước khi đăng. Phân loại đúng là điều cần thiết để duy trì cộng đồng có tổ chức và dễ điều hướng.</string>
+    
+    <string name="help_topic_violation_title">Điều gì xảy ra nếu tôi vi phạm nguyên tắc cộng đồng?</string>
+    <string name="help_topic_violation_content">Các vi phạm nguyên tắc cộng đồng được thực hiện nghiêm túc và dẫn đến các hành động thực thi lũy tiến. Đối với các vi phạm nhỏ lần đầu, bạn sẽ nhận được cảnh báo chính thức và nội dung vi phạm sẽ bị xóa. Cảnh báo sẽ được ghi lại trong hồ sơ tài khoản của bạn. Các vi phạm lặp đi lặp lại hoặc coi thường các quy tắc của nền tảng sẽ dẫn đến việc đình chỉ tài khoản tạm thời, với thời hạn được xác định bởi mức độ nghiêm trọng và tần suất vi phạm. Trong thời gian bị đình chỉ, bạn sẽ không thể đăng bài, bình luận hoặc tương tác với cộng đồng, mặc dù bạn vẫn có thể xem nội dung. Các vi phạm nghiêm trọng như quấy rối, đe dọa, chia sẻ nội dung bất hợp pháp hoặc gian lận học thuật nghiêm trọng có thể dẫn đến việc chấm dứt tài khoản vĩnh viễn ngay lập tức. Tất cả các quyết định thực thi có thể được kháng cáo lên nhóm kiểm duyệt bằng cách liên hệ với bộ phận hỗ trợ.</string>
+    
+    <string name="help_topic_about_title">Forumus là gì và ai có thể sử dụng nó?</string>
+    <string name="help_topic_about_content">Forumus là một nền tảng thảo luận học thuật nội bộ được phát triển dành riêng cho các thành viên của Đại học Khoa học Tự nhiên – Đại học Quốc gia Thành phố Hồ Chí Minh. Nền tảng này được thiết kế để cung cấp một môi trường an toàn, chuyên nghiệp và hợp tác, nơi sinh viên, giảng viên, giảng viên và nhân viên học thuật có thể tham gia vào các cuộc thảo luận ý nghĩa, chia sẻ kiến thức, đặt câu hỏi và hỗ trợ hành trình học tập của nhau. Quyền truy cập vào Forumus yêu cầu địa chỉ email đại học hợp lệ và bị hạn chế đối với các thành viên đã được xác minh của cộng đồng đại học. Nền tảng này tạo điều kiện thuận lợi cho việc trao đổi học thuật trên tất cả các ngành và phòng ban trong khi vẫn duy trì các tiêu chuẩn cao về diễn ngôn và sự tôn trọng.</string>
+    <!-- Community Guidelines -->
+    <string name="title_community_guidelines">Nguyên tắc cộng đồng</string>
+    <string name="community_hero_title">Xây dựng một cộng đồng\nhọc thuật tôn trọng</string>
+    <string name="community_hero_subtitle">Những nguyên tắc này giúp duy trì một môi trường an toàn, chuyên nghiệp và thân thiện cho tất cả thành viên của cộng đồng học thuật chúng ta.</string>
+    <string name="footer_last_updated">Cập nhật lần cuối: %s</string>
+    <string name="footer_contact_us">Có câu hỏi? Liên hệ với chúng tôi</string>
+    <string name="toast_contact_support_soon">Liên hệ hỗ trợ - Sắp ra mắt</string>
+
+    <!-- Guideline Sections -->
+    <string name="guideline_respect_title">Hành vi tôn trọng và ứng xử văn minh</string>
+    <string name="guideline_respect_1">Tất cả thành viên được yêu cầu đối xử với những người tham gia khác bằng thái độ tôn trọng, lịch sự và chuyên nghiệp nhất trong mọi tương tác trên nền tảng.</string>
+    <string name="guideline_respect_2">Quấy rối, đe dọa, bắt nạt, tấn công cá nhân hoặc bất kỳ hình thức hành vi lăng mạ nào nhắm vào các thành viên khác đều bị nghiêm cấm và sẽ bị xử lý ngay lập tức.</string>
+    <string name="guideline_respect_3">Khi tham gia tranh luận hoặc bất đồng quan điểm, thành viên phải duy trì thái độ xây dựng và chuyên nghiệp, tập trung vào ý tưởng thay vì cá nhân.</string>
+    <string name="guideline_respect_4">Việc sử dụng ngôn từ kích động thù địch, ngôn ngữ phân biệt đối xử, lời lẽ xúc phạm hoặc bất kỳ hình thức giao tiếp nào nhắm vào cá nhân dựa trên chủng tộc, dân tộc, giới tính, tôn giáo, xu hướng tính dục, khuyết tật hoặc các đặc điểm được bảo vệ khác đều bị nghiêm cấm.</string>
+    <string name="guideline_respect_5">Thành viên được mong đợi thừa nhận và tôn trọng các quan điểm, ý kiến và nền tảng đa dạng, thúc đẩy một môi trường hòa nhập thuận lợi cho sự phát triển học thuật và trao đổi trí tuệ.</string>
+    <string name="guideline_respect_6">Mọi giao tiếp nên được thực hiện theo cách đề cao phẩm giá và sự liêm chính học thuật của cộng đồng Trường Đại học Khoa học Tự nhiên.</string>
+
+    <string name="guideline_content_title">Tiêu chuẩn và quy định về đăng tải nội dung</string>
+    <string name="guideline_content_1">Tất cả bài đăng và đóng góp phải phù hợp với danh mục chủ đề được chỉ định và tuân thủ trọng tâm học thuật của khu vực thảo luận tương ứng.</string>
+    <string name="guideline_content_2">Tiêu đề bài đăng phải rõ ràng, mô tả và phản ánh chính xác nội dung được chia sẻ, cho phép điều hướng hiệu quả và chức năng tìm kiếm cho tất cả người dùng.</string>
+    <string name="guideline_content_3">Việc đăng thư rác, quảng cáo không mong muốn, tự quảng cáo quá mức, nội dung lừa đảo hoặc nội dung lặp lại đều bị nghiêm cấm.</string>
+    <string name="guideline_content_4">Thành viên được yêu cầu sử dụng các thẻ chủ đề và danh mục phù hợp để đảm bảo tổ chức nội dung hợp lý và nâng cao khả năng khám phá cho cộng đồng.</string>
+    <string name="guideline_content_5">Chất lượng đóng góp được ưu tiên hơn số lượng; thành viên được khuyến khích soạn thảo bài đăng và bình luận một cách thấu đáo trước khi gửi.</string>
+    <string name="guideline_content_6">Trước khi tạo một chủ đề thảo luận mới, thành viên nên sử dụng chức năng tìm kiếm để xác minh rằng các chủ đề tương tự chưa được giải quyết.</string>
+    <string name="guideline_content_7">Tất cả nội dung nên đóng góp một cách có ý nghĩa vào diễn ngôn học thuật và phù hợp với sứ mệnh giáo dục của nền tảng.</string>
+    <string name="guideline_content_8">Thành viên phải đảm bảo rằng đóng góp của họ được nghiên cứu kỹ lưỡng, chính xác về mặt thực tế và được trình bày một cách rõ ràng, chuyên nghiệp.</string>
+
+    <string name="guideline_prohibited_title">Nội dung và hoạt động bị cấm</string>
+    <string name="guideline_prohibited_1">Việc đăng, chia sẻ hoặc quảng bá bất kỳ nội dung, hoạt động hoặc tài liệu bất hợp pháp nào vi phạm luật pháp địa phương, quốc gia hoặc quốc tế đều bị nghiêm cấm.</string>
+    <string name="guideline_prohibited_2">Nội dung người lớn, tài liệu không phù hợp tại nơi làm việc (NSFW), nội dung khiêu dâm hoặc bất kỳ hình thức tài liệu không phù hợp nào đều bị nghiêm cấm trên nền tảng này.</string>
+    <string name="guideline_prohibited_3">Nội dung mô tả bạo lực đẫm máu, hình ảnh ghê rợn, gây khó chịu hoặc tài liệu nhằm gây sốc hoặc làm tổn thương các thành viên khác sẽ không được dung thứ.</string>
+    <string name="guideline_prohibited_4">Việc chia sẻ, lôi kéo hoặc phân phối thông tin nhận dạng cá nhân (doxxing) của bất kỳ cá nhân nào, cho dù là thành viên của cộng đồng này hay không, đều bị nghiêm cấm.</string>
+    <string name="guideline_prohibited_5">Việc cố ý lan truyền thông tin sai lệch, tin giả, tuyên bố chưa được xác minh hoặc thuyết âm mưu là không được phép.</string>
+    <string name="guideline_prohibited_6">Đạo văn, gian lận học thuật, tạo điều kiện gian lận, chia sẻ tài liệu thi cử hoặc bất kỳ hoạt động nào làm tổn hại đến sự liêm chính học thuật đều bị nghiêm cấm và có thể bị báo cáo lên cơ quan chức năng của trường đại học.</string>
+    <string name="guideline_prohibited_7">Nội dung cổ vũ các hoạt động nguy hiểm, tự hại hoặc gây ra mối đe dọa đến sự an toàn và sức khỏe của các thành viên cộng đồng sẽ bị xóa ngay lập tức.</string>
+
+    <string name="guideline_security_title">Bảo mật tài khoản và chính sách xác thực</string>
+    <string name="guideline_security_1">Mỗi cá nhân thành viên chỉ được phép duy trì một tài khoản hoạt động trên nền tảng; việc tạo nhiều tài khoản nhằm mục đích né tránh các hạn chế hoặc thao túng nội dung đều bị cấm.</string>
+    <string name="guideline_security_2">Mạo danh cá nhân khác, bao gồm nhưng không giới hạn ở sinh viên, giảng viên, quản trị viên hoặc người của công chúng, đều bị nghiêm cấm.</string>
+    <string name="guideline_security_3">Thành viên chịu trách nhiệm duy trì bảo mật và tính bảo mật của thông tin đăng nhập, bao gồm mật khẩu và thông tin xác thực.</string>
+    <string name="guideline_security_4">Bất kỳ hoạt động đáng ngờ, nỗ lực truy cập trái phép, lỗ hổng bảo mật hoặc vi phạm tiềm ẩn nào phải được báo cáo ngay cho quản trị viên nền tảng.</string>
+    <string name="guideline_security_5">Việc chia sẻ thông tin đăng nhập tài khoản với cá nhân khác hoặc cho phép truy cập trái phép vào tài khoản của bạn là không được phép.</string>
+    <string name="guideline_security_6">Thành viên nên sử dụng mật khẩu mạnh, duy nhất và bật tất cả các tính năng bảo mật có sẵn để bảo vệ tài khoản khỏi truy cập trái phép.</string>
+
+    <string name="guideline_ip_title">Quyền sở hữu trí tuệ và trích dẫn</string>
+    <string name="guideline_ip_1">Tất cả thành viên phải tôn trọng và tuân thủ luật bản quyền, quyền sở hữu trí tuệ và các tiêu chuẩn trích dẫn học thuật khi chia sẻ nội dung trên nền tảng.</string>
+    <string name="guideline_ip_2">Phải cung cấp trích dẫn và ghi nhận tác giả phù hợp cho tất cả tài liệu được trích dẫn, tác phẩm tham khảo, nguồn bên ngoài và đóng góp trí tuệ của người khác.</string>
+    <string name="guideline_ip_3">Đạo văn dưới mọi hình thức, bao gồm việc sử dụng trái phép tác phẩm của người khác mà không ghi nhận tác giả phù hợp, đều bị nghiêm cấm và cấu thành vi phạm nghiêm trọng về sự liêm chính học thuật.</string>
+    <string name="guideline_ip_4">Thành viên chỉ có thể đăng hình ảnh, tệp tin phương tiện, tài liệu hoặc các tài liệu khác mà họ sở hữu quyền, giấy phép hoặc quyền cho phép chia sẻ phù hợp.</string>
+    <string name="guideline_ip_5">Khi chia sẻ tài liệu có bản quyền, thành viên phải tuân thủ các nguyên tắc sử dụng hợp lý và các ngoại lệ bản quyền áp dụng cho mục đích giáo dục.</string>
+    <string name="guideline_ip_6">Nghiên cứu gốc, tác phẩm sáng tạo và đóng góp trí tuệ nên được ghi nhận đúng mức cho các tác giả và người tạo ra chúng.</string>
+    <string name="guideline_ip_7">Bất kỳ trường hợp vi phạm bản quyền hoặc vi phạm sở hữu trí tuệ nào cũng nên được báo cáo cho quản trị viên nền tảng để có hành động thích hợp.</string>
+
+    <string name="guideline_moderation_title">Quy trình kiểm duyệt và biện pháp xử lý</string>
+    <string name="guideline_moderation_1">Người kiểm duyệt và quản trị viên nền tảng có quyền xem xét, chỉnh sửa, di chuyển hoặc xóa bất kỳ nội dung nào vi phạm các nguyên tắc cộng đồng này hoặc làm gián đoạn sứ mệnh học thuật của nền tảng.</string>
+    <string name="guideline_moderation_2">Các vi phạm lần đầu có tính chất nhỏ thường sẽ dẫn đến cảnh báo chính thức và xóa nội dung vi phạm, với tài liệu được lưu giữ trong hồ sơ tài khoản của người dùng.</string>
+    <string name="guideline_moderation_3">Vi phạm nhiều lần các nguyên tắc cộng đồng hoặc liên tục coi thường các quy tắc nền tảng sẽ dẫn đến tạm ngưng tài khoản, với thời gian được xác định bởi mức độ nghiêm trọng và tần suất vi phạm.</string>
+    <string name="guideline_moderation_4">Các vi phạm nghiêm trọng, bao gồm nhưng không giới hạn ở quấy rối, đe dọa, doxxing, chia sẻ nội dung bất hợp pháp hoặc gian lận học thuật nghiêm trọng, có thể dẫn đến chấm dứt tài khoản ngay lập tức và vĩnh viễn.</string>
+    <string name="guideline_moderation_5">Thành viên không đồng ý với các quyết định kiểm duyệt có thể gửi khiếu nại chính thức đến nhóm quản trị nền tảng để xem xét và cân nhắc lại.</string>
+    <string name="guideline_moderation_6">Tất cả các hành động thực thi đều được ghi lại và có thể được chia sẻ với ban quản trị trường đại học trong các trường hợp vi phạm chính sách nghiêm trọng hoặc đe dọa tiềm ẩn đến an toàn cộng đồng.</string>
+    <string name="guideline_moderation_7">Nhóm kiểm duyệt hoạt động độc lập và công bằng, áp dụng các nguyên tắc này một cách nhất quán cho tất cả thành viên bất kể địa vị hay liên kết.</string>
+
+    <string name="guideline_reporting_title">Cơ chế và quy trình báo cáo vi phạm</string>
+    <string name="guideline_reporting_1">Thành viên quan sát thấy nội dung hoặc hành vi vi phạm các nguyên tắc cộng đồng này được khuyến khích sử dụng chức năng báo cáo của nền tảng để đưa các vấn đề đó đến sự chú ý của người kiểm duyệt.</string>
+    <string name="guideline_reporting_2">Cơ chế báo cáo có thể được truy cập thông qua nút báo cáo hoặc biểu tượng cờ nằm trên tất cả các bài đăng, bình luận và hồ sơ người dùng trên toàn nền tảng.</string>
+    <string name="guideline_reporting_3">Khi gửi báo cáo, thành viên nên cung cấp thông tin cụ thể, chi tiết liên quan đến bản chất của vi phạm, bao gồm bối cảnh và bằng chứng liên quan khi có sẵn.</string>
+    <string name="guideline_reporting_4">Tất cả các báo cáo đều được nhóm kiểm duyệt xem xét kỹ lưỡng theo các quy trình và mốc thời gian đã thiết lập, với hành động thích hợp được thực hiện dựa trên các phát hiện.</string>
+    <string name="guideline_reporting_5">Nền tảng cung cấp các tùy chọn báo cáo ẩn danh cho các thành viên muốn báo cáo vi phạm mà không tiết lộ danh tính, đảm bảo bảo vệ cho những người nêu lên lo ngại.</string>
+    <string name="guideline_reporting_6">Báo cáo sai sự thật hoặc ác ý được gửi với mục đích quấy rối các thành viên khác hoặc lạm dụng hệ thống báo cáo sẽ bị điều tra và có thể dẫn đến hành động kỷ luật đối với bên báo cáo.</string>
+    <string name="guideline_reporting_7">Thành viên sẽ nhận được xác nhận khi báo cáo của họ được nhận và có thể được liên hệ nếu cần thêm thông tin cho cuộc điều tra.</string>
+
+    <string name="guideline_privacy_title">Kỳ vọng về quyền riêng tư và bảo vệ dữ liệu</string>
+    <string name="guideline_privacy_1">Thành viên nên biết rằng thông tin hồ sơ, bao gồm tên, địa chỉ email, chỉ định vai trò và tiểu sử, hiển thị với các thành viên đã xác thực khác của nền tảng.</string>
+    <string name="guideline_privacy_2">Tất cả các bài đăng, bình luận và đóng góp do thành viên thực hiện đều trở thành một phần của hồ sơ công khai và có thể truy cập được bởi các thành viên cộng đồng khác vô thời hạn trừ khi bị xóa.</string>
+    <string name="guideline_privacy_3">Chức năng nhắn tin riêng tư sử dụng mã hóa đầu cuối để đảm bảo tính bảo mật và an toàn của các giao tiếp trực tiếp giữa các thành viên.</string>
+    <string name="guideline_privacy_4">Thành viên được khuyến nghị xem xét Chính sách quyền riêng tư toàn diện của nền tảng để biết thông tin chi tiết về các hoạt động thu thập, lưu trữ, xử lý và bảo vệ dữ liệu.</string>
+    <string name="guideline_privacy_5">Cài đặt hiển thị hồ sơ và kiểm soát quyền riêng tư có sẵn trong cài đặt tài khoản, cho phép thành viên tùy chỉnh thông tin nào được chia sẻ với cộng đồng rộng lớn hơn.</string>
+    <string name="guideline_privacy_6">Nền tảng không bán, chia sẻ hoặc phân phối thông tin cá nhân của thành viên cho bên thứ ba mà không có sự đồng ý rõ ràng, trừ khi pháp luật hoặc chính sách của trường đại học yêu cầu.</string>
+    <string name="guideline_privacy_7">Thành viên nên thực hiện sự thận trọng khi chia sẻ thông tin cá nhân trong các bài đăng hoặc thảo luận công khai và chịu trách nhiệm về việc quản lý quyền riêng tư của chính mình.</string>
+
+    <string name="guideline_updates_title">Sửa đổi nguyên tắc và cập nhật chính sách</string>
+    <string name="guideline_updates_1">Ban quản trị nền tảng có quyền sửa đổi, cập nhật hoặc sửa đổi các nguyên tắc cộng đồng này bất cứ lúc nào để đáp ứng các nhu cầu cộng đồng đang phát triển, yêu cầu pháp lý hoặc cân nhắc hoạt động.</string>
+    <string name="guideline_updates_2">Tất cả các thành viên đã đăng ký sẽ nhận được thông báo qua email và thông báo trong nền tảng khi có những thay đổi đáng kể đối với các nguyên tắc này được thực hiện.</string>
+    <string name="guideline_updates_3">Việc tiếp tục sử dụng nền tảng sau khi thực hiện các nguyên tắc cập nhật cấu thành sự chấp nhận và đồng ý tuân thủ các chính sách đã sửa đổi.</string>
+    <string name="guideline_updates_4">Thành viên được khuyến khích xem xét các nguyên tắc cộng đồng này định kỳ để đảm bảo làm quen với các tiêu chuẩn và kỳ vọng hiện hành.</string>
+    <string name="guideline_updates_5">Các câu hỏi, mối quan tâm hoặc đề xuất liên quan đến các nguyên tắc này có thể được chuyển đến nhóm quản trị nền tảng thông qua các kênh liên lạc chính thức.</string>
+    <string name="guideline_updates_6">Phiên bản hiện tại nhất của các nguyên tắc này sẽ luôn có sẵn thông qua menu Cài đặt và sẽ bao gồm ngày sửa đổi cuối cùng để tham khảo.</string>
+    <string name="violation_scam_name">Lừa đảo - Gian lận</string>
+    <string name="violation_scam_desc">Cố gắng lừa dối người dùng vì lợi ích tài chính hoặc cá nhân. Quà tặng giả, liên kết lừa đảo, mạo danh quản trị viên/người kiểm duyệt. Yêu cầu tiền, thông tin tài khoản hoặc dữ liệu nhạy cảm dưới vỏ bọc giả tạo. Bài đăng quảng bá dịch vụ gian lận.</string>
+    
+    <string name="violation_violence_name">Bạo lực, Ngôn từ kích động thù địch</string>
+    <string name="violation_violence_desc">Khuyến khích bạo lực hoặc đe dọa. Xúc phạm hoặc phân biệt đối xử dựa trên chủng tộc, giới tính, tôn giáo, v.v.</string>
+    
+    <string name="violation_inappropriate_name">Nội dung không phù hợp</string>
+    <string name="violation_inappropriate_desc">Chứa tài liệu thô tục, phản cảm hoặc khiêu dâm. Nội dung NSFW/18+ không nhằm mục đích giáo dục.</string>
+    
+    <string name="violation_misinfo_name">Thông tin sai lệch</string>
+    <string name="violation_misinfo_desc">Lan truyền thông tin sai lệch hoặc chưa được kiểm chứng. Tuyên bố gây hiểu lầm gây hoang mang.</string>
+    
+    <string name="violation_illegal_name">Nội dung bất hợp pháp</string>
+    <string name="violation_illegal_desc">Quảng bá hack, crack, cờ bạc, ma túy, vũ khí, v.v.</string>
+    
+    <string name="violation_harassment_name">Quấy rối - Ngôn ngữ lăng mạ</string>
+    <string name="violation_harassment_desc">Tấn công cá nhân hoặc lăng mạ. Giao tiếp độc hại nhắm vào cá nhân hoặc nhóm.</string>
+    
+    <string name="violation_privacy_name">Vi phạm quyền riêng tư (Doxxing)</string>
+    <string name="violation_privacy_desc">Tiết lộ dữ liệu cá nhân như số điện thoại, địa chỉ, số CMND. Phơi bày thông tin riêng tư mà không có sự đồng ý.</string>
+    
+    <string name="violation_copyright_name">Vi phạm bản quyền</string>
+    <string name="violation_copyright_desc">Sao chép nội dung không ghi nguồn. Tải lên phương tiện có bản quyền mà không được phép.</string>
+    <string name="topic_biology">Sinh học</string>
+    <string name="see_more_notifications">Xem thêm thông báo</string>
+    <string name="message_sent_placeholder">Tôi đang rất ổn! Cảm ơn đã hỏi thăm</string>
+    <string name="message_sent_time">10:32 SA</string>
+    <string name="message_received_placeholder">Chào! Bạn có khỏe không?</string>
+    <string name="message_received_time">10:30 SA</string>
+    <string name="help_topic_title">Tiêu đề chủ đề</string>
+    <string name="help_topic_content">Nội dung chủ đề trợ giúp tại đây</string>
+    <string name="guideline_section_title">Tiêu đề mục</string>
+    <string name="guideline_content_placeholder">• Nguyên tắc 1\n• Nguyên tắc 2</string>
+    <string name="chat_read_name">Emma Williams</string>
+    <string name="chat_read_time">1g</string>
+    <string name="chat_read_message">Hẹn gặp bạn vào ngày mai lúc 3 giờ chiều 👋</string>
+    <string name="plus_three">+3</string>
+
+    <!-- App Bar -->
+    <string name="forumus_title">Forumus</string>
+
+    <!-- Validation numbers -->
+    <string name="number_one">1</string>
+    <string name="number_zero">0</string>
+    <string name="dot_separator">•</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Xin chào blank fragment</string>
+    <string name="default_notification_channel_id">general_notification_channel</string>
+    <!-- About Forumus -->
+    <string name="title_about_forumus">Về Forumus</string>
+    <string name="app_subtitle">Nền tảng Thảo luận Học thuật</string>
+    <string name="about_platform_title">Giới thiệu về Nền tảng</string>
+    <string name="about_platform_desc_1">Forumus là diễn đàn trực tuyến nội bộ được phát triển dành riêng cho các thành viên của Trường Đại học Khoa học Tự nhiên – ĐHQG-HCM.</string>
+    <string name="about_platform_desc_2">Nền tảng được thiết kế để cung cấp không gian thảo luận học thuật an toàn, chuyên nghiệp và thân thiện, nơi sinh viên, giảng viên và cán bộ học thuật có thể kết nối và hợp tác.</string>
+    <string name="about_features_title">Tính năng Chính</string>
+    <string name="about_feature_1">Chia sẻ thông tin và tài nguyên học thuật</string>
+    <string name="about_feature_2">Thảo luận các chủ đề liên quan đến học tập và nghiên cứu</string>
+    <string name="about_feature_3">Hỗ trợ và giúp đỡ lẫn nhau trong quá trình học tập và nghiên cứu</string>
+    <string name="about_team_title">Đội ngũ Phát triển</string>
+    <string name="about_developed_by">Phát triển bởi:</string>
+    <string name="about_team_name">Đội ngũ Phát triển Forumus</string>
+    <string name="about_affiliation">Đơn vị:</string>
+    <string name="about_university_name">Trường Đại học Khoa học Tự nhiên – ĐHQG-HCM</string>
+    <string name="about_copyright">© 2025 Đội ngũ Phát triển Forumus</string>
+    <string name="about_disclaimer">Ứng dụng này được phát triển cho mục đích học thuật và không dành cho mục đích thương mại.</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_tab_general">Tổng quan</string>
+    <string name="profile_tab_post">Bài đăng</string>
+    <string name="profile_tab_reply">Phản hồi</string>
+    <string name="profile_stat_posts">bài đăng</string>
+    <string name="profile_stat_replies">phản hồi</string>
+    <string name="profile_stat_upvotes">tán thành</string>
+
+    <!-- Date Formatting -->
+    <string name="date_format_short_month_day">dd MMM</string>
+
+    <!-- Comment Section -->
+    <plurals name="view_replies">
+        <item quantity="one">Xem %d phản hồi</item>
+        <item quantity="other">Xem %d phản hồi</item>
+    </plurals>
+    <plurals name="hide_replies">
+        <item quantity="one">Ẩn %d phản hồi</item>
+        <item quantity="other">Ẩn %d phản hồi</item>
+    </plurals>
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">Hồ sơ người dùng</string>
+    <string name="upload_avatar">Tải ảnh lên</string>
+    <string name="full_name_label">Họ và tên</string>
+    <string name="discard">Hủy</string>
+    <string name="saving">Đang lưu...</string>
+
+    <!-- Chats -->
+    <string name="chats_title">Đoạn chat</string>
+    <string name="filter_all">Tất cả</string>
+    <string name="filter_unread">Chưa đọc</string>
+    <string name="no_chats_available">Không có đoạn chat nào</string>
+    <string name="loading_chats">Đang tải đoạn chat...</string>
+    <string name="search_users_hint">Tìm kiếm người dùng...</string>
+    <string name="no_users_found">Không tìm thấy người dùng</string>
+    <string name="chat_deleted">Đã xóa đoạn chat</string>
+
+    <!-- Notifications -->
+    <string name="notification_title">Thông báo</string>
+    <string name="no_notifications_yet">Chưa có thông báo nào</string>
+    <string name="today">Hôm nay</string>
+    <string name="earlier">Trước đó</string>
+    <string name="just_now">Vừa xong</string>
+    <string name="noti_upvoted">đã upvote bài viết của bạn</string>
+    <string name="noti_commented">đã bình luận về bài viết của bạn</string>
+    <string name="noti_replied">đã trả lời bình luận của bạn</string>
+    <string name="noti_removed_post">đã xóa bài viết của bạn</string>
+    <string name="noti_rejected_post">đã từ chối bài viết của bạn</string>
+    <string name="noti_approved_post">đã duyệt bài viết của bạn</string>
+    <string name="noti_status_changed_admin">Admin đã thay đổi trạng thái của bạn</string>
+    <string name="noti_interacted">đã tương tác với bạn</string>
+    <string name="reason_label">Lý do: %s</string>
+    <string name="original_post_fallback">Bài viết gốc</string>
+    <string name="content_not_available">Nội dung không có sẵn</string>
+    <string name="notification_header">Thông báo</string>
+
+    <!-- Explore/Search -->
+    <string name="search_hint_posts">Tìm kiếm bài viết, chủ đề...</string>
+    <string name="search_hint_people">Tìm tên, email...</string>
+    <string name="tab_posts">Bài viết</string>
+    <string name="tab_people">Mọi người</string>
+    <string name="trending_topics">Chủ đề thịnh hành</string>
+    <string name="recent_searches">Tìm kiếm gần đây</string>
+    <string name="no_recent_history">Chưa có lịch sử tìm kiếm</string>
+    <string name="no_results_found">Không tìm thấy kết quả</string>
+
+    <!-- Create Post -->
+    <string name="create_post_title">Tạo bài viết</string>
+    <string name="action_post">ĐĂNG</string>
+    <string name="post_title_hint">Tiêu đề</string>
+    <string name="post_content_hint">Bạn đang nghĩ gì?</string>
+    <string name="location_is_at">tại</string>
+    <string name="option_photo_video">Ảnh/Video</string>
+    <string name="option_camera">Máy ảnh</string>
+    <string name="option_topic">Chủ đề</string>
+    <string name="option_check_in">Check in</string>
+
+    <string name="dialog_choose_action">Chọn hành động</string>
+    <string name="action_take_photo">Chụp ảnh</string>
+    <string name="action_record_video">Quay video</string>
+    <string name="error_permission_denied">Quyền bị từ chối</string>
+    <string name="msg_draft_restored">Đã khôi phục bản nháp</string>
+    <string name="msg_draft_saved">Đã lưu bản nháp</string>
+    <string name="status_posting">Đang đăng...</string>
+    <string name="msg_post_success">Thành công!</string>
+    <string name="error_enter_content">Vui lòng nhập nội dung trước</string>
+    <string name="ai_topic_suggestion_title">Gợi ý chủ đề AI</string>
+    <string name="msg_found_topics">Đã tìm thấy chủ đề gợi ý!</string>
+    <string name="msg_no_suggestions">Không có gợi ý nào</string>
+    <string name="action_close">Đóng</string>
+</resources>

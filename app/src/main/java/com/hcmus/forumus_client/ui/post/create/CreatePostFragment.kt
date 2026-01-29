@@ -85,17 +85,17 @@ class CreatePostFragment : Fragment() {
 
     private val requestVideoPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         if ((permissions[Manifest.permission.CAMERA] == true) && (permissions[Manifest.permission.RECORD_AUDIO] == true)) launchCamera(isVideo = true)
-        else Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
+        else Toast.makeText(requireContext(), getString(R.string.error_permission_denied), Toast.LENGTH_SHORT).show()
     }
 
     private val requestCameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) launchCamera(isVideo = false)
-        else Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
+        else Toast.makeText(requireContext(), getString(R.string.error_permission_denied), Toast.LENGTH_SHORT).show()
     }
 
     private val requestStoragePermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         if (permissions.entries.any { it.value }) launchPhotoPicker()
-        else Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
+        else Toast.makeText(requireContext(), getString(R.string.error_permission_denied), Toast.LENGTH_SHORT).show()
     }
 
     private val pickMedia = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(10)) { uris ->
@@ -163,7 +163,7 @@ class CreatePostFragment : Fragment() {
                 updateTopicChips()
             }
             // Ảnh đã được viewModel restore vào LiveData -> setupObservers sẽ tự update UI
-            Toast.makeText(context, "Draft restored", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.msg_draft_restored), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -272,7 +272,7 @@ class CreatePostFragment : Fragment() {
         view.findViewById<View>(R.id.btnSaveDraft).setOnClickListener {
             performSaveDraft()
             isPostSubmittedOrDiscarded = false // Để onPause không cần lưu lại lần nữa (hoặc cứ để nó lưu cũng ko sao)
-            Toast.makeText(context, "Draft saved locally", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.msg_draft_saved), Toast.LENGTH_SHORT).show()
             dialog.dismiss()
             findNavController().popBackStack()
         }
@@ -312,7 +312,7 @@ class CreatePostFragment : Fragment() {
         val btnClose = dialog.findViewById<Button>(R.id.btnCloseMap)
 
         tvTitle.text = name
-        btnClose.text = "Close"
+        btnClose.text = getString(R.string.action_close)
 
         MapsInitializer.initialize(requireContext())
         mapView.onCreate(dialog.onSaveInstanceState())
@@ -375,15 +375,15 @@ class CreatePostFragment : Fragment() {
     private fun setupObservers() {
         viewModel.postState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is PostState.Loading -> { binding.btnSubmitPost.isEnabled = false; binding.btnSubmitPost.text = "Posting..." }
+                is PostState.Loading -> { binding.btnSubmitPost.isEnabled = false; binding.btnSubmitPost.text = getString(R.string.status_posting) }
                 is PostState.Success -> {
                     // Post thành công -> Đánh dấu xong để onPause không lưu lại -> Xóa draft
                     isPostSubmittedOrDiscarded = true
                     // ViewModel đã tự gọi clearDraft trong hàm createPost khi success rồi
-                    Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.msg_post_success), Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack()
                 }
-                is PostState.Error -> { binding.btnSubmitPost.isEnabled = true; binding.btnSubmitPost.text = "POST"; Toast.makeText(context, state.msg, Toast.LENGTH_SHORT).show() }
+                is PostState.Error -> { binding.btnSubmitPost.isEnabled = true; binding.btnSubmitPost.text = getString(R.string.action_post); Toast.makeText(context, state.msg, Toast.LENGTH_SHORT).show() }
             }
         }
         viewModel.selectedImages.observe(viewLifecycleOwner) { images ->
@@ -395,8 +395,16 @@ class CreatePostFragment : Fragment() {
             user?.let {
                 binding.tvAuthorName.text = it.fullName
                 binding.tvAuthorEmail.text = it.email
-                val url = if (!it.profilePictureUrl.isNullOrEmpty()) it.profilePictureUrl else "https://ui-avatars.com/api/?name=${it.fullName}"
-                Glide.with(this).load(url).circleCrop().into(binding.ivAuthorAvatar)
+                if (!it.profilePictureUrl.isNullOrEmpty()) {
+                    Glide.with(this)
+                        .load(it.profilePictureUrl)
+                        .circleCrop()
+                        .placeholder(R.drawable.default_avatar)
+                        .error(R.drawable.default_avatar)
+                        .into(binding.ivAuthorAvatar)
+                } else {
+                    binding.ivAuthorAvatar.setImageResource(R.drawable.default_avatar)
+                }
             }
         }
         viewModel.topicColors.observe(viewLifecycleOwner) { if (selectedTopicsList.isNotEmpty()) updateTopicChips() }
@@ -431,7 +439,7 @@ class CreatePostFragment : Fragment() {
             val title = binding.edtTitle.text.toString().trim()
             val content = binding.edtContent.text.toString().trim()
             if (title.isEmpty() && content.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter content first", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.error_enter_content), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             progressAi.visibility = View.VISIBLE
@@ -444,7 +452,7 @@ class CreatePostFragment : Fragment() {
         viewModel.suggestedTopics.observe(viewLifecycleOwner) { suggestedTopics ->
             progressAi.visibility = View.GONE
             tvAiEmoji.visibility = View.VISIBLE
-            tvAiText.text = "AI Topic Suggestion"
+            tvAiText.text = getString(R.string.ai_topic_suggestion_title)
             btnAiSuggestion.isClickable = true
 
             if (!suggestedTopics.isNullOrEmpty()) {
@@ -459,9 +467,9 @@ class CreatePostFragment : Fragment() {
                     }
                 }
                 topicAdapter.notifyDataSetChanged()
-                Toast.makeText(requireContext(), "Found suggested topics!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.msg_found_topics), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(requireContext(), "No suggestions", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.msg_no_suggestions), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -485,9 +493,9 @@ class CreatePostFragment : Fragment() {
     }
 
     private fun showCameraModeSelection() {
-        val options = arrayOf("Take Photo", "Record Video")
+        val options = arrayOf(getString(R.string.action_take_photo), getString(R.string.action_record_video))
         AlertDialog.Builder(requireContext())
-            .setTitle("Choose Action")
+            .setTitle(getString(R.string.dialog_choose_action))
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> { if (hasPermission(Manifest.permission.CAMERA)) launchCamera(isVideo = false) else requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA) }

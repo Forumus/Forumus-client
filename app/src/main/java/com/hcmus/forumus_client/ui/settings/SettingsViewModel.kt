@@ -49,6 +49,10 @@ class SettingsViewModel(
     private val _isEmailNotificationsEnabled = MutableLiveData<Boolean>(true)
     val isEmailNotificationsEnabled: LiveData<Boolean> = _isEmailNotificationsEnabled
 
+    // Language preference state
+    private val _language = MutableLiveData<String>("English")
+    val language: LiveData<String> = _language
+
     // Loading state indicator
     private val _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: LiveData<Boolean> = _isLoading
@@ -92,6 +96,7 @@ class SettingsViewModel(
         _isDarkModeEnabled.value = preferencesManager.isDarkModeEnabled
         _isPushNotificationsEnabled.value = preferencesManager.isPushNotificationsEnabled
         _isEmailNotificationsEnabled.value = preferencesManager.isEmailNotificationsEnabled
+        _language.value = preferencesManager.language
     }
 
     /**
@@ -125,6 +130,17 @@ class SettingsViewModel(
     fun saveEmailNotificationsPreference(isEnabled: Boolean) {
         _isEmailNotificationsEnabled.value = isEnabled
         preferencesManager.isEmailNotificationsEnabled = isEnabled
+    }
+
+    /**
+     * Save language preference to SharedPreferences.
+     * Immediately updates persistent storage.
+     *
+     * @param language Selected language ("English" or "Vietnamese")
+     */
+    fun saveLanguagePreference(language: String) {
+        _language.value = language
+        preferencesManager.language = language
     }
 
     /**
