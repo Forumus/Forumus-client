@@ -29,6 +29,7 @@
     <string name="didnt_receive_code">Không nhận được mã? Gửi lại</string>
     <string name="request_new_code_timer">Yêu cầu mã mới trong %s</string>
     <string name="otp_digit_hint">0</string>
+    <string name="error_video_duration">Video không được dài quá 1 phút</string>
 
     <!-- Login screen -->
     <string name="welcome_back">Chào mừng trở lại</string>
