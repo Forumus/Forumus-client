@@ -140,6 +140,9 @@ class NotificationFragment : Fragment() {
             },
             onShowMoreClick = {
                 viewModel.expandEarlierSection()
+            },
+            onMarkAllReadClick = {
+                viewModel.markAllAsRead()
             }
         )
         binding.rvNotifications.apply {

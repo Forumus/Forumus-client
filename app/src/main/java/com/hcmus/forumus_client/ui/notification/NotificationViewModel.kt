@@ -90,6 +90,25 @@ class NotificationViewModel : ViewModel() {
         }
     }
     
+    fun markAllAsRead() {
+        val currentList = _notifications.value ?: return
+        if (currentList.none { !it.isRead }) return
+
+        // Optimistic Update
+        val updatedList = currentList.map { it.copy(isRead = true) }
+        _notifications.value = updatedList
+        updateUnreadCount(updatedList)
+        processDisplayList(updatedList)
+
+        viewModelScope.launch {
+            try {
+                repository.markAllAsRead()
+            } catch (e: Exception) {
+                // Revert or log error
+            }
+        }
+    }
+    
     private fun updateUnreadCount(list: List<Notification>) {
         val count = list.count { !it.isRead }
         _unreadCount.value = count
@@ -113,15 +132,19 @@ class NotificationViewModel : ViewModel() {
         
         val displayList = mutableListOf<NotificationListItem>()
         
+        var isFirstHeader = true
+
         // TODAY Section
         if (todayItems.isNotEmpty()) {
-            displayList.add(NotificationListItem.Header(com.hcmus.forumus_client.R.string.today))
+            displayList.add(NotificationListItem.Header(com.hcmus.forumus_client.R.string.today, showAction = isFirstHeader))
+            isFirstHeader = false
             displayList.addAll(todayItems.map { NotificationListItem.Item(it) })
         }
         
         // EARLIER Section
         if (earlierItems.isNotEmpty()) {
-            displayList.add(NotificationListItem.Header(com.hcmus.forumus_client.R.string.earlier))
+            displayList.add(NotificationListItem.Header(com.hcmus.forumus_client.R.string.earlier, showAction = isFirstHeader))
+            isFirstHeader = false
             
             if (isEarlierExpanded || earlierItems.size <= 5) {
                 displayList.addAll(earlierItems.map { NotificationListItem.Item(it) })

@@ -453,6 +453,7 @@
     <!-- Notifications -->
     <string name="notification_title">Thông báo</string>
     <string name="no_notifications_yet">Chưa có thông báo nào</string>
+    <string name="mark_all_read">Đánh dấu tất cả đã đọc</string>
     <string name="today">Hôm nay</string>
     <string name="earlier">Trước đó</string>
     <string name="just_now">Vừa xong</string>

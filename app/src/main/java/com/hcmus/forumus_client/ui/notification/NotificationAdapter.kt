@@ -13,7 +13,8 @@ import com.hcmus.forumus_client.databinding.ItemNotificationBinding
 
 class NotificationAdapter(
     private val onNotificationClick: (Notification) -> Unit,
-    private val onShowMoreClick: () -> Unit
+    private val onShowMoreClick: () -> Unit,
+    private val onMarkAllReadClick: () -> Unit
 ) : ListAdapter<NotificationListItem, RecyclerView.ViewHolder>(NotificationDiffCallback()) {
 
     companion object {
@@ -50,7 +51,7 @@ class NotificationAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
-            is NotificationListItem.Header -> (holder as HeaderViewHolder).bind(item.titleResId)
+            is NotificationListItem.Header -> (holder as HeaderViewHolder).bind(item)
             is NotificationListItem.Item -> (holder as NotificationViewHolder).bind(item.notification)
             is NotificationListItem.ShowMore -> (holder as ShowMoreViewHolder).bind()
         }
@@ -140,9 +141,18 @@ class NotificationAdapter(
     }
 
     inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val tvTitle: android.widget.TextView = itemView as android.widget.TextView
-        fun bind(titleResId: Int) {
-            tvTitle.setText(titleResId)
+        private val tvTitle: android.widget.TextView = itemView.findViewById(com.hcmus.forumus_client.R.id.tvHeaderTitle)
+        private val tvAction: android.widget.TextView = itemView.findViewById(com.hcmus.forumus_client.R.id.tvHeaderAction)
+
+        fun bind(item: NotificationListItem.Header) {
+            tvTitle.setText(item.titleResId)
+            if (item.showAction) {
+                tvAction.visibility = View.VISIBLE
+                tvAction.setOnClickListener { onMarkAllReadClick() }
+            } else {
+                tvAction.visibility = View.GONE
+                tvAction.setOnClickListener(null)
+            }
         }
     }
 
