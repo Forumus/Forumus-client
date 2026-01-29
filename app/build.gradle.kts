@@ -117,17 +117,12 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
 
     implementation(libs.androidx.swiperefreshlayout)
-    implementation(libs.converter.moshi.v290)
-    implementation(libs.moshi.kotlin.v1140)
-    implementation(libs.logging.interceptor.v4110)
     implementation(libs.okhttp)
 
     // Google Maps & Location
     implementation("com.google.android.libraries.places:places:3.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
-
-    implementation("com.github.bumptech.glide:glide:4.16.0")
 
     // PhotoView for pinch-to-zoom on images
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
