@@ -448,6 +448,7 @@
     <!-- Notifications -->
     <string name="notification_title">Notification</string>
     <string name="no_notifications_yet">No notifications yet</string>
+    <string name="mark_all_read">Mark all as read</string>
     <string name="today">Today</string>
     <string name="earlier">Earlier</string>
     <string name="just_now">Just now</string>

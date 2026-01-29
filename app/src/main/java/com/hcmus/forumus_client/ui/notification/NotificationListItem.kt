@@ -5,7 +5,10 @@ import com.hcmus.forumus_client.data.model.Notification
 sealed class NotificationListItem {
     abstract val id: String
 
-    data class Header(val titleResId: Int) : NotificationListItem() {
+    data class Header(
+        val titleResId: Int,
+        val showAction: Boolean = false
+    ) : NotificationListItem() {
         override val id: String = titleResId.toString()
     }
 

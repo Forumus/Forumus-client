@@ -49,4 +49,25 @@ class NotificationRepository {
             .update("isRead", true)
             .await()
     }
+
+    suspend fun markAllAsRead() {
+        val userId = auth.currentUser?.uid ?: return
+        val batch = firestore.batch()
+        
+        // Query only unread notifications to minimize writes
+        val snapshot = firestore.collection("users")
+            .document(userId)
+            .collection("notifications")
+            .whereEqualTo("isRead", false)
+            .get()
+            .await()
+
+        if (snapshot.isEmpty) return
+
+        for (document in snapshot.documents) {
+            batch.update(document.reference, "isRead", true)
+        }
+
+        batch.commit().await()
+    }
 }
