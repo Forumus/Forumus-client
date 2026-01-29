@@ -533,7 +533,7 @@ class CreatePostFragment : Fragment() {
         }
     }
 
-    private fun launchPhotoPicker() = pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    private fun launchPhotoPicker() = pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
 
     private fun setupBottomSheet() {
         val bottomSheet = binding.bottomSheetLayout

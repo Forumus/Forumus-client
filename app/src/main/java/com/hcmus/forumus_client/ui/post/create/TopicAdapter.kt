@@ -41,7 +41,6 @@ class TopicAdapter(
 
             binding.root.setOnClickListener {
                 if (!item.isSelected) {
-                    // Đang chưa chọn -> Muốn chọn
                     val currentCount = topics.count { it.isSelected }
                     if (currentCount >= maxSelection) {
                         Toast.makeText(binding.root.context, "Max $maxSelection topics!", Toast.LENGTH_SHORT).show()
@@ -49,10 +48,8 @@ class TopicAdapter(
                     }
                     item.isSelected = true
                 } else {
-                    // Đang chọn -> Bỏ chọn
                     item.isSelected = false
                 }
-                // Cập nhật lại UI ngay lập tức
                 updateSelectionState(binding.cardTopic, item.isSelected)
             }
         }

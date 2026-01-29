@@ -165,6 +165,8 @@ class SearchFragment : Fragment() {
 
         viewModel.postResults.observe(viewLifecycleOwner) { posts ->
             if (binding.tabLayout.selectedTabPosition == 0) {
+                binding.rvPostsResults.visibility = View.VISIBLE
+                binding.rvUsersResults.visibility = View.GONE
                 postsAdapter.submitList(posts)
                 binding.tvNoResults.visibility = if (posts.isEmpty()) View.VISIBLE else View.GONE
             }
