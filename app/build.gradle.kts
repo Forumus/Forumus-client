@@ -129,6 +129,9 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
+    // PhotoView for pinch-to-zoom on images
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 
     implementation(libs.gson)
