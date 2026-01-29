@@ -86,8 +86,7 @@ class HomeViewModel(
     private val _selectedTopics = MutableLiveData<Set<String>>(emptySet())
     val selectedTopics: LiveData<Set<String>> = _selectedTopics
 
-    // Keep track of the original list to support un-sorting
-    private var originalPosts: List<Post> = emptyList()
+
 
     /** Fetches topics from Firestore. */
     fun loadTopics() {
@@ -116,13 +115,31 @@ class HomeViewModel(
                 lastDocument = null
                 hasMorePosts = true
 
-                val (posts, lastDoc) = postRepository.getPostsPaginated(pageSize, null)
+                val posts: List<Post>
+                val lastDoc: com.google.firebase.firestore.DocumentSnapshot?
+
+                // Check for active filters
+                val selected = _selectedTopics.value ?: emptySet()
+                if (selected.isNotEmpty()) {
+                    // SERVER-SIDE FILTERING: Fetch only topics
+                    // Limitation: Only filtering by the first selected topic for now
+                    // due to Firestore limitations on 'OR' queries without complex client-merging.
+                    posts = postRepository.getPostsByTopic(selected.first(), pageSize)
+                    lastDoc = null // Pagination not yet implemented for topic search
+                    hasMorePosts = false 
+                } else {
+                     // STANDARD FEED
+                    val result = postRepository.getPostsPaginated(pageSize, null)
+                    posts = result.first
+                    lastDoc = result.second
+                    hasMorePosts = posts.size >= pageSize
+                }
+
                 lastDocument = lastDoc
-                hasMorePosts = posts.size >= pageSize
-
-                originalPosts = posts // Save original order
-                applyFilters()
-
+                _posts.value = posts
+                // Sorting logic can still be applied client-side to the fetched batch
+                applyClientSideSort(posts)
+                
                 _error.value = null
             } catch (e: Exception) {
                 Log.d("HomeViewModel", "loadPosts: Exception ${e.message}")
@@ -151,8 +168,12 @@ class HomeViewModel(
                 hasMorePosts = newPosts.size >= pageSize
 
                 // Append new posts to original list
-                originalPosts = originalPosts + newPosts
-                applyFilters()
+                // Append new posts to current list
+                val currentList = _posts.value ?: emptyList()
+                val combinedList = currentList + newPosts
+                
+                _posts.value = combinedList
+                applyClientSideSort(combinedList)
 
                 _error.value = null
             } catch (e: Exception) {
@@ -164,33 +185,20 @@ class HomeViewModel(
     }
 
     /** Applie filtering logic. */
-    private fun applyFilters() {
-        val selected = _selectedTopics.value ?: emptySet()
-        var filteredList =
-                if (selected.isEmpty()) {
-                    originalPosts
-                } else {
-                    originalPosts.filter { post ->
-                        // Post must have at least one topic in the selected set
-                        // Note: post.topicIds is List<String>, selected is Set<String>
-                        post.topicIds.any { it in selected }
-                    }
-                }
-
+    /** Applies client-side sorting to the current list locally. */
+    private fun applyClientSideSort(currentList: List<Post>) {
         val sort = _sortOption.value ?: SortOption.NONE
-        filteredList =
+        val sortedList =
                 when (sort) {
-                    SortOption.NEW -> filteredList.sortedByDescending { it.createdAt }
+                    SortOption.NEW -> currentList.sortedByDescending { it.createdAt }
                     SortOption.TRENDING ->
-                            filteredList.sortedByDescending {
-                                // Trending score = Total interactions (upvotes + downvotes +
-                                // comments)
+                            currentList.sortedByDescending {
                                 it.upvoteCount + it.downvoteCount + it.commentCount
                             }
-                    SortOption.NONE -> filteredList
+                    SortOption.NONE -> currentList // Keep server order (usually NEW)
                 }
 
-        _posts.value = filteredList
+        _posts.value = sortedList
     }
 
     /**
@@ -205,7 +213,7 @@ class HomeViewModel(
         } else {
             _sortOption.value = option
         }
-        applyFilters()
+        applyClientSideSort(_posts.value ?: emptyList())
     }
 
     /**
@@ -231,7 +239,9 @@ class HomeViewModel(
         }
 
         _selectedTopics.value = currentSelection
-        applyFilters()
+        
+        // RELOAD FROM SERVER with new filters
+        loadPosts()
     }
 
     fun addFieldForPosts() {

@@ -423,6 +423,15 @@ class HomeFragment : Fragment() {
             
             homeAdapter.submitList(posts)
             
+            // Toggle empty state
+            if (posts.isEmpty()) {
+                binding.tvEmptyState.visibility = View.VISIBLE
+                binding.postRecyclerView.visibility = View.GONE
+            } else {
+                binding.tvEmptyState.visibility = View.GONE
+                binding.postRecyclerView.visibility = View.VISIBLE
+            }
+            
             // Restore scroll position if it changed
             if (firstVisiblePosition > 0) {
                 binding.postRecyclerView.post {
