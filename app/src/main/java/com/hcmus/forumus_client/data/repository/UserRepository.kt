@@ -161,8 +161,9 @@ class UserRepository(
 
             // Client-side filtering for case-insensitive search
             return filteredUsers.filter { user ->
-                user.fullName.lowercase().contains(queryLower) ||
-                user.email.lowercase().contains(queryLower)
+                (user.fullName.lowercase().contains(queryLower) ||
+                user.email.lowercase().contains(queryLower)) &&
+                !user.email.lowercase().endsWith("@admin.forumus.me")
             }.take(10) // Limit results to 10 users
 
         } catch (e: Exception) {
