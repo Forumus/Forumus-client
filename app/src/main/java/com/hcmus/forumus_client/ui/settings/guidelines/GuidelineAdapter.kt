@@ -9,9 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.databinding.ItemGuidelineSectionBinding
 
 /**
- * RecyclerView adapter for displaying expandable community guideline sections.
- * 
- * Handles expand/collapse animations and user interactions.
+ * Adapter for expandable community guideline sections with collapse/expand animation.
  */
 class GuidelineAdapter(
     private val sections: List<GuidelineSection>

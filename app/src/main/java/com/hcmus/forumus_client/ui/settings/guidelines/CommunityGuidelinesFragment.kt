@@ -12,17 +12,7 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.FragmentCommunityGuidelinesBinding
 
 /**
- * Fragment displaying the community guidelines for the Forumus platform.
- * 
- * Shows expandable sections covering:
- * - Respectful behavior and civility
- * - Content posting guidelines
- * - Prohibited content
- * - Account security
- * - Intellectual property
- * - Moderation and consequences
- * - Reporting violations
- * - Privacy expectations
+ * Displays community guidelines in expandable sections covering respect, content rules, etc.
  */
 class CommunityGuidelinesFragment : Fragment() {
 
@@ -47,18 +37,12 @@ class CommunityGuidelinesFragment : Fragment() {
         setupFooterActions()
     }
 
-    /**
-     * Setup back button to return to settings screen
-     */
     private fun setupBackButton() {
         binding.ibBack.setOnClickListener {
             navController.popBackStack()
         }
     }
 
-    /**
-     * Setup RecyclerView with guideline sections
-     */
     private fun setupGuidelinesList() {
         val sections = getGuidelineSections()
         
@@ -70,9 +54,6 @@ class CommunityGuidelinesFragment : Fragment() {
         }
     }
 
-    /**
-     * Setup footer contact action
-     */
     private fun setupFooterActions() {
         // Set last updated text
         binding.tvLastUpdated.text = getString(R.string.footer_last_updated, "January 2026")
@@ -86,12 +67,6 @@ class CommunityGuidelinesFragment : Fragment() {
         }
     }
 
-    /**
-     * Get the list of guideline sections with content
-     */
-    /**
-     * Get the list of guideline sections with content
-     */
     private fun getGuidelineSections(): List<GuidelineSection> {
         return listOf(
             GuidelineSection(

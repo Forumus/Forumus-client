@@ -26,23 +26,8 @@ import kotlinx.coroutines.launch
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
 
 /**
- * ViewModel for managing user profile data and interactions.
- *
- * Responsibilities:
- * - Load and manage user profile information (name, email, avatar, etc.)
- * - Fetch user's posts and comments from repositories
- * - Handle content filtering (GENERAL/POSTS/REPLIES modes)
- * - Calculate and expose user statistics (post count, comment count, upvote count)
- * - Handle voting actions on user's posts and comments
- * - Manage loading and error states
- *
- * The view model uses MediatorLiveData to automatically recompute visible items
- * whenever the display mode or content changes, eliminating the need for manual
- * updates when switching between GENERAL, POSTS, and REPLIES views.
- *
- * @param postRepository Repository for post operations
- * @param commentRepository Repository for comment operations
- * @param userRepository Repository for user operations
+ * Manages profile data: user info, posts, comments, and statistics.
+ * Uses MediatorLiveData to auto-update visible items when mode or content changes.
  */
 class ProfileViewModel(
     private val postRepository: PostRepository = PostRepository(),
@@ -53,43 +38,36 @@ class ProfileViewModel(
 
     private lateinit var userId: String
 
-    // User profile information
     private val _user = MutableLiveData<User>()
     val user: LiveData<User> = _user
 
-    // User's posts
     private val _posts = MutableLiveData<List<Post>>(emptyList())
     val posts: LiveData<List<Post>> = _posts
 
-    // User's comments
     private val _comments = MutableLiveData<List<Comment>>(emptyList())
     val comments: LiveData<List<Comment>> = _comments
 
-    // Combined list of posts and comments (mixed chronologically)
+    // Posts and comments combined, sorted by time (for GENERAL mode)
     private val _mixedItems = MutableLiveData<List<FeedItem>>(emptyList())
     val mixedItems: LiveData<List<FeedItem>> = _mixedItems
 
-    // Current display mode (GENERAL, POSTS, or REPLIES)
     private val _mode = MutableLiveData<ProfileMode>(ProfileMode.GENERAL)
     val mode: LiveData<ProfileMode> = _mode
 
-    // List filtered based on current display mode, automatically recomputed
+    // Filtered based on current mode - recomputed automatically via MediatorLiveData
     private val _visibleItems = MediatorLiveData<List<FeedItem>>()
     val visibleItems: LiveData<List<FeedItem>> = _visibleItems
 
-    // Loading state indicator
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-    // Error message (null if no error)
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    // Save post result for UI feedback
     private val _savePostResult = MutableLiveData<SavePostResult?>()
     val savePostResult: LiveData<SavePostResult?> = _savePostResult
 
-    // Statistics
+    // Profile statistics
     private val _postsCount = MutableLiveData<Int>(0)
     val postsCount: LiveData<Int> = _postsCount
 
@@ -100,8 +78,7 @@ class ProfileViewModel(
     val upvotesCount: LiveData<Int> = _upvotesCount
 
     init {
-        // Set up MediatorLiveData sources to automatically recompute visible items
-        // when any of these LiveData values change
+        // Recompute visible items whenever mode or content changes
         _visibleItems.addSource(_mode) { recomputeVisibleItems() }
         _visibleItems.addSource(_posts) { recomputeVisibleItems() }
         _visibleItems.addSource(_comments) { recomputeVisibleItems() }
@@ -109,13 +86,7 @@ class ProfileViewModel(
     }
 
     /**
-     * Initializes the view model with a specific user ID and display mode.
-     *
-     * Should be called from the Activity's onCreate or onNewIntent.
-     * Triggers loading of user information and content.
-     *
-     * @param userId The ID of the user whose profile to display
-     * @param initialMode The initial display mode (GENERAL, POSTS, or REPLIES)
+     * Loads user profile, posts, and comments. Resets mode to GENERAL.
      */
     fun loadUserInfo(userId: String) {
         this.userId = userId
@@ -127,21 +98,17 @@ class ProfileViewModel(
                 val userData = userRepository.getUserById(userId)
                 _user.value = userData
 
-                // Fetch all posts for the user, sorted newest first
+                // Fetch posts and comments, sorted newest first
                 val allPosts = postRepository.getPostsByUser(userId)
                     .sortedByDescending { it.createdAt?.toDate()?.time ?: 0L }
-
-                // Fetch all comments for the user, sorted newest first
                 val allComments = commentRepository.getCommentsByUser(userId)
                     .sortedByDescending { it.createdAt?.toDate()?.time ?: 0L }
 
                 _posts.value = allPosts
                 _comments.value = allComments
-
-                // Calculate and update statistics
                 updateStats(allPosts, allComments)
 
-                // Build mixed list combining posts and comments, sorted by creation time
+                // Build mixed list for GENERAL mode
                 val mixed = mutableListOf<FeedItem>()
                 mixed += allPosts.map { FeedItem.PostItem(it) }
                 mixed += allComments.map { FeedItem.CommentItem(it) }
@@ -158,30 +125,11 @@ class ProfileViewModel(
         }
     }
 
-    /**
-     * Changes the current display mode for filtering content.
-     *
-     * The visibleItems list will automatically update through MediatorLiveData
-     * without requiring additional repository calls.
-     *
-     * @param mode The new ProfileMode to display
-     */
     fun setMode(mode: ProfileMode) {
         if (_mode.value == mode) return
         _mode.value = mode
     }
 
-    /**
-     * Updates user statistics based on posts and comments.
-     *
-     * Calculates:
-     * - Total number of posts
-     * - Total number of comments (replies)
-     * - Total upvotes across all posts and comments
-     *
-     * @param posts The user's posts
-     * @param comments The user's comments
-     */
     private fun updateStats(posts: List<Post>, comments: List<Comment>) {
         _postsCount.value = posts.size
         _repliesCount.value = comments.size
@@ -190,14 +138,6 @@ class ProfileViewModel(
         _upvotesCount.value = totalUpvotes
     }
 
-    /**
-     * Handles user interaction with a comment (upvote/downvote).
-     *
-     * Delegates to handleVote for vote processing.
-     *
-     * @param comment The comment being voted on
-     * @param commentAction The action type (UPVOTE or DOWNVOTE)
-     */
     fun onCommentAction(comment: Comment, commentAction: CommentAction) {
         when (commentAction) {
             CommentAction.UPVOTE -> handleVote(comment, isUpvote = true)
@@ -206,37 +146,24 @@ class ProfileViewModel(
         }
     }
 
-    /**
-     * Processes a vote action on a comment.
-     *
-     * Toggles the vote on the server via repository, then updates the local
-     * comment list and recalculates statistics.
-     *
-     * @param comment The comment to vote on
-     * @param isUpvote True for upvote, false for downvote
-     */
+    // Toggles vote on server, updates local list, and recalculates stats
     private fun handleVote(comment: Comment, isUpvote: Boolean) {
         viewModelScope.launch {
             try {
-                // Toggle vote on server and get updated comment
                 val updatedComment = if (isUpvote) {
                     commentRepository.toggleUpvote(comment)
                 } else {
                     commentRepository.toggleDownvote(comment)
                 }
 
-                // Update local comment list with the new state
                 val currentList = _comments.value ?: emptyList()
                 val newComments = currentList.map { c ->
                     if (c.id == comment.id) updatedComment else c
                 }
                 _comments.value = newComments
 
-                // Recalculate statistics
                 val currentPosts = _posts.value ?: emptyList()
                 updateStats(currentPosts, newComments)
-
-                // Rebuild mixed items list
                 recomputeMixedItems()
             } catch (e: Exception) {
                 _error.value = e.message
@@ -244,14 +171,6 @@ class ProfileViewModel(
         }
     }
 
-    /**
-     * Handles user interaction with a post (upvote/downvote).
-     *
-     * Delegates to handleVote for vote processing.
-     *
-     * @param post The post being voted on
-     * @param postAction The action type (UPVOTE or DOWNVOTE)
-     */
     fun onPostAction(post: Post, postAction: PostAction) {
         when (postAction) {
             PostAction.UPVOTE -> handleVote(post, isUpvote = true)
@@ -260,37 +179,23 @@ class ProfileViewModel(
         }
     }
 
-    /**
-     * Processes a vote action on a post.
-     *
-     * Toggles the vote on the server via repository, then updates the local
-     * post list and recalculates statistics.
-     *
-     * @param post The post to vote on
-     * @param isUpvote True for upvote, false for downvote
-     */
     private fun handleVote(post: Post, isUpvote: Boolean) {
         viewModelScope.launch {
             try {
-                // Toggle vote on server and get updated post
                 val updatedPost = if (isUpvote) {
                     postRepository.toggleUpvote(post)
                 } else {
                     postRepository.toggleDownvote(post)
                 }
 
-                // Update local post list with the new state
                 val currentList = _posts.value ?: emptyList()
                 val newPosts = currentList.map { p ->
                     if (p.id == post.id) updatedPost else p
                 }
                 _posts.value = newPosts
 
-                // Recalculate statistics
                 val currentComments = _comments.value ?: emptyList()
                 updateStats(newPosts, currentComments)
-
-                // Rebuild mixed items list
                 recomputeMixedItems()
             } catch (e: Exception) {
                 _error.value = e.message
@@ -298,12 +203,7 @@ class ProfileViewModel(
         }
     }
 
-    /**
-     * Rebuilds the mixed items list from current posts and comments.
-     *
-     * Sorts the combined list chronologically (newest first) and updates mixedItems.
-     * Called automatically whenever posts or comments change.
-     */
+    // Combines posts and comments into a single list sorted by time
     private fun recomputeMixedItems() {
         val postsList = _posts.value ?: emptyList()
         val commentsList = _comments.value ?: emptyList()
@@ -316,17 +216,7 @@ class ProfileViewModel(
         _mixedItems.value = mixed
     }
 
-    /**
-     * Filters the mixed items list based on the current display mode.
-     *
-     * Automatically called by MediatorLiveData when mode, posts, comments, or
-     * mixedItems change.
-     *
-     * Modes:
-     * - GENERAL: Shows all posts and comments mixed
-     * - POSTS: Shows only posts
-     * - REPLIES: Shows only comments
-     */
+    // Filters content based on mode: GENERAL=mixed, POSTS=posts only, REPLIES=comments only
     private fun recomputeVisibleItems() {
         val currentMode = _mode.value ?: ProfileMode.GENERAL
         val postsList = _posts.value ?: emptyList()
@@ -341,13 +231,6 @@ class ProfileViewModel(
         _visibleItems.value = result
     }
 
-    /**
-     * Saves a report for a post when user selects a violation. Creates a Report object, saves it to
-     * Firebase, increments reportCount, and adds userId to reportedUsers list in the post.
-     *
-     * @param post The post being reported
-     * @param violation The violation category selected by the user
-     */
     fun saveReport(post: Post, violation: Violation) {
         viewModelScope.launch {
             try {
@@ -356,7 +239,7 @@ class ProfileViewModel(
                     currentUser?.uid
                         ?: FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
 
-                // Check if user has already reported this post
+                // Prevent duplicate reports
                 if (post.reportedUsers.contains(userId)) {
                     Toast.makeText(
                         applicationContext,
@@ -367,7 +250,6 @@ class ProfileViewModel(
                     return@launch
                 }
 
-                // Create report object
                 val report =
                     Report(
                         postId = post.id,
@@ -376,12 +258,10 @@ class ProfileViewModel(
                         descriptionViolation = violation
                     )
 
-                // Save report to Firebase
                 reportRepository.saveReport(report)
-
                 Toast.makeText(applicationContext, "Post reported", Toast.LENGTH_SHORT).show()
 
-                // Update post: increment reportCount and add userId to reportedUsers
+                // Update post with new report info
                 val updatedPost =
                     post.copy(
                         reportCount = post.reportCount + 1,
@@ -389,14 +269,10 @@ class ProfileViewModel(
                             post.reportedUsers.toMutableList().apply { add(userId) }
                     )
 
-                // Update post in Firebase via repository
                 postRepository.updatePost(updatedPost)
 
-                // Update posts list with the updated post
                 val currentList = _posts.value ?: emptyList()
                 _posts.value = currentList.map { p -> if (p.id == post.id) updatedPost else p }
-
-                // Rebuild mixed items list
                 recomputeMixedItems()
 
                 _error.value = null
@@ -406,11 +282,6 @@ class ProfileViewModel(
         }
     }
 
-    /**
-     * Saves a post for the current user.
-     *
-     * @param post The post to save
-     */
     fun savePost(post: Post) {
         viewModelScope.launch {
             val result = userRepository.savePost(post.id)
@@ -418,9 +289,6 @@ class ProfileViewModel(
         }
     }
 
-    /**
-     * Clears the save post result after it has been handled by the UI
-     */
     fun clearSavePostResult() {
         _savePostResult.value = null
     }

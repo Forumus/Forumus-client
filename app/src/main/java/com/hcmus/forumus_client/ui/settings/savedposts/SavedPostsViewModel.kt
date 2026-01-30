@@ -17,8 +17,7 @@ import com.hcmus.forumus_client.data.model.PostAction
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel for the Saved Posts screen.
- * Manages loading saved posts from the user's followedPostIds list and handles unsaving posts.
+ * Manages saved posts screen - loads posts from user's followedPostIds and handles unsaving.
  */
 class SavedPostsViewModel(
     private val userRepository: UserRepository = UserRepository(),
@@ -42,9 +41,6 @@ class SavedPostsViewModel(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    /**
-     * Load the current user and their saved posts.
-     */
     fun loadSavedPosts() {
         viewModelScope.launch {
             try {
@@ -80,12 +76,6 @@ class SavedPostsViewModel(
         }
     }
 
-    /**
-     * Handles post actions such as voting.
-     *
-     * @param post The post being acted upon
-     * @param postAction The action type (UPVOTE, DOWNVOTE, etc.)
-     */
     fun onPostAction(post: Post, postAction: PostAction) {
         when (postAction) {
             PostAction.UPVOTE -> handleVote(post, isUpvote = true)
@@ -94,13 +84,7 @@ class SavedPostsViewModel(
         }
     }
 
-    /**
-     * Processes voting logic for a post. Updates the post via repository and refreshes the posts
-     * list.
-     *
-     * @param post The post to vote on
-     * @param isUpvote True for upvote, false for downvote
-     */
+    // Toggles vote and updates local list
     private fun handleVote(post: Post, isUpvote: Boolean) {
         viewModelScope.launch {
             try {
@@ -121,11 +105,7 @@ class SavedPostsViewModel(
         }
     }
 
-    /**
-     * Unsave a post (remove from user's followedPostIds).
-     *
-     * @param post The post to unsave
-     */
+    // Removes post from user's saved list
     fun unsavePost(post: Post) {
         viewModelScope.launch {
             try {
@@ -151,12 +131,7 @@ class SavedPostsViewModel(
         }
     }
 
-    /**
-     * Saves a report for a post when user selects a violation.
-     *
-     * @param post The post being reported
-     * @param violation The violation category selected by the user
-     */
+    // Reports a post with the selected violation type
     fun saveReport(post: Post, violation: Violation) {
         viewModelScope.launch {
             try {

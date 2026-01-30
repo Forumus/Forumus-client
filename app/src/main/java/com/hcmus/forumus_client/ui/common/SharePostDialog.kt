@@ -25,11 +25,6 @@ import com.hcmus.forumus_client.utils.SharePostUtil
 import kotlinx.coroutines.launch
 import androidx.core.graphics.toColorInt
 
-/**
- * Dialog for selecting recipients to share a post with.
- * Shows a list of mock recipients (in a real app, this would be contacts/chats).
- * Features a custom UI with search, selection counter, and recipient filtering.
- */
 class SharePostDialog : DialogFragment() {
     
     private var postId: String = ""
@@ -37,7 +32,6 @@ class SharePostDialog : DialogFragment() {
     private val chatRepository = ChatRepository()
     private val userRepository = UserRepository()
     
-    // UI Components
     private lateinit var etSearchRecipient: EditText
     private lateinit var rvShareRecipients: RecyclerView
     private lateinit var tvSelectionCount: TextView
@@ -47,7 +41,6 @@ class SharePostDialog : DialogFragment() {
     private lateinit var btnCancel: Button
     private lateinit var progressBar: View
     
-    // Track sharing state
     private var isSharing = false
 
     companion object {
@@ -70,10 +63,8 @@ class SharePostDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
         
-        // Inflate custom layout
         val customView = layoutInflater.inflate(R.layout.dialog_share_post, null)
         
-        // Bind UI components
         etSearchRecipient = customView.findViewById(R.id.etSearchRecipient)
         rvShareRecipients = customView.findViewById(R.id.rvShareRecipients)
         tvSelectionCount = customView.findViewById(R.id.tvSelectionCount)
@@ -83,24 +74,19 @@ class SharePostDialog : DialogFragment() {
         btnCancel = customView.findViewById(R.id.btnCancel)
         progressBar = customView.findViewById(R.id.progressBar)
         
-        // Setup RecyclerView
         rvShareRecipients.layoutManager = LinearLayoutManager(context)
         
-        // Create adapter with callback
-        // Adapter manages selection state, just update UI counter on changes
         recipientAdapter = ShareRecipientAdapter { _, _ ->
             updateSelectionCounter()
         }
         
         rvShareRecipients.adapter = recipientAdapter
         
-        // Fetch recipients from database
         lifecycleScope.launch {
             val recipients = SharePostUtil.getRecipients(userRepository)
             recipientAdapter.setFullList(recipients)
         }
         
-        // Setup search filter
         etSearchRecipient.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -109,13 +95,11 @@ class SharePostDialog : DialogFragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
         
-        // Setup clear selection button
         ivClearSelection.setOnClickListener {
             recipientAdapter.clearSelection()
             updateSelectionCounter()
         }
         
-        // Setup button clicks
         btnCancel.setOnClickListener {
             dismiss()
         }
@@ -129,15 +113,12 @@ class SharePostDialog : DialogFragment() {
             }
         }
 
-        // Initialize counter and button state
         updateSelectionCounter()
         
-        // Create dialog
         val dialog = AlertDialog.Builder(context)
             .setView(customView)
             .create()
         
-        // Optional: Set dialog size and properties
         dialog.window?.attributes?.apply {
             width = (context.resources.displayMetrics.widthPixels * 0.95).toInt()
             height = (context.resources.displayMetrics.heightPixels * 0.7).toInt()
@@ -146,21 +127,16 @@ class SharePostDialog : DialogFragment() {
         return dialog
     }
     
-    /**
-     * Updates the selection counter display
-     */
     private fun updateSelectionCounter() {
         val count = recipientAdapter.getSelectedUserIds().size
         tvSelectionCount.text = getString(R.string.contacts_selected_format, count)
         
-        // Show/hide clear button based on selection
         ivClearSelection.visibility = if (count > 0) {
             View.VISIBLE
         } else {
             View.GONE
         }
         
-        // Update share button state - change background based on count
         if (count > 0) {
             btnShare.isEnabled = true
             btnShare.setBackgroundResource(R.drawable.button_login_background)
@@ -173,11 +149,9 @@ class SharePostDialog : DialogFragment() {
     }
 
     private fun sharePostToRecipients(selectedIds: List<String>) {
-        // Prevent duplicate submissions
         if (isSharing) return
         
         lifecycleScope.launch {
-            // Show loading state
             isSharing = true
             setLoadingState(true)
             
@@ -199,11 +173,9 @@ class SharePostDialog : DialogFragment() {
                 }
             }
             
-            // Hide loading state
             isSharing = false
             setLoadingState(false)
             
-            // Show result toast
             val message = when {
                 failureCount == 0 -> "Post shared successfully to $successCount contact${if (successCount > 1) "s" else ""}"
                 successCount == 0 -> "Failed to share post to $failureCount contact${if (failureCount > 1) "s" else ""}"
@@ -215,10 +187,6 @@ class SharePostDialog : DialogFragment() {
         }
     }
     
-    /**
-     * Sets the loading state of the dialog.
-     * Disables buttons and shows progress indicator during sharing.
-     */
     private fun setLoadingState(loading: Boolean) {
         btnShare.isEnabled = !loading
         btnCancel.isEnabled = !loading

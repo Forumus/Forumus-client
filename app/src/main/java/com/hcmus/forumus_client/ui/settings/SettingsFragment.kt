@@ -57,27 +57,18 @@ class SettingsFragment : Fragment() {
         viewModel.loadSavedPreferences()
     }
 
-    /**
-     * Setup back button and header interactions
-     */
     private fun setupHeaderActions() {
         binding.ibBack.setOnClickListener {
             navController.popBackStack()
         }
     }
 
-    /**
-     * Setup user profile header card display
-     */
     private fun setupProfileSection() {
         binding.llUserProfile.setOnClickListener {
             // Profile card is read-only, no action needed
         }
     }
 
-    /**
-     * Setup preference toggle switches with saved state persistence
-     */
     private fun setupToggleSwitches() {
         // Dark mode toggle with theme application
         binding.swDarkMode.setOnCheckedChangeListener { _, isChecked ->
@@ -105,9 +96,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    /**
-     * Setup language selection spinner
-     */
     private fun setupLanguageSpinner() {
         // Use localized strings for display
         val languages = listOf(getString(R.string.english), getString(R.string.vietnamese))
@@ -153,9 +141,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    /**
-     * Setup menu action click listeners
-     */
     private fun setupMenuActions() {
         // View profile - navigate to profile screen
         binding.llViewProfile.setOnClickListener {
@@ -197,9 +182,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    /**
-     * Observe ViewModel LiveData for UI updates
-     */
     private fun observeViewModel() {
         // Observe current user for profile display
         viewModel.user.observe(viewLifecycleOwner) { user ->
@@ -247,9 +229,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    /**
-     * Show confirmation dialog before logging out
-     */
     private fun showLogoutConfirmationDialog() {
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.logout_title)
@@ -267,12 +246,8 @@ class SettingsFragment : Fragment() {
             ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
     }
 
-    /**
-     * Navigate to login screen and clear back stack
-     */
     private fun navigateToLogin() {
-        // Clear session first - Firestore.terminate() cancels all active listeners
-        // before Firebase signout to prevent PERMISSION_DENIED errors
+        // Terminate Firestore listeners before signing out to prevent PERMISSION_DENIED errors
         viewModel.clearSession()
         
         val intent = Intent(requireContext(), LoginActivity::class.java)

@@ -7,15 +7,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import com.hcmus.forumus_client.databinding.LayoutBottomInputBarBinding
 
-/**
- * A reusable bottom input bar component for text input + send action.
- *
- * Features:
- * - Editable text field with dynamic hint
- * - Send button callback returning the typed text
- * - Utility methods for focusing the input and showing the keyboard
- * - Clears input automatically after sending
- */
 class BottomInputBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -25,23 +16,11 @@ class BottomInputBar @JvmOverloads constructor(
     private val binding: LayoutBottomInputBarBinding =
         LayoutBottomInputBarBinding.inflate(LayoutInflater.from(context), this, true)
 
-    /**
-     * Callback triggered when the user taps the send button.
-     * Provides the trimmed input text. Empty strings are filtered out.
-     */
-    /**
-     * Callback triggered when the user taps the send button.
-     * Provides the trimmed input text. Empty strings are filtered out.
-     */
     var onSendClick: ((String) -> Unit)? = null
-
-    /**
-     * Callback triggered when the user cancels the reply mode.
-     */
     var onCancelReply: (() -> Unit)? = null
 
     init {
-        orientation = VERTICAL // Changed to vertical to stack banner and input
+        orientation = VERTICAL
 
         binding.btnSendComment.setOnClickListener {
             val text = getInputText().trim()
@@ -57,15 +36,10 @@ class BottomInputBar @JvmOverloads constructor(
         }
     }
 
-    /** Updates the input field hint text. */
     fun setHint(hint: String) {
         binding.etCommentInput.hint = hint
     }
 
-    /**
-     * Shows the "Replying to <user>" banner above the input.
-     * @param username The name of the user being replied to.
-     */
     fun showReplyBanner(username: String) {
         binding.tvReplyContext.text = context.getString(
             com.hcmus.forumus_client.R.string.replying_to_format, 
@@ -76,33 +50,22 @@ class BottomInputBar @JvmOverloads constructor(
         focusAndShowKeyboard()
     }
 
-    /**
-     * Hides the reply banner.
-     */
     fun hideReplyBanner() {
         binding.replyBannerContainer.visibility = GONE
         binding.replyDivider.visibility = GONE
     }
     
-    /**
-     * Check if reply banner is visible
-     */
     fun isReplying(): Boolean = binding.replyBannerContainer.visibility == VISIBLE
 
-    /**
-     * Requests focus on the input field and shows the soft keyboard.
-     */
     fun focusAndShowKeyboard() {
         binding.etCommentInput.requestFocus()
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(binding.etCommentInput, InputMethodManager.SHOW_IMPLICIT)
     }
 
-    /** Clears the current input text. */
     fun clearInput() {
         binding.etCommentInput.text.clear()
     }
 
-    /** Returns the current text from the input field. */
     fun getInputText(): String = binding.etCommentInput.text.toString()
 }

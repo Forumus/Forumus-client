@@ -27,9 +27,8 @@ import com.hcmus.forumus_client.ui.common.SharePostDialog
 import com.hcmus.forumus_client.data.repository.SavePostResult
 
 /**
- * Profile Fragment displaying a user's profile information and content (posts and comments).
- * Receives userId and mode via Safe Args from navigation.
- * Uses ProfileViewModel for profile-specific data and MainSharedViewModel for shared user data.
+ * Displays a user's profile with their info, posts, and comments.
+ * Supports filtering between all content, posts only, or comments only.
  */
 class ProfileFragment : Fragment() {
 
@@ -41,7 +40,6 @@ class ProfileFragment : Fragment() {
     private val navController by lazy { findNavController() }
     private lateinit var profileAdapter: ProfileAdapter
 
-    // Receive userId via Safe Args
     private val args: ProfileFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -72,15 +70,11 @@ class ProfileFragment : Fragment() {
         setupBottomNavigation()
         observeViewModel()
 
-        // Initialize view model with user ID and mode
+        // Load profile data for the user
         viewModel.loadUserInfo(userId)
         mainSharedViewModel.loadCurrentUser()
     }
 
-    /**
-     * Setup top app bar callbacks for menu, search, and profile actions.
-     * Observes MainSharedViewModel for current user data.
-     */
     private fun setupTopAppBar() {
         binding.topAppBar.apply {
             onFuncClick = {
@@ -106,12 +100,10 @@ class ProfileFragment : Fragment() {
                     }
 
                     ProfileMenuAction.TOGGLE_DARK_MODE -> {
-                        // Toggle dark mode preference
                         val preferencesManager = com.hcmus.forumus_client.data.local.PreferencesManager(requireContext())
                         val currentMode = preferencesManager.isDarkModeEnabled
                         preferencesManager.isDarkModeEnabled = !currentMode
 
-                        // Apply new theme
                         if (!currentMode) {
                             androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
                                 androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
@@ -122,7 +114,6 @@ class ProfileFragment : Fragment() {
                             )
                         }
 
-                        // Update system status bar and navigation bar colors
                         (activity as? com.hcmus.forumus_client.ui.main.MainActivity)?.updateStatusBarAppearance()
                     }
 
@@ -146,9 +137,7 @@ class ProfileFragment : Fragment() {
             }
         }
     }
-    /**
-     * Setup bottom navigation bar for fragment switching.
-     */
+
     private fun setupBottomNavigation() {
         binding.bottomBar.apply {
             setActiveTab(BottomNavigationBar.Tab.NONE)
@@ -160,20 +149,13 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    /**
-     * Setup filter buttons for different content views (GENERAL, POSTS, REPLIES).
-     * Clicking a button switches the profile display mode.
-     */
+    // Filter buttons switch between showing all content, posts only, or comments only
     private fun setupFilterButtons() {
         binding.generalButton.setOnClickListener { viewModel.setMode(ProfileMode.GENERAL) }
         binding.postButton.setOnClickListener { viewModel.setMode(ProfileMode.POSTS) }
         binding.replyButton.setOnClickListener { viewModel.setMode(ProfileMode.REPLIES) }
     }
 
-    /**
-     * Set up the RecyclerView with ProfileAdapter to display profile content.
-     * Handles both posts and comments, with separate callbacks for each type.
-     */
     private fun setupRecyclerView() {
         binding.contentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -181,6 +163,7 @@ class ProfileFragment : Fragment() {
             onPostAction = { post, action, view ->
                 when (action) {
                     PostAction.UPVOTE, PostAction.DOWNVOTE -> viewModel.onPostAction(post, action)
+                    // Navigate to post detail for open/reply actions
                     PostAction.OPEN -> {
                         val navAction = ProfileFragmentDirections
                             .actionGlobalPostDetailFragment(post.id)
@@ -195,9 +178,8 @@ class ProfileFragment : Fragment() {
                         val shareDialog = SharePostDialog.newInstance(post.id)
                         shareDialog.show(childFragmentManager, "SharePostDialog")
                     }
-                    PostAction.AUTHOR_PROFILE, PostAction.SUMMARY -> {
-                        // Already on profile or summary not applicable here, ignore
-                    }
+                    // Ignore: already on profile, summary not available here
+                    PostAction.AUTHOR_PROFILE, PostAction.SUMMARY -> { }
                     PostAction.MENU -> {
                         showPostMenu(post, view)
                     }
@@ -206,6 +188,7 @@ class ProfileFragment : Fragment() {
             onCommentAction = { comment, action ->
                 when (action) {
                     CommentAction.UPVOTE, CommentAction.DOWNVOTE -> viewModel.onCommentAction(comment, action)
+                    // Navigate to the parent post to see comment in context
                     CommentAction.OPEN -> {
                         val navAction = ProfileFragmentDirections
                             .actionGlobalPostDetailFragment(comment.postId)
@@ -215,9 +198,7 @@ class ProfileFragment : Fragment() {
                             .actionGlobalPostDetailFragment(comment.postId)
                         navController.navigate(navAction)
                     }
-                    CommentAction.AUTHOR_PROFILE -> {
-                        // Already on profile, ignore
-                    }
+                    CommentAction.AUTHOR_PROFILE -> { }
                     CommentAction.REPLIED_USER_PROFILE -> {
                         comment.replyToUserId?.let {
                             val navAction = ProfileFragmentDirections
@@ -238,11 +219,8 @@ class ProfileFragment : Fragment() {
         binding.contentRecyclerView.adapter = profileAdapter
     }
 
-    /**
-     * Observe all ViewModel LiveData streams and update UI accordingly.
-     */
     private fun observeViewModel() {
-        // Update profile header with user information
+        // Profile header
         viewModel.user.observe(viewLifecycleOwner) { user ->
             binding.username.text = user.fullName.ifBlank { getString(R.string.anonymous) }
             binding.userEmail.text = user.email
@@ -254,18 +232,17 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        // Update badge counts
+        // Bottom bar badge counts
         notificationViewModel.unreadCount.observe(viewLifecycleOwner) { count ->
             android.util.Log.d("ProfileFragment", "Notification badge update: $count")
             binding.bottomBar.setNotificationBadge(count)
         }
-
         chatsViewModel.unreadChatCount.observe(viewLifecycleOwner) { count ->
             android.util.Log.d("ProfileFragment", "Chat badge update: $count")
             binding.bottomBar.setChatBadge(count)
         }
 
-        // Update statistics display
+        // Profile stats
         viewModel.postsCount.observe(viewLifecycleOwner) { count ->
             binding.postsCount.text = count.toString()
         }
@@ -276,19 +253,16 @@ class ProfileFragment : Fragment() {
             binding.upvotesCount.text = count.toString()
         }
 
-        // Update filter buttons UI when mode changes
+        // Update filter button styles and scroll to top when mode changes
         viewModel.mode.observe(viewLifecycleOwner) { mode ->
-            // RecyclerView continues using same adapter, only data source changes
             updateFilterUI(mode)
             binding.contentRecyclerView.scrollToPosition(0)
         }
 
-        // Update adapter with filtered visible items
         viewModel.visibleItems.observe(viewLifecycleOwner) { items ->
             profileAdapter.submitList(items)
         }
 
-        // Display error messages to user
         viewModel.error.observe(viewLifecycleOwner) { msg ->
             if (!msg.isNullOrBlank()) {
                 Toast.makeText(requireContext(), "Error: $msg", Toast.LENGTH_SHORT).show()
@@ -312,22 +286,12 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        // Monitor loading state (can show/hide ProgressBar if needed)
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.swipeRefresh.isRefreshing = isLoading
         }
     }
 
-    /**
-     * Update the visual appearance of filter buttons based on current mode.
-     */
-    /**
-     * Updates the visual state of filter buttons based on the current mode.
-     *
-     * Applies active/inactive background resources to highlight the selected filter.
-     *
-     * @param mode The current ProfileMode (GENERAL, POSTS, or REPLIES)
-     */
+    // Highlight the active filter button
     private fun updateFilterUI(mode: ProfileMode) {
         with(binding) {
             when (mode) {
@@ -350,22 +314,10 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    /**
-     * Display the post action menu popup when user taps the menu icon on a post. Allows users to
-     * save or report the post.
-     */
     private fun showPostMenu(post: Post, menuButton: View) {
         val popupMenu = PopupPostMenu(requireActivity() as androidx.appcompat.app.AppCompatActivity)
-
-        // Handle save button click
-        popupMenu.onSaveClick = {
-            viewModel.savePost(post)
-        }
-
-        // Handle violation selection from report menu
+        popupMenu.onSaveClick = { viewModel.savePost(post) }
         popupMenu.onReportClick = { violation -> viewModel.saveReport(post, violation) }
-
-        // Show popup at menu button
         popupMenu.show(menuButton)
     }
 }

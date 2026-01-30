@@ -15,16 +15,11 @@ class PostMediaAdapter(
     private var onMediaClick: (position: Int) -> Unit = {}
 ) : RecyclerView.Adapter<PostMediaAdapter.ImageViewHolder>() {
 
-    // Full list of media items (images + videos) in original order
     private var allItems: List<PostMediaItem> = emptyList()
-    // Subset displayed by the adapter (max 3)
     private var displayedItems: List<PostMediaItem> = emptyList()
     private var totalCount: Int = 0
 
-    /**
-     * Truyền vào list media (ảnh + video). Adapter sẽ chỉ hiển thị tối đa 3 item,
-     * nhưng totalCount vẫn là tổng số để tính overlay +N.
-     */
+    // Shows max 3 items, rest shown as +N overlay on 3rd item
     fun submitMedia(items: List<PostMediaItem>) {
         totalCount = items.size
         allItems = items
@@ -55,7 +50,6 @@ class PostMediaAdapter(
                         crossfade(true)
                         error(R.drawable.error_image)
                         placeholder(R.drawable.gray_background)
-                        // Enable aggressive caching
                         memoryCachePolicy(CachePolicy.ENABLED)
                         diskCachePolicy(CachePolicy.ENABLED)
                         networkCachePolicy(CachePolicy.ENABLED)
@@ -72,7 +66,6 @@ class PostMediaAdapter(
                         crossfade(true)
                         error(R.drawable.gray_background)
                         placeholder(R.drawable.gray_background)
-                        // Enable aggressive caching for video thumbnails
                         memoryCachePolicy(CachePolicy.ENABLED)
                         diskCachePolicy(CachePolicy.ENABLED)
                         networkCachePolicy(CachePolicy.ENABLED)
@@ -83,16 +76,13 @@ class PostMediaAdapter(
                             onError = { _, _ -> progressBar.visibility = View.GONE }
                         )
                     }
-                    // Hiển thị icon play cho video
                     ivPlayIcon.visibility = View.VISIBLE
                 }
             }
 
-            // Mặc định ẩn overlay +N
             overlay.visibility = View.GONE
             tvMoreCount.visibility = View.GONE
 
-            // Nếu > 3 media, item thứ 3 (index 2) hiện overlay +N
             if (totalCount > 3 && position == 2) {
                 val moreCount = totalCount - 3
                 overlay.visibility = View.VISIBLE

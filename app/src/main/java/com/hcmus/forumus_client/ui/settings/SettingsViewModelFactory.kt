@@ -4,6 +4,9 @@ import android.app.Application
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModel
 
+/**
+ * Factory to create SettingsViewModel with Application context.
+ */
 class SettingsViewModelFactory(
     private val application: Application
 ) : ViewModelProvider.Factory {

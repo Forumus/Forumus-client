@@ -15,13 +15,7 @@ import com.hcmus.forumus_client.databinding.FragmentHelpCenterBinding
 import androidx.core.net.toUri
 
 /**
- * Fragment displaying the help center with FAQs and support options.
- * 
- * Features:
- * - Frequently asked questions with expandable answers
- * - Quick action buttons for contact support and reporting issues
- * - Email support contact information
- * - Comprehensive help topics covering platform usage
+ * Help center with FAQs and support contact options (email support, report issues).
  */
 class HelpCenterFragment : Fragment() {
 
@@ -47,18 +41,12 @@ class HelpCenterFragment : Fragment() {
         setupFooterActions()
     }
 
-    /**
-     * Setup back button to return to settings screen
-     */
     private fun setupBackButton() {
         binding.ibBack.setOnClickListener {
             navController.popBackStack()
         }
     }
 
-    /**
-     * Setup quick action buttons for support and reporting
-     */
     private fun setupQuickActions() {
         // Contact support button
         binding.cvContactSupport.setOnClickListener {
@@ -71,9 +59,6 @@ class HelpCenterFragment : Fragment() {
         }
     }
 
-    /**
-     * Setup RecyclerView with help topics/FAQs
-     */
     private fun setupHelpTopics() {
         val topics = getHelpTopics()
         
@@ -85,18 +70,13 @@ class HelpCenterFragment : Fragment() {
         }
     }
 
-    /**
-     * Setup footer email support link
-     */
     private fun setupFooterActions() {
         binding.tvEmailSupport.setOnClickListener {
             openEmailClient("support@forumus.edu.vn", getString(R.string.email_subject_general))
         }
     }
 
-    /**
-     * Open email client with pre-filled recipient and subject
-     */
+    // Opens email app with pre-filled recipient and subject
     private fun openEmailClient(email: String, subject: String) {
         try {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
@@ -123,9 +103,6 @@ class HelpCenterFragment : Fragment() {
         }
     }
 
-    /**
-     * Get the list of help topics with detailed answers
-     */
     private fun getHelpTopics(): List<HelpTopic> {
         return listOf(
             HelpTopic(

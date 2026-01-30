@@ -69,7 +69,7 @@ class EditProfileFragment : Fragment() {
         mainSharedViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             vm.setUser(user)
 
-            // Bind UI 1 lần khi user về (tránh setText lặp khi đang gõ)
+            // Bind UI once when user loads (avoid resetting text while typing)
             if (user != null && !hasBoundOnce) {
                 hasBoundOnce = true
                 binding.fullnameEditText.setText(user.fullName)
@@ -100,7 +100,7 @@ class EditProfileFragment : Fragment() {
                     vm.clearError()
                 }
 
-                // Disable khi saving
+                // Disable inputs while saving
                 val enabled = !state.isSaving
                 binding.uploadButton.isEnabled = enabled
                 binding.saveButton.isEnabled = enabled
@@ -108,7 +108,7 @@ class EditProfileFragment : Fragment() {
                 binding.fullnameInputLayout.isEnabled = enabled
                 binding.saveButton.text = if (state.isSaving) getString(R.string.saving) else getString(R.string.save)
 
-                // Nếu chưa chọn preview mà user thay đổi avatarUrl (sau save) thì load lại
+                // Reload avatar from URL if no preview is selected
                 val user = state.user
                 if (user != null && state.avatarPreviewUri == null) {
                     binding.avatarImageView.load(user.profilePictureUrl) {
@@ -157,13 +157,13 @@ class EditProfileFragment : Fragment() {
     private fun applyRoleChipStyle(role: UserRole) {
         val (textColorRes, bgColorRes) = when (role) {
             UserRole.STUDENT ->
-                R.color.role_student to R.color.role_student_tonal   // xanh dương
+                R.color.role_student to R.color.role_student_tonal   // blue
 
             UserRole.TEACHER ->
-                R.color.role_teacher to R.color.role_teacher_tonal   // tím
+                R.color.role_teacher to R.color.role_teacher_tonal   // purple
 
             UserRole.ADMIN ->
-                R.color.role_admin to R.color.role_admin_tonal       // vàng
+                R.color.role_admin to R.color.role_admin_tonal       // yellow
 
             else ->
                 R.color.text_primary to R.color.neutral_tonal
@@ -182,16 +182,16 @@ class EditProfileFragment : Fragment() {
     private fun applyStatusChipStyle(status: UserStatus) {
         val (textColorRes, bgColorRes) = when (status) {
             UserStatus.BANNED ->
-                R.color.status_banned to R.color.status_banned_tonal      // đỏ
+                R.color.status_banned to R.color.status_banned_tonal      // red
 
             UserStatus.WARNED ->
-                R.color.status_warned to R.color.status_warned_tonal      // vàng
+                R.color.status_warned to R.color.status_warned_tonal      // yellow
 
             UserStatus.REMINDED ->
-                R.color.status_reminded to R.color.status_reminded_tonal  // xanh dương
+                R.color.status_reminded to R.color.status_reminded_tonal  // blue
 
             else ->
-                R.color.status_normal to R.color.status_normal_tonal      // xanh lá
+                R.color.status_normal to R.color.status_normal_tonal      // green
         }
 
         val textColor = ContextCompat.getColor(requireContext(), textColorRes)

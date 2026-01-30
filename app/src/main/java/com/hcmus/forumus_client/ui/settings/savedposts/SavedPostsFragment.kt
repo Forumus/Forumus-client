@@ -18,9 +18,7 @@ import com.hcmus.forumus_client.ui.home.HomeFragmentDirections
 import kotlinx.coroutines.launch
 
 /**
- * Fragment displaying all posts saved by the user.
- * Follows MVVM architecture with Data Binding.
- * Users can view saved posts, navigate to post details, and unsave posts.
+ * Displays posts saved by the user. Supports viewing, unsaving, and navigating to details.
  */
 class SavedPostsFragment : Fragment() {
 
@@ -52,18 +50,12 @@ class SavedPostsFragment : Fragment() {
         viewModel.loadSavedPosts()
     }
 
-    /**
-     * Setup header with back button navigation.
-     */
     private fun setupHeader() {
         binding.ibBack.setOnClickListener {
             navController.popBackStack()
         }
     }
 
-    /**
-     * Setup RecyclerView with adapter to display saved posts.
-     */
     private fun setupRecyclerView() {
         adapter = SavedPostsAdapter(
             items = emptyList(),
@@ -76,18 +68,12 @@ class SavedPostsFragment : Fragment() {
         }
     }
 
-    /**
-     * Setup SwipeRefreshLayout for pull-to-refresh functionality.
-     */
     private fun setupSwipeRefresh() {
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.loadSavedPosts()
         }
     }
 
-    /**
-     * Observe ViewModel LiveData for UI updates.
-     */
     private fun observeViewModel() {
         // Observe saved posts list
         viewModel.savedPosts.observe(viewLifecycleOwner) { posts ->
@@ -116,13 +102,6 @@ class SavedPostsFragment : Fragment() {
         }
     }
 
-    /**
-     * Handle post action clicks (upvote, downvote, reply, menu).
-     *
-     * @param post The post that was interacted with
-     * @param action The action performed
-     * @param view The view that was clicked
-     */
     private fun handlePostAction(post: Post, action: PostAction, view: View) {
         when (action) {
             PostAction.UPVOTE -> {
@@ -165,13 +144,7 @@ class SavedPostsFragment : Fragment() {
         }
     }
 
-    /**
-     * Display the post action menu popup when user taps the menu icon on a post.
-     * Allows users to unsave the post and report violations.
-     *
-     * @param post The post to show menu for
-     * @param menuButton The menu button view
-     */
+    // Shows post menu with unsave and report options
     private fun showPostMenu(post: Post, menuButton: View) {
         val popupMenu = PopupPostMenu(requireActivity() as androidx.appcompat.app.AppCompatActivity)
 

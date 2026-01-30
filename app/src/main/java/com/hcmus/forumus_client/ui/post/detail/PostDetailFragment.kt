@@ -26,9 +26,7 @@ import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 import com.hcmus.forumus_client.data.repository.SavePostResult
 
 /**
- * Post Detail Fragment displaying a single post and all its comments.
- * Receives postId via Safe Args from navigation.
- * Hides BottomNavigationBar while showing an input bar for commenting.
+ * Displays a single post with all its comments and allows commenting.
  */
 class PostDetailFragment : Fragment() {
 
@@ -38,7 +36,6 @@ class PostDetailFragment : Fragment() {
     private val navController by lazy { findNavController() }
     private lateinit var detailAdapter: PostDetailAdapter
 
-    // Receive postId via Safe Args
     private val args: PostDetailFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -53,7 +50,6 @@ class PostDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize summary cache with context
         viewModel.initSummaryCache(requireContext())
 
         val postId = args.postId
@@ -72,10 +68,6 @@ class PostDetailFragment : Fragment() {
         viewModel.loadPostDetail(postId)
     }
 
-    /**
-     * Setup top app bar callbacks for menu, search, and profile actions.
-     * Observes MainSharedViewModel for current user data.
-     */
     private fun setupTopAppBar() {
         binding.topAppBar.apply {
             onFuncClick = {
@@ -101,12 +93,10 @@ class PostDetailFragment : Fragment() {
                     }
 
                     ProfileMenuAction.TOGGLE_DARK_MODE -> {
-                        // Toggle dark mode preference
                         val preferencesManager = com.hcmus.forumus_client.data.local.PreferencesManager(requireContext())
                         val currentMode = preferencesManager.isDarkModeEnabled
                         preferencesManager.isDarkModeEnabled = !currentMode
 
-                        // Apply new theme
                         if (!currentMode) {
                             androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
                                 androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
@@ -117,7 +107,6 @@ class PostDetailFragment : Fragment() {
                             )
                         }
 
-                        // Update system status bar and navigation bar colors
                         (activity as? com.hcmus.forumus_client.ui.main.MainActivity)?.updateStatusBarAppearance()
                     }
 
@@ -131,9 +120,6 @@ class PostDetailFragment : Fragment() {
         }
     }
 
-    /**
-     * Sets up the bottom input bar for composing new comments.
-     */
     private fun setupBottomInputBar() {
         binding.bottomInputBar.apply {
             onSendClick = { text ->
@@ -152,17 +138,11 @@ class PostDetailFragment : Fragment() {
         }
     }
 
-    /**
-     * Sets up the RecyclerView with PostDetailAdapter to display post and comments.
-     * Handles post voting and comment interactions.
-     */
     private fun setupRecyclerView() {
         detailAdapter = PostDetailAdapter(
             onPostAction = { post, action, view ->
                 when (action) {
-                    PostAction.OPEN -> {
-                        // No action needed - already on detail page
-                    }
+                    PostAction.OPEN -> { }
                     PostAction.UPVOTE -> {
                         viewModel.handleVote(post, true)
                     }
@@ -191,7 +171,6 @@ class PostDetailFragment : Fragment() {
             onCommentAction = { comment, action ->
                 when (action) {
                     CommentAction.OPEN -> {
-                        // Toggle expand/collapse for nested replies
                         viewModel.handleOpen(comment)
                     }
                     CommentAction.UPVOTE -> {
@@ -217,7 +196,6 @@ class PostDetailFragment : Fragment() {
                     }
 
                     CommentAction.VIEW_REPLIES -> {
-                        // Toggle expand/collapse for comment's nested replies
                         viewModel.toggleReplies(comment)
                     }
                 }
@@ -230,23 +208,19 @@ class PostDetailFragment : Fragment() {
         }
     }
 
-    /**
-     * Observe all ViewModel LiveData streams and update UI accordingly.
-     */
     private fun observeViewModel() {
         mainSharedViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             binding.topAppBar.setProfileImage(user?.profilePictureUrl)
         }
 
         viewModel.items.observe(viewLifecycleOwner) { items ->
-            // Preserve scroll position during updates
+            // Preserve scroll position
             val layoutManager = binding.postRecyclerView.layoutManager as? LinearLayoutManager
             val firstVisiblePosition = layoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
             val scrollOffset = layoutManager?.findViewByPosition(firstVisiblePosition)?.top ?: 0
             
             detailAdapter.submitList(items)
             
-            // Restore scroll position if it changed
             if (firstVisiblePosition > 0) {
                 binding.postRecyclerView.post {
                     layoutManager?.scrollToPositionWithOffset(firstVisiblePosition, scrollOffset)
@@ -255,7 +229,6 @@ class PostDetailFragment : Fragment() {
         }
 
         viewModel.topics.observe(viewLifecycleOwner) { topics ->
-            // Only update if topics list is not empty to prevent redundant calls
             if (topics.isNotEmpty()) {
                 detailAdapter.setTopics(topics)
             }
@@ -288,14 +261,12 @@ class PostDetailFragment : Fragment() {
             }
         }
 
-        // Open keyboard and focus input bar when user replies to post or comment
         viewModel.openReplyInput.observe(viewLifecycleOwner) { open ->
             if (open == true) {
                 binding.bottomInputBar.focusAndShowKeyboard()
             }
         }
 
-        // Update input bar hint based on reply target (post or specific comment)
         viewModel.replyTargetComment.observe(viewLifecycleOwner) { target ->
             if (target != null) {
                 binding.bottomInputBar.showReplyBanner(target.authorName)
@@ -307,12 +278,10 @@ class PostDetailFragment : Fragment() {
             }
         }
 
-        // Observe AI summary loading state for button UI
         viewModel.isSummaryLoading.observe(viewLifecycleOwner) { isLoading ->
             detailAdapter.setSummaryLoading(isLoading)
         }
 
-        // Observe AI summary result to show dialog or error
         viewModel.summaryResult.observe(viewLifecycleOwner) { result ->
             result?.let { summaryResult ->
                 summaryResult.onSuccess { summary ->
@@ -325,11 +294,6 @@ class PostDetailFragment : Fragment() {
         }
     }
 
-    /**
-     * Displays a bottom sheet dialog with the AI-generated summary.
-     *
-     * @param summary The summary text to display
-     */
     private fun showSummaryDialog(summary: String) {
         val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
         val view = layoutInflater.inflate(R.layout.dialog_post_summary, null)
@@ -343,31 +307,19 @@ class PostDetailFragment : Fragment() {
         dialog.show()
     }
 
-    /**
-     * Displays an error toast when summary generation fails.
-     *
-     * @param message The error message to display
-     */
     private fun showSummaryError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
-    /**
-     * Display the post action menu popup when user taps the menu icon on a post. Allows users to
-     * save or report the post.
-     */
     private fun showPostMenu(post: Post, menuButton: View) {
         val popupMenu = PopupPostMenu(requireActivity() as androidx.appcompat.app.AppCompatActivity)
 
-        // Handle save button click
         popupMenu.onSaveClick = {
             viewModel.savePost(post)
         }
 
-        // Handle violation selection from report menu
         popupMenu.onReportClick = { violation -> viewModel.saveReport(post, violation) }
 
-        // Show popup at menu button
         popupMenu.show(menuButton)
     }
 }

@@ -12,19 +12,8 @@ import com.hcmus.forumus_client.data.repository.UserRepository
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel for managing settings screen state and user preferences.
- *
- * Responsibilities:
- * - Load and display current user profile information
- * - Manage preference toggles (dark mode, push notifications, email notifications)
- * - Persist user preferences to SharedPreferences using PreferencesManager
- * - Restore saved preferences when activity is created
- * - Provide observable LiveData for preference state
- *
- * All preference changes are immediately saved to persistent storage,
- * ensuring that user preferences are retained across app sessions.
- *
- * @param application The application context for PreferencesManager
+ * Manages settings screen state and user preferences.
+ * Handles loading/saving preferences (dark mode, notifications, language) to SharedPreferences.
  */
 class SettingsViewModel(
     application: Application,
@@ -65,10 +54,7 @@ class SettingsViewModel(
     private val _logoutCompleted = MutableLiveData<Boolean>()
     val logoutCompleted: LiveData<Boolean> = _logoutCompleted
 
-    /**
-     * Load current user profile information from Firestore.
-     * This populates the user profile header card with name, email, and avatar.
-     */
+    // Fetches current user from Firestore for profile header display
     fun loadCurrentUser() {
         viewModelScope.launch {
             try {
@@ -88,10 +74,7 @@ class SettingsViewModel(
         }
     }
 
-    /**
-     * Load all saved user preferences from SharedPreferences.
-     * Called when activity is created to restore user's previous settings.
-     */
+    // Restores saved preferences from SharedPreferences
     fun loadSavedPreferences() {
         _isDarkModeEnabled.value = preferencesManager.isDarkModeEnabled
         _isPushNotificationsEnabled.value = preferencesManager.isPushNotificationsEnabled
@@ -99,62 +82,32 @@ class SettingsViewModel(
         _language.value = preferencesManager.language
     }
 
-    /**
-     * Save dark mode preference to SharedPreferences.
-     * Immediately updates persistent storage.
-     *
-     * @param isEnabled True to enable dark mode, false to disable
-     */
     fun saveDarkModePreference(isEnabled: Boolean) {
         _isDarkModeEnabled.value = isEnabled
         preferencesManager.isDarkModeEnabled = isEnabled
     }
 
-    /**
-     * Save push notifications preference to SharedPreferences.
-     * Immediately updates persistent storage.
-     *
-     * @param isEnabled True to enable push notifications, false to disable
-     */
     fun savePushNotificationsPreference(isEnabled: Boolean) {
         _isPushNotificationsEnabled.value = isEnabled
         preferencesManager.isPushNotificationsEnabled = isEnabled
     }
 
-    /**
-     * Save email notifications preference to SharedPreferences.
-     * Immediately updates persistent storage.
-     *
-     * @param isEnabled True to enable email notifications, false to disable
-     */
     fun saveEmailNotificationsPreference(isEnabled: Boolean) {
         _isEmailNotificationsEnabled.value = isEnabled
         preferencesManager.isEmailNotificationsEnabled = isEnabled
     }
 
-    /**
-     * Save language preference to SharedPreferences.
-     * Immediately updates persistent storage.
-     *
-     * @param language Selected language ("English" or "Vietnamese")
-     */
     fun saveLanguagePreference(language: String) {
         _language.value = language
         preferencesManager.language = language
     }
 
-    /**
-     * Perform user logout.
-     * Signals the fragment to navigate to login screen.
-     */
+    // Signals fragment to navigate to login
     fun logout() {
         _logoutCompleted.value = true
     }
 
-    /**
-     * Clear session data and sign out.
-     * Terminates Firestore to cancel all active listeners before signing out.
-     */
+    // Terminates Firestore listeners and signs out
     fun clearSession() {
         authRepository.logout()
     }

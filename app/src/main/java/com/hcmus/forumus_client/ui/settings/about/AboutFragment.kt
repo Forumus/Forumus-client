@@ -9,15 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.hcmus.forumus_client.databinding.FragmentAboutBinding
 
 /**
- * Fragment displaying information about the Forumus application.
- * 
- * This screen provides:
- * - App description and purpose
- * - Key features of the platform
- * - Development team information
- * - Legal and copyright information
- * 
- * The screen is purely informational and does not require complex logic.
+ * Shows information about Forumus - app features, team info, and legal notices.
  */
 class AboutFragment : Fragment() {
 
@@ -39,9 +31,6 @@ class AboutFragment : Fragment() {
         setupBackButton()
     }
 
-    /**
-     * Setup back button to return to previous screen
-     */
     private fun setupBackButton() {
         binding.ibBack.setOnClickListener {
             navController.popBackStack()

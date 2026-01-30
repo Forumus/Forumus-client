@@ -17,18 +17,8 @@ import android.view.View
 import com.hcmus.forumus_client.data.model.Topic
 
 /**
- * RecyclerView adapter that displays a mixed list of posts and comments in post detail.
- *
- * Supports two item types:
- * - PostItem: Shows post content with voting capabilities
- * - CommentItem: Shows comment content with voting and detail mode for nesting
- *
- * Uses callbacks to handle user interactions (upvote, downvote, open details, etc.)
- * and delegates rendering to specialized ViewHolder classes (PostViewHolder, CommentViewHolder).
- *
- * @param items Initial list of feed items (posts and comments)
- * @param onPostAction Callback when user interacts with a post
- * @param onCommentAction Callback when user interacts with a comment
+ * Adapter for displaying a post and its comments in the detail screen.
+ * Post is always at position 0, followed by comments.
  */
 class PostDetailAdapter(
     private val onPostAction: (Post, PostAction, View) -> Unit,
@@ -36,41 +26,23 @@ class PostDetailAdapter(
 ) : ListAdapter<FeedItem, RecyclerView.ViewHolder>(FeedItemDiffCallback()) {
 
     companion object {
-        // View type constants for determining which ViewHolder to use
         private const val TYPE_POST = 1
         private const val TYPE_COMMENT = 2
     }
 
-    // Map of topic id to Topic object
     private var topicMap: Map<String, Topic> = emptyMap()
-
-    // Track if AI summary is loading for the post
     private var isSummaryLoading: Boolean = false
 
-    /**
-     * Updates the adapter with the list of topics.
-     * Only triggers update if topics actually changed to prevent redundant re-renders.
-     *
-     * @param topics The list of topics to map
-     */
     fun setTopics(topics: List<Topic>) {
         val newTopicMap = topics.associateBy { it.id }
-        // Only update if topics actually changed
         if (newTopicMap != topicMap) {
             this.topicMap = newTopicMap
-            // Only notify the post item (always at position 0) with topics payload
             if (currentList.isNotEmpty() && currentList[0] is FeedItem.PostItem) {
                 notifyItemChanged(0, "topics")
             }
         }
     }
 
-    /**
-     * Returns the view type for the item at the specified position.
-     *
-     * @param position The position of the item in the adapter
-     * @return TYPE_POST if item is a PostItem, TYPE_COMMENT if item is a CommentItem
-     */
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             is FeedItem.PostItem -> TYPE_POST
@@ -78,26 +50,14 @@ class PostDetailAdapter(
         }
     }
 
-    /**
-     * Creates the appropriate ViewHolder based on the item view type.
-     *
-     * Inflates the corresponding layout and wraps it with the proper ViewHolder class.
-     * Attaches the action callbacks to enable communication between ViewHolder and Activity.
-     *
-     * @param parent The parent ViewGroup
-     * @param viewType The type of view to create (TYPE_POST or TYPE_COMMENT)
-     * @return The created ViewHolder (PostViewHolder or CommentViewHolder)
-     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             TYPE_POST -> {
-                // Inflate post item layout and create PostViewHolder
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.post_item, parent, false)
                 PostViewHolder(view, onPostAction)
             }
             else -> {
-                // Inflate comment item layout and create CommentViewHolder
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.comment_item, parent, false)
                 CommentViewHolder(view, onCommentAction)
@@ -105,15 +65,6 @@ class PostDetailAdapter(
         }
     }
 
-    /**
-     * Binds the data at the specified position to the corresponding ViewHolder.
-     *
-     * Extracts the appropriate data object from the FeedItem and calls the
-     * ViewHolder's bind method to update the views.
-     *
-     * @param holder The ViewHolder to bind data to
-     * @param position The position of the item in the adapter
-     */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is FeedItem.PostItem -> {
@@ -124,21 +75,16 @@ class PostDetailAdapter(
         }
     }
 
-    /**
-     * Binds data with payloads for partial updates.
-     * This prevents full item rebinding when only specific fields change.
-     */
+    // Partial updates via payloads to avoid full rebind
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
         payloads: MutableList<Any>
     ) {
         if (payloads.isEmpty()) {
-            // Full bind
             super.onBindViewHolder(holder, position, payloads)
         } else {
             val item = getItem(position)
-            // Handle partial updates
             for (payload in payloads) {
                 when (payload) {
                     "votes" -> {
@@ -163,15 +109,8 @@ class PostDetailAdapter(
         }
     }
 
-    /**
-     * Updates the AI summary loading state for the post.
-     * Since there's only one post at position 0, we notify that item.
-     *
-     * @param isLoading True if summary is being fetched, false otherwise
-     */
     fun setSummaryLoading(isLoading: Boolean) {
         isSummaryLoading = isLoading
-        // Post is always at position 0, notify to update loading state
         if (itemCount > 0 && getItem(0) is FeedItem.PostItem) {
             notifyItemChanged(0, "summary_loading")
         }

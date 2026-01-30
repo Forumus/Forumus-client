@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.GridLayoutManager
 
 class GridSpacingItemDecoration(
-    private val spacing: Int       // px
+    private val spacing: Int
 ) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(
@@ -22,22 +22,20 @@ class GridSpacingItemDecoration(
 
         val spanCount = layoutManager.spanCount
         val lp = view.layoutParams as GridLayoutManager.LayoutParams
-        val spanIndex = lp.spanIndex      // cột bắt đầu
+        val spanIndex = lp.spanIndex
         val groupIndex = layoutManager
             .spanSizeLookup
-            .getSpanGroupIndex(position, spanCount) // hàng thứ mấy
+            .getSpanGroupIndex(position, spanCount)
 
-        // Reset
         outRect.set(0, 0, 0, 0)
 
-        // Item bình thường (spanSize < spanCount), dùng spanIndex làm "column"
-        val column = spanIndex // 0..spanCount-1
+        val column = spanIndex
 
         if(column != 0) {
             outRect.left = spacing
         }
 
-        if (groupIndex > 0) { // từ hàng 2 trở đi
+        if (groupIndex > 0) {
             outRect.top = spacing
         }
     }

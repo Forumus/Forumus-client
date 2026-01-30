@@ -30,7 +30,7 @@ class EditProfileViewModel(
     private val _uiState = MutableStateFlow(EditProfileUiState())
     val uiState: StateFlow<EditProfileUiState> = _uiState.asStateFlow()
 
-    /** Gọi khi Fragment nhận user từ MainSharedViewModel */
+    // Called when Fragment receives user from MainSharedViewModel
     fun setUser(user: User?) {
         _uiState.update { it.copy(user = user) }
     }
@@ -39,9 +39,7 @@ class EditProfileViewModel(
         _uiState.update { it.copy(avatarPreviewUri = uri, error = null) }
     }
 
-    /**
-     * Save và trả về updatedUser để Fragment cập nhật MainSharedViewModel
-     */
+    // Saves profile and returns updated user for Fragment to update MainSharedViewModel
     fun saveProfile(newFullName: String, onSuccess: (updatedUser: User) -> Unit) {
         val user = _uiState.value.user ?: run {
             _uiState.update { it.copy(error = "No user to save") }
@@ -55,7 +53,7 @@ class EditProfileViewModel(
                 val pickedUri = _uiState.value.avatarPreviewUri
                 var finalAvatarUrl: String? = user.profilePictureUrl
 
-                // 1) Upload avatar nếu có
+                // Step 1: Upload avatar if user picked a new one
                 if (pickedUri != null) {
                     val downloadUrl = userRepository.uploadAvatar(user.uid, pickedUri)
                     val urlForUi = "$downloadUrl?ts=${System.currentTimeMillis()}"
@@ -71,11 +69,11 @@ class EditProfileViewModel(
                     }
                 }
 
-                // 2) Update full name
+                // Step 2: Update full name
                 userRepository.updateProfile(user.uid, fullName = newFullName)
                 _uiState.update { st -> st.copy(user = st.user?.copy(fullName = newFullName)) }
 
-                // 3) Sync posts/comments (có thể cần index)
+                // Step 3: Sync author info across posts/comments
                 postRepository.updateAuthorInfoInPosts(user.uid, newFullName, finalAvatarUrl)
                 commentRepository.updateAuthorInfoInComments(user.uid, newFullName, finalAvatarUrl)
 

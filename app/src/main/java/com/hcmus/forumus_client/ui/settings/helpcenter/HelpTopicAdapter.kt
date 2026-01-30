@@ -8,9 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.databinding.ItemHelpTopicBinding
 
 /**
- * RecyclerView adapter for displaying expandable help center topics/FAQs.
- * 
- * Handles expand/collapse animations and user interactions.
+ * Adapter for expandable help center FAQs with collapse/expand animation.
  */
 class HelpTopicAdapter(
     private val topics: List<HelpTopic>
