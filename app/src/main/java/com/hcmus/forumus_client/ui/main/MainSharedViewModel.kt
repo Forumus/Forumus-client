@@ -12,15 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.hcmus.forumus_client.data.model.Topic
 
-/**
- * Shared ViewModel across MainActivity and its Fragments.
- * Manages common data and logic used by multiple fragments:
- * - Current authenticated user (for TopAppBar avatar and profile menu)
- * - Loading and error states
- * 
- * Scope: Activity-level (activityViewModels in Fragments)
- * This ensures data persistence across fragment transitions.
- */
+/** Shared ViewModel for MainActivity and its Fragments. */
 class MainSharedViewModel(
     private val userRepository: UserRepository = UserRepository(),
 ) : ViewModel() {
@@ -37,10 +29,7 @@ class MainSharedViewModel(
     private val _error = MutableLiveData<String?>(null)
     val error: LiveData<String?> = _error
 
-    /**
-     * Load the currently authenticated user from repository.
-     * Called once on app startup and cached for subsequent fragments.
-     */
+    /** Loads the currently authenticated user. */
     fun loadCurrentUser() {
         if (_currentUser.value != null) {
             // User already loaded, skip
@@ -62,7 +51,7 @@ class MainSharedViewModel(
         }
     }
 
-    /** Gọi sau khi edit profile để lấy user mới nhất từ Firestore */
+    /** Refreshes user data from Firestore. */
     fun refreshCurrentUser() {
         _isLoading.value = true
         viewModelScope.launch {
@@ -77,7 +66,7 @@ class MainSharedViewModel(
         }
     }
 
-    /** Nếu đã có object user mới rồi thì set thẳng khỏi gọi Firestore */
+    /** Directly sets the current user without Firestore call. */
     fun setCurrentUser(user: User?) {
         _currentUser.value = user
     }

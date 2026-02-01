@@ -18,10 +18,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.launch
 
-/**
- * Activity displayed when a user is banned. Shows a countdown timer until the ban expires. Blocks
- * all user interaction and prevents access to the app while banned.
- */
+/** Activity displayed when a user is banned. */
 class BannedActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBannedBinding
     private lateinit var userRepository: UserRepository

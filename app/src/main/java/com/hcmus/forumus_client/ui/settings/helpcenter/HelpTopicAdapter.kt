@@ -7,9 +7,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.databinding.ItemHelpTopicBinding
 
-/**
- * Adapter for expandable help center FAQs with collapse/expand animation.
- */
+/** Adapter for expandable help center FAQs. */
 class HelpTopicAdapter(
     private val topics: List<HelpTopic>
 ) : RecyclerView.Adapter<HelpTopicAdapter.HelpTopicViewHolder>() {

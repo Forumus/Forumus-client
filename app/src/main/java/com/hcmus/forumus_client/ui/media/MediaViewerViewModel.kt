@@ -19,10 +19,7 @@ class MediaViewerViewModel(application: Application) : AndroidViewModel(applicat
 
     private val imageLoader = ImageLoader(application)
 
-    /**
-     * Set media list and optionally prefetch current + neighbors.
-     * Preloading logic lives here so the Fragment can be lightweight.
-     */
+    /** Sets media list and prefetches neighbors. */
     fun setMediaList(items: List<MediaViewerItem>, startIndex: Int) {
         _mediaItems.value = items
         _currentIndex.value = startIndex.coerceIn(0, maxOf(0, items.size - 1))
@@ -54,9 +51,7 @@ class MediaViewerViewModel(application: Application) : AndroidViewModel(applicat
         if (idx < size - 1) _currentIndex.value = idx + 1
     }
 
-    /**
-     * Set the current index directly (used by ViewPager2 callback)
-     */
+    /** Sets the current index directly. */
     fun setCurrentIndex(index: Int) {
         val size = _mediaItems.value?.size ?: 0
         if (index in 0 until size) {

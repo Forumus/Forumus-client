@@ -5,18 +5,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-/**
- * Helper class to prepare notification data.
- * Note: Actual FCM notification sending must be done from a server/Cloud Function.
- */
+/** Helper class to prepare notification data. */
 object NotificationHelper {
     
     private const val TAG = "NotificationHelper"
     
-    /**
-     * Get FCM token for a specific user.
-     * This token is needed by your backend to send notifications.
-     */
+    /** Gets FCM token for a specific user. */
     suspend fun getUserFcmToken(userId: String): String? {
         return try {
             val userDoc = FirebaseFirestore.getInstance()
@@ -34,9 +28,7 @@ object NotificationHelper {
         }
     }
     
-    /**
-     * Get sender information for notification.
-     */
+    /** Gets sender information for notification. */
     suspend fun getSenderInfo(senderId: String): SenderInfo? {
         return try {
             val userDoc = FirebaseFirestore.getInstance()
@@ -56,10 +48,7 @@ object NotificationHelper {
         }
     }
     
-    /**
-     * Save current user's FCM token to Firestore.
-     * Call this when the app starts or when the user logs in.
-     */
+    /** Saves current user's FCM token to Firestore. */
     suspend fun saveCurrentUserFcmToken(token: String): Boolean {
         return try {
             val userId = FirebaseAuth.getInstance().currentUser?.uid

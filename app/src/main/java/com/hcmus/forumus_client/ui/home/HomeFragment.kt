@@ -35,10 +35,7 @@ import kotlin.text.ifEmpty
 import kotlin.text.lowercase
 import kotlin.text.startsWith
 
-/**
- * Home Fragment displaying a feed of posts with voting and interaction features. Uses NavController
- * for navigation and Safe Args for passing data. Shares MainSharedViewModel for current user data.
- */
+/** Home Fragment displaying a feed of posts with voting features. */
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
@@ -84,10 +81,7 @@ class HomeFragment : Fragment() {
 
     }
 
-    /**
-     * Setup top app bar callbacks for menu, search, and profile actions. Observes
-     * MainSharedViewModel for current user data.
-     */
+    /** Sets up top app bar callbacks. */
     private fun setupTopAppBar() {
         binding.topAppBar.apply {
             onFuncClick = { binding.drawerLayout.openDrawer(GravityCompat.START) }
@@ -140,10 +134,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /**
-     * Sets up the RecyclerView with HomeAdapter to display posts. Configures post action callbacks
-     * for upvote, downvote, and navigation. Adds scroll listener for infinite scrolling.
-     */
+    /** Sets up the RecyclerView with HomeAdapter. */
     private fun setupRecyclerView() {
         homeAdapter =
                 HomeAdapter(emptyList()) { post, action, view ->
@@ -553,10 +544,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /**
-     * Display the post action menu popup when user taps the menu icon on a post. Allows users to
-     * save or report the post.
-     */
+    /** Displays the post action menu popup. */
     private fun showPostMenu(post: Post, menuButton: View) {
         val popupMenu = PopupPostMenu(requireActivity() as androidx.appcompat.app.AppCompatActivity)
 
@@ -572,11 +560,7 @@ class HomeFragment : Fragment() {
         popupMenu.show(menuButton)
     }
 
-    /**
-     * Displays a bottom sheet dialog with the AI-generated summary.
-     *
-     * @param summary The summary text to display
-     */
+    /** Displays a dialog with the AI-generated summary. */
     private fun showSummaryDialog(summary: String) {
         val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
         val view = layoutInflater.inflate(R.layout.dialog_post_summary, null)
@@ -590,11 +574,7 @@ class HomeFragment : Fragment() {
         dialog.show()
     }
 
-    /**
-     * Displays an error toast when summary generation fails.
-     *
-     * @param message The error message to display
-     */
+    /** Displays an error toast when summary generation fails. */
     private fun showSummaryError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }

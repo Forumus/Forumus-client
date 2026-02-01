@@ -4,30 +4,17 @@ import android.util.Patterns
 
 object ValidationUtils {
 
-    /**
-     * Validates if the full name is valid
-     * @param fullName The full name to validate
-     * @return true if valid, false otherwise
-     */
+    /** Validates if the full name is valid. */
     fun isValidFullName(fullName: String): Boolean {
         return fullName.trim().length >= 2 && fullName.trim().contains(" ")
     }
 
-    /**
-     * Validates if the email address is in correct format
-     * @param email The email to validate
-     * @return true if valid, false otherwise
-     */
+    /** Validates if the email is in correct format. */
     fun isValidEmail(email: String): Boolean {
         return email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    /**
-     * Validates if the email is a student/university email
-     * This is a simple check for university domains - can be extended
-     * @param email The email to validate
-     * @return true if valid university email, false otherwise
-     */
+    /** Validates if the email is a student/university email. */
     fun isValidStudentEmail(email: String): Boolean {
         if (!isValidEmail(email)) return false
         
@@ -41,11 +28,7 @@ object ValidationUtils {
         return universityDomains.any { domain.endsWith(it) }
     }
 
-    /**
-     * Validates if the password meets minimum requirements
-     * @param password The password to validate
-     * @return true if valid, false otherwise
-     */
+    /** Validates if the password meets minimum requirements. */
     fun isValidPassword(password: String): Boolean {
         return password.length >= 6
                 && password.length <= 32
@@ -53,11 +36,7 @@ object ValidationUtils {
                 && password.all { it.isLetterOrDigit() || "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~".contains(it) }
     }
 
-    /**
-     * Validates if the password meets strong requirements
-     * @param password The password to validate
-     * @return true if strong password, false otherwise
-     */
+    /** Validates if the password meets strong requirements. */
     fun isStrongPassword(password: String): Boolean {
         if (password.length < 8) return false
         
@@ -69,11 +48,7 @@ object ValidationUtils {
         return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar
     }
 
-    /**
-     * Validates if the phone number is in correct format
-     * @param phoneNumber The phone number to validate
-     * @return true if valid, false otherwise
-     */
+    /** Validates if the phone number is in correct format. */
     fun isValidPhoneNumber(phoneNumber: String): Boolean {
         return phoneNumber.isNotBlank() && 
                phoneNumber.replace(" ", "").replace("+", "").replace("-", "").all { it.isDigit() } &&

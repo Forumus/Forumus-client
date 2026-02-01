@@ -22,10 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
 
-/**
- * Manages post detail screen with hierarchical comment threading.
- * Comments are stored flat and organized on display based on parent-child relationships.
- */
+/** Manages post detail screen with hierarchical comment threading. */
 class PostDetailViewModel(
     private val userRepository: UserRepository = UserRepository(),
     private val postRepository: PostRepository = PostRepository(),
@@ -106,10 +103,7 @@ class PostDetailViewModel(
         }
     }
 
-    /**
-     * Rebuilds the display list: post first, then root comments with their
-     * replies shown only if the root is expanded.
-     */
+    /** Rebuilds the display list with post and comments. */
     private fun rebuildItems() {
         val post = currentPost ?: return
 
@@ -355,9 +349,7 @@ class PostDetailViewModel(
         handleOpen(comment)
     }
 
-    /**
-     * Creates a comment replying to either the post (if no target) or a specific comment.
-     */
+    /** Creates a comment replying to the post or a specific comment. */
     fun sendComment(rawText: String) {
         val text = rawText.trim()
         if (text.isBlank()) return

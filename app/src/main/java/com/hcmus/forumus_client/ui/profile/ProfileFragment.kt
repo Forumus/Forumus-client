@@ -26,10 +26,7 @@ import com.hcmus.forumus_client.ui.common.ProfileMenuAction
 import com.hcmus.forumus_client.ui.common.SharePostDialog
 import com.hcmus.forumus_client.data.repository.SavePostResult
 
-/**
- * Displays a user's profile with their info, posts, and comments.
- * Supports filtering between all content, posts only, or comments only.
- */
+/** Displays a user's profile with posts and comments. */
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding

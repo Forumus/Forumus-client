@@ -8,9 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.hcmus.forumus_client.databinding.FragmentAboutBinding
 
-/**
- * Shows information about Forumus - app features, team info, and legal notices.
- */
+/** Shows information about Forumus. */
 class AboutFragment : Fragment() {
 
     private lateinit var binding: FragmentAboutBinding

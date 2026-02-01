@@ -16,10 +16,7 @@ import com.hcmus.forumus_client.ui.common.CommentViewHolder
 import android.view.View
 import com.hcmus.forumus_client.data.model.Topic
 
-/**
- * Adapter for displaying a post and its comments in the detail screen.
- * Post is always at position 0, followed by comments.
- */
+/** Adapter for displaying a post and its comments. */
 class PostDetailAdapter(
     private val onPostAction: (Post, PostAction, View) -> Unit,
     private val onCommentAction: (Comment, CommentAction) -> Unit,

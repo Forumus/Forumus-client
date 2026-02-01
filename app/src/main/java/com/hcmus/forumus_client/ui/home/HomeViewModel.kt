@@ -21,16 +21,14 @@ import okhttp3.internal.platform.PlatformRegistry.applicationContext
 import com.hcmus.forumus_client.data.model.UserRole
 import com.hcmus.forumus_client.data.model.User
 
-/** ViewModel for the Home screen. Manages loading posts and users, handling voting interactions. */
+/** ViewModel for the Home screen. */
 class HomeViewModel(
         private val userRepository: UserRepository = UserRepository(),
         private val postRepository: PostRepository = PostRepository(),
         private val reportRepository: ReportRepository = ReportRepository()
 ) : ViewModel() {
 
-    /**
-     * Initializes the summary cache with context. Call this from the Fragment/Activity.
-     */
+    /** Initializes the summary cache with context. */
     fun initSummaryCache(context: Context) {
         postRepository.initSummaryCache(context.applicationContext)
     }
@@ -103,10 +101,7 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Fetches initial posts from the repository using pagination. Manages loading state and error
-     * handling.
-     */
+    /** Fetches initial posts using pagination. */
     fun loadPosts() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -150,10 +145,7 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Loads more posts for infinite scroll. Only loads if not already loading and there are more
-     * posts available.
-     */
+    /** Loads more posts for infinite scroll. */
     fun loadMorePosts() {
         // Don't load if already loading or no more posts
         if (_isLoadingMore.value == true || !hasMorePosts || _isLoading.value == true) {
@@ -201,11 +193,7 @@ class HomeViewModel(
         _posts.value = sortedList
     }
 
-    /**
-     * Toggles the sort option. If the same option is clicked, it toggles off to NONE.
-     *
-     * @param option The sort option to toggle
-     */
+    /** Toggles the sort option. */
     fun toggleSort(option: SortOption) {
         val current = _sortOption.value ?: SortOption.NONE
         if (current == option) {
@@ -216,11 +204,7 @@ class HomeViewModel(
         applyClientSideSort(_posts.value ?: emptyList())
     }
 
-    /**
-     * Toggles the selection of a topic for filtering. Enforces a maximum of 5 selected topics.
-     *
-     * @param topicId The ID of the topic to toggle
-     */
+    /** Toggles topic selection for filtering. */
     fun toggleTopicSelection(topicId: String) {
         val currentSelection = _selectedTopics.value?.toMutableSet() ?: mutableSetOf()
 
@@ -260,12 +244,7 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Handles post actions such as voting.
-     *
-     * @param post The post being acted upon
-     * @param postAction The action type (UPVOTE, DOWNVOTE, etc.)
-     */
+    /** Handles post actions such as voting. */
     fun onPostAction(post: Post, postAction: PostAction) {
         when (postAction) {
             PostAction.UPVOTE -> handleVote(post, isUpvote = true)
@@ -275,12 +254,7 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Requests an AI-generated summary for a post.
-     * Prevents duplicate requests for the same post.
-     *
-     * @param postId The ID of the post to summarize
-     */
+    /** Requests an AI summary for a post. */
     fun requestSummary(postId: String) {
         // Prevent duplicate requests
         if (_summaryLoadingPostId.value == postId) return
@@ -298,20 +272,12 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Clears the summary result after it has been handled by the UI.
-     */
+    /** Clears the summary result after handling. */
     fun clearSummaryResult() {
         _summaryResult.value = null
     }
 
-    /**
-     * Processes voting logic for a post using optimistic UI updates.
-     * Updates UI immediately, then persists to server. Rolls back on error.
-     *
-     * @param post The post to vote on
-     * @param isUpvote True for upvote, false for downvote
-     */
+    /** Processes voting with optimistic UI updates. */
     private fun handleVote(post: Post, isUpvote: Boolean) {
         viewModelScope.launch {
             // Calculate optimistic update
@@ -400,13 +366,7 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Saves a report for a post when user selects a violation. Creates a Report object, saves it to
-     * Firebase, increments reportCount, and adds userId to reportedUsers list in the post.
-     *
-     * @param post The post being reported
-     * @param violation The violation category selected by the user
-     */
+    /** Saves a report for a post. */
     fun saveReport(post: Post, violation: Violation) {
         viewModelScope.launch {
             try {
@@ -462,11 +422,7 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Saves a post for the current user.
-     *
-     * @param post The post to save
-     */
+    /** Saves a post for the current user. */
     fun savePost(post: Post) {
         viewModelScope.launch {
             val result = userRepository.savePost(post.id)
@@ -474,9 +430,7 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Clears the save post result after it has been handled by the UI
-     */
+    /** Clears the save post result after handling. */
     fun clearSavePostResult() {
         _savePostResult.value = null
     }

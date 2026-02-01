@@ -18,20 +18,12 @@ object SharePostUtil {
     // ABC123_xyz)
     private val VALID_POST_ID_PATTERN = "^[a-zA-Z0-9_-]+$".toRegex()
 
-    /**
-     * Generates a share URL for a post
-     * @param postId The ID of the post to share
-     * @return Share URL in format: app/forumus/share/<PostID>
-     */
+    /** Generates a share URL for a post. */
     fun generateShareUrl(postId: String): String {
         return "$SHARE_URL_PREFIX$postId"
     }
 
-    /**
-     * Extracts post ID from a share URL with strict validation
-     * @param url The share URL
-     * @return The post ID if valid, or null if the URL is not a valid share URL
-     */
+    /** Extracts post ID from a share URL. */
     fun extractPostIdFromUrl(url: String): String? {
         return if (url.startsWith(SHARE_URL_PREFIX)) {
             val postId = url.substringAfter(SHARE_URL_PREFIX)
@@ -46,14 +38,7 @@ object SharePostUtil {
         }
     }
 
-    /**
-     * Checks if a string is a strictly valid share URL
-     * - Must start with SHARE_URL_PREFIX
-     * - Must have non-empty PostId after prefix
-     * - PostId must match valid pattern
-     * @param text The text to check
-     * @return True if the text is a valid share URL (format-wise, not Firebase validation)
-     */
+    /** Checks if a string is a valid share URL. */
     fun isShareUrl(text: String): Boolean {
         if (!text.startsWith(SHARE_URL_PREFIX)) return false
 
@@ -61,15 +46,7 @@ object SharePostUtil {
         return postId.isNotEmpty() && postId.matches(VALID_POST_ID_PATTERN)
     }
 
-    /**
-     * Validates a share URL by checking:
-     * 1. Format is strictly: SHARE_URL_PREFIX + valid PostId
-     * 2. The extracted PostId exists in Firebase
-     *
-     * @param url The share URL to validate
-     * @param postRepository The PostRepository instance to check Firebase
-     * @return Result<Pair<String, Post>> with (postId, post) on success, exception on failure
-     */
+    /** Validates a share URL format and checks if post exists. */
     suspend fun validateShareUrl(
             url: String,
             postRepository: PostRepository = PostRepository()
@@ -105,12 +82,7 @@ object SharePostUtil {
         }
     }
 
-    /**
-     * Gets recipients for share dialog from the database.
-     * Fetches users from Firestore via UserRepository, excluding the current user.
-     * @param userRepository The UserRepository instance to use for fetching users
-     * @return List of users to share with (excluding current user)
-     */
+    /** Gets recipients for share dialog from the database. */
     suspend fun getRecipients(userRepository: UserRepository = UserRepository()): List<User> {
         return try {
             Log.d(TAG, "Fetching recipients from database")
@@ -133,12 +105,7 @@ object SharePostUtil {
         }
     }
 
-    /**
-     * Gets mock recipients for share dialog. In a real implementation, this would fetch the user's
-     * contacts or chat list.
-     * @return List of mock users to share with
-     * @deprecated Use getRecipients() instead to fetch real users from database
-     */
+    /** Returns mock recipients for testing. */
     @Deprecated("Use getRecipients() instead", ReplaceWith("getRecipients()"))
     fun getMockRecipients(): List<User> {
         return listOf(
@@ -193,13 +160,7 @@ object SharePostUtil {
         )
     }
 
-    /**
-     * Sends a shared post to a recipient via the ChatRepository
-     * @param recipientId The ID of the recipient user
-     * @param postId The ID of the post being shared
-     * @param chatRepository The ChatRepository instance to use for sending
-     * @return Result with message ID on success, exception on failure
-     */
+    /** Sends a shared post to a recipient via chat. */
     suspend fun sendShareMessage(
             recipientId: String,
             postId: String,

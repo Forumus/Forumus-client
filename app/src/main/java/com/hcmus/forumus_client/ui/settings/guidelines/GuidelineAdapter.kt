@@ -8,9 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_client.databinding.ItemGuidelineSectionBinding
 
-/**
- * Adapter for expandable community guideline sections with collapse/expand animation.
- */
+/** Adapter for expandable guideline sections. */
 class GuidelineAdapter(
     private val sections: List<GuidelineSection>
 ) : RecyclerView.Adapter<GuidelineAdapter.GuidelineViewHolder>() {

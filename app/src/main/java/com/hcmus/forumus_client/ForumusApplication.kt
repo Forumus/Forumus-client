@@ -10,18 +10,14 @@ import coil.util.DebugLogger
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-/**
- * Custom Application class with optimized image and video caching configuration.
- */
+/** Application class with image and video caching. */
 class ForumusApplication : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
     }
 
-    /**
-     * Create a custom ImageLoader with aggressive caching for better performance.
-     */
+    /** Creates a custom ImageLoader with caching. */
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
             .memoryCache {

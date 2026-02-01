@@ -8,10 +8,7 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.Post
 
 object MediaViewerNavigator {
-    /**
-     * Open media viewer for a given post and start index.
-     * This centralizes navigation and preloading so multiple fragments don't duplicate code.
-     */
+    /** Opens media viewer for a post at given index. */
     fun open(view: View, post: Post, startIndex: Int) {
         val activity = view.context as? FragmentActivity ?: return
 

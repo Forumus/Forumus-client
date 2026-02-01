@@ -28,14 +28,7 @@ import com.hcmus.forumus_client.databinding.ActivityMainBinding
 import com.hcmus.forumus_client.ui.auth.banned.BannedActivity
 import kotlinx.coroutines.launch
 
-/**
- * Main Activity that serves as the container for all Fragments.
- * Manages:
- * - Navigation between Home, Profile, and Post Detail fragments using Navigation Component
- * - TopAppBar with profile menu, search, and home navigation
- * - BottomNavigationBar for switching between Home and Profile (hidden during Post Detail)
- * - Shared ViewModel for current user data across fragments
- */
+/** Main Activity container for all app fragments. */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -89,10 +82,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Handle system window insets by applying padding to avoid overlap with status bar,
-     * navigation bar and keyboard (IME).
-     */
+    /** Applies padding to avoid overlap with system bars. */
     private fun setupWindowInsetsHandling() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(
@@ -103,10 +93,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Initialize the Navigation Component with NavHostFragment and set up destination changed listener.
-     * Hides BottomNavigationBar when navigating to PostDetailFragment.
-     */
+    /** Initializes the Navigation Component. */
     private fun setupNavigation() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.navHostFragment) as? NavHostFragment
@@ -115,16 +102,12 @@ class MainActivity : AppCompatActivity() {
             ?: throw IllegalStateException("NavHostFragment not found")
     }
 
-    /**
-     * Load initial data on app startup.
-     */
+    /** Loads initial data on app startup. */
     private fun loadInitialData() {
         mainSharedViewModel.loadCurrentUser()
     }
 
-    /**
-     * Handle notification intent and navigate to the conversation fragment if chatId is present.
-     */
+    /** Handles notification intent navigation. */
     private fun handleNotificationIntent(intent: Intent?) {
         val chatId = intent?.getStringExtra("chatId")
         Log.d("MainActivity", "Notification intent chatId: $chatId")
@@ -149,9 +132,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Activity Result Launcher to request notification permission on Android 13+.
-     */
+    /** Request notification permission on Android 13+. */
     private val requestNotificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -168,9 +149,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Initialize FCM and retrieve the token
-     */
+    /** Initializes FCM and retrieves the token. */
     private fun initializeFCM() {
         Log.d("HomeActivity", "Initializing FCM...")
 
@@ -190,9 +169,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Manually save FCM token to Firestore
-     */
+    /** Saves FCM token to Firestore. */
     private fun saveFcmTokenToFirestore(token: String) {
         val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
 
@@ -215,9 +192,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
     
-    /**
-     * Check if the current user is banned and redirect to BannedActivity if necessary.
-     */
+    /** Checks if user is banned and redirects if necessary. */
     private fun checkBanStatus() {
         lifecycleScope.launch {
             try {
@@ -245,9 +220,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    /**
-     * Navigate to BannedActivity with ban expiration timestamp.
-     */
+    /** Navigates to BannedActivity. */
     private fun navigateToBannedActivity(blacklistedUntil: Long) {
         val intent = Intent(this, BannedActivity::class.java)
         intent.putExtra(BannedActivity.EXTRA_BLACKLISTED_UNTIL, blacklistedUntil)
@@ -256,10 +229,7 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
     
-    /**
-     * Apply the saved theme preference from SharedPreferences.
-     * Called before super.onCreate() to ensure proper theme application.
-     */
+    /** Applies saved theme preference. */
     private fun applyTheme() {
         val preferencesManager = PreferencesManager(application)
         val isDarkMode = preferencesManager.isDarkModeEnabled
@@ -271,10 +241,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Apply the saved language preference from SharedPreferences.
-     * Ensures that if the app is restarted, the correct language is applied.
-     */
+    /** Applies saved language preference. */
     private fun applyLocale() {
         val preferencesManager = PreferencesManager(application)
         val language = preferencesManager.language
@@ -288,11 +255,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    /**
-     * Update status bar and navigation bar appearance based on current theme.
-     * Light theme = dark icons/bars, Dark theme = light icons/bars
-     * Public so it can be called when theme is changed in SettingsFragment
-     */
+    /** Updates status bar appearance based on theme. */
     fun updateStatusBarAppearance() {
         val preferencesManager = PreferencesManager(application)
         val isDarkMode = preferencesManager.isDarkModeEnabled

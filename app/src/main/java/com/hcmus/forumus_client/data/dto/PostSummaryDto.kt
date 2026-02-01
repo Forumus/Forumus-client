@@ -3,20 +3,13 @@ package com.hcmus.forumus_client.data.dto
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-/**
- * Request DTO for generating an AI summary of a post.
- */
+/** Request DTO for generating an AI summary. */
 @JsonClass(generateAdapter = true)
 data class PostSummaryRequest(
     @Json(name = "postId") val postId: String
 )
 
-/**
- * Response DTO for AI-generated post summaries with caching support.
- * 
- * The contentHash field allows the client to detect when content has changed
- * and invalidate local cache accordingly.
- */
+/** Response DTO for AI-generated post summaries. */
 @JsonClass(generateAdapter = true)
 data class PostSummaryResponse(
     @Json(name = "success") val success: Boolean,

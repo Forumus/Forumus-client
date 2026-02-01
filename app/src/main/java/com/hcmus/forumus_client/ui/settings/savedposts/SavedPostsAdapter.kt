@@ -9,9 +9,7 @@ import com.hcmus.forumus_client.data.model.Post
 import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.ui.common.PostViewHolder
 
-/**
- * Adapter for saved posts list. Reuses PostViewHolder for consistent display.
- */
+/** Adapter for saved posts list. */
 class SavedPostsAdapter(
     private var items: List<Post>,
     private val onActionClick: (Post, PostAction, View) -> Unit

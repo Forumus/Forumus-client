@@ -11,10 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-/**
- * Repository for managing comment data operations with Firestore.
- * Handles CRUD operations, voting, and comment hierarchy.
- */
+/** Repository for managing comment data with Firestore. */
 class CommentRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
@@ -59,10 +56,7 @@ class CommentRepository(
         }
     }
 
-    /**
-     * Cập nhật luôn tên ở "replyToUserName"
-     * cho những comment reply tới user này.
-     */
+    /** Updates replyToUserName for comments replying to this user. */
     suspend fun updateReplyToUserName(
         userId: String,
         newName: String
@@ -91,10 +85,7 @@ class CommentRepository(
         }
     }
 
-    /**
-     * Enriches a comment with the current user's vote state and vote counts.
-     * Calculates userVote and updates upvote/downvote counts from votedUsers map.
-     */
+    /** Enriches comment with user vote state and vote counts. */
     private fun Comment.withUserVoteAndVoteCounts(userId: String?): Comment {
         // Set user's vote state for this comment
         this.userVote = userId?.let { votedUsers[it] } ?: VoteState.NONE
@@ -107,13 +98,7 @@ class CommentRepository(
         return this
     }
 
-    /**
-     * Updates an existing comment in Firestore.
-     *
-     * @param comment The comment object to update
-     * @return The updated comment
-     * @throws IllegalArgumentException if postId or commentId is blank
-     */
+    /** Updates an existing comment in Firestore. */
     suspend fun updateComment(comment: Comment): Comment {
         if (comment.postId.isBlank() || comment.id.isBlank()) {
             throw IllegalArgumentException("updateComment: postId or commentId is blank")
@@ -128,14 +113,7 @@ class CommentRepository(
         return comment
     }
 
-    /**
-     * Retrieves all comments for a specific post, ordered by creation date.
-     * Enriches each comment with reply counts, user vote state, and vote counts.
-     *
-     * @param postId The ID of the post
-     * @param limit Maximum number of comments to retrieve
-     * @return List of enriched comments
-     */
+    /** Retrieves all comments for a post. */
     suspend fun getCommentsByPost(
         postId: String,
         limit: Long = 100
@@ -159,14 +137,7 @@ class CommentRepository(
         return comments.map { it.withUserVoteAndVoteCounts(currentUser) }
     }
 
-    /**
-     * Retrieves all comments authored by a specific user across all posts.
-     * Uses collectionGroup query which requires a Firestore index to be set up.
-     *
-     * @param userId The ID of the author
-     * @param limit Maximum number of comments to retrieve
-     * @return List of enriched comments ordered by creation date descending
-     */
+    /** Retrieves all comments by a specific user. */
     suspend fun getCommentsByUser(
         userId: String,
         limit: Long = 100
@@ -188,13 +159,7 @@ class CommentRepository(
         return comments.map { it.withUserVoteAndVoteCounts(currentUser) }
     }
 
-    /**
-     * Calculates the reply count for each comment using depth-first search.
-     * Takes into account all nested replies (multi-level comment threads).
-     *
-     * @param comments List of all comments in a post
-     * @return The input list with updated commentCount for each comment
-     */
+    /** Calculates the reply count for each comment. */
     fun applyCommentCounts(comments: List<Comment>): List<Comment> {
         // Group comments by their parent comment ID to build parent-child relationships
         val childrenMap: Map<String, List<Comment>> =

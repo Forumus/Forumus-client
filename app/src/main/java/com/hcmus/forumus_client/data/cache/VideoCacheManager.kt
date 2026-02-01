@@ -10,9 +10,7 @@ import java.io.FileOutputStream
 import java.net.URL
 import java.security.MessageDigest
 
-/**
- * Manager for caching video files to improve performance and reduce network usage.
- */
+/** Manages video file caching to improve performance. */
 class VideoCacheManager private constructor(private val context: Context) {
 
     private val cacheDir: File = File(context.cacheDir, "video_cache")
@@ -35,11 +33,7 @@ class VideoCacheManager private constructor(private val context: Context) {
         }
     }
 
-    /**
-     * Get cached video file or download if not cached.
-     * @param videoUrl URL of the video to cache
-     * @return Uri of the cached video file
-     */
+    /** Returns cached video or downloads it if not cached. */
     suspend fun getCachedVideo(videoUrl: String): Uri? = withContext(Dispatchers.IO) {
         try {
             val fileName = generateFileName(videoUrl)
@@ -67,26 +61,20 @@ class VideoCacheManager private constructor(private val context: Context) {
         }
     }
 
-    /**
-     * Check if video is already cached.
-     */
+    /** Checks if video is already cached. */
     fun isCached(videoUrl: String): Boolean {
         val fileName = generateFileName(videoUrl)
         return File(cacheDir, fileName).exists()
     }
 
-    /**
-     * Get cached file if exists, null otherwise.
-     */
+    /** Returns cached file if it exists. */
     fun getCachedFileIfExists(videoUrl: String): File? {
         val fileName = generateFileName(videoUrl)
         val file = File(cacheDir, fileName)
         return if (file.exists()) file else null
     }
 
-    /**
-     * Download video from URL to cache file.
-     */
+    /** Downloads video from URL to local file. */
     private fun downloadVideo(videoUrl: String, destFile: File) {
         URL(videoUrl).openStream().use { input ->
             FileOutputStream(destFile).use { output ->
@@ -95,9 +83,7 @@ class VideoCacheManager private constructor(private val context: Context) {
         }
     }
 
-    /**
-     * Generate unique filename from URL using MD5 hash.
-     */
+    /** Generates unique filename from URL using MD5 hash. */
     private fun generateFileName(url: String): String {
         val md5 = MessageDigest.getInstance("MD5")
         val digest = md5.digest(url.toByteArray())
@@ -109,9 +95,7 @@ class VideoCacheManager private constructor(private val context: Context) {
         return "$hexString.$extension"
     }
 
-    /**
-     * Cleanup old cached files using LRU (Least Recently Used) strategy.
-     */
+    /** Removes old cached files using LRU strategy. */
     private fun cleanupCache() {
         val files = cacheDir.listFiles() ?: return
         val totalSize = files.sumOf { it.length() }
@@ -133,17 +117,13 @@ class VideoCacheManager private constructor(private val context: Context) {
         }
     }
 
-    /**
-     * Clear all cached videos.
-     */
+    /** Clears all cached videos. */
     fun clearCache() {
         cacheDir.listFiles()?.forEach { it.delete() }
         Log.d("VideoCacheManager", "Cleared all video cache")
     }
 
-    /**
-     * Get cache statistics.
-     */
+    /** Returns cache statistics. */
     fun getCacheStats(): String {
         val files = cacheDir.listFiles() ?: emptyArray()
         val totalSize = files.sumOf { it.length() }

@@ -26,9 +26,7 @@ class VerificationViewModel : ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
     
-    /**
-     * Send initial OTP when verification screen is opened
-     */
+    /** Sends initial OTP to the email. */
     fun sendInitialOTP(email: String) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -49,9 +47,7 @@ class VerificationViewModel : ViewModel() {
         }
     }
     
-    /**
-     * Verify OTP entered by user
-     */
+    /** Verifies OTP entered by user. */
     fun verifyOtp(email: String, otp: String) {
         // Validate OTP format
         if (otp.length != 6 || !otp.all { it.isDigit() }) {
@@ -83,9 +79,7 @@ class VerificationViewModel : ViewModel() {
         }
     }
     
-    /**
-     * Complete the verification process
-     */
+    /** Completes the verification process. */
     private suspend fun completeVerification(email: String) {
         when (val result = authRepository.completeEmailVerification(email)) {
             is Resource.Success -> {
@@ -102,9 +96,7 @@ class VerificationViewModel : ViewModel() {
         }
     }
     
-    /**
-     * Resend OTP to user's email
-     */
+    /** Resends OTP to user's email. */
     fun resendOtp(email: String) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -125,9 +117,7 @@ class VerificationViewModel : ViewModel() {
         }
     }
     
-    /**
-     * Validate OTP format (6 digits only)
-     */
+    /** Validates OTP format (6 digits only). */
     fun validateOtpFormat(otp: String): Boolean {
         return otp.length == 6 && otp.all { it.isDigit() }
     }

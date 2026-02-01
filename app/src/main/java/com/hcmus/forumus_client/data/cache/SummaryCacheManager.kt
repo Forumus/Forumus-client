@@ -9,18 +9,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.security.MessageDigest
 import java.util.Base64
 
-/**
- * Client-side cache for AI-generated post summaries.
- * 
- * Architecture:
- * - Uses SharedPreferences for persistent storage
- * - Validates cache using content hash from server
- * - Supports TTL (Time-To-Live) for cache entries
- * - Thread-safe operations
- * 
- * Cache Key Format: "summary_{postId}"
- * Cache Value: JSON serialized CachedSummaryEntry
- */
+/** Client-side cache for AI-generated post summaries. */
 class SummaryCacheManager private constructor(context: Context) {
 
     companion object {
@@ -41,9 +30,7 @@ class SummaryCacheManager private constructor(context: Context) {
         }
     }
 
-    /**
-     * Data class representing a cached summary entry.
-     */
+    /** Represents a cached summary entry. */
     @JsonClass(generateAdapter = true)
     data class CachedSummaryEntry(
         val postId: String,
@@ -62,9 +49,7 @@ class SummaryCacheManager private constructor(context: Context) {
         )
     }
 
-    /**
-     * Cache metadata for tracking statistics.
-     */
+    /** Cache metadata for tracking statistics. */
     @JsonClass(generateAdapter = true)
     data class CacheMetadata(
         val totalHits: Long = 0,
@@ -83,13 +68,7 @@ class SummaryCacheManager private constructor(context: Context) {
     private val entryAdapter = moshi.adapter(CachedSummaryEntry::class.java)
     private val metadataAdapter = moshi.adapter(CacheMetadata::class.java)
 
-    /**
-     * Gets a cached summary if it exists, is not expired, and matches the content hash.
-     * 
-     * @param postId The post ID
-     * @param contentHash Optional content hash for validation (from server response)
-     * @return The cached summary if valid, null otherwise
-     */
+    /** Gets cached summary if valid. */
     @Synchronized
     fun get(postId: String, contentHash: String? = null): CachedSummaryEntry? {
         val key = KEY_PREFIX + postId
@@ -135,15 +114,7 @@ class SummaryCacheManager private constructor(context: Context) {
         }
     }
 
-    /**
-     * Stores a summary in the cache.
-     * 
-     * @param postId The post ID
-     * @param summary The generated summary
-     * @param contentHash The content hash from server
-     * @param generatedAt Timestamp when summary was generated
-     * @param expiresAt Optional expiration timestamp
-     */
+    /** Stores a summary in the cache. */
     @Synchronized
     fun put(
         postId: String,
@@ -175,11 +146,7 @@ class SummaryCacheManager private constructor(context: Context) {
         prefs.edit().putString(key, json).apply()
     }
 
-    /**
-     * Removes a cached summary.
-     * 
-     * @param postId The post ID to remove
-     */
+    /** Removes a cached summary. */
     @Synchronized
     fun remove(postId: String) {
         val key = KEY_PREFIX + postId
@@ -187,35 +154,24 @@ class SummaryCacheManager private constructor(context: Context) {
         Log.d(TAG, "Removed cache for post $postId")
     }
 
-    /**
-     * Checks if a valid cache entry exists for a post.
-     * 
-     * @param postId The post ID
-     * @return true if valid cache exists
-     */
+    /** Checks if valid cache exists for a post. */
     fun hasValidCache(postId: String): Boolean {
         return get(postId) != null
     }
 
-    /**
-     * Clears all cached summaries.
-     */
+    /** Clears all cached summaries. */
     @Synchronized
     fun clearAll() {
         prefs.edit().clear().apply()
         Log.d(TAG, "Cleared all cached summaries")
     }
 
-    /**
-     * Gets the number of cached entries.
-     */
+    /** Gets the number of cached entries. */
     fun size(): Int {
         return prefs.all.count { it.key.startsWith(KEY_PREFIX) }
     }
 
-    /**
-     * Gets cache statistics.
-     */
+    /** Gets cache statistics. */
     fun getStats(): CacheMetadata {
         val json = prefs.getString(KEY_CACHE_METADATA, null) ?: return CacheMetadata()
         return try {
@@ -225,18 +181,14 @@ class SummaryCacheManager private constructor(context: Context) {
         }
     }
 
-    /**
-     * Gets a human-readable cache status summary.
-     */
+    /** Gets a human-readable cache status summary. */
     fun getCacheStatusSummary(): String {
         val stats = getStats()
         return "Cache: size=${size()}, hits=${stats.totalHits}, " +
                "misses=${stats.totalMisses}, hitRate=${String.format("%.1f", stats.getHitRate() * 100)}%"
     }
 
-    /**
-     * Cleans up expired entries.
-     */
+    /** Cleans up expired entries. */
     @Synchronized
     fun cleanup() {
         val editor = prefs.edit()
@@ -265,9 +217,7 @@ class SummaryCacheManager private constructor(context: Context) {
         }
     }
 
-    /**
-     * Ensures cache size doesn't exceed limit by removing oldest entries.
-     */
+    /** Ensures cache size doesn't exceed limit. */
     private fun ensureCacheSize() {
         val currentSize = size()
         if (currentSize < MAX_CACHE_SIZE) return
@@ -316,10 +266,7 @@ class SummaryCacheManager private constructor(context: Context) {
         prefs.edit().putString(KEY_CACHE_METADATA, json).apply()
     }
 
-    /**
-     * Computes a content hash locally for validation.
-     * Should match the server-side hash algorithm.
-     */
+    /** Computes a content hash for validation. */
     fun computeContentHash(title: String?, content: String?): String {
         return try {
             val digest = MessageDigest.getInstance("SHA-256")

@@ -11,14 +11,7 @@ import com.hcmus.forumus_client.data.model.PostAction
 import com.hcmus.forumus_client.data.model.Topic
 import com.hcmus.forumus_client.ui.common.PostViewHolder
 
-/**
- * RecyclerView adapter for displaying posts in the home feed. Manages the list of posts and
- * delegates rendering to PostViewHolder. Supports showing a loading indicator at the bottom when
- * fetching more posts.
- *
- * @param items Initial list of posts
- * @param onActionClick Callback for post actions (upvote, downvote, reply, etc.)
- */
+/** RecyclerView adapter for displaying posts in the home feed. */
 class HomeAdapter(
         private var items: List<Post>,
         private val onActionClick: (Post, PostAction, View) -> Unit
@@ -38,10 +31,7 @@ class HomeAdapter(
     // Track which post is currently loading AI summary
     private var summaryLoadingPostId: String? = null
 
-    /**
-     * Determines the view type for a given position. Returns VIEW_TYPE_LOADING if showing loading
-     * indicator, otherwise VIEW_TYPE_POST.
-     */
+    /** Determines the view type for a position. */
     override fun getItemViewType(position: Int): Int {
         return if (isLoadingMore && position == items.size) {
             VIEW_TYPE_LOADING
@@ -50,13 +40,7 @@ class HomeAdapter(
         }
     }
 
-    /**
-     * Creates a new ViewHolder instance based on the view type.
-     *
-     * @param parent The parent ViewGroup
-     * @param viewType The view type (POST or LOADING)
-     * @return New ViewHolder instance
-     */
+    /** Creates a ViewHolder based on view type. */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_LOADING) {
             val view =
@@ -70,13 +54,7 @@ class HomeAdapter(
         }
     }
 
-    /**
-     * Binds data to the ViewHolder at the specified position.
-     * Supports partial updates via payloads for better performance.
-     *
-     * @param holder The ViewHolder to bind data to
-     * @param position The position of the item in the list
-     */
+    /** Binds data to the ViewHolder. */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is PostViewHolder) {
             holder.bind(items[position], topicMap)
@@ -85,10 +63,7 @@ class HomeAdapter(
         // LoadingViewHolder doesn't need binding
     }
 
-    /**
-     * Binds data with payloads for partial updates.
-     * This prevents full item rebinding when only specific fields change.
-     */
+    /** Binds data with payloads for partial updates. */
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
@@ -111,21 +86,12 @@ class HomeAdapter(
         }
     }
 
-    /**
-     * Returns the total number of items including the loading indicator if shown.
-     *
-     * @return Size of the items list plus 1 if loading indicator is shown
-     */
+    /** Returns total item count including loading indicator. */
     override fun getItemCount(): Int {
         return if (isLoadingMore) items.size + 1 else items.size
     }
 
-    /**
-     * Updates the adapter with a new list of posts using DiffUtil for efficient updates.
-     * This prevents unnecessary re-renders and maintains scroll position.
-     *
-     * @param newItems The new list of posts to display
-     */
+    /** Updates the list using DiffUtil. */
     fun submitList(newItems: List<Post>) {
         val oldItems = items
         val diffCallback = PostDiffCallback(oldItems, newItems)
@@ -135,12 +101,7 @@ class HomeAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    /**
-     * Updates the adapter with the list of topics.
-     * Only triggers update if topics actually changed to prevent redundant re-renders.
-     *
-     * @param topics The list of topics to map
-     */
+    /** Updates the topic map. */
     fun setTopics(topics: List<Topic>) {
         val newTopicMap = topics.associateBy { it.id }
         // Only update if topics actually changed
@@ -151,11 +112,7 @@ class HomeAdapter(
         }
     }
 
-    /**
-     * Sets whether the loading indicator should be shown.
-     *
-     * @param isLoading True to show loading indicator, false to hide
-     */
+    /** Sets loading indicator visibility. */
     fun setLoadingMore(isLoading: Boolean) {
         val wasLoading = isLoadingMore
         isLoadingMore = isLoading
@@ -169,12 +126,7 @@ class HomeAdapter(
         }
     }
 
-    /**
-     * Sets the post ID that is currently loading an AI summary.
-     * Updates the UI to show/hide loading indicators on the affected posts.
-     *
-     * @param postId The ID of the post loading summary, or null if none
-     */
+    /** Sets the post ID loading AI summary. */
     fun setSummaryLoadingPostId(postId: String?) {
         val oldId = summaryLoadingPostId
         summaryLoadingPostId = postId
@@ -193,10 +145,7 @@ class HomeAdapter(
     /** ViewHolder for the loading indicator. */
     class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
-    /**
-     * DiffUtil callback for calculating the difference between two lists of posts.
-     * This enables efficient, targeted updates instead of full list redraws.
-     */
+    /** DiffUtil callback for calculating list differences. */
     private class PostDiffCallback(
         private val oldList: List<Post>,
         private val newList: List<Post>

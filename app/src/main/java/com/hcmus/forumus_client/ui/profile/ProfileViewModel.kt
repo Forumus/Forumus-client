@@ -25,10 +25,7 @@ import com.hcmus.forumus_client.data.model.Violation
 import kotlinx.coroutines.launch
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
 
-/**
- * Manages profile data: user info, posts, comments, and statistics.
- * Uses MediatorLiveData to auto-update visible items when mode or content changes.
- */
+/** Manages profile data: user info, posts, comments, and statistics. */
 class ProfileViewModel(
     private val postRepository: PostRepository = PostRepository(),
     private val commentRepository: CommentRepository = CommentRepository(),
@@ -85,9 +82,7 @@ class ProfileViewModel(
         _visibleItems.addSource(_mixedItems) { recomputeVisibleItems() }
     }
 
-    /**
-     * Loads user profile, posts, and comments. Resets mode to GENERAL.
-     */
+    /** Loads user profile, posts, and comments. */
     fun loadUserInfo(userId: String) {
         this.userId = userId
         _mode.value = ProfileMode.GENERAL

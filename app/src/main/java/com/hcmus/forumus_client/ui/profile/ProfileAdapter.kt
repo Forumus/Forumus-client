@@ -14,10 +14,7 @@ import com.hcmus.forumus_client.ui.common.CommentViewHolder
 import android.view.View
 import com.hcmus.forumus_client.data.model.Topic
 
-/**
- * Adapter for displaying user's posts and comments in profile screen.
- * Handles two item types (posts and comments) with their respective actions.
- */
+/** Adapter for displaying posts and comments in profile. */
 class ProfileAdapter(
     private var items: List<FeedItem> = emptyList(),
     private val onPostAction: (Post, PostAction, View) -> Unit,

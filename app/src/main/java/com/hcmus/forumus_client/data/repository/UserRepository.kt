@@ -9,19 +9,14 @@ import com.hcmus.forumus_client.data.model.User
 import kotlinx.coroutines.tasks.await
 import android.net.Uri
 
-/**
- * Result of saving a post operation
- */
+/** Result of saving a post operation. */
 sealed class SavePostResult {
     object Success : SavePostResult()
     object AlreadySaved : SavePostResult()
     data class Error(val message: String) : SavePostResult()
 }
 
-/**
- * Repository for managing user data operations with Firestore.
- * Handles CRUD operations for user profiles and authentication-related data.
- */
+/** Repository for managing user data with Firestore. */
 class UserRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
@@ -47,12 +42,7 @@ class UserRepository(
         }
     }
 
-    /**
-     * Retrieves a user by their unique ID.
-     *
-     * @param userId The unique identifier of the user
-     * @return The user object, or empty User if not found
-     */
+    /** Retrieves a user by their ID. */
     suspend fun getUserById(userId: String): User {
         return try {
             val document = usersCollection.document(userId).get().await()
@@ -63,24 +53,13 @@ class UserRepository(
         }
     }
 
-    /**
-     * Retrieves the currently authenticated user.
-     *
-     * @return The current user object, or null if no user is logged in
-     */
+    /** Retrieves the currently authenticated user. */
     suspend fun getCurrentUser(): User? {
         val currentUser = auth.currentUser ?: return null
         return getUserById(currentUser.uid)
     }
 
-    /**
-     * Retrieves multiple users by their IDs.
-     * Uses Firestore whereIn query which is limited to 10 items per query.
-     * Chunks large ID lists into multiple queries if needed.
-     *
-     * @param ids List of user IDs to retrieve
-     * @return List of user objects found
-     */
+    /** Retrieves multiple users by their IDs. */
     suspend fun getUsersByIds(ids: List<String>): List<User> {
         if (ids.isEmpty()) return emptyList()
 
@@ -105,13 +84,7 @@ class UserRepository(
         }
     }
 
-    /**
-     * Searches for users by full name or email (case-insensitive).
-     * Excludes the current authenticated user from results.
-     *
-     * @param query The search query string
-     * @return List of matching users (up to 10 results)
-     */
+    /** Searches for users by name or email. */
     suspend fun searchUsers(query: String): List<User> {
         return try {
             if (query.isBlank()) {
@@ -172,12 +145,7 @@ class UserRepository(
         }
     }
 
-    /**
-     * Saves or creates a user profile in Firestore.
-     * Uses merge option to preserve existing data if document already exists.
-     *
-     * @param user The user object to save
-     */
+    /** Saves or creates a user profile in Firestore. */
     suspend fun saveUser(user: User) {
         try {
             usersCollection
@@ -190,14 +158,7 @@ class UserRepository(
         }
     }
 
-    /**
-     * Updates specific user profile fields (fullName, profilePictureUrl).
-     * Only updates provided fields, leaving others unchanged.
-     *
-     * @param uid The user ID
-     * @param fullName The user's full name (optional)
-     * @param profilePictureUrl The user's profile picture URL (optional)
-     */
+    /** Updates specific user profile fields. */
     suspend fun updateProfile(
         uid: String,
         fullName: String? = null,
@@ -221,10 +182,7 @@ class UserRepository(
         }
     }
 
-    /**
-     * Upload avatar lên Firebase Storage, trả về downloadUrl (String).
-     * Lưu theo path: avatars/{uid}.jpg  (ghi đè ảnh cũ)
-     */
+    /** Uploads avatar to Firebase Storage and returns download URL. */
     suspend fun uploadAvatar(uid: String, uri: Uri): String {
         return try {
             val ref = storage.reference.child("$AVATAR_FOLDER/$uid.jpg")
@@ -243,12 +201,7 @@ class UserRepository(
         }
     }
 
-    /**
-     * Deletes a user document from Firestore.
-     * Note: This only removes the user profile data, not the authentication account.
-     *
-     * @param uid The user ID
-     */
+    /** Deletes a user document from Firestore. */
     suspend fun deleteUser(uid: String) {
         try {
             usersCollection
@@ -261,12 +214,7 @@ class UserRepository(
         }
     }
 
-    /**
-     * Saves a post to the user's saved posts list.
-     *
-     * @param postId The ID of the post to save
-     * @return SavePostResult indicating the result of the operation
-     */
+    /** Saves a post to user's saved posts list. */
     suspend fun savePost(postId: String): SavePostResult {
         return try {
             val currentUserId = auth.currentUser?.uid
@@ -303,11 +251,7 @@ class UserRepository(
         }
     }
 
-    /**
-     * Removes a post from the user's saved posts list.
-     *
-     * @param postId The ID of the post to unsave
-     */
+    /** Removes a post from user's saved posts list. */
     suspend fun unsavePost(postId: String) {
         try {
             val currentUserId = auth.currentUser?.uid ?: return

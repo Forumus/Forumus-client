@@ -16,9 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.hcmus.forumus_client.data.model.PostAction
 import kotlinx.coroutines.launch
 
-/**
- * Manages saved posts screen - loads posts from user's followedPostIds and handles unsaving.
- */
+/** Manages saved posts screen. */
 class SavedPostsViewModel(
     private val userRepository: UserRepository = UserRepository(),
     private val postRepository: PostRepository = PostRepository(),

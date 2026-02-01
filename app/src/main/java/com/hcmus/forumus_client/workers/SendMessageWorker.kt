@@ -16,10 +16,7 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.data.model.MessageType
 import com.hcmus.forumus_client.data.repository.ChatRepository
 
-/**
- * Background worker for sending messages with images. This ensures that image uploads and message
- * sending continue even if the user navigates away.
- */
+/** Background worker for sending messages with images. */
 class SendMessageWorker(context: Context, params: WorkerParameters) :
         CoroutineWorker(context, params) {
 
@@ -139,7 +136,7 @@ class SendMessageWorker(context: Context, params: WorkerParameters) :
         }
     }
 
-    /** Create a foreground notification to keep the work running */
+    /** Creates foreground notification. */
     private fun createForegroundInfo(imageCount: Int): ForegroundInfo {
         createNotificationChannel()
 
@@ -165,7 +162,7 @@ class SendMessageWorker(context: Context, params: WorkerParameters) :
         }
     }
 
-    /** Create notification channel for Android O and above */
+    /** Creates notification channel. */
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel =
@@ -183,7 +180,7 @@ class SendMessageWorker(context: Context, params: WorkerParameters) :
         }
     }
 
-    /** Show a completion notification when upload finishes */
+    /** Shows completion notification. */
     private fun showCompletionNotification(
         success: Boolean,
         imageCount: Int,

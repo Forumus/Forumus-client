@@ -16,9 +16,7 @@ object NotificationPermissionHelper {
     
     private var permissionCallback: ((Boolean) -> Unit)? = null
     
-    /**
-     * Check if notification permission is granted.
-     */
+    /** Checks if notification permission is granted. */
     fun hasPermission(activity: Activity): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
@@ -31,13 +29,7 @@ object NotificationPermissionHelper {
         }
     }
     
-    /**
-     * Request notification permission if needed (Android 13+).
-     * For Android 12 and below, this will immediately call the callback with true.
-     * 
-     * @param activity The activity to request permission from
-     * @param callback Called with true if permission is granted, false otherwise
-     */
+    /** Requests notification permission if needed (Android 13+). */
     fun requestPermissionIfNeeded(
         activity: Activity,
         callback: (Boolean) -> Unit
@@ -72,9 +64,7 @@ object NotificationPermissionHelper {
         }
     }
     
-    /**
-     * Request the notification permission.
-     */
+    /** Requests the notification permission. */
     private fun requestPermission(activity: Activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(
@@ -85,10 +75,7 @@ object NotificationPermissionHelper {
         }
     }
     
-    /**
-     * Handle the permission request result.
-     * Call this from your Activity's onRequestPermissionsResult().
-     */
+    /** Handles the permission request result. */
     fun handlePermissionResult(
         requestCode: Int,
         grantResults: IntArray,
@@ -114,9 +101,7 @@ object NotificationPermissionHelper {
         }
     }
     
-    /**
-     * Initialize FCM and get the token.
-     */
+    /** Initializes FCM and gets the token. */
     private fun initializeFCM() {
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener {
@@ -131,10 +116,7 @@ object NotificationPermissionHelper {
             }
     }
     
-    /**
-     * Force refresh the FCM token.
-     * Use this after login or when you suspect the token might be stale.
-     */
+    /** Force refreshes the FCM token. */
     fun refreshFCMToken() {
         FirebaseMessaging.getInstance().deleteToken()
             .addOnSuccessListener {

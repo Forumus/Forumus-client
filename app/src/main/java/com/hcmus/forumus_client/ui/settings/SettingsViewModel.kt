@@ -11,10 +11,7 @@ import com.hcmus.forumus_client.data.repository.AuthRepository
 import com.hcmus.forumus_client.data.repository.UserRepository
 import kotlinx.coroutines.launch
 
-/**
- * Manages settings screen state and user preferences.
- * Handles loading/saving preferences (dark mode, notifications, language) to SharedPreferences.
- */
+/** Manages settings screen state and preferences. */
 class SettingsViewModel(
     application: Application,
     private val userRepository: UserRepository = UserRepository(),

@@ -14,9 +14,7 @@ import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.FragmentHelpCenterBinding
 import androidx.core.net.toUri
 
-/**
- * Help center with FAQs and support contact options (email support, report issues).
- */
+/** Help center with FAQs and support options. */
 class HelpCenterFragment : Fragment() {
 
     private lateinit var binding: FragmentHelpCenterBinding

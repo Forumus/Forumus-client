@@ -27,10 +27,7 @@ import com.google.firebase.firestore.FieldValue
 import com.hcmus.forumus_client.data.remote.NetworkService
 import com.hcmus.forumus_client.data.cache.SummaryCacheManager
 
-/**
- * Repository for managing post data operations with Firestore.
- * Handles CRUD operations, voting, and post enrichment with user-specific data.
- */
+/** Repository for managing post data with Firestore. */
 class PostRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
@@ -42,9 +39,7 @@ class PostRepository(
         private const val TAG = "PostRepository"
     }
 
-    /**
-     * Initializes the summary cache manager. Must be called with application context.
-     */
+    /** Initializes the summary cache manager. */
     fun initSummaryCache(context: Context) {
         if (summaryCacheManager == null) {
             summaryCacheManager = SummaryCacheManager.getInstance(context)
@@ -114,12 +109,7 @@ class PostRepository(
         }
     }
 
-    /**
-     * Enriches a post with user-specific data including vote state, vote counts, and comment count.
-     *
-     * @param userId The current user's ID (nullable)
-     * @return Enriched post with calculated values
-     */
+    /** Enriches a post with user-specific data. */
     private suspend fun Post.enrichForUser(userId: String?): Post {
         // Calculate user's vote state from votedUsers map
         this.userVote = userId?.let { votedUsers[it] } ?: VoteState.NONE
@@ -287,13 +277,7 @@ class PostRepository(
         }
     }
 
-    /**
-     * Updates an existing post in Firestore.
-     *
-     * @param post The post object to update
-     * @return The updated post
-     * @throws IllegalArgumentException if post ID is blank
-     */
+    /** Updates an existing post in Firestore. */
     suspend fun updatePost(post: Post): Post {
         if (post.id.isBlank()) {
             throw IllegalArgumentException("Post id is blank, cannot update")
@@ -305,12 +289,7 @@ class PostRepository(
         return post
     }
 
-    /**
-     * Retrieves a limited number of recent posts, ordered by creation date descending.
-     *
-     * @param limit Maximum number of posts to retrieve
-     * @return List of enriched posts with user-specific data
-     */
+    /** Retrieves a limited number of recent posts. */
     suspend fun getPosts(limit: Long = 50): List<Post> {
         val userId = auth.currentUser?.uid
         return firestore.collection("posts")
@@ -323,13 +302,7 @@ class PostRepository(
             .map { it.enrichForUser(userId) }
     }
 
-    /**
-     * Retrieves posts with pagination support.
-     *
-     * @param limit Maximum number of posts to retrieve per page
-     * @param lastDocument The last document from the previous page (null for first page)
-     * @return Pair of enriched posts list and the last document snapshot for next page
-     */
+    /** Retrieves posts with pagination support. */
     suspend fun getPostsPaginated(
         limit: Long = 10,
         lastDocument: com.google.firebase.firestore.DocumentSnapshot? = null
@@ -362,11 +335,7 @@ class PostRepository(
         return Pair(posts, lastDoc)
     }
 
-    /**
-     * Retrieves all posts from Firestore, ordered by creation date descending.
-     *
-     * @return List of enriched posts with user-specific data
-     */
+    /** Retrieves all posts from Firestore. */
     suspend fun getAllPosts(): List<Post> {
         val userId = auth.currentUser?.uid
         return firestore.collection("posts")
@@ -378,13 +347,7 @@ class PostRepository(
             .map { it.enrichForUser(userId) }
     }
 
-    /**
-     * Retrieves all posts authored by a specific user, ordered by creation date descending.
-     *
-     * @param userId The ID of the author
-     * @param limit Maximum number of posts to retrieve
-     * @return List of enriched posts with user-specific data
-     */
+    /** Retrieves all posts by a specific user. */
     suspend fun getPostsByUser(
         userId: String,
         limit: Long = 100
@@ -402,12 +365,7 @@ class PostRepository(
             .map { it.enrichForUser(currentUser) }
     }
 
-    /**
-     * Retrieves a single post by its ID.
-     *
-     * @param postId The ID of the post to retrieve
-     * @return Enriched post with user-specific data, or null if not found
-     */
+    /** Retrieves a single post by ID. */
     suspend fun getPostById(postId: String): Post? {
         val userId = auth.currentUser?.uid
         return firestore.collection("posts")
@@ -428,15 +386,7 @@ class PostRepository(
      */
 
     
-    /**
-     * Retrieves posts filtered by a list of topics.
-     * Uses server-side filtering via Firestore 'array-contains-any' query.
-     * This implements "OR" logic: posts containing AT LEAST ONE of the selected topics.
-     *
-     * @param topicIds The list of topic IDs to filter by (Max 10 per Firestore limit)
-     * @param limit Maximum number of posts to retrieve
-     * @return List of enriched posts
-     */
+    /** Retrieves posts filtered by topics. */
     suspend fun getPostsByTopics(topicIds: List<String>, limit: Long = 50): List<Post> {
         val userId = auth.currentUser?.uid
         if (topicIds.isEmpty()) return emptyList()
@@ -457,14 +407,7 @@ class PostRepository(
         }
     }
 
-    /**
-     * Retrieves multiple posts by their IDs.
-     * Uses Firestore whereIn query which is limited to 10 items per query.
-     * Chunks large ID lists into multiple queries if needed.
-     *
-     * @param postIds List of post IDs to retrieve
-     * @return List of enriched posts found (may be less than input if some posts don't exist)
-     */
+    /** Retrieves multiple posts by their IDs. */
     suspend fun getPostsByIds(postIds: List<String>): List<Post> {
         if (postIds.isEmpty()) return emptyList()
 
@@ -492,16 +435,7 @@ class PostRepository(
         }
     }
 
-    /**
-     * Toggles upvote for a post by the current user.
-     * If already upvoted, removes the vote.
-     * If downvoted, changes to upvote.
-     * If no vote, creates new upvote.
-     *
-     * @param post The post to upvote
-     * @return Updated post with new vote state
-     * @throws IllegalStateException if user is not logged in
-     */
+    /** Toggles upvote for a post by the current user. */
     suspend fun toggleUpvote(post: Post): Post {
         val userId = auth.currentUser?.uid
             ?: throw IllegalStateException("User not logged in")
@@ -564,16 +498,7 @@ class PostRepository(
         return post.copy()
     }
 
-    /**
-     * Toggles downvote for a post by the current user.
-     * If already downvoted, removes the vote.
-     * If upvoted, changes to downvote.
-     * If no vote, creates new downvote.
-     *
-     * @param post The post to downvote
-     * @return Updated post with new vote state
-     * @throws IllegalStateException if user is not logged in
-     */
+    /** Toggles downvote for a post by the current user. */
     suspend fun toggleDownvote(post: Post): Post {
         val userId = auth.currentUser?.uid
             ?: throw IllegalStateException("User not logged in")
@@ -665,19 +590,7 @@ class PostRepository(
         }
     }
 
-    /**
-     * Generates an AI-powered summary for a post with intelligent caching.
-     * 
-     * Caching Strategy:
-     * 1. Check local cache first (fastest response)
-     * 2. If cache miss or expired, call server API
-     * 3. Server may return cached response (avoiding AI call)
-     * 4. Store new summaries in local cache with content hash
-     * 5. Invalidate cache when content hash changes
-     *
-     * @param postId The ID of the post to summarize
-     * @return Result containing the summary string on success, or an exception on failure
-     */
+    /** Generates an AI-powered summary for a post with caching. */
     suspend fun getPostSummary(postId: String): Result<String> {
         return try {
             // Check local cache first
@@ -732,24 +645,17 @@ class PostRepository(
         }
     }
 
-    /**
-     * Invalidates the local cache for a specific post.
-     * Call this when a post is updated.
-     */
+    /** Invalidates the local cache for a specific post. */
     fun invalidateSummaryCache(postId: String) {
         summaryCacheManager?.remove(postId)
     }
 
-    /**
-     * Clears all cached summaries.
-     */
+    /** Clears all cached summaries. */
     fun clearSummaryCache() {
         summaryCacheManager?.clearAll()
     }
 
-    /**
-     * Gets cache statistics for debugging.
-     */
+    /** Gets cache statistics for debugging. */
     fun getSummaryCacheStats(): String {
         return summaryCacheManager?.getCacheStatusSummary() ?: "Cache not initialized"
     }

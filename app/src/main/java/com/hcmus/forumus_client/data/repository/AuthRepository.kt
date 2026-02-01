@@ -117,9 +117,7 @@ class AuthRepository (
         }
     }
 
-    /**
-     * Generate and send OTP to user's email
-     */
+    /** Generates and sends OTP to user's email. */
     suspend fun generateAndSendOTP(email: String): Resource<Boolean> {
         return try {
             // Generate OTP
@@ -150,23 +148,17 @@ class AuthRepository (
         }
     }
     
-    /**
-     * Verify OTP code entered by user
-     */
+    /** Verifies OTP code entered by user. */
     suspend fun verifyOTP(email: String, otpCode: String): Resource<Boolean> {
         return otpService.verifyOTP(email, otpCode)
     }
     
-    /**
-     * Resend OTP to user's email
-     */
+    /** Resends OTP to user's email. */
     suspend fun resendOTP(email: String): Resource<Boolean> {
         return generateAndSendOTP(email)
     }
     
-    /**
-     * Complete user verification after successful OTP verification
-     */
+    /** Completes user verification after successful OTP. */
     suspend fun completeEmailVerification(email: String): Resource<Boolean> {
         return try {
             val currentUser = firebaseAuth.currentUser
@@ -283,9 +275,7 @@ class AuthRepository (
         }
     }
 
-    /**
-     * Reset user password using server API with custom secret key
-     */
+    /** Resets user password using server API with custom secret key. */
     suspend fun resetPassword(email: String, newPassword: String, secretKey: String): Resource<Boolean> {
         return try {
             val request = ResetPasswordRequest(
@@ -311,9 +301,7 @@ class AuthRepository (
         }
     }
 
-    /**
-     * Reset user password using server API with default secret key
-     */
+    /** Resets user password using default secret key. */
     suspend fun resetPassword(email: String, newPassword: String): Resource<Boolean> {
         return resetPassword(email, newPassword, ApiConstants.SECRET_KEY)
     }

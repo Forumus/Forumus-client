@@ -25,9 +25,7 @@ import com.hcmus.forumus_client.ui.common.SharePostDialog
 import com.hcmus.forumus_client.ui.main.MainSharedViewModel
 import com.hcmus.forumus_client.data.repository.SavePostResult
 
-/**
- * Displays a single post with all its comments and allows commenting.
- */
+/** Displays a single post with its comments. */
 class PostDetailFragment : Fragment() {
 
     private lateinit var binding: FragmentPostDetailBinding

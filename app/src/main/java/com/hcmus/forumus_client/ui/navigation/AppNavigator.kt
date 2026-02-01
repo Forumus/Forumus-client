@@ -9,15 +9,7 @@ import com.hcmus.forumus_client.ui.profile.ProfileMode
 
 class AppNavigator(private val activity: Activity) {
 
-    /**
-     * Applies appropriate intent flags based on navigation mode.
-     *
-     * @param clearStack:
-     *  - true  → clears the existing task and starts a new one
-     *             (used for flows like login/logout or resetting navigation)
-     *  - false → keeps the current back stack but prevents creating duplicate
-     *             activity instances (via CLEAR_TOP | SINGLE_TOP)
-     */
+    /** Applies intent flags based on navigation mode. */
     private fun applyFlags(intent: Intent, clearStack: Boolean) {
         if (clearStack) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)

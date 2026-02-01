@@ -17,9 +17,7 @@ import com.hcmus.forumus_client.ui.common.PopupPostMenu
 import com.hcmus.forumus_client.ui.home.HomeFragmentDirections
 import kotlinx.coroutines.launch
 
-/**
- * Displays posts saved by the user. Supports viewing, unsaving, and navigating to details.
- */
+/** Displays posts saved by the user. */
 class SavedPostsFragment : Fragment() {
 
     private lateinit var binding: FragmentSavedPostsBinding

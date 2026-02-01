@@ -1,8 +1,6 @@
 package com.hcmus.forumus_client.ui.settings.guidelines
 
-/**
- * Model for a guideline section with icon, title, and expandable content.
- */
+/** Model for a guideline section. */
 data class GuidelineSection(
     val icon: Int,
     val title: String,

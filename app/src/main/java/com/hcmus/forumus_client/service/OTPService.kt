@@ -16,16 +16,12 @@ class OTPService(
         private const val MAX_DAILY_REQUESTS = 10 // Rate limiting
     }
     
-    /**
-     * Generate a 6-digit OTP code
-     */
+    /** Generates a 6-digit OTP code. */
     private fun generateOTPCode(): String {
         return Random.nextInt(100000, 999999).toString()
     }
     
-    /**
-     * Generate and store OTP in Firestore
-     */
+    /** Generates and stores OTP in Firestore. */
     suspend fun generateOTP(email: String): Resource<String> {
         return try {
             // Check if user has exceeded daily limit
@@ -52,9 +48,7 @@ class OTPService(
         }
     }
     
-    /**
-     * Verify OTP against stored value
-     */
+    /** Verifies OTP against stored value. */
     suspend fun verifyOTP(email: String, inputOtp: String): Resource<Boolean> {
         return try {
             val document = firestore.collection(COLLECTION_NAME)
@@ -116,9 +110,7 @@ class OTPService(
         }
     }
     
-    /**
-     * Check if user can request OTP (rate limiting)
-     */
+    /** Checks if user can request OTP (rate limiting). */
     private suspend fun canRequestOTP(email: String): Boolean {
         return try {
             // Get OTP requests from the last 24 hours
@@ -136,9 +128,7 @@ class OTPService(
         }
     }
     
-    /**
-     * Log OTP request for rate limiting
-     */
+    /** Logs OTP request for rate limiting. */
     suspend fun logOTPRequest(email: String) {
         try {
             val requestLog = hashMapOf(
@@ -154,9 +144,7 @@ class OTPService(
         }
     }
     
-    /**
-     * Invalidate existing OTPs for an email
-     */
+    /** Invalidates existing OTPs for an email. */
     private suspend fun invalidateExistingOTPs(email: String) {
         try {
             val document = firestore.collection(COLLECTION_NAME)
@@ -180,9 +168,7 @@ class OTPService(
         }
     }
     
-    /**
-     * Delete OTP from Firestore
-     */
+    /** Deletes OTP from Firestore. */
     private suspend fun deleteOTP(email: String) {
         try {
             firestore.collection(COLLECTION_NAME)
@@ -194,9 +180,7 @@ class OTPService(
         }
     }
     
-    /**
-     * Clean up expired OTPs (call periodically)
-     */
+    /** Cleans up expired OTPs. */
     suspend fun cleanupExpiredOTPs(): Resource<Int> {
         return try {
             val now = Timestamp.now()
@@ -217,9 +201,7 @@ class OTPService(
         }
     }
     
-    /**
-     * Get OTP status for debugging
-     */
+    /** Gets OTP status for debugging. */
     suspend fun getOTPStatus(email: String): Resource<OTP> {
         return try {
             val document = firestore.collection(COLLECTION_NAME)

@@ -11,9 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_client.R
 import com.hcmus.forumus_client.databinding.FragmentCommunityGuidelinesBinding
 
-/**
- * Displays community guidelines in expandable sections covering respect, content rules, etc.
- */
+/** Displays community guidelines in expandable sections. */
 class CommunityGuidelinesFragment : Fragment() {
 
     private lateinit var binding: FragmentCommunityGuidelinesBinding

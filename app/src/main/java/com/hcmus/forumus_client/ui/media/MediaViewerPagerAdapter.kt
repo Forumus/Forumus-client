@@ -14,9 +14,7 @@ import com.github.chrisbanes.photoview.PhotoView
 import com.hcmus.forumus_client.R
 import kotlin.math.min
 
-/**
- * ViewPager2 adapter for displaying media items (images and videos) in fullscreen viewer.
- */
+/** ViewPager2 adapter for media items. */
 class MediaViewerPagerAdapter : RecyclerView.Adapter<MediaViewerPagerAdapter.MediaPageViewHolder>() {
 
     private var mediaItems: List<MediaViewerItem> = emptyList()
