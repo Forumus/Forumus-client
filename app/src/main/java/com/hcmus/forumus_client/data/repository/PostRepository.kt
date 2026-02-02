@@ -132,17 +132,14 @@ class PostRepository(
     }
 
     fun generatePostId(): String {
-        // Lấy thời gian hiện tại
         val currentDate = Calendar.getInstance()
 
-        // Định dạng thời gian theo yêu cầu (yyyyMMdd_HHmmss)
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+
         val formattedDate = dateFormat.format(currentDate.time)
 
-        // Tạo số ngẫu nhiên từ 1000 đến 9999
         val randomPart = (1000..9999).random()
 
-        // Kết hợp lại thành ID với định dạng "POST_yyyyMMdd_HHmmss_random"
         return "POST" + "_" + "$formattedDate" + "_" + "$randomPart"
     }
 
@@ -153,13 +150,11 @@ class PostRepository(
             val videoUrls = mutableListOf<String>()
             val videoThumbnailUrls = mutableListOf<String?>()
 
-            // 1. Upload ảnh
             post.imageUrls.forEach { imageUri ->
                 val imageRef = storage.child("post_images/${UUID.randomUUID()}.jpg")
                 val imageData = imageUri.toUri()
 
                 try {
-                    // Upload ảnh
                     val imageUrl = uploadFile(imageRef, imageData)
                     imageUrls.add(imageUrl)
                 } catch (e: Exception) {
@@ -167,17 +162,14 @@ class PostRepository(
                 }
             }
 
-            // 2. Upload video
             post.videoUrls.forEach { videoUri ->
                 val videoRef = storage.child("post_videos/${UUID.randomUUID()}.mp4")
                 val videoData = videoUri.toUri()
 
                 try {
-                    // Upload video
                     val videoUrl = uploadFile(videoRef, videoData)
                     videoUrls.add(videoUrl)
 
-                    // 3. Tạo thumbnail cho video
                     val videoThumbnailUri = getVideoThumbnailUri(context, videoUri)
                     if (videoThumbnailUri != null) {
                         val thumbRef = storage.child("post_thumbnails/${UUID.randomUUID()}.jpg")
@@ -262,7 +254,6 @@ class PostRepository(
                 MediaMetadataRetriever.OPTION_CLOSEST
             ) ?: return null
 
-            // Tạo file tạm trong cache của app
             val tempFile = File.createTempFile("video_thumb_", ".jpg", context.cacheDir)
             FileOutputStream(tempFile).use { out ->
                 thumbnailBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)

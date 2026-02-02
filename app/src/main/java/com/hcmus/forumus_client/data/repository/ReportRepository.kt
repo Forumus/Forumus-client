@@ -15,21 +15,16 @@ class ReportRepository (
 ) {
 
     fun generateReportId(): String {
-        // Lấy thời gian hiện tại
         val currentDate = Calendar.getInstance()
 
-        // Định dạng thời gian theo yêu cầu (yyyyMMdd_HHmmss)
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
         val formattedDate = dateFormat.format(currentDate.time)
 
-        // Tạo số ngẫu nhiên từ 1000 đến 9999
         val randomPart = (1000..9999).random()
 
-        // Kết hợp lại thành ID với định dạng "POST_yyyyMMdd_HHmmss_random"
         return "REPORT" + "_" + "$formattedDate" + "_" + "$randomPart"
     }
 
-    // Save report to Firebase
     suspend fun saveReport(report: Report) {
         val user = auth.currentUser ?: throw IllegalStateException("User not logged in")
 
