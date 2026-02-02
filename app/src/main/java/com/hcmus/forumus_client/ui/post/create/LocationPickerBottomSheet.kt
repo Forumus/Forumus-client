@@ -48,7 +48,6 @@ class LocationPickerBottomSheet(
     private lateinit var tvPreviewMap: TextView
     private var currentSelectedPlace: Place? = null
 
-    // Launcher xin quyền vị trí
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -69,24 +68,19 @@ class LocationPickerBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Khởi tạo Places Client
         if (!Places.isInitialized()) {
-            // Thay YOUR_API_KEY bằng key của bạn, hoặc để CreatePostFragment lo việc init
             Places.initialize(requireContext(), "YOUR_API_KEY_HERE")
         }
         placesClient = Places.createClient(requireContext())
 
-        // 2. Setup View
         rvNearbyPlaces = view.findViewById(R.id.rvNearbyPlaces)
         rvNearbyPlaces.layoutManager = LinearLayoutManager(context)
         btnAddLocation = view.findViewById(R.id.btnAddLocation)
         tvPreviewMap = view.findViewById(R.id.tvPreviewMap)
         val btnSearch = view.findViewById<LinearLayout>(R.id.btnSearchPlace)
 
-        // 3. Logic: Kiểm tra quyền và lấy địa điểm
         checkPermissionsAndFetch()
 
-        // 4. Sự kiện Click
         btnSearch.setOnClickListener {
             dismiss()
             onSearchClick()
@@ -117,42 +111,36 @@ class LocationPickerBottomSheet(
     }
 
     private fun fetchNearbyPlaces() {
-        // Chỉ định các trường dữ liệu cần lấy
         val placeFields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG)
         val request = FindCurrentPlaceRequest.newInstance(placeFields)
 
-        // Kiểm tra quyền lại một lần nữa (bắt buộc bởi IDE)
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
             placesClient.findCurrentPlace(request).addOnSuccessListener { response ->
-                // Lấy danh sách Place từ response
+
                 val places = response.placeLikelihoods.map { it.place }
 
-                // Đổ dữ liệu vào Adapter
                 rvNearbyPlaces.adapter = NearbyPlacesAdapter(places) { selectedPlace ->
                     currentSelectedPlace = selectedPlace
 
-                    // Khi chọn xong mới sáng nút lên
                     btnAddLocation.isEnabled = true
 
                     tvPreviewMap.isEnabled = true
                     tvPreviewMap.alpha = 1.0f
                 }
             }.addOnFailureListener { exception ->
-                // Có thể lỗi do chưa bật GPS hoặc API Key chưa enable Billing
                 Toast.makeText(context, "Không thể lấy địa điểm gần đây.", Toast.LENGTH_SHORT).show()
                 exception.printStackTrace()
             }
         }
     }
 
-    // --- HIỂN THỊ MAP PREVIEW ---
+    // --- MAP PREVIEW ---
     private fun showMapPreviewDialog(place: Place) {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.layout_dialog_map_preview)
 
-        // Làm nền dialog trong suốt để bo góc đẹp hơn
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         val mapView = dialog.findViewById<MapView>(R.id.mapView)
@@ -161,7 +149,6 @@ class LocationPickerBottomSheet(
 
         tvTitle.text = place.name
 
-        // Khởi tạo MapView trong Dialog
         MapsInitializer.initialize(requireContext())
         mapView.onCreate(dialog.onSaveInstanceState())
         mapView.onResume()
@@ -170,7 +157,6 @@ class LocationPickerBottomSheet(
             val latLng = place.latLng ?: LatLng(10.762622, 106.660172) // Mặc định HCM nếu null
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
 
-            // Vẽ Marker Avatar
             loadAvatarMarker(googleMap, latLng)
         }
 
@@ -178,7 +164,6 @@ class LocationPickerBottomSheet(
         dialog.show()
     }
 
-    // --- LOGIC VẼ MARKER AVATAR ---
     private fun loadAvatarMarker(googleMap: com.google.android.gms.maps.GoogleMap, latLng: LatLng) {
         val url = userAvatarUrl ?: "https://ui-avatars.com/api/?name=User"
 

@@ -63,7 +63,6 @@ class CreatePostFragment : Fragment() {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private lateinit var placesClient: PlacesClient
 
-    // Biến lưu địa điểm đã chọn
     private var selectedLocationName: String? = null
     private var selectedLat: Double? = null
     private var selectedLng: Double? = null
@@ -72,7 +71,6 @@ class CreatePostFragment : Fragment() {
     private var tempImageUri: Uri? = null
     private val selectedTopicsList = ArrayList<String>()
 
-    // Cờ kiểm soát trạng thái để tránh lưu nháp khi đã post xong hoặc discard
     private var isPostSubmittedOrDiscarded = false
 
     private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -107,15 +105,13 @@ class CreatePostFragment : Fragment() {
 
     private val pickMedia = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(10)) { uris ->
         if (uris.isNotEmpty()) {
-            // Lọc ra các file hợp lệ
+
             val validUris = uris.filter { isVideoDurationValid(it) }
 
-            // Nếu có file bị loại, báo lỗi
             if (validUris.size < uris.size) {
                 Toast.makeText(requireContext(), getString(R.string.error_video_duration), Toast.LENGTH_LONG).show()
             }
 
-            // Chỉ thêm các file hợp lệ vào list
             if (validUris.isNotEmpty()) {
                 viewModel.addImages(validUris)
                 setBottomSheetState(false)
@@ -154,19 +150,15 @@ class CreatePostFragment : Fragment() {
         validatePostButton()
         viewModel.getAllTopics()
 
-        // --- KHÔI PHỤC DỮ LIỆU NHÁP (RESTORE) ---
         restoreDraftData()
     }
 
-    // Hàm khôi phục dữ liệu từ ViewModel lên UI
     private fun restoreDraftData() {
         val draft = viewModel.restoreDraft(requireContext())
         if (draft != null) {
-            // Khôi phục Text
             binding.edtTitle.setText(draft["title"] as? String ?: "")
             binding.edtContent.setText(draft["content"] as? String ?: "")
 
-            // Khôi phục Location
             val locName = draft["locationName"] as? String
             val lat = draft["lat"] as? Double
             val lng = draft["lng"] as? Double
@@ -175,20 +167,17 @@ class CreatePostFragment : Fragment() {
                 updateLocationUI(locName, lat, lng)
             }
 
-            // Khôi phục Topics
             val topics = draft["topics"] as? List<String>
             if (!topics.isNullOrEmpty()) {
                 selectedTopicsList.clear()
                 selectedTopicsList.addAll(topics)
-                // Đợi observer allTopics load xong sẽ update màu, nhưng gọi tạm update để hiện text
+
                 updateTopicChips()
             }
-            // Ảnh đã được viewModel restore vào LiveData -> setupObservers sẽ tự update UI
             Toast.makeText(context, getString(R.string.msg_draft_restored), Toast.LENGTH_SHORT).show()
         }
     }
 
-    // --- AUTO SAVE (TỰ ĐỘNG LƯU KHI THOÁT/ẨN APP) ---
     override fun onPause() {
         super.onPause()
         if (!isPostSubmittedOrDiscarded) {
@@ -196,12 +185,10 @@ class CreatePostFragment : Fragment() {
         }
     }
 
-    // Hàm thực hiện lưu nháp
     private fun performSaveDraft() {
         val title = binding.edtTitle.text.toString()
         val content = binding.edtContent.text.toString()
 
-        // Dù rỗng cũng lưu để đảm bảo trạng thái nhất quán
         viewModel.saveDraft(
             requireContext(),
             title,
@@ -280,7 +267,6 @@ class CreatePostFragment : Fragment() {
     }
 
     private fun handleExit() {
-        // Luôn hiện dialog confirm khi thoát, cho phép người dùng chọn Save/Discard
         showExitConfirmationDialog()
     }
 
@@ -289,18 +275,16 @@ class CreatePostFragment : Fragment() {
         val view = layoutInflater.inflate(R.layout.layout_exit_confirmation, null)
         dialog.setContentView(view)
 
-        // Nút Save as draft
         view.findViewById<View>(R.id.btnSaveDraft).setOnClickListener {
             performSaveDraft()
-            isPostSubmittedOrDiscarded = false // Để onPause không cần lưu lại lần nữa (hoặc cứ để nó lưu cũng ko sao)
+            isPostSubmittedOrDiscarded = false
             Toast.makeText(context, getString(R.string.msg_draft_saved), Toast.LENGTH_SHORT).show()
             dialog.dismiss()
             findNavController().popBackStack()
         }
 
-        // Nút Discard post (Xóa nháp)
         view.findViewById<View>(R.id.btnDiscardPost).setOnClickListener {
-            isPostSubmittedOrDiscarded = true // Đánh dấu để onPause KHÔNG lưu lại
+            isPostSubmittedOrDiscarded = true
             viewModel.clearDraft(requireContext())
             dialog.dismiss()
             findNavController().popBackStack()
@@ -398,9 +382,7 @@ class CreatePostFragment : Fragment() {
             when (state) {
                 is PostState.Loading -> { binding.btnSubmitPost.isEnabled = false; binding.btnSubmitPost.text = getString(R.string.status_posting) }
                 is PostState.Success -> {
-                    // Post thành công -> Đánh dấu xong để onPause không lưu lại -> Xóa draft
                     isPostSubmittedOrDiscarded = true
-                    // ViewModel đã tự gọi clearDraft trong hàm createPost khi success rồi
                     Toast.makeText(context, getString(R.string.msg_post_success), Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack()
                 }
@@ -597,24 +579,21 @@ class CreatePostFragment : Fragment() {
         binding.btnSubmitPost.alpha = if (isValid) 1.0f else 0.3f
     }
 
-    // Hàm kiểm tra video có dưới 2 phút (120000ms) không
     private fun isVideoDurationValid(uri: Uri): Boolean {
         return try {
             val mimeType = requireContext().contentResolver.getType(uri)
-            // Nếu là video thì mới kiểm tra
             if (mimeType?.startsWith("video") == true) {
                 val retriever = android.media.MediaMetadataRetriever()
                 retriever.setDataSource(requireContext(), uri)
                 val time = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION)
                 val timeInMillis = time?.toLong() ?: 0
                 retriever.release()
-                // 60000 ms = 1 phút
                 timeInMillis <= 60000
             } else {
-                true // Là ảnh thì luôn hợp lệ
+                true
             }
         } catch (e: Exception) {
-            true // Nếu lỗi đọc file (do file lạ) thì tạm cho qua
+            true
         }
     }
 }

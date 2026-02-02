@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.hcmus.forumus_client.databinding.ItemSelectedImageBinding
 
-// Adapter chuẩn nhận 2 tham số
 class SelectedImageAdapter(
     private val onDelete: (Uri) -> Unit,
     private val onItemClick: (Uri) -> Unit
@@ -36,13 +35,10 @@ class SelectedImageAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(uri: Uri) {
-            // Load ảnh
             Glide.with(itemView.context).load(uri).into(binding.ivSelected)
 
-            // Xóa (Dùng onDelete)
             binding.ivRemove.setOnClickListener { onDelete(uri) }
 
-            // Xem (Dùng onItemClick)
             binding.root.setOnClickListener { onItemClick(uri) }
         }
     }
